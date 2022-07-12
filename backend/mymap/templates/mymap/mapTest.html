@@ -1,0 +1,63 @@
+{% extends 'mymap/base.html' %} {% load static %} {% block content %}
+
+<main>
+    <div style="display: none" id="location_x" data-json="{{ location_x }}"></div>
+    <div style="display: none" id="location_y" data-json="{{ location_y }}"></div>
+    <div style="display: none" id="name" data-json="{{ name }}"></div>
+    <div id="map"></div>
+    <script>
+        function loadJson(selector) {
+            console.log(JSON.parse(document.querySelector(selector).getAttribute('data-json')));
+            return JSON.parse(document.querySelector(selector).getAttribute('data-json'));
+        }
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        let map = L.map('map').locate({
+            setView: true,
+            maxZoom: 19,
+            enableHighAccuracy: true,
+        }).on("locationfound", (e) => map.setView(e.latlng, 16)).on("locationerror", () => map.setView([50.586276, 5.560470], 14));
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
+            maxZoom: 19,
+            zoom: 16,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        let popup = L.popup();
+        const location_x = loadJson('#location_x');
+        const location_y = loadJson('#location_y');
+        const name = loadJson('#name');
+
+        var greenIcon = L.icon({
+            iconUrl: "{% static 'mymap/images/marker.png' %}",
+            //shadowUrl: "{% static 'mymap/images/marker.png' %}",
+            iconSize: [24, 28.5], // size of the icon 
+            //shadowSize: [0, 0], // size of the shadow
+            iconAnchor: [12, 28.5], // point of the icon which will correspond to marker 's location
+            //shadowAnchor: [0, 0], // the same for the shadow
+            popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+
+        L.marker([48.5, 0.5], {
+            icon: greenIcon
+        }).addTo(map);
+
+        var markers = new L.MarkerClusterGroup();
+
+
+        for (let i = 0; i < location_x.length; i++) {
+
+            markers.addLayer(L.marker([location_y[i], location_x[i]]));
+        }
+
+        map.addLayer(markers);
+        map.on('click ', onMapClick);
+    </script>
+</main>
+{% endblock %}

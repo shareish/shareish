@@ -1,0 +1,121 @@
+﻿{% extends 'mymap/base.html' %} {% load static %} {% block content %}
+<main>
+    {% if name and type and cat1 %}
+
+    <p>You successfully added the article to the database</p>
+    <meta http-equiv="refresh" content="0.5; URL={% url 'detailBarter' id %}" /> {% elif name or type or cat1 %}
+
+    <p>Something went wrong</p>
+
+    {% else %}
+
+    <form class="d-flex flex-column" method=POST action={% url 'addBarter' %} enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="inputBarterName">Name of the article</label>
+                <input type="text" class="form-control" id="inputBarterName" placeholder="Name..." name="name" required>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="barter_type">Type of the article</label>
+                <select class="form-control" id="barter_type" name="barter_type" required>
+                            <option value="BR">Barter</option>
+                            <option value="DN">Donation</option>
+                            <option value="LN">Loan</option>
+                        </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label for="category1">Category 1</label>
+                <select class="form-control" id="category1" name="category1" required>
+                            <option value="FD">Food</option>
+                            <option value="AN">Animals</option>
+                            <option value="EN">Arts and Entertainments</option>
+                            <option value="CL">Collectors</option>
+                            <option value="HL">Helping hand</option>
+                            <option value="DY">DIY</option>
+                            <option value="BT">Beauty and Well-being</option>
+                            <option value="CH">Childhood</option>
+                            <option value="IT">IT and Multimedia</option>
+                            <option value="GD">Garden</option>
+                            <option value="HS">House</option>
+                            <option value="HD">Holidays and Week-end</option>
+                            <option value="BK">Books, CDs and DVDs</option>
+                            <option value="SP">Sport and Leisure</option>
+                            <option value="TS">Transport and vehicle</option>
+                            <option value="OT">Other</option>
+                        </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="cat2Barter">Category 2</label>
+                <select class="form-control" id="cat2Barter" name="cat2">
+                            <option value="">--</option>
+                            <option value="FD">Food</option>
+                            <option value="AN">Animals</option>
+                            <option value="EN">Arts and Entertainments</option>
+                            <option value="CL">Collectors</option>
+                            <option value="HL">Helping hand</option>
+                            <option value="DY">DIY</option>
+                            <option value="BT">Beauty and Well-being</option>
+                            <option value="CH">Childhood</option>
+                            <option value="IT">IT and Multimedia</option>
+                            <option value="GD">Garden</option>
+                            <option value="HS">House</option>
+                            <option value="HD">Holidays and Week-end</option>
+                            <option value="BK">Books, CDs and DVDs</option>
+                            <option value="SP">Sport and Leisure</option>
+                            <option value="TS">Transport and vehicle</option>
+                        </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="cat3Barter">Category 3</label>
+                <select class="form-control" id="cat3Barter" name="cat3">
+                            <option value="">--</option>
+                            <option value="FD">Food</option>
+                            <option value="AN">Animals</option>
+                            <option value="EN">Arts and Entertainments</option>
+                            <option value="CL">Collectors</option>
+                            <option value="HL">Helping hand</option>
+                            <option value="DY">DIY</option>
+                            <option value="BT">Beauty and Well-being</option>
+                            <option value="CH">Childhood</option>
+                            <option value="IT">IT and Multimedia</option>
+                            <option value="GD">Garden</option>
+                            <option value="HS">House</option>
+                            <option value="HD">Holidays and Week-end</option>
+                            <option value="BK">Books, CDs and DVDs</option>
+                            <option value="SP">Sport and Leisure</option>
+                            <option value="TS">Transport and vehicle</option>
+                        </select>
+            </div>
+        </div>
+
+        <div class="row d-flex">
+            <div class="form-group col-md-4 file-upload-wrapper">
+                <label for="imageFile">Images</label><br />
+                <input type="file" id="imageFile" name="images" accept="image/*" multiple />
+            </div>
+        </div>
+
+        <div class="row d-flex">
+            <div class="form-group col-md-6">
+                <label for="descriptionBarter">Description</label>
+                <textarea class="form-control" maxlength="500" id="descriptionBarter" placeholder="Description..." name="description" required></textarea>
+            </div>
+            <div class="col-md-2">
+                <br/>
+                <button type="submit" class="btn btn-primary mb-2">Add Barter</button>
+            </div>
+        </div>
+
+
+    </form>
+
+    {% endif %}
+
+</main>
+{% endblock %}
