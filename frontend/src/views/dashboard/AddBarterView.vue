@@ -11,7 +11,6 @@
                         <input type="text" class="input" name="name" v-model="barter.name" required>
                     </div>
                 </div>
-                <!-- And keep going with the form -->
             </div>
             <div class="column is-one-third">
                 <div class="field">
@@ -113,7 +112,7 @@
         </div>
 
         <div class="columns">
-            <div class="column is-half">
+            <div class="column is-one-third">
                 <label>Images</label>
                 <div class="field">
                     <div class="control">
@@ -130,6 +129,14 @@
                                 </span>
                             </label>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-two-thirds">
+                <div class="field">
+                    <label>Address</label>
+                    <div class="control">
+                        <input type="text" class="input" name="location" v-model="barter.location" required>
                     </div>
                 </div>
             </div>
@@ -186,12 +193,10 @@ export default {
                     }
                     axios
                         .post('/api/v1/images/', formData)
-                        .then(response => {
-                            this.$router.push('/dashboard/barters')
-                        })
                         .catch(error => {
                             console.log(JSON.stringify(error));
                         });
+                    this.$router.push('/dashboard/barters')
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))

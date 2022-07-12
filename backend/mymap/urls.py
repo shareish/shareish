@@ -10,4 +10,5 @@ router.register("users", UserViewSet, basename="users")
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('request/', views.searchBarter, name='search_barter'),
 ]

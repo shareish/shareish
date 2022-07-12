@@ -94,7 +94,7 @@ export default {
             axios
                 .get('/api/v1/barters/')
                 .then(response => {
-                    console.log(response)
+                    console.log(response.data)
                     for(let i = 0; i < response.data.length; i++){
                         this.barters.push(response.data[i])
                         if(response.data[i]['images'][0]){

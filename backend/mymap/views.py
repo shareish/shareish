@@ -15,10 +15,13 @@ logger = logging.getLogger('django')
 
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.core import serializers
 from mymap.serializers import BarterSerializer, UserSerializer, BarterImageSerializer
-from rest_framework.renderers import TemplateHTMLRenderer
+
+from geopy.geocoders import Nominatim
+locator = Nominatim(user_agent="shareish")
 
 #@login_required
 def index(request):
@@ -122,8 +125,17 @@ class BarterViewSet(viewsets.ModelViewSet):
     queryset = Barter.objects.all()
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = request.data
+        print(data)
+        address = data['location']
+        if address != '':
+            geoloc = locator.geocode(address)[-1]
+            if geoloc != None:
+                data['location'] = "SRID=4326;POINT (" + str(geoloc[1]) + " " + str(geoloc[0]) + ")"
+
+        serializer = self.get_serializer(data=data)
         if serializer.is_valid():
+            print('salut')
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -218,11 +230,29 @@ def showContent(request):
     return HttpResponse("Hello. You're at the content.")
 
 #@login_required
+@api_view(['POST'])
 def searchBarter(request):
     if request.method == "POST":
-        searched = request.POST['searched']
-        barters = Barter.objects.filter(name__icontains=searched)
-        return render(request, 'mymap/search_barter.html', {'searched' : searched, 'barters' : barters, 'user': request.user})
+        searched = request.data
+        barters_name = None
+        barters_barter_type = None
+        barters_category = None
+        barters = Barter.objects.none()
+        if 'name' in searched:
+            barters_name = Barter.objects.filter(name__icontains=searched['name'])
+            barters_description = Barter.objects.filter(description__icontains=searched['name'])
+            barters = barters | barters_description | barters_name
+        if 'barter_type' in searched:
+            barters_barter_type = Barter.objects.filter(barter_type__exact=searched['barter_type'])
+            barters = barters | barters_barter_type
+        if 'category' in searched:
+            barters_category1 = Barter.objects.filter(category1__exact='FD')
+            barters_category2 = Barter.objects.filter(category2__exact=searched['category'])
+            barters_category3 = Barter.objects.filter(category3__exact=searched['category'])
+            barters = barters | barters_category1 | barters_category2 | barters_category3
+
+            serialized_barters = serializers.serialize('jsonl', list(barters), fields=('id', 'name', 'location'))
+        return Response(serialized_barters, status=status.HTTP_200_OK)
     else:
         return render(request, 'mymap/search_barter.html', {'user': request.user})
 
