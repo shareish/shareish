@@ -27,7 +27,7 @@
                         <label>Type of the article</label>
                         <div class="control">
                             <div class="select">
-                                <select name="type" id="type" v-model="filter.barter_type" >
+                                <select name="type" id="type" v-model="filter.item_type" >
                                     <option value="BR">Barter</option>
                                     <option value="DN">Donation</option>
                                     <option value="LN">Loan</option>
@@ -107,7 +107,7 @@ export default {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
-        await this.getBartersLocation()
+        await this.getItemsLocation()
         console.log(this.locations)
 
         var markers = new L.MarkerClusterGroup();
@@ -117,12 +117,11 @@ export default {
         }
 
         this.map.addLayer(markers);
-
     },
     methods: {
-        async getBartersLocation(){
+        async getItemsLocation(){
             await axios
-                .get('/api/v1/barters/')
+                .get('/api/v1/items/')
                 .then(response => {
                     for(let i = 0; i < response.data.length; i++){
                         if(response.data[i]['location'] != null){
@@ -147,7 +146,7 @@ export default {
             axios
                 .post('/api/v1/request/', this.filter)
                 .then(response => {
-                    console.log(response.data[0])
+                    console.log(response.data)
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))

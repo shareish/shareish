@@ -1,14 +1,14 @@
 <template>
-    <div class="page-add-barter">
+    <div class="page-add-item">
         <div class="columns is-multiline is-mobile">
             <div class="column is-full">
-                <h1 class="title">Add barter</h1>
+                <h1 class="title">Add item</h1>
             </div>
             <div class="column is-two-thirds">
                 <div class="field">
                     <label>Name of the article</label>
                     <div class="control">
-                        <input type="text" class="input" name="name" v-model="barter.name" required>
+                        <input type="text" class="input" name="name" v-model="item.name" required>
                     </div>
                 </div>
             </div>
@@ -17,7 +17,7 @@
                     <label>Type of the article</label>
                     <div class="control">
                         <div class="select">
-                            <select name="type" id="type" v-model="barter.barter_type" required>
+                            <select name="type" id="type" v-model="item.item_type" required>
                                 <option value="BR">Barter</option>
                                 <option value="DN">Donation</option>
                                 <option value="LN">Loan</option>
@@ -31,7 +31,7 @@
                     <label>Category 1</label>
                     <div class="control">
                         <div class="select">
-                            <select id="category1" name="category1" v-model="barter.category1" required>
+                            <select id="category1" name="category1" v-model="item.category1" required>
                                 <option value="FD">Food</option>
                                 <option value="AN">Animals</option>
                                 <option value="EN">Arts and Entertainments</option>
@@ -58,7 +58,7 @@
                     <label>Category 2</label>
                     <div class="control">
                         <div class="select">
-                            <select id="category2" name="category2" v-model="barter.category2" required>
+                            <select id="category2" name="category2" v-model="item.category2" required>
                                 <option value="">--</option>
                                 <option value="FD">Food</option>
                                 <option value="AN">Animals</option>
@@ -86,7 +86,7 @@
                     <label>Category 3</label>
                     <div class="control">
                         <div class="select">
-                            <select id="category3" name="category3" v-model="barter.category3" required>
+                            <select id="category3" name="category3" v-model="item.category3" required>
                                 <option value="">--</option>
                                 <option value="FD">Food</option>
                                 <option value="AN">Animals</option>
@@ -136,7 +136,7 @@
                 <div class="field">
                     <label>Address</label>
                     <div class="control">
-                        <input type="text" class="input" name="location" v-model="barter.location" required>
+                        <input type="text" class="input" name="location" v-model="item.location" required>
                     </div>
                 </div>
             </div>
@@ -145,10 +145,10 @@
 
         <div class="columns is-multiline">
             <div class="column is-two-third">
-                <label for="descriptionBarter">Description</label>
+                <label for="descriptionItem">Description</label>
                 <div class="field">
                     <div class="control">
-                        <textarea class="textarea" maxlength="500" id="description" placeholder="Description..." name="description" v-model="barter.description" required>
+                        <textarea class="textarea" maxlength="500" id="description" placeholder="Description..." name="description" v-model="item.description" required>
                         </textarea>
                     </div>
                 </div>
@@ -165,11 +165,11 @@
 <script>
 import axios from 'axios'
 export default {
-    name: "AddBarter",
+    name: "AddItem",
     data() {
         return {
-            barter: {},
-            images: '',
+            item: {},
+            files: '',
         }
     },
     mounted() {
@@ -180,23 +180,26 @@ export default {
             this.files = event.target.files;
         },
         submitForm(){
-            this.barter['images'] = []
+            this.item['images'] = []
             axios
-                .post('/api/v1/barters/', this.barter)
+                .post('/api/v1/items/', this.item)
                 .then(response => {
-                    this.barter['id'] = response.data['id']
-                    let formData = new FormData();
-                    formData.append('barterID', this.barter['id'])
-                    for( var i = 0; i < this.files.length; i++ ){
-                        let file = this.files[i];
-                        formData.append('files', file);
+                    if(Object.keys(this.files).length > 0){
+                      
+                        this.item['id'] = response.data['id']
+                        let formData = new FormData();
+                        formData.append('itemID', this.item['id'])
+                        for( var i = 0; i < this.files.length; i++ ){
+                            let file = this.files[i];
+                            formData.append('files', file);
+                        }
+                        axios
+                            .post('/api/v1/images/', formData)
+                            .catch(error => {
+                                console.log(JSON.stringify(error));
+                            });   
                     }
-                    axios
-                        .post('/api/v1/images/', formData)
-                        .catch(error => {
-                            console.log(JSON.stringify(error));
-                        });
-                    this.$router.push('/dashboard/barters')
+                    this.$router.push('/dashboard/items')
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))

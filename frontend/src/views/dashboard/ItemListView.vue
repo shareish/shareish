@@ -1,21 +1,21 @@
 <template>
-    <div class="page-barter">
+    <div class="page-item">
         <div class="columns is-multiline">
             <div class="column is-12">
-                <h1 class="title">Barters</h1>
+                <h1 class="title">Items</h1>
             </div>
 
-            <div class="column is-3" v-for="barter in barters" v-bind:key="barter.id">
+            <div class="column is-3" v-for="item in items" v-bind:key="item.id">
                 <!-- <div class="box">
-                    <h3 class="is-size-4 mb-4">{{ barter.name }}</h3>
-                    <router-link :to="{ name: 'barterDetail', params: { id: barter.id }}" class="button is-light">Details</router-link>
+                    <h3 class="is-size-4 mb-4">{{ item.name }}</h3>
+                    <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-light">Details</router-link>
                 </div> -->
 
                 <div class="card">
                     <div class="card-image">
 
-                        <figure v-if="getImageURL(barter.id)" class="image is-4by3">
-                            <img :src="getImageURL(barter.id)" alt="Placeholder image">
+                        <figure v-if="getImageURL(item.id)" class="image is-4by3">
+                            <img :src="getImageURL(item.id)" alt="Placeholder image">
                         </figure>
                         <div v-else class="image is-4by3">
                             No content Image
@@ -25,19 +25,19 @@
                         <div class="media">
                             <div class="media-left">
                                 <figure class="image is-48x48">
-                                <!-- <img :src="getSmallImageURL(barter.id)" alt="Placeholder image"> -->User's photo
+                                <!-- <img :src="getSmallImageURL(item.id)" alt="Placeholder image"> -->User's photo
                                 </figure>
                             </div>
                             <div class="media-content">
-                                <p class="title is-4">{{ barter.name }}</p>
-                                <p class="subtitle is-6">{{ barter.category1 }}</p>
+                                <p class="title is-4">{{ item.name }}</p>
+                                <p class="subtitle is-6">{{ item.category1 }}</p>
                             </div>
                         </div>
 
                         <div class="content">
-                            {{ barter.description }}
+                            {{ item.description }}
                             <br>
-                            <router-link :to="{ name: 'barterDetail', params: { id: barter.id }}" class="button is-light">Details</router-link>
+                            <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-light">Details</router-link>
                         </div>
                     </div>
                 </div>
@@ -51,25 +51,25 @@
 <script>
 import axios from 'axios'
 export default {
-    name: 'Barter',
+    name: 'Item',
     data() {
         return {
-            barters: [],
+            items: [],
             images: {},
             images2: {}
         }
     },
     mounted() {
-        this.getBarters()
+        this.getItems()
     },
     methods: {
         //ATTENTION le code est pas beau mais ça marchait pas sinon et je ne comprends pas pourquoi
-        // async getBarters() {
+        // async getItems() {
         //     await axios
-        //         .get('/api/v1/barters/')
+        //         .get('/api/v1/items/')
         //         .then(response => {
         //             for(let i = 0; i < response.data.length; i++){
-        //                 this.barters.push(response.data[i])
+        //                 this.items.push(response.data[i])
         //                 if(response.data[i]['images'][0]){
         //                     var image = this.getImage(response.data[i]['images'][0])
         //                     console.log(image)
@@ -90,13 +90,13 @@ export default {
         //         })
         // },
 
-        getBarters() {
+        getItems() {
             axios
-                .get('/api/v1/barters/')
+                .get('/api/v1/items/')
                 .then(response => {
                     console.log(response.data)
                     for(let i = 0; i < response.data.length; i++){
-                        this.barters.push(response.data[i])
+                        this.items.push(response.data[i])
                         if(response.data[i]['images'][0]){
                             axios
                                 .get(`/api/v1/images/${response.data[i]['images'][0]}`)

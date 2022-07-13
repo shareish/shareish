@@ -10,8 +10,8 @@
       <div class="navbar-menu">
         <div class="navbar-end">
           <template v-if="$store.state.isAuthenticated">
-            <router-link to="/dashboard/barters" class="navbar-item">Barters</router-link>
-            <router-link to="/dashboard/barters/add" class="navbar-item">Add barter</router-link>
+            <router-link to="/dashboard/items" class="navbar-item">Items</router-link>
+            <router-link to="/dashboard/items/add" class="navbar-item">Add item</router-link>
             <router-link to="/dashboard/my-account" class="navbar-item">My Account</router-link>
           </template>
 
@@ -53,7 +53,7 @@
                     <p>
                         <a @click="goto('/')" class="text-reset">Home</a><br />
                         <a @click="goto('/dashboard/my-account')" class="text-reset">Profil</a><br />
-                        <!--<a @click="goto('/add-barter')" class="text-reset">Add barter</a><br />
+                        <!--<a @click="goto('/add-item')" class="text-reset">Add item</a><br />
                         <a @click="goto('/groups')" class="text-reset">Groups</a><br />-->
                         
                     </p>

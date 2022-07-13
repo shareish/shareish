@@ -39,5 +39,5 @@ class UsersManagersTests(TestCase):
             User.objects.create_superuser(
                 email='super@user.com', password='foo', is_superuser=False)
 
-class BartersTests(TestCase):
+class ItemsTests(TestCase):
     pass

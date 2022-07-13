@@ -1,5 +1,5 @@
 from django import forms
-from .models import Barter
+from .models import Item
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
@@ -34,7 +34,7 @@ class LoginForm(forms.ModelForm):
                 if not authenticate(email=email,password=password):
                     raise forms.ValidationError("Invalid LOGIN")
 
-class BarterForm(forms.ModelForm):
+class ItemForm(forms.ModelForm):
     class Meta:
-        model= Barter
-        fields= ["name", "barter_type", "category1", "category2", "category3", "description"]#, "image"]#, "location"]
+        model= Item
+        fields= ["name", "item_type", "category1", "category2", "category3", "description"]

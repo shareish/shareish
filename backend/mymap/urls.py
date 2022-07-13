@@ -1,14 +1,14 @@
 from django.urls import path, include
 from . import views
-from .views import BarterViewSet, BarterImageViewSet, UserViewSet
+from .views import ItemViewSet, ItemImageViewSet, UserViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register("barters", BarterViewSet, basename="barters")
-router.register("images", BarterImageViewSet, basename="images")
+router.register("items", ItemViewSet, basename="items")
+router.register("images", ItemImageViewSet, basename="images")
 router.register("users", UserViewSet, basename="users")
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('request/', views.searchBarter, name='search_barter'),
+    path('request/', views.searchItem, name='search_item'),
 ]

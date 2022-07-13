@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import Barter, BarterImage, User
+from .models import Item, ItemImage, User
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -75,8 +75,8 @@ class UserAdmin(BaseUserAdmin):
 geoadmin.site.register(get_user_model(), UserAdmin)
 geoadmin.site.unregister(Group)
 
-class BarterAdmin(geoadmin.OSMGeoAdmin):
-    list_display = ("name", "location", "description", "barter_type", "user")
+class ItemAdmin(geoadmin.OSMGeoAdmin):
+    list_display = ("name", "location", "description", "item_type", "user")
 
-geoadmin.site.register(Barter)
-geoadmin.site.register(BarterImage)
+geoadmin.site.register(Item)
+geoadmin.site.register(ItemImage)

@@ -4,9 +4,9 @@ import Dashboard from '../views/dashboard/DashboardView.vue'
 import SignUp from '../views/SignUpView.vue'
 import Login from '../views/LoginView.vue'
 import MyAccount from '../views/dashboard/MyAccountView.vue'
-import Barters from '../views/dashboard/BarterListView.vue'
-import BarterDetail from '../views/dashboard/BarterDetailView.vue'
-import AddBarter from '../views/dashboard/AddBarterView.vue'
+import Items from '../views/dashboard/ItemListView.vue'
+import ItemDetail from '../views/dashboard/ItemDetailView.vue'
+import AddItem from '../views/dashboard/AddItemView.vue'
 
 import store from '../store'
 
@@ -51,25 +51,25 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/barters',
-        name: 'barters',
-        component: Barters,
+        path: '/dashboard/items',
+        name: 'items',
+        component: Items,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/barters/:id',
-        name: 'barterDetail',
-        component: BarterDetail,
+        path: '/dashboard/items/:id',
+        name: 'itemDetail',
+        component: ItemDetail,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/barters/add',
-        name: 'addBarter',
-        component: AddBarter,
+        path: '/dashboard/items/add',
+        name: 'addItem',
+        component: AddItem,
         meta: {
             requireLogin: true
         }

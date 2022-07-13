@@ -79,21 +79,21 @@ class User(AbstractBaseUser):
     class Meta:
         ordering = ['sign_in_date']
 
-class Barter(models.Model):
+class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
     location = models.PointField(blank=True, geography=True, null=True)
     in_progress = models.BooleanField(default=True)
     
-    class BarterType(models.TextChoices):
+    class ItemType(models.TextChoices):
         DONATION = 'DN', _('Donation')
         LOAN = 'LN', _('Loan')
         BARTER = 'BR', _('Barter')
     
-    barter_type = models.CharField(
+    item_type = models.CharField(
         max_length=2,
-        choices=BarterType.choices,
-        default=BarterType.BARTER
+        choices=ItemType.choices,
+        default=ItemType.BARTER
     )
 
     class Categories(models.TextChoices):
@@ -130,7 +130,7 @@ class Barter(models.Model):
         blank = True,
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="barters", on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
 
     image = models.ImageField(upload_to='tfe/uploads/', null=True, blank=True)
 
@@ -140,9 +140,9 @@ class Barter(models.Model):
     class Meta:
         ordering = ['name']
 
-class BarterImage(models.Model):
+class ItemImage(models.Model):
     image = models.ImageField(upload_to='tfe/uploads/')
-    barter = models.ForeignKey(Barter, related_name='images', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -154,7 +154,7 @@ class BarterImage(models.Model):
             img.save(self.image.path)
 
     def __str__(self) -> str:
-        return 'Image related to ' + self.barter.name + '.'
+        return 'Image related to ' + self.item.name + '.'
 
     class Meta:
-        ordering = ['barter']
+        ordering = ['item']

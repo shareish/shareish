@@ -1,16 +1,16 @@
 <template>
-    <div class="page-barter">
+    <div class="page-item">
         <div class="columns is-multiline">
             <div class="column is-full">
-                <h1 class="title">{{ barter.name }} {{ barter.id }}</h1>
+                <h1 class="title">{{ item.name }} {{ item.id }}</h1>
             </div>
             <div class="column is-half">
                 <h2 class="subtitle">Details</h2>
 
-                <p v-if="barter.category1">{{ barter.category1 }}</p>
-                <p v-if="barter.category2">{{ barter.category2 }}</p>
-                <p v-if="barter.category3">{{ barter.category3 }}</p>
-                <p v-if="barter.description">{{ barter.description }}</p>
+                <p v-if="item.category1">{{ item.category1 }}</p>
+                <p v-if="item.category2">{{ item.category2 }}</p>
+                <p v-if="item.category3">{{ item.category3 }}</p>
+                <p v-if="item.description">{{ item.description }}</p>
             </div>
             <div class="column is-half">
                 <figure class="image is-128x128">
@@ -20,47 +20,47 @@
         </div>
     </div>
 
-    <button class="button is-danger" @click="deleteBarter()" >Delete</button>
+    <button class="button is-danger" @click="deleteItem()" >Delete</button>
     
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-    name: 'BarterDetail',
+    name: 'ItemDetail',
     data() {
         return {
-            barter: {},
+            item: {},
             image : null
         }
     },
     mounted() {
-        this.getBarter()
+        this.getItem()
     },
     methods: {
         getImgUrl(){
             return this.image
         },
-        deleteBarter(){
-            const barterID = this.$route.params.id
+        deleteItem(){
+            const itemID = this.$route.params.id
             axios
-                .delete(`/api/v1/barters/${barterID}`)
+                .delete(`/api/v1/items/${itemID}`)
                 .then(response => {
-                    this.$router.push('/dashboard/barters')
+                    this.$router.push('/dashboard/items')
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
         },
-        getBarter() {
+        getItem() {
             console.log(this.$store.state.user.email)
-            const barterID = this.$route.params.id
+            const itemID = this.$route.params.id
             axios
-                .get(`/api/v1/barters/${barterID}`)
+                .get(`/api/v1/items/${itemID}`)
                 .then(response => {
-                    this.barter = response.data
+                    this.item = response.data
                     axios
-                        .get(`/api/v1/images/${this.barter['images'][0]}`)
+                        .get(`/api/v1/images/${this.item['images'][0]}`)
                         .then(response => {
                             this.image = response.data['image']
                             const localhost = 'http://localhost:8000'

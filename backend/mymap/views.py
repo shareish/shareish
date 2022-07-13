@@ -5,8 +5,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 import json
-from .models import Barter, BarterImage
-from .forms import SignUpForm, LoginForm, BarterForm
+from .models import Item, ItemImage
+from .forms import SignUpForm, LoginForm, ItemForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -18,40 +18,40 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core import serializers
-from mymap.serializers import BarterSerializer, UserSerializer, BarterImageSerializer
+from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer
 
 from geopy.geocoders import Nominatim
 locator = Nominatim(user_agent="shareish")
 
 #@login_required
 def index(request):
-    best_barter_list = Barter.objects.order_by('id')[:3]
+    best_item_list = Item.objects.order_by('id')[:3]
 
-    context = {'best_barter_list': best_barter_list, 'user' : request.user}
+    context = {'best_item_list': best_item_list, 'user' : request.user}
     return render(request, 'mymap/index.html', context)
 
 #@login_required
-def addBarter(request):
+def addItem(request):
     if request.method == "POST":
         """
         I should maybe create a class controller where i do all this stuff ? TODO ask Mr Marée about that
         """
-        form = BarterForm(request.POST, request.FILES)
+        form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
             name = request.POST['name']
-            type = request.POST['barter_type']
+            type = request.POST['item_type']
             cat1 = request.POST['category1']
             cat2 = request.POST.get('cat2', None)
             cat3 = request.POST.get('cat3', None)
             description = request.POST['description']
             images = request.FILES.getlist('images')
             if len(images)!=0:
-                barter = Barter(name = name, barter_type = type, category1 = cat1, category2 = cat2, category3 = cat3, description = description, user=request.user, image = images[0])
+                item = Item(name = name, item_type = type, category1 = cat1, category2 = cat2, category3 = cat3, description = description, user=request.user, image = images[0])
             else:
-                barter = Barter(name = name, barter_type = type, category1 = cat1, category2 = cat2, category3 = cat3, description = description, user=request.user)
-            barter.save()
+                item = Item(name = name, item_type = type, category1 = cat1, category2 = cat2, category3 = cat3, description = description, user=request.user)
+            item.save()
             for image in images:
-                newImage = BarterImage(image = image, barter = barter)
+                newImage = ItemImage(image = image, item = item)
                 newImage.save()
             return render(request, 'mymap/addBarter.html',
             {
@@ -62,10 +62,10 @@ def addBarter(request):
                 'cat3': cat3,
                 'description': description,
                 'user': request.user,
-                'id': barter.id
+                'id': item.id
             })
     else:
-        form = BarterForm()
+        form = ItemForm()
     return render(request, 'mymap/addBarter.html', {'user': request.user, 'form': form})
 
 def changeBType(btype):
@@ -111,18 +111,18 @@ def changeCategory(cat):
         return 'Other'
 
 def changeInstance(item):
-    item['barter_type'] = changeBType(item['barter_type'])
+    item['item_type'] = changeBType(item['item_type'])
     if item['category1']:
         item['category1'] = changeCategory(item['category1'])
     if item['category2']:
         item['category2'] = changeCategory(item['category2'])
     if item['category3']:
         item['category3'] = changeCategory(item['category3'])
-    return BarterImage.objects.filter(barter_id = item['id']).order_by('id')
+    return ItemImage.objects.filter(item_id = item['id']).order_by('id')
 
-class BarterViewSet(viewsets.ModelViewSet):
-    serializer_class = BarterSerializer
-    queryset = Barter.objects.all()
+class ItemViewSet(viewsets.ModelViewSet):
+    serializer_class = ItemSerializer
+    queryset = Item.objects.all()
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -150,19 +150,19 @@ class BarterViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         totalImages = []
         try:
-            barter = Barter.objects.get(pk=pk)
-        except Barter.DoesNotExist:
+            item = Item.objects.get(pk=pk)
+        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = BarterSerializer(barter)
+        serializer = ItemSerializer(item)
         totalImages.append(changeInstance(serializer.data))
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         try:
-            barter = Barter.objects.get(pk=pk)
-        except Barter.DoesNotExist:
+            item = Item.objects.get(pk=pk)
+        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = BarterSerializer(barter, data=request.data)
+        serializer = ItemSerializer(item, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -170,44 +170,44 @@ class BarterViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         try:
-            barter = Barter.objects.get(pk=pk)
-        except Barter.DoesNotExist:
+            item = Item.objects.get(pk=pk)
+        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        barter.delete()
+        item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class BarterImageViewSet(viewsets.ViewSet):
+class ItemImageViewSet(viewsets.ViewSet):
 
     def list(self, request):
-        images = BarterImage.objects.all()
-        serializer = BarterImageSerializer(images, many=True)
+        images = ItemImage.objects.all()
+        serializer = ItemImageSerializer(images, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        barter = Barter.objects.get(pk = request.POST['barterID'])
+        item = Item.objects.get(pk = request.POST['itemID'])
         print(request.FILES)
         images = request.FILES.getlist('files')
         for image in images:
             print('coucou')
-            newImage = BarterImage(image = image, barter = barter)
+            newImage = ItemImage(image = image, item = item)
             newImage.save()
             print(newImage)
         return Response(status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
-            image = BarterImage.objects.get(pk=pk)
-        except BarterImage.DoesNotExist:
+            image = ItemImage.objects.get(pk=pk)
+        except ItemImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = BarterImageSerializer(image)
+        serializer = ItemImageSerializer(image)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         try:
-            image = BarterImage.objects.get(pk=pk)
-        except BarterImage.DoesNotExist:
+            image = ItemImage.objects.get(pk=pk)
+        except ItemImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = BarterImageSerializer(image, data=request.data)
+        serializer = ItemImageSerializer(image, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -215,8 +215,8 @@ class BarterImageViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         try:
-            image = BarterImage.objects.get(pk=pk)
-        except BarterImage.DoesNotExist:
+            image = ItemImage.objects.get(pk=pk)
+        except ItemImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -231,37 +231,40 @@ def showContent(request):
 
 #@login_required
 @api_view(['POST'])
-def searchBarter(request):
+def searchItem(request):
     if request.method == "POST":
+        print(request.data)
         searched = request.data
-        barters_name = None
-        barters_barter_type = None
-        barters_category = None
-        barters = Barter.objects.none()
+        items_name = None
+        items_item_type = None
+        items_category1 = None
+        items_category2 = None
+        items_category3 = None
+        items = Item.objects.none()
         if 'name' in searched:
-            barters_name = Barter.objects.filter(name__icontains=searched['name'])
-            barters_description = Barter.objects.filter(description__icontains=searched['name'])
-            barters = barters | barters_description | barters_name
-        if 'barter_type' in searched:
-            barters_barter_type = Barter.objects.filter(barter_type__exact=searched['barter_type'])
-            barters = barters | barters_barter_type
+            items_name = Item.objects.filter(name__icontains=searched['name'])
+            items_description = Item.objects.filter(description__icontains=searched['name'])
+            items = items | items_description | items_name
+        if 'item_type' in searched:
+            items_item_type = Item.objects.filter(item_type__exact=searched['item_type'])
+            items = items | items_item_type
         if 'category' in searched:
-            barters_category1 = Barter.objects.filter(category1__exact='FD')
-            barters_category2 = Barter.objects.filter(category2__exact=searched['category'])
-            barters_category3 = Barter.objects.filter(category3__exact=searched['category'])
-            barters = barters | barters_category1 | barters_category2 | barters_category3
-
-            serialized_barters = serializers.serialize('jsonl', list(barters), fields=('id', 'name', 'location'))
-        return Response(serialized_barters, status=status.HTTP_200_OK)
+            items_category1 = Item.objects.filter(category1__exact=searched['category'])
+            items_category2 = Item.objects.filter(category2__exact=searched['category'])
+            items_category3 = Item.objects.filter(category3__exact=searched['category'])
+            items = items | items_category1 | items_category2 | items_category3
+        
+        serialized_items = ItemSerializer(items, many=True)
+        return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
-        return render(request, 'mymap/search_barter.html', {'user': request.user})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #@login_required
 def profil(request, user_id):
     print(user_id)
     user_information = get_object_or_404(User, pk=user_id)
-    barter_list = Barter.objects.filter(user__email = user_information.email).order_by('-id')[:2] #two last if the user wants more we should pt a button "see all barters"
-    return render(request, 'mymap/profil.html', {'user': request.user, 'barter_list': barter_list, 'user_information': user_information})
+    item_list = Item.objects.filter(user__email = user_information.email).order_by('-id')[:2] #two last if the user wants more we should pt a button "see all items"
+    return render(request, 'mymap/profil.html', {'user': request.user, 'item_list': item_list, 'user_information': user_information})
 
 #@login_required
 def groups(request):
@@ -283,18 +286,18 @@ def mapTest(request):
     else:
         lat_lon = g.lat_lon('2a02:a03f:a18f:5f00:6d80:7c8d:b686:3f60')
     '''
-    barter_list = Barter.objects.all()
+    item_list = Item.objects.all()
     location_x = []
     location_y = []
     name = []
-    for barter in barter_list:
-        if barter.location != None:
-            location_x.append(barter.location.x)
-            location_y.append(barter.location.y)
+    for item in item_list:
+        if item.location != None:
+            location_x.append(item.location.x)
+            location_y.append(item.location.y)
         else:
             location_x.append(None)
             location_y.append(None)
-        name.append(barter.name)
+        name.append(item.name)
 
 
     return render(request, 'mymap/mapTest.html', {'location_x': json.dumps(location_x), 'location_y': json.dumps(location_y), 'name': json.dumps(name)})

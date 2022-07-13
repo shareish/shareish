@@ -1,24 +1,24 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
-from mymap.models import Barter, BarterImage, User
+from mymap.models import Item, ItemImage, User
 
-class BarterSerializer(serializers.ModelSerializer):
-    images = serializers.PrimaryKeyRelatedField(many=True, queryset=BarterImage.objects.all(), allow_null=True)
+class ItemSerializer(serializers.ModelSerializer):
+    images = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemImage.objects.all(), allow_null=True)
     class Meta:
-        model = Barter
-        fields = ['id', 'name', 'description', 'location', 'in_progress', 'barter_type', 'category1', 'category2', 'category3', 'user', 'images']
+        model = Item
+        fields = ['id', 'name', 'description', 'location', 'in_progress', 'item_type', 'category1', 'category2', 'category3', 'user', 'images']
 
 class UserSerializer(serializers.ModelSerializer):
-    barters = serializers.PrimaryKeyRelatedField(many=True, queryset=Barter.objects.all(), allow_null=True)
+    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'barters']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'items']
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
         fields = ('email', 'password', 'username', 'first_name', 'last_name',)
 
-class BarterImageSerializer(serializers.ModelSerializer):
+class ItemImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BarterImage
-        fields = ['image', 'barter']
+        model = ItemImage
+        fields = ['image', 'item']

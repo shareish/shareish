@@ -33,23 +33,23 @@
                         </p>
                     </div>
                     <div class="container">
-                        <h2 class="is-size-3 has-text-centered mt-5">Last Barters</h2>
+                        <h2 class="is-size-3 has-text-centered mt-5">Last Items</h2>
                         <hr class="hr mx-auto has-text-centered">
                         <div class="columns is-multiline is-centered">
-                            <!-- <div class="column is-4" v-for="barter in barters" v-bind:key="barter.id">
+                            <!-- <div class="column is-4" v-for="item in items" v-bind:key="item.id">
                                 <div class="box is-shadowless has-border-grey has-background-white-bis">
-                                    <span class="tag is-dark is-medium">{{ barter.name }}</span>
+                                    <span class="tag is-dark is-medium">{{ item.name }}</span>
                                     <p class="is-size-6 mt-3 has-text-grey">
-                                        {{ barter.description }}
+                                        {{ item.description }}
                                     </p>
                                 </div>
                             </div> -->
-                            <div class="column is-6" v-for="barter in barters" v-bind:key="barter.id">
+                            <div class="column is-6" v-for="item in items" v-bind:key="item.id">
                                 <div class="card">
                                     <div class="card-image">
 
-                                        <figure v-if="getImageBarterURL(barter.id)" class="image is-4by3">
-                                            <img :src="getImageBarterURL(barter.id)" alt="Placeholder image">
+                                        <figure v-if="getImageItemURL(item.id)" class="image is-4by3">
+                                            <img :src="getImageItemURL(item.id)" alt="Placeholder image">
                                         </figure>
                                         <div v-else class="image is-4by3">
                                             No content Image
@@ -59,19 +59,19 @@
                                         <div class="media">
                                             <div class="media-left">
                                                 <figure class="image is-48x48">
-                                                <!-- <img :src="getSmallImageURL(barter.id)" alt="Placeholder image"> -->User's photo
+                                                <!-- <img :src="getSmallImageURL(item.id)" alt="Placeholder image"> -->User's photo
                                                 </figure>
                                             </div>
                                             <div class="media-content">
-                                                <p class="title is-4">{{ barter.name }}</p>
-                                                <p class="subtitle is-6">{{ barter.category1 }}</p>
+                                                <p class="title is-4">{{ item.name }}</p>
+                                                <p class="subtitle is-6">{{ item.category1 }}</p>
                                             </div>
                                         </div>
 
                                         <div class="content">
-                                            {{ barter.description }}
+                                            {{ item.description }}
                                             <br>
-                                            <router-link :to="{ name: 'barterDetail', params: { id: barter.id }}" class="button is-light">Details</router-link>
+                                            <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-light">Details</router-link>
                                         </div>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@ export default {
     data() {
         return {
             user: {},
-            barters: [],
+            items: [],
             images: {}
         }
     },
@@ -128,18 +128,18 @@ export default {
                 .get('/api/v1/users/me/')
                 .then(response => {
                     this.user = response.data
-                    this.getBarters(response)
+                    this.getItems(response)
                 })
                 .catch(error1 => {
                     console.log(JSON.stringify(error1))
                 })
         },
-        getBarters(user) {
-            for(let i = 0; i < user.data['barters'].length; i++){
+        getItems(user) {
+            for(let i = 0; i < user.data['items'].length; i++){
                 axios
-                    .get(`/api/v1/barters/${user.data['barters'][i]}`)
+                    .get(`/api/v1/items/${user.data['items'][i]}`)
                     .then(response => {
-                        this.barters.push(response.data)
+                        this.items.push(response.data)
                         if(response.data['images'][0]){
                             axios
                                 .get(`/api/v1/images/${response.data['images'][0]}`)
@@ -166,7 +166,7 @@ export default {
             const localhost = "http://localhost:8000"
             return localhost.concat(image)
         },
-        getImageBarterURL(index){
+        getImageItemURL(index){
             return this.images[index]
         },
         getSmallImageURL(index){
@@ -177,4 +177,4 @@ export default {
 </script>
 
 
-<!-- TODO Faire en sorte qu'on puisse clicker sur les barters-->
+<!-- TODO Faire en sorte qu'on puisse clicker sur les items-->
