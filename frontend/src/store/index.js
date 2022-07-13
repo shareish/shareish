@@ -6,7 +6,7 @@ export default createStore({
             email: '',
         },
         isAuthenticated: false,
-        token: ''
+        token: '',
     },
     getters: {},
     mutations: {

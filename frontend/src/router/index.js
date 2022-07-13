@@ -9,6 +9,7 @@ import ItemDetail from '../views/dashboard/ItemDetailView.vue'
 import AddItem from '../views/dashboard/AddItemView.vue'
 
 import store from '../store'
+import i18n from '@/i18n'
 
 const routes = [{
         path: '/',
@@ -83,6 +84,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
+        i18n.locale = localStorage.getItem('language') || 'en'
         next('/log-in')
     } else {
         next()

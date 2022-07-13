@@ -2,21 +2,21 @@
     <div class="page-dashboard">
         <div class="columns is-multiline">
             <div class="column is-12">
-                <h1 class="title has-text-centered">Welcome to SHAREISH</h1>
+                <h1 class="title has-text-centered"> {{ $t('welcome') }} </h1>
             </div>
         </div>
 
         <nav class="level-right">
             <button class="button level-right" @click="show = !show">
-                <p v-if="show">Hide filters</p>
-                <p v-else>Show filters</p>
+                <p v-if="show">{{ $t('hide') }}</p>
+                <p v-else>{{ $t('showFilter') }}</p>
             </button>
         </nav>
         <Transition>
             <div v-if="show" class="columns is-multiline is-mobile">
                 <div class="column is-two-thirds">
                     <div class="field">
-                        <label>Text to search (in the description or in the name)</label>
+                        <label>{{ $t('filter-name') }}</label>
                         <div class="control">
                             <input type="text" class="input" name="name" v-model="filter.name" >
                         </div>
@@ -24,13 +24,13 @@
                 </div>
                 <div class="column is-one-third">
                     <div class="field">
-                        <label>Type of the article</label>
+                        <label>{{ $t('filter-type') }}</label>
                         <div class="control">
                             <div class="select">
                                 <select name="type" id="type" v-model="filter.item_type" >
-                                    <option value="BR">Barter</option>
-                                    <option value="DN">Donation</option>
-                                    <option value="LN">Loan</option>
+                                    <option value="BR">{{ $t('barter') }}</option>
+                                    <option value="DN">{{ $t('donation') }}</option>
+                                    <option value="LN">{{ $t('loan') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -38,26 +38,26 @@
                 </div>
                 <div class="column is-quarter">
                     <div class="field">
-                        <label>Category</label>
+                        <label>{{ $t('category') }}</label>
                         <div class="control">
                             <div class="select">
                                 <select id="category" name="category" v-model="filter.category" >
-                                    <option value="FD">Food</option>
-                                    <option value="AN">Animals</option>
-                                    <option value="EN">Arts and Entertainments</option>
-                                    <option value="CL">Collectors</option>
-                                    <option value="HL">Helping hand</option>
-                                    <option value="DY">DIY</option>
-                                    <option value="BT">Beauty and Well-being</option>
-                                    <option value="CH">Childhood</option>
-                                    <option value="IT">IT and Multimedia</option>
-                                    <option value="GD">Garden</option>
-                                    <option value="HS">House</option>
-                                    <option value="HD">Holidays and Week-end</option>
-                                    <option value="BK">Books, CDs and DVDs</option>
-                                    <option value="SP">Sport and Leisure</option>
-                                    <option value="TS">Transport and vehicle</option>
-                                    <option value="OT">Other</option>
+                                    <option value="FD">{{ $t('food') }}</option>
+                                    <option value="AN">{{ $t('animals') }}</option>
+                                    <option value="EN">{{ $t('aee') }}</option>
+                                    <option value="CL">{{ $t('collectors') }}</option>
+                                    <option value="HL">{{ $t('hh') }}</option>
+                                    <option value="DY">{{ $t('diy') }}</option>
+                                    <option value="BT">{{ $t('beauty') }}</option>
+                                    <option value="CH">{{ $t('childhood') }}</option>
+                                    <option value="IT">{{ $t('it') }}</option>
+                                    <option value="GD">{{ $t('garden') }}</option>
+                                    <option value="HS">{{ $t('house') }}</option>
+                                    <option value="HD">{{ $t('holidays') }}</option>
+                                    <option value="BK">{{ $t('book') }}</option>
+                                    <option value="SP">{{ $t('sport') }}</option>
+                                    <option value="TS">{{ $t('transport') }}</option>
+                                    <option value="OT">{{ $t('other') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="column is-full">
                     <div class="field">
-                        <button class="button is-success" @click="submitFilters">Search</button>
+                        <button class="button is-success" @click="submitFilters">{{ $t('search') }}</button>
                     </div>
                 </div>
             </div>

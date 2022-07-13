@@ -10,6 +10,14 @@
       <div class="navbar-menu">
         <div class="navbar-end">
           <template v-if="$store.state.isAuthenticated">
+            <div class="navbar-item">
+              <div class="select is-rounded">
+                <select v-model="$i18n.locale" @change="changeLanguage">
+                  <option value="en">En</option>
+                  <option value="fr">Fr</option>
+                </select>
+              </div>
+            </div>
             <router-link to="/dashboard/items" class="navbar-item">Items</router-link>
             <router-link to="/dashboard/items/add" class="navbar-item">Add item</router-link>
             <router-link to="/dashboard/my-account" class="navbar-item">My Account</router-link>
@@ -20,6 +28,10 @@
 
             <div class="navbar-item">
               <div class="buttons">
+                <select v-model="$i18n.locale" @change="changeLanguage">
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                </select>
                 <router-link to="/sign-up" class="button is-success"><strong>Sign up</strong></router-link>
                 <router-link to="/log-in" class="button is-light">Log in</router-link>
               </div>
@@ -95,7 +107,10 @@
     methods: {
       goto(url) {
         this.$router.push(url)
-      }
+      },
+      changeLanguage(obj){
+        localStorage.setItem('language',obj.target.value)
+      },
     },
   }
 </script>
