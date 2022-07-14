@@ -38,7 +38,6 @@ class MyUserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    #TODO ajouter photo à l'utilisateur
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=20, blank=True)
     birth_date = models.DateField(default=date.today, blank=True)
@@ -51,7 +50,7 @@ class User(AbstractBaseUser):
     image = models.ImageField(upload_to='tfe/uploads/', null=True, blank=True)
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['image']
     """
     Use what's in this to have a better database later:
     https://stackoverflow.com/questions/310540/best-practices-for-storing-postal-addresses-in-a-database-rdbms

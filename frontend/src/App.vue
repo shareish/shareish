@@ -25,13 +25,16 @@
 
           <template v-else>
             <router-link to="/" class="navbar-item">Home</router-link>
-
+            <div class="navbar-item">
+              <div class="select is-rounded">
+                <select v-model="$i18n.locale" @change="changeLanguage">
+                  <option value="en">En</option>
+                  <option value="fr">Fr</option>
+                </select>
+              </div>
+            </div>
             <div class="navbar-item">
               <div class="buttons">
-                <select v-model="$i18n.locale" @change="changeLanguage">
-                    <option value="en">English</option>
-                    <option value="fr">French</option>
-                </select>
                 <router-link to="/sign-up" class="button is-success"><strong>Sign up</strong></router-link>
                 <router-link to="/log-in" class="button is-light">Log in</router-link>
               </div>

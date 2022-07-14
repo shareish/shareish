@@ -19,6 +19,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core import serializers
 from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer
+from .permissions import IsOwnerProfileOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 from geopy.geocoders import Nominatim
 locator = Nominatim(user_agent="shareish")
@@ -224,7 +226,8 @@ class ItemImageViewSet(viewsets.ViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-
+    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
+    
 #@login_required
 def showContent(request):
     return HttpResponse("Hello. You're at the content.")

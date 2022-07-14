@@ -18,14 +18,17 @@
                             <img :src="getImageURL(item.id)" alt="Placeholder image">
                         </figure>
                         <div v-else class="image is-4by3">
-                            No content Image
+                           <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
                         </div>
                     </div>
                     <div class="card-content">
                         <div class="media">
                             <div class="media-left">
-                                <figure class="image is-48x48">
-                                <!-- <img :src="getSmallImageURL(item.id)" alt="Placeholder image"> -->User's photo
+                                <figure v-if="getSmallImageURL(item.id)" class="image is-48x48">
+                                    <img class="is-rounded" :src="getSmallImageURL(item.id)" alt="Placeholder image">
+                                </figure>
+                                <figure class="image is-inline-block is-responsive is-48x48" v-else>
+                                    <img class="is-rounded" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
                                 </figure>
                             </div>
                             <div class="media-content">
@@ -34,10 +37,11 @@
                             </div>
                         </div>
 
-                        <div class="content">
+                        <div class="content has-text-centered">
                             {{ item.description }}
                             <br>
-                            <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-light">Details</router-link>
+                            <br>
+                            <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-info is-normal is-responsive">Details</router-link>
                         </div>
                     </div>
                 </div>
@@ -50,17 +54,18 @@
 
 <script>
 import axios from 'axios'
+import imagefinder from "../../assets/imagefinder.json"
 export default {
     name: 'Item',
     data() {
         return {
             items: [],
             images: {},
-            images2: {}
+            images2: []
         }
     },
-    mounted() {
-        this.getItems()
+    async mounted() {
+        await this.getItems()
     },
     methods: {
         //ATTENTION le code est pas beau mais ça marchait pas sinon et je ne comprends pas pourquoi
@@ -90,11 +95,10 @@ export default {
         //         })
         // },
 
-        getItems() {
-            axios
+        async getItems() {
+            await axios
                 .get('/api/v1/items/')
                 .then(response => {
-                    console.log(response.data)
                     for(let i = 0; i < response.data.length; i++){
                         this.items.push(response.data[i])
                         if(response.data[i]['images'][0]){
@@ -102,31 +106,25 @@ export default {
                                 .get(`/api/v1/images/${response.data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    console.log(image)
                                     const localhost = 'http://localhost:8000'
                                     image = localhost.concat(image)
                                     this.images[response.data[i]['id']] = image
-
-                                    // if(response.data[i]['user']){
-                                    //     axios
-                                    //         .get(`/api/v1/users/${response.data[i]['user']}`)
-                                    //         .then(response3 => {
-                                    //             var image2 = response3.data['image']
-                                    //             image2 = localhost.concat(image2)
-                                    //             this.images2[response.data[i]['id']] = image2
-                                    //         })
-                                    //         .catch(error => {
-                                    //             console.log(JSON.stringify(error))
-                                    //         })
-                                    // }.
-                                    // A voir plus tard pour la photo de profil de l'utilisateur
+                                })
+                                .catch(error => {
+                                    console.log(JSON.stringify(error))
+                                })
+                        }
+                        if(response.data[i]['user']){
+                            axios
+                                .get(`/api/v1/users/${response.data[i]['user']}`)
+                                .then(response3 => {
+                                    this.images2[response.data[i]['id']] = response3.data['image']
                                 })
                                 .catch(error => {
                                     console.log(JSON.stringify(error))
                                 })
                         }
                     }
-                    console.log(this.images)
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
@@ -134,7 +132,6 @@ export default {
         },
         async getImage(image_id){
             var imageURL = ''
-            console.log(image_id)
             await axios
                 .get(`/api/v1/images/${image_id}`)
                 .then(response => {
@@ -160,8 +157,15 @@ export default {
         getImageURL(index){
             return this.images[index]
         },
+        getImageURLDefault(category){
+            console.log('coucou')
+            return imagefinder[category]
+        },
         getSmallImageURL(index){
-            return this.images2[index]
+            if(this.images2[index] == '' || this.images2[index] == undefined){
+                return ''
+            }
+            return this.images2[index]   
         }
     },
 }
