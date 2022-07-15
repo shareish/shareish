@@ -11,4 +11,5 @@ router.register("users", UserViewSet, basename="users")
 urlpatterns = [
     path('', include(router.urls)),
     path('request/', views.searchItem, name='search_item'),
+    path('address/', views.getAddress, name='get_address')
 ]

@@ -128,55 +128,41 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         address = data['location']
         if address != '':
-            geoloc = locator.geocode(address)[-1]
+            geoloc = locator.geocode(address)
             if geoloc != None:
-                data['location'] = "SRID=4326;POINT (" + str(geoloc[1]) + " " + str(geoloc[0]) + ")"
+                data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
-            print('salut')
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    #TODO il faut changer deux trois trucs ici
-
-    def retrieve(self, request, pk=None):
-        totalImages = []
-        try:
-            item = Item.objects.get(pk=pk)
-        except Item.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ItemSerializer(item)
-        totalImages.append(changeInstance(serializer.data))
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    def update(self, request, pk=None):
-        try:
-            item = Item.objects.get(pk=pk)
-        except Item.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ItemSerializer(item, data=request.data)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        address = request.data['location']
+        if address != '':
+            geoloc = locator.geocode(address)
+            if geoloc != None:
+                request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            self.perform_update(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        try:
-            item = Item.objects.get(pk=pk)
-        except Item.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ItemImageViewSet(viewsets.ViewSet):
 
@@ -227,7 +213,22 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
-    
+
+@api_view(['POST'])
+def getAddress(request):
+    if request.method == "POST":
+        address = request.data['SRID']
+        print(address)
+        address = address.split(' ')
+        address[1] = address[1][1:]
+        address[2] = address[2][:-1]
+        print(address[1])
+        print(address[2])
+        geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
+        if geoloc != None:
+            return Response(geoloc.address)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 #@login_required
 def showContent(request):
     return HttpResponse("Hello. You're at the content.")
@@ -236,7 +237,6 @@ def showContent(request):
 @api_view(['POST'])
 def searchItem(request):
     if request.method == "POST":
-        print(request.data)
         searched = request.data
         items_name = None
         items_item_type = None

@@ -87,7 +87,7 @@ class Item(models.Model):
     class ItemType(models.TextChoices):
         DONATION = 'DN', _('Donation')
         LOAN = 'LN', _('Loan')
-        BARTER = 'BR', _('Barter')
+        BARTER = 'BR', _('Request')
     
     item_type = models.CharField(
         max_length=2,

@@ -28,7 +28,7 @@
                         <div class="control">
                             <div class="select">
                                 <select name="type" id="type" v-model="filter.item_type" >
-                                    <option value="BR">{{ $t('barter') }}</option>
+                                    <option value="BR">{{ $t('request') }}</option>
                                     <option value="DN">{{ $t('donation') }}</option>
                                     <option value="LN">{{ $t('loan') }}</option>
                                 </select>

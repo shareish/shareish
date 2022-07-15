@@ -18,7 +18,7 @@
                     <div class="control">
                         <div class="select">
                             <select name="type" id="type" v-model="item.item_type" required>
-                                <option value="BR">Barter</option>
+                                <option value="BR">Request</option>
                                 <option value="DN">Donation</option>
                                 <option value="LN">Loan</option>
                             </select>
@@ -197,7 +197,7 @@ export default {
                             .post('/api/v1/images/', formData)
                             .catch(error => {
                                 console.log(JSON.stringify(error));
-                            });   
+                            });
                     }
                     this.$router.push('/dashboard/items')
                 })
