@@ -7,6 +7,8 @@ import MyAccount from '../views/dashboard/MyAccountView.vue'
 import Items from '../views/dashboard/ItemListView.vue'
 import ItemDetail from '../views/dashboard/ItemDetailView.vue'
 import AddItem from '../views/dashboard/AddItemView.vue'
+import Conversations from '../views/dashboard/ConversationsView.vue'
+import ConversationDetail from '../views/dashboard/ConversationDetailView.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
@@ -71,6 +73,22 @@ const routes = [{
         path: '/dashboard/items/add',
         name: 'addItem',
         component: AddItem,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: '/dashboard/conversations',
+        name: 'conversations',
+        component: Conversations,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: '/dashboard/conversations/:id',
+        name: 'conversationDetail',
+        component: ConversationDetail,
         meta: {
             requireLogin: true
         }

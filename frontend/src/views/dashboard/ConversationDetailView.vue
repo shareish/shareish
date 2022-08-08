@@ -1,0 +1,168 @@
+<template>
+    <div class="box">
+        This is the conversation {{ conversation.name }}.
+        <div class="conv-messages"  v-for="message in messages" v-bind:key="message.id" id="conv-messages">
+            <article class="message is-dark" v-if="message.user != userID">
+                <div class="message-body">
+                    {{ message.content }}
+                </div>
+            </article>
+            <article class="message" v-else>
+                <div class="message-body">
+                    {{ message.content }}
+                </div>
+            </article>
+        </div>
+        <div class="conv-messages" id="conv-messages-new"></div>
+
+        <article class="message">
+            <div class="message-body">
+                <div class="columns">
+                    <div class="column is-two-thirds">
+                        <label for="newMessage">Message</label>
+                        <div class="field">
+                            <div class="control">
+                                <textarea class="textarea is-rounded" placeholder="" id="newMessage" name="newMessage" v-model="message" required>
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-one-third is-centered is-vcentered">
+                        <div class="field">
+                            <button class="button is-info" @click="sendMessage">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>    
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+    name: 'ConversationDetail',
+    data() {
+        return {
+            conversation: {},
+            message: '',
+            ws: null,
+            messages: [],
+            conversationID: null,
+        }
+    },
+    async mounted() {
+        this.conversationID = this.$route.params.id
+        this.userID = this.$store.state.user.id
+        await this.getConversation()
+        await this.getMessages()
+        await this.createWebSocket()
+    },
+    methods: {
+        async getConversation() {
+            await axios
+                .get(`/api/v1/conversations/${this.conversationID}`)
+                .then(response => {
+                    this.conversation = response.data
+                })
+                .catch(error => {
+                    console.log(JSON.stringify(error))
+                })
+        },
+        async getMessages() {
+            let maxlength = this.conversation['messages'].length
+            // if(this.conversation['messages'].length < 5){
+            //     maxlength = this.conversation['messages'].length
+            // }
+            for(let i = 0; i < maxlength; i++){
+                await axios
+                    .get(`/api/v1/messages/${this.conversation['messages'][i]}`)
+                    .then(response => {
+                        this.pushMessages(response.data)
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+            }
+        },
+        async createWebSocket(){
+            console.log("Starting connection to WebSocket Server")
+
+            this.ws = new WebSocket(
+                'ws://localhost:8000/ws/'
+                + this.conversation['name']
+                + '/'
+            )
+
+            function compareUsers(user_id, userID=this.userID){
+                return user_id == userID
+            }
+
+            // this.ws.onmessage = function(e) {
+            //     const data = JSON.parse(e.data)
+            //     isUser = compareUsers(data.user_id)
+            //     console.log(isUser)
+            //     if(data.content){
+            //         if(isUser){
+            //             document.querySelector('#conv-messages-new').innerHTML += '<article class="message"> <div class="message-body">' + data.content + '</div></article>'
+            //         }else{
+            //             document.querySelector('#conv-messages-new').innerHTML += '<article class="message is-dark"> <div class="message-body">' + data.content + '</div></article>'
+            //         }
+                    
+            //     }else{
+            //         alert('The message was empty')
+            //     }
+            // }
+
+            this.ws.addEventListener("message", (e) => {
+                const data = JSON.parse(e.data)
+                if(data.content){
+                    if(data.user_id == this.userID){
+                        document.querySelector('#conv-messages-new').innerHTML += '<article class="message"> <div class="message-body">' + data.content + '</div></article>'
+                    }else{
+                        document.querySelector('#conv-messages-new').innerHTML += '<article class="message is-dark"> <div class="message-body">' + data.content + '</div></article>'
+                    }
+                    
+                }else{
+                    alert('The message was empty')
+                }
+            })
+
+            this.ws.onclose = function(e) {
+                console.log(e)
+                console.log("Closed")
+            }
+
+            this.ws.onopen = function(e) {
+                console.log(e)
+                console.log("Successfully connected to the echo websocket server...")
+            }
+        },
+        pushMessages(message){
+            this.messages.push(message)
+        },
+        sendMessage(){
+            this.ws.send(
+                JSON.stringify({
+                    'content': this.message,
+                    'conversation_id': this.conversation['id'],
+                    'user_id': this.userID,
+                })
+            )
+            this.message = ''
+            return false;
+        },
+    },
+}
+</script>
+
+<style scoped>
+.is-vcentered {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center; /* used this for multiple child */
+  align-items: center; /* if an only child */
+}
+</style>
+
+<!-- TODO le layout risque de ne pas être beau si nous avons beaucoup de messages -->

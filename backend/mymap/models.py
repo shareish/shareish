@@ -157,3 +157,20 @@ class ItemImage(models.Model):
 
     class Meta:
         ordering = ['item']
+
+class Conversation(models.Model):
+    name = models.CharField(max_length=100)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE, null=True)
+    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        ordering = ['name']
+
+class Message(models.Model):
+    content = models.TextField(null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="messages", on_delete=models.CASCADE, null=True)
+    conversation = models.ForeignKey(Conversation, related_name="messages", on_delete=models.CASCADE, null=True)
+    date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['date']

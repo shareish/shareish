@@ -19,6 +19,11 @@ export default createStore({
                 state.token = ''
                 state.isAuthenticated = false
             }
+            if (localStorage.getItem('user_id')) {
+                state.user.id = localStorage.getItem('user_id')
+            } else {
+                state.user.id = ''
+            }
         },
 
         setToken(state, token) {

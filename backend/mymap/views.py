@@ -5,7 +5,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 import json
-from .models import Item, ItemImage
+from .models import Item, ItemImage, Conversation, Message
 from .forms import SignUpForm, LoginForm, ItemForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -18,7 +18,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core import serializers
-from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer
+from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 
@@ -214,6 +214,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
 
+class ConversationViewSet(viewsets.ModelViewSet):
+    serializer_class = ConversationSerializer
+    queryset = Conversation.objects.all()
+
+class MessageViewSet(viewsets.ModelViewSet):
+    serializer_class = MessageSerializer
+    queryset = Message.objects.all()
+
 @api_view(['POST'])
 def getAddress(request):
     if request.method == "POST":
@@ -222,8 +230,6 @@ def getAddress(request):
         address = address.split(' ')
         address[1] = address[1][1:]
         address[2] = address[2][:-1]
-        print(address[1])
-        print(address[2])
         geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
         if geoloc != None:
             return Response(geoloc.address)

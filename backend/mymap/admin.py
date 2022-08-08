@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import Item, ItemImage, User
+from .models import Item, ItemImage, User, Conversation, Message
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -81,3 +81,5 @@ class ItemAdmin(geoadmin.OSMGeoAdmin):
 
 geoadmin.site.register(Item)
 geoadmin.site.register(ItemImage)
+geoadmin.site.register(Conversation)
+geoadmin.site.register(Message)

@@ -166,7 +166,6 @@
 </template>
 
 <script>
-import { nullLiteralTypeAnnotation } from '@babel/types'
 import axios from 'axios'
 export default {
     name: 'ItemDetail',

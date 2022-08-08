@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
-from mymap.models import Item, ItemImage, User
+from mymap.models import Item, ItemImage, User, Conversation, Message
 
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemImage.objects.all(), allow_null=True)
@@ -16,9 +16,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('email', 'password', 'username', 'first_name', 'last_name',)
+        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
 
 class ItemImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemImage
-        fields = ['image', 'item']
+        fields = ['id', 'image', 'item']
+
+class ConversationSerializer(serializers.ModelSerializer):
+    messages = serializers.PrimaryKeyRelatedField(many=True, queryset=Message.objects.all(), allow_null=True)
+    class Meta:
+        model = Conversation
+        fields = ['id', 'name', 'owner', 'buyer', 'messages']
+    
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['id', 'conversation', 'content', 'user', 'date']

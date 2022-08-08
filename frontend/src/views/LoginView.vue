@@ -64,6 +64,7 @@ export default {
                         .get("api/v1/users/me/")
                         .then(response => {
                             this.$store.commit('setUserID', response.data['id'])
+                            localStorage.setItem("user_id", response.data['id'])
                         })
                         .catch(error => {
                             console.log(JSON.stringify(error))

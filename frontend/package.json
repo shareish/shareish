@@ -17,7 +17,8 @@
     "vue-router": "^4.0.3",
     "vue2-leaflet": "^2.7.1",
     "vue2-leaflet-markercluster": "^3.1.0",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "ws": "^8.8.1"
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^3.0.0",

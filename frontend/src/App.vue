@@ -21,6 +21,7 @@
             <router-link to="/dashboard/items" class="navbar-item">Items</router-link>
             <router-link to="/dashboard/items/add" class="navbar-item">Add item</router-link>
             <router-link to="/dashboard/my-account" class="navbar-item">My Account</router-link>
+            <router-link to="/dashboard/conversations" class="navbar-item">Chat Rooms</router-link>
           </template>
 
           <template v-else>
@@ -101,7 +102,7 @@
       const token = this.$store.state.token
 
       if(token){
-        axios.defaults.headers.common['Authorization'] = "Token" + token
+        axios.defaults.headers.common['Authorization'] = "Token " + token
       }else{
         axios.defaults.headers.common['Authorization'] = ""
       }

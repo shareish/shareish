@@ -158,7 +158,6 @@ export default {
             return this.images[index]
         },
         getImageURLDefault(category){
-            console.log('coucou')
             return imagefinder[category]
         },
         getSmallImageURL(index){

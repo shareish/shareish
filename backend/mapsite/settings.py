@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'djoser',
+    'channels',
     'mymap.apps.MymapConfig',
 ]
 
@@ -76,7 +77,15 @@ TEMPLATES = [
     },
 ]
 
+# /!\ use Redis channel layer in production
 WSGI_APPLICATION = 'mapsite.wsgi.application'
+ASGI_APPLICATION = 'mapsite.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 
 # Database
