@@ -220,7 +220,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
-    queryset = Conversation.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return Conversation.objects.filter(owner=user) | Conversation.objects.filter(buyer=user)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -240,18 +243,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer, owner, buyer):
         print('salut')
         serializer.save(owner=owner, buyer=buyer)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
     
 
 class MessageViewSet(viewsets.ModelViewSet):

@@ -25,7 +25,6 @@ export default {
         await this.getConversations()
     },
     methods: {
-        // TODO Comment filter les chats pour que il n'y ait que les owners et buyers qui les voit ?
         async getConversations() {
             await axios
                 .get('/api/v1/conversations/')
