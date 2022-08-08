@@ -25,10 +25,10 @@ export default {
         await this.getConversations()
     },
     methods: {
-        // Comment faire autrement que avec des recherche get avec ?owner...
+        // TODO Comment filter les chats pour que il n'y ait que les owners et buyers qui les voit ?
         async getConversations() {
             await axios
-                .get(`/api/v1/conversations/?owner=[${this.$store.state.user.id}]OR?buyer=[${this.$store.state.user.id}]`)
+                .get('/api/v1/conversations/')
                 .then(response => {
                     for(let i = 0; i < response.data.length; i++){
                         this.conversations.push(response.data[i])
