@@ -188,5 +188,6 @@ DJOSER = {
         'user': 'mymap.serializers.UserSerializer',
         'current_user': 'mymap.serializers.UserSerializer',
         'user_create': 'mymap.serializers.UserRegistrationSerializer',
-    }
+        'user_update': 'mymap.serializers.UserSerializer',
+    },
 }

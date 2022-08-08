@@ -76,7 +76,7 @@ export default {
                 first_name: this.first_name,
                 last_name: this.last_name,
             }
-
+            console.log(formData)
             axios
                 .post("/api/v1/users/", formData)
                 .then(response => {

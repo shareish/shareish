@@ -94,26 +94,6 @@ export default {
                 + '/'
             )
 
-            function compareUsers(user_id, userID=this.userID){
-                return user_id == userID
-            }
-
-            // this.ws.onmessage = function(e) {
-            //     const data = JSON.parse(e.data)
-            //     isUser = compareUsers(data.user_id)
-            //     console.log(isUser)
-            //     if(data.content){
-            //         if(isUser){
-            //             document.querySelector('#conv-messages-new').innerHTML += '<article class="message"> <div class="message-body">' + data.content + '</div></article>'
-            //         }else{
-            //             document.querySelector('#conv-messages-new').innerHTML += '<article class="message is-dark"> <div class="message-body">' + data.content + '</div></article>'
-            //         }
-                    
-            //     }else{
-            //         alert('The message was empty')
-            //     }
-            // }
-
             this.ws.addEventListener("message", (e) => {
                 const data = JSON.parse(e.data)
                 if(data.content){

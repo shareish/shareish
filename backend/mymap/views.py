@@ -5,6 +5,9 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 import json
+from django.core import serializers
+from sqlalchemy import null
+from django.db.models import Q
 from .models import Item, ItemImage, Conversation, Message
 from .forms import SignUpForm, LoginForm, ItemForm
 from django.contrib.auth import get_user_model
@@ -125,6 +128,7 @@ def changeInstance(item):
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
+    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -217,6 +221,38 @@ class UserViewSet(viewsets.ModelViewSet):
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     queryset = Conversation.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        owner= User.objects.get(pk=data['owner'])
+        buyer = User.objects.get(pk=data['buyer'])
+        data['owner'] = None
+        data['buyer'] = None
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer, owner, buyer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        print("coucou")
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer, owner, buyer):
+        print('salut')
+        serializer.save(owner=owner, buyer=buyer)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer

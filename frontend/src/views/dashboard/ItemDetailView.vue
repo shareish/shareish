@@ -161,6 +161,8 @@
         </div>
     </div>
 
+    <button class="button is-info" @click="beginConversation()" >Begin a conversation</button>
+
     <button class="button is-danger" @click="deleteItem()" >Delete</button>
     
 </template>
@@ -195,6 +197,7 @@ export default {
                     this.$router.push('/dashboard/items')
                 })
                 .catch(error => {
+                    alert('You cannot delete this item.')
                     console.log(JSON.stringify(error))
                 })
         },
@@ -274,6 +277,28 @@ export default {
         uploadImage(event){
             this.files = event.target.files;
         },
+        beginConversation(){
+            if(this.item['user'] == this.$store.state.user.id){
+                alert('You cannot begin a conversation with yourself.')
+                return false
+            }
+            const formData = {
+                'name': "" + this.item['id'] + this.item['user'] + this.$store.state.user.id,
+                'owner': this.item['user'],
+                'buyer': this.$store.state.user.id,
+                'messages': [],
+            }
+            console.log(formData)
+            axios
+                .post('api/v1/conversations/', formData)
+                .then(response => {
+                    console.log(response)
+                    this.$router.push(`/dashboard/conversations/${response.data['id']}`)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
     },
 }
 </script>

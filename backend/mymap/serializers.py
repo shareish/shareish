@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
+        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name', )
 
 class ItemImageSerializer(serializers.ModelSerializer):
     class Meta:

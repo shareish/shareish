@@ -28,6 +28,14 @@
                                             <p class="control has-icon has-icon-right">
                                                 <input class="input" placeholder="Email..." type="email" v-model="changes.email">
                                             </p>
+                                            <label class="label">First Name</label>
+                                            <p class="control has-icon has-icon-right">
+                                                <input class="input" placeholder="First Name..." type="text" v-model="changes.first_name">
+                                            </p>
+                                            <label class="label">Last Name</label>
+                                            <p class="control has-icon has-icon-right">
+                                                <input class="input" placeholder="Last Name..." type="text" v-model="changes.last_name">
+                                            </p>
                                             <label class="label">Description</label>
                                             <p class="control">
                                                 <textarea class="textarea" placeholder="Describe Yourself!" maxlength="300" v-model="changes.description">
@@ -128,7 +136,8 @@ export default {
             items: [],
             images: {},
             showModal: false,
-            changes: {}
+            changes: {},
+            files: '',
         }
     },
     mounted() {
@@ -157,7 +166,7 @@ export default {
         },
         getUser() {
             axios
-                .get('/api/v1/users/me/')
+                .get(`/api/v1/users/me/`)
                 .then(response => {
                     this.user = Object.assign({}, response.data)
                     this.changes = Object.assign({}, response.data)
@@ -206,16 +215,22 @@ export default {
             return this.images2[index]
         },
         editProfil(){
-            console.log(this.changes)
+            const formData = {
+                email: this.changes['email'],
+                password: this.changes['password'],
+                username: this.changes['username'],
+                first_name: this.changes['first_name'],
+                last_name: this.changes['last_name'],
+                image: this.changes['image'],
+            }
             axios
-                .put('/api/v1/users/me/', this.changes)
+                .patch(`/api/v1/users/me/`, formData)
                 .then(response => {
                     this.showModal = false
                     this.user = response.data
                 })
                 .catch(error => {
                     console.log(error)
-                    console.log(JSON.stringify(error))
                 })
         },
         closeEdit(){
@@ -224,7 +239,7 @@ export default {
         },
         uploadImage(event){
             this.changes['image'] = event.target.files;
-        }
+        },
     },
 }
 </script>
