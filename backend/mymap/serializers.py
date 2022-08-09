@@ -6,7 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
     images = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemImage.objects.all(), allow_null=True)
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'item_type', 'category1', 'category2', 'category3', 'user', 'images']
+        fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3', 'user', 'images']
 
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)

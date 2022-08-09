@@ -83,7 +83,6 @@
 <script>
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
-import { onMounted } from 'vue';
 import axios from 'axios'
 export default {
     name: 'Dashboard',

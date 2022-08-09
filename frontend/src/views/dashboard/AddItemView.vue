@@ -179,6 +179,17 @@
                     Recurrent Item
                 </label>
             </div>
+
+            <div class="column is-4 columns is-multiline">
+                <label class="column is-full">Starting date</label>
+                <input class="column is-4 m-2" type="date" v-model="item.startdate">
+            </div>
+
+            <div class="column is-4 columns is-multiline">
+                <label class="column is-full">End date</label>
+                <input class="column is-4 m-2" type="date" v-model="item.enddate">
+            </div>
+
             <div class="column is-full">
                 <div class="field">
                     <button class="button is-success" @click="submitForm">Submit</button>
@@ -186,10 +197,12 @@
             </div>
         </div>
     </div>
+    
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import moment from 'moment';
 export default {
     name: "AddItem",
     data() {
@@ -213,11 +226,9 @@ export default {
                 .then(async response => {
                     this.item = response.data
                     if(this.item['location'] != null){
-                        console.log('coucou')
                         await axios
                             .post('/api/v1/address/', this.item['location'])
                             .then(response3 => {
-                                console.log(response3.data)
                                 this.item['location'] = response3.data
                             })
                             .catch(error => {
@@ -247,7 +258,18 @@ export default {
             this.files = event.target.files
         },
         submitForm(){
+            this.item['in_progress'] = true
+            if(this.item['startdate'] == undefined){
+                this.item['startdate'] = moment().format('YYYY-MM-DD')
+            }
+            if(this.item['enddate']){
+                if(this.item['enddate'] < this.item['startdate']){
+                    alert('The end date is invalid.')
+                    return false
+                }
+            }
             if(this.item['id'] != undefined){
+                console.log('salut')
                 delete this.item['images']
                 axios
                     .patch(`/api/v1/items/${this.item['id']}/`, this.item)
@@ -315,3 +337,27 @@ export default {
   align-items: center; /* if an only child */
 }
 </style>
+
+
+
+<!-- import bulma_calendar from "bulma-calendar/dist/components/vue/bulma_calendar.vue";
+
+    export default {
+        components: { bulma_calendar },
+        computed: {
+            displayDate() {
+                if (!this.date[0] || !this.date[1]) return '- n/a -';
+                return this.date[0] + ' to ' + this.date[1];
+            }
+        },
+        data() {
+            return {
+                date: [null, null],
+                options: {
+                    dateFormat: 'dd.MM.yyyy',
+                    labelFrom:  'From',
+                    labelTo:    'To',
+                }
+            }
+        }
+    } -->

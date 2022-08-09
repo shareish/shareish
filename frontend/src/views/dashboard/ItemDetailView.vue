@@ -6,7 +6,7 @@
             </div>
             <div class="column is-half">
                 <div class="columns is-multiline">
-                    <div class="container" id="edit" v-if="id === item['user']">
+                    <div class="container" id="edit" v-if="$store.state.user.id == item.user">
                         <div v-if="showModal">
                             <div class="modal is-active">
                                 <div class="modal-background"></div>
@@ -130,6 +130,21 @@
                                                 </div>
                                             </div>
 
+                                            <label>Recurrent item</label>
+                                            <div class="control">
+                                                <input type="checkbox" name="is_recurrent" v-model="changes.is_recurrent">
+                                            </div>
+
+                                            <label>Start date</label>
+                                            <div class="control">
+                                                <input class="column is-4 m-2" type="date" v-model="changes.startdate">
+                                            </div>
+
+                                            <label>End date</label>
+                                            <div class="control">
+                                                <input class="column is-4 m-2" type="date" v-model="changes.enddate">
+                                            </div>
+
                                             <button class="button is-success" @click="editItem()">Save changes</button>
                                         </div>
                                     </div>
@@ -140,7 +155,7 @@
                         </div>                   
                     </div>
                     
-                    <div class="column">
+                    <div class="column is-full" v-if="$store.state.user.id == item.user">
                         <button type="button" class="button is-info" @click="showModal = true">
                             Edit Item
                         </button>
@@ -153,7 +168,7 @@
                     </div>
 
                     <div class="column box is-full m-2">
-                        <div class="columns box is-multiline">
+                        <div class="columns is-multiline">
                             <div class="column is-full">
                                 <label class="subtitle">Categories</label>
                             </div>
@@ -179,8 +194,14 @@
                         <p v-else>None were given.</p>
                     </div>
 
-
-                    
+                    <div class="column is-full box m-2">
+                        <div class="columns is-multiline">
+                            <label class="column is-full subtitle">Disponibility</label>
+                            <p class="column is-6">From {{ item.startdate }}</p>
+                            <p class="column is-6" v-if="item.enddate">To {{ item.enddate }}</p>
+                        </div> 
+                    </div>
+                                       
                 </div>
                 
                 <!-- We could show the info in a more beautiful way and the location on a small map -->
@@ -296,10 +317,18 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
-            console.log(this.item['in_progress'])
         },
         editItem(){
-            console.log(this.changes)
+            if(this.changes['startdate'] == undefined){
+                this.changes['startdate'] = moment().format('YYYY-MM-DD')
+            }
+            if(this.changes['enddate']){
+                if(this.changes['enddate'] < this.changes['startdate']){
+                    alert('The end date is invalid.')
+                    this.closeEdit()
+                    return false
+                }
+            }
             let address = ''
             if("address" in this.changes){
                 address = this.changes["address"]

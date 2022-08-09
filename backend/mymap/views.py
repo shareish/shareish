@@ -132,17 +132,19 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        address = data['location']
-        if address != '':
-            geoloc = locator.geocode(address)
-            if geoloc != None:
-                data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+        if 'location' in data:
+            address = data['location']
+            if address != '':
+                geoloc = locator.geocode(address)
+                if geoloc != None:
+                    data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def perform_create(self, serializer):
@@ -159,7 +161,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         if 'location' in request.data:
             address = request.data['location']
             print(address)
-            if address != '' and address.startswith("SRID=4326;POINT") == False:
+            if address != '' and address != None and address.startswith("SRID=4326;POINT") == False:
                 geoloc = locator.geocode(address)
                 if geoloc != None:
                     request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
@@ -195,10 +197,8 @@ class ItemImageViewSet(viewsets.ViewSet):
         print(request.FILES)
         images = request.FILES.getlist('files')
         for image in images:
-            print('coucou')
             newImage = ItemImage(image = image, item = item)
             newImage.save()
-            print(newImage)
         return Response(status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
