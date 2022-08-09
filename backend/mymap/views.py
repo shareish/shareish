@@ -156,17 +156,32 @@ class ItemViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        address = request.data['location']
-        if address != '':
-            geoloc = locator.geocode(address)
-            if geoloc != None:
-                request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+        if 'location' in request.data:
+            address = request.data['location']
+            print(address)
+            if address != '' and address.startswith("SRID=4326;POINT") == False:
+                geoloc = locator.geocode(address)
+                if geoloc != None:
+                    request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RecurrentItemViewSet(ItemViewSet):
+    def get_queryset(self):
+        return Item.objects.filter(is_recurrent=True, user=self.request.user)
+
+    def partial_update(self, request, *args, **kwargs):
+        print(self.request.data)
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+class ActiveItemViewSet(ItemViewSet):
+    def get_queryset(self):
+        return Item.objects.filter(in_progress=True)
 
 class ItemImageViewSet(viewsets.ViewSet):
 
@@ -236,7 +251,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer, owner, buyer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        print("coucou")
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -372,5 +386,3 @@ def signup(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-"""TODO A travailler le login et logout"""

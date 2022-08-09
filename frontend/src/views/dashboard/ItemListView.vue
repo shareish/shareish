@@ -68,36 +68,9 @@ export default {
         await this.getItems()
     },
     methods: {
-        //ATTENTION le code est pas beau mais ça marchait pas sinon et je ne comprends pas pourquoi
-        // async getItems() {
-        //     await axios
-        //         .get('/api/v1/items/')
-        //         .then(response => {
-        //             for(let i = 0; i < response.data.length; i++){
-        //                 this.items.push(response.data[i])
-        //                 if(response.data[i]['images'][0]){
-        //                     var image = this.getImage(response.data[i]['images'][0])
-        //                     console.log(image)
-        //                     const localhost = 'http://localhost:8000'
-        //                     image = localhost.concat(image)
-        //                     this.images[response.data[i]['id']] = image
-        //                     if(response.data[i]['images'][1]){
-        //                         let image2 = this.getImage(response.data[i]['images'][1])
-        //                         const localhost = 'http://localhost:8000'
-        //                         image2 = localhost.concat(image2)
-        //                         this.images2[response.data[i]['id']] = image2
-        //                     }
-        //                 }
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        // },
-
         async getItems() {
             await axios
-                .get('/api/v1/items/')
+                .get('/api/v1/actives/')
                 .then(response => {
                     for(let i = 0; i < response.data.length; i++){
                         this.items.push(response.data[i])

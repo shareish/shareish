@@ -121,7 +121,7 @@ export default {
     methods: {
         async getItemsLocation(){
             await axios
-                .get('/api/v1/items/')
+                .get('/api/v1/actives/')
                 .then(response => {
                     for(let i = 0; i < response.data.length; i++){
                         if(response.data[i]['location'] != null){

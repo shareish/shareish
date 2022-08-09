@@ -2,168 +2,218 @@
     <div class="page-item">
         <div class="columns is-multiline">
             <div class="column is-full">
-                <h1 class="title">{{ item.name }} {{ item.id }}</h1>
+                <h1 class="title">{{ item.name }}</h1>
             </div>
             <div class="column is-half">
-                <h2 class="subtitle">Details</h2>
-
-                <div class="container" id="edit" v-if="id === item['user']">
-                    <div v-if="showModal">
-                        <div class="modal is-active">
-                            <div class="modal-background"></div>
-                                <div class="modal-content">
-                                    <div class="box">
-                                        <label class="label">Name</label>
-                                        <p class="control has-icon has-icon-right">
-                                            <input class="input" placeholder="Name..." type="text" v-model="changes.name">
-                                        </p>
-                                        <label class="label">Item type</label>
-                                        <div class="control has-icon has-icon-right">
-                                            <div class="select">
-                                                <select  v-model="changes.item_type">
-                                                    <option value="BR">Request</option>
-                                                    <option value="DN">Donation</option>
-                                                    <option value="LN">Loan</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <label class="label">Category 1</label>
-                                        <div class="control has-icon has-icon-right">
-                                            <div class="select">
-                                                <select v-model="changes.category1">
-                                                    <option value="FD">Food</option>
-                                                    <option value="AN">Animals</option>
-                                                    <option value="EN">Arts and Entertainments</option>
-                                                    <option value="CL">Collectors</option>
-                                                    <option value="HL">Helping hand</option>
-                                                    <option value="DY">DIY</option>
-                                                    <option value="BT">Beauty and Well-being</option>
-                                                    <option value="CH">Childhood</option>
-                                                    <option value="IT">IT and Multimedia</option>
-                                                    <option value="GD">Garden</option>
-                                                    <option value="HS">House</option>
-                                                    <option value="HD">Holidays and Week-end</option>
-                                                    <option value="BK">Books, CDs and DVDs</option>
-                                                    <option value="SP">Sport and Leisure</option>
-                                                    <option value="TS">Transport and vehicle</option>
-                                                    <option value="OT">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <label class="label">Category 2</label>
-                                        <div class="control has-icon has-icon-right">
-                                            <div class="select">
-                                                <select v-model="changes.category2">
-                                                    <option value="FD">Food</option>
-                                                    <option value="AN">Animals</option>
-                                                    <option value="EN">Arts and Entertainments</option>
-                                                    <option value="CL">Collectors</option>
-                                                    <option value="HL">Helping hand</option>
-                                                    <option value="DY">DIY</option>
-                                                    <option value="BT">Beauty and Well-being</option>
-                                                    <option value="CH">Childhood</option>
-                                                    <option value="IT">IT and Multimedia</option>
-                                                    <option value="GD">Garden</option>
-                                                    <option value="HS">House</option>
-                                                    <option value="HD">Holidays and Week-end</option>
-                                                    <option value="BK">Books, CDs and DVDs</option>
-                                                    <option value="SP">Sport and Leisure</option>
-                                                    <option value="TS">Transport and vehicle</option>
-                                                    <option value="OT">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <label class="label">Category 3</label>
-                                        <div class="control has-icon has-icon-right">
-                                            <div class="select">
-                                                <select v-model="changes.category3">
-                                                    <option value="FD">Food</option>
-                                                    <option value="AN">Animals</option>
-                                                    <option value="EN">Arts and Entertainments</option>
-                                                    <option value="CL">Collectors</option>
-                                                    <option value="HL">Helping hand</option>
-                                                    <option value="DY">DIY</option>
-                                                    <option value="BT">Beauty and Well-being</option>
-                                                    <option value="CH">Childhood</option>
-                                                    <option value="IT">IT and Multimedia</option>
-                                                    <option value="GD">Garden</option>
-                                                    <option value="HS">House</option>
-                                                    <option value="HD">Holidays and Week-end</option>
-                                                    <option value="BK">Books, CDs and DVDs</option>
-                                                    <option value="SP">Sport and Leisure</option>
-                                                    <option value="TS">Transport and vehicle</option>
-                                                    <option value="OT">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <label class="label">Description</label>
-                                        <p class="control">
-                                            <textarea class="textarea" placeholder="Describe the item!" maxlength="500" v-model="changes.description">
-
-                                            </textarea>
-                                        </p>
-
-                                        <label>Address</label>
-                                        <div class="control has-icon has-icon-right">
-                                            <input type="text" class="input" placeholder="Address..." v-model="changes.address">
-                                        </div>
-
-                                        <label>Images</label>
-                                        <div class="field">
-                                            <div class="control">
-                                                <div class="file has-name is-fullwidth">
-                                                    <label class="file-label">
-                                                        <input class="file-input" type="file" accept="image/*" multiple @change="uploadImage">
-                                                        <span class="file-cta">
-                                                        <span class="file-icon">
-                                                            <i class="fas fa-upload"></i>
-                                                        </span>
-                                                        <span class="file-label">
-                                                            Choose a file… (The previous images will be kept with the new ones)
-                                                        </span>
-                                                        </span>
-                                                    </label>
+                <div class="columns is-multiline">
+                    <div class="container" id="edit" v-if="id === item['user']">
+                        <div v-if="showModal">
+                            <div class="modal is-active">
+                                <div class="modal-background"></div>
+                                    <div class="modal-content">
+                                        <div class="box">
+                                            <label class="label">Name</label>
+                                            <p class="control has-icon has-icon-right">
+                                                <input class="input" placeholder="Name..." type="text" v-model="changes.name">
+                                            </p>
+                                            <label class="label">Item type</label>
+                                            <div class="control has-icon has-icon-right">
+                                                <div class="select">
+                                                    <select  v-model="changes.item_type">
+                                                        <option value="BR">Request</option>
+                                                        <option value="DN">Donation</option>
+                                                        <option value="LN">Loan</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <button class="button is-success" @click="editItem()">Save changes</button>
+                                            <label class="label">Category 1</label>
+                                            <div class="control has-icon has-icon-right">
+                                                <div class="select">
+                                                    <select v-model="changes.category1">
+                                                        <option value="FD">Food</option>
+                                                        <option value="AN">Animals</option>
+                                                        <option value="EN">Arts and Entertainments</option>
+                                                        <option value="CL">Collectors</option>
+                                                        <option value="HL">Helping hand</option>
+                                                        <option value="DY">DIY</option>
+                                                        <option value="BT">Beauty and Well-being</option>
+                                                        <option value="CH">Childhood</option>
+                                                        <option value="IT">IT and Multimedia</option>
+                                                        <option value="GD">Garden</option>
+                                                        <option value="HS">House</option>
+                                                        <option value="HD">Holidays and Week-end</option>
+                                                        <option value="BK">Books, CDs and DVDs</option>
+                                                        <option value="SP">Sport and Leisure</option>
+                                                        <option value="TS">Transport and vehicle</option>
+                                                        <option value="OT">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <label class="label">Category 2</label>
+                                            <div class="control has-icon has-icon-right">
+                                                <div class="select">
+                                                    <select v-model="changes.category2">
+                                                        <option value="FD">Food</option>
+                                                        <option value="AN">Animals</option>
+                                                        <option value="EN">Arts and Entertainments</option>
+                                                        <option value="CL">Collectors</option>
+                                                        <option value="HL">Helping hand</option>
+                                                        <option value="DY">DIY</option>
+                                                        <option value="BT">Beauty and Well-being</option>
+                                                        <option value="CH">Childhood</option>
+                                                        <option value="IT">IT and Multimedia</option>
+                                                        <option value="GD">Garden</option>
+                                                        <option value="HS">House</option>
+                                                        <option value="HD">Holidays and Week-end</option>
+                                                        <option value="BK">Books, CDs and DVDs</option>
+                                                        <option value="SP">Sport and Leisure</option>
+                                                        <option value="TS">Transport and vehicle</option>
+                                                        <option value="OT">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <label class="label">Category 3</label>
+                                            <div class="control has-icon has-icon-right">
+                                                <div class="select">
+                                                    <select v-model="changes.category3">
+                                                        <option value="FD">Food</option>
+                                                        <option value="AN">Animals</option>
+                                                        <option value="EN">Arts and Entertainments</option>
+                                                        <option value="CL">Collectors</option>
+                                                        <option value="HL">Helping hand</option>
+                                                        <option value="DY">DIY</option>
+                                                        <option value="BT">Beauty and Well-being</option>
+                                                        <option value="CH">Childhood</option>
+                                                        <option value="IT">IT and Multimedia</option>
+                                                        <option value="GD">Garden</option>
+                                                        <option value="HS">House</option>
+                                                        <option value="HD">Holidays and Week-end</option>
+                                                        <option value="BK">Books, CDs and DVDs</option>
+                                                        <option value="SP">Sport and Leisure</option>
+                                                        <option value="TS">Transport and vehicle</option>
+                                                        <option value="OT">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <label class="label">Description</label>
+                                            <p class="control">
+                                                <textarea class="textarea" placeholder="Describe the item!" maxlength="500" v-model="changes.description">
+
+                                                </textarea>
+                                            </p>
+
+                                            <label>Address</label>
+                                            <div class="control has-icon has-icon-right">
+                                                <input type="text" class="input" placeholder="Address..." v-model="changes.address">
+                                            </div>
+
+                                            <label>Images</label>
+                                            <div class="field">
+                                                <div class="control">
+                                                    <div class="file has-name is-fullwidth">
+                                                        <label class="file-label">
+                                                            <input class="file-input" type="file" accept="image/*" multiple @change="uploadImage">
+                                                            <span class="file-cta">
+                                                            <span class="file-icon">
+                                                                <i class="fas fa-upload"></i>
+                                                            </span>
+                                                            <span class="file-label">
+                                                                Choose a file… (The previous images will be kept with the new ones)
+                                                            </span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button class="button is-success" @click="editItem()">Save changes</button>
+                                        </div>
                                     </div>
-                                </div>
-                            <button class="modal-close is-large" @click="closeEdit()">
-                                Close
-                            </button>
+                                <button class="modal-close is-large" @click="closeEdit()">
+                                    Close
+                                </button>
+                            </div>
+                        </div>                   
+                    </div>
+                    
+                    <div class="column">
+                        <button type="button" class="button is-info" @click="showModal = true">
+                            Edit Item
+                        </button>
+                    </div>
+
+                    <div class="column box is-full m-2">
+                        <label class="subtitle">Description</label>
+                        <p v-if="item.description">{{ item.description }}</p>
+                        <p v-else>None were given.</p>
+                    </div>
+
+                    <div class="column box is-full m-2">
+                        <div class="columns box is-multiline">
+                            <div class="column is-full">
+                                <label class="subtitle">Categories</label>
+                            </div>
+
+                            <div class="column is-third">
+                                <p v-if="item.category1">{{ item.category1 }}</p>
+                                <p v-else>None were given.</p>
+                            </div>
+
+                            <div class="column is-third">
+                                <p v-if="item.category2">{{ item.category2 }}</p>
+                            </div>
+
+                            <div class="column is-third">
+                                <p v-if="item.category3">{{ item.category3 }}</p>
+                            </div>
                         </div>
                     </div>
 
+                    <div class="column box is-full m-2">
+                        <label class="subtitle">Location</label>
+                        <p v-if="item.location">{{ item.address }}</p>
+                        <p v-else>None were given.</p>
+                    </div>
 
-                    <button type="button"
-                            class="button is-info" 
-                            @click="showModal = true">Edit Item</button>
+
+                    
                 </div>
-
-                <p v-if="item.category1">{{ item.category1 }}</p>
-                <p v-if="item.category2">{{ item.category2 }}</p>
-                <p v-if="item.category3">{{ item.category3 }}</p>
-                <p v-if="item.description">{{ item.description }}</p>
-                <p v-if="item.location">{{ item.address }}</p>
+                
                 <!-- We could show the info in a more beautiful way and the location on a small map -->
             </div>
-            <div class="column is-half">
-                <figure class="image is-128x128">
+            <div class="column is-third is-offset-3">
+                <figure class="image is-256x256">
                     <img :src="getImgUrl()">
                 </figure>
             </div>
         </div>
     </div>
 
-    <button class="button is-info" @click="beginConversation()" >Begin a conversation</button>
+    <div class="columns is-multiline">
+        <div class="column is-3 m-2">
+            <button class="button is-info" @click="beginConversation()" >Begin a conversation</button>
 
-    <button class="button is-danger" @click="deleteItem()" >Delete</button>
+        </div>
+        <div v-if="item.is_recurrent && item.user == $store.state.user.id">
+            <div class="column is-3 is-offset-3 m-2">
+                <button class="button is-danger" @click="removeItem()" >Remove recurrent Item</button>  
+            </div>
+            <div class="column is-3 is-offset-3 m-2">
+                <button class="button is-danger" @click="deleteItem()" >Delete Item</button>  
+            </div>
+        </div>
+        <div v-else>
+            <div class="column is-3 is-centered m-2" v-if="item.user == $store.state.user.id">
+                <button class="button is-danger" @click="deleteItem()" >Delete Item</button>  
+            </div>
+        </div>
+        
+    </div>
+
     
 </template>
 
@@ -175,7 +225,6 @@ export default {
         return {
             item: {},
             image: null,
-            id: null,
             showModal: false,
             changes: {},
             files: ''
@@ -183,16 +232,28 @@ export default {
     },
     async mounted() {
         await this.getItem()
-        this.id = this.$store.state.user.id
     },
     methods: {
         getImgUrl(){
             return this.image
         },
         deleteItem(){
-            const itemID = this.$route.params.id
             axios
-                .delete(`/api/v1/items/${itemID}`)
+                .delete(`/api/v1/items/${this.item['id']}/`)
+                .then(response => {
+                    this.$router.push('/dashboard/items')
+                })
+                .catch(error => {
+                    alert('You cannot delete this item.')
+                    console.log(JSON.stringify(error))
+                })
+        },
+        removeItem(){
+            this.item['in_progress'] = false
+            const formData = new FormData()
+            formData.append('in_progress', false)
+            axios
+                .patch(`/api/v1/recurrents/${this.item['id']}/`, formData)
                 .then(response => {
                     this.$router.push('/dashboard/items')
                 })
@@ -202,10 +263,9 @@ export default {
                 })
         },
         async getItem() {
-            console.log(this.$store.state.user.email)
             const itemID = this.$route.params.id
             await axios
-                .get(`/api/v1/items/${itemID}`)
+                .get(`/api/v1/items/${itemID}/`)
                 .then(async response => {
                     this.item = response.data
                     if(this.item['images'][0]){
@@ -236,6 +296,7 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+            console.log(this.item['in_progress'])
         },
         editItem(){
             console.log(this.changes)

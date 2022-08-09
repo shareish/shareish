@@ -83,6 +83,7 @@ class Item(models.Model):
     description = models.TextField(max_length=500)
     location = models.PointField(blank=True, geography=True, null=True)
     in_progress = models.BooleanField(default=True)
+    is_recurrent = models.BooleanField(default=False)
     
     class ItemType(models.TextChoices):
         DONATION = 'DN', _('Donation')
@@ -147,8 +148,8 @@ class ItemImage(models.Model):
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
-        if img.height > 128 or img.width > 128:
-            output_size = (128, 128)
+        if img.height > 512 or img.width > 512:
+            output_size = (512, 512)
             img.thumbnail(output_size)
             img.save(self.image.path)
 
