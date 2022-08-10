@@ -199,9 +199,26 @@
                             <label class="column is-full subtitle">Disponibility</label>
                             <p class="column is-6">From {{ item.startdate }}</p>
                             <p class="column is-6" v-if="item.enddate">To {{ item.enddate }}</p>
+                            <p class="column is-6" v-else>No end date communicated</p>
                         </div> 
                     </div>
-                                       
+
+                    <div class="column is-full box m-2">
+                        <label class="sutitle">Owner</label>
+                        <br>
+                        <div class="columns is-multiline">
+                            <router-link v-if="item.user !== undefined" :to="{ name: 'userDetail', params: { id: item.user }}" class="column is-3 ml-5">
+                                <figure v-if="getSmallImageURL()" class="image is-96x96">
+                                    <img class="is-rounded" :src="getSmallImageURL()" alt="Placeholder image">
+                                </figure>
+                                <figure class="image is-inline-block is-responsive is-96x96" v-else>
+                                    <img class="is-rounded" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                                </figure>
+                            </router-link>
+                            <p class="column is-offset3 is-6 is-vcentered">{{ userName }}</p>
+                        </div>
+                        <div class="column is-full"></div>
+                    </div>
                 </div>
                 
                 <!-- We could show the info in a more beautiful way and the location on a small map -->
@@ -248,7 +265,9 @@ export default {
             image: null,
             showModal: false,
             changes: {},
-            files: ''
+            files: '',
+            userImage: null,
+            userName: '',
         }
     },
     async mounted() {
@@ -311,12 +330,29 @@ export default {
                                 console.log(JSON.stringify(error))
                             })
                     }
+                    await this.getUserImage()
                     this.changes = Object.assign({}, this.item)
-                    console.log(this.changes)
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+            console.log(this.item['user'])
+        },
+        async getUserImage(){
+            await axios
+                    .get((`/api/v1/users/${this.item['user']}/`))
+                    .then(response => {
+                        if(response.data['image']){
+                            this.userImage = response.data['image']
+                        }
+                        this.userName = response.data['email'] + ' (' + response.data['username'] + ')'
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+        },
+        getSmallImageURL(){
+            return this.userImage
         },
         editItem(){
             if(this.changes['startdate'] == undefined){
@@ -378,11 +414,9 @@ export default {
                 'buyer': this.$store.state.user.id,
                 'messages': [],
             }
-            console.log(formData)
             axios
                 .post('api/v1/conversations/', formData)
                 .then(response => {
-                    console.log(response)
                     this.$router.push(`/dashboard/conversations/${response.data['id']}`)
                 })
                 .catch(error => {
@@ -392,3 +426,12 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+.is-vcentered {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center; /* used this for multiple child */
+  align-items: center; /* if an only child */
+}
+</style>

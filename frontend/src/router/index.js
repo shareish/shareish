@@ -11,6 +11,8 @@ import Conversations from '../views/dashboard/ConversationsView.vue'
 import ConversationDetail from '../views/dashboard/ConversationDetailView.vue'
 import Recurrents from '../views/dashboard/RecurrentsListView.vue'
 import RecurrentDetail from '../views/dashboard/RecurrentDetailView.vue'
+import UserDetail from '../views/dashboard/UserDetailView.vue'
+import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
@@ -67,6 +69,22 @@ const routes = [{
         path: '/dashboard/items/:id',
         name: 'itemDetail',
         component: ItemDetail,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: '/dashboard/results',
+        name: 'resultsSearch',
+        component: ResultsSearch,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: '/dashboard/users/:id',
+        name: 'userDetail',
+        component: UserDetail,
         meta: {
             requireLogin: true
         }

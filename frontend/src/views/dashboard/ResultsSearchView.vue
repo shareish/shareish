@@ -55,52 +55,33 @@
 import axios from 'axios'
 import imagefinder from "../../assets/imagefinder.json"
 export default {
-    name: 'Item',
+    name: 'ResultsSearch',
     data() {
         return {
             items: [],
             images: {},
-            images2: []
+            images2: [],
+            search: '',
         }
     },
     async mounted() {
+        this.search = this.$route.params['data']
+        //TODO faire une recherche axios sur un nouveau ItemViewSet qu'il faut faire pour envoyer une liste d'id et en retirer cette liste.
         await this.getItems()
     },
     methods: {
         async getItems() {
+            const formData = new FormData()
+            formData.append('search', this.search)
             await axios
-                .get('/api/v1/actives/')
+                .post('/api/v1/requestItems/', formData)
                 .then(response => {
-                    for(let i = 0; i < response.data.length; i++){
-                        this.items.push(response.data[i])
-                        if(response.data[i]['images'][0]){
-                            axios
-                                .get(`/api/v1/images/${response.data[i]['images'][0]}`)
-                                .then(response2 => {
-                                    var image = response2.data['image']
-                                    const localhost = 'http://localhost:8000'
-                                    image = localhost.concat(image)
-                                    this.images[response.data[i]['id']] = image
-                                })
-                                .catch(error => {
-                                    console.log(JSON.stringify(error))
-                                })
-                        }
-                        if(response.data[i]['user']){
-                            axios
-                                .get(`/api/v1/users/${response.data[i]['user']}`)
-                                .then(response3 => {
-                                    this.images2[response.data[i]['id']] = response3.data['image']
-                                })
-                                .catch(error => {
-                                    console.log(JSON.stringify(error))
-                                })
-                        }
-                    }
+                    this.items = response.data
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+            console.log(this.items)
         },
         async getImage(image_id){
             var imageURL = ''

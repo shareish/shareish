@@ -143,7 +143,7 @@ export default {
         },
         submitFilters(){
             axios
-                .post('/api/v1/request/', this.filter)
+                .post('/api/v1/requestFilter/', this.filter)
                 .then(response => {
                     console.log(response.data)
                 })

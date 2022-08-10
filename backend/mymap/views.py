@@ -277,12 +277,8 @@ def getAddress(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #@login_required
-def showContent(request):
-    return HttpResponse("Hello. You're at the content.")
-
-#@login_required
 @api_view(['POST'])
-def searchItem(request):
+def searchItemFilter(request):
     if request.method == "POST":
         searched = request.data
         items_name = None
@@ -305,6 +301,21 @@ def searchItem(request):
             items = items | items_category1 | items_category2 | items_category3
         
         serialized_items = ItemSerializer(items, many=True)
+        return Response(serialized_items.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def searchItems(request):
+    if request.method == "POST":
+        search = request.data['search']
+        items = Item.objects.none()
+        if search != None:
+            items_name = Item.objects.filter(name__icontains=search)
+            items_description = Item.objects.filter(description__icontains=search)
+            items = items | items_description | items_name
+        serialized_items = ItemSerializer(items, many=True)
+        print(serialized_items.data)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)

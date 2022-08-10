@@ -14,6 +14,7 @@ router.register("actives", ActiveItemViewSet, basename="actives")
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('request/', views.searchItem, name='search_item'),
-    path('address/', views.getAddress, name='get_address')
+    path('requestFilter/', views.searchItemFilter, name='search_item_filter'),
+    path('address/', views.getAddress, name='get_address'),
+    path('requestItems/', views.searchItems, name='searchItems'),
 ]

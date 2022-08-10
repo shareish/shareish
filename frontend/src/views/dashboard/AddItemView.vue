@@ -337,27 +337,3 @@ export default {
   align-items: center; /* if an only child */
 }
 </style>
-
-
-
-<!-- import bulma_calendar from "bulma-calendar/dist/components/vue/bulma_calendar.vue";
-
-    export default {
-        components: { bulma_calendar },
-        computed: {
-            displayDate() {
-                if (!this.date[0] || !this.date[1]) return '- n/a -';
-                return this.date[0] + ' to ' + this.date[1];
-            }
-        },
-        data() {
-            return {
-                date: [null, null],
-                options: {
-                    dateFormat: 'dd.MM.yyyy',
-                    labelFrom:  'From',
-                    labelTo:    'To',
-                }
-            }
-        }
-    } -->
