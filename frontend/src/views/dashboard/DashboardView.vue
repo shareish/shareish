@@ -114,6 +114,8 @@ export default {
     },
     methods: {
         async getItemsLocation(){
+            console.log('time for receiving the informations and adding them to the this.location array :')
+            console.time('timer')
             await axios
                 .post('/api/v1/requestFilter/', this.filter)
                 .then(response => {
@@ -133,7 +135,11 @@ export default {
                             this.locations.push(location)
                         }
                     }
+                    console.timeEnd('timer')
+                    console.log('Time to add markers to the map and shows them (' + this.locations.length + ' markers)')
+                    console.time('timer2')
                     this.addMarkersLocation()
+                    console.timeEnd('timer2')
                 })
                 .catch(error => {
                     console.log(error)
@@ -176,13 +182,6 @@ export default {
                     container
                 )
                 .openOn(this.map);
-            
-            L.DomEvent.on(startBtn, 'click', () => {
-                alert("toto");
-            });
-            L.DomEvent.on(destBtn, 'click', () => {
-                alert("tata");
-            });
         },
         goto(item_id){
             this.$router.push({ name: "itemDetail", params: { id: item_id}})
