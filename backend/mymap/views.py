@@ -253,11 +253,9 @@ class ConversationViewSet(viewsets.ModelViewSet):
         owner= User.objects.get(pk=data['owner'])
         buyer = User.objects.get(pk=data['buyer'])
         already_exist = Conversation.objects.filter(owner=owner, buyer=buyer, name=data['name'])
-        print(already_exist)
         if already_exist:
-            print('already exists')
-            serializer = ConversationSerializer(already_exist)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            serializer = ConversationSerializer(already_exist[0], many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         data['owner'] = None
         data['buyer'] = None
         serializer = self.get_serializer(data=data)
@@ -265,7 +263,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer, owner, buyer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer, owner, buyer):
@@ -300,19 +297,19 @@ def searchItemFilter(request):
         items_category2 = None
         items_category3 = None
         items = Item.objects.none()
+        queryset = Item.objects.filter(in_progress=True)
         if 'name' in searched:
-            items_name = Item.objects.filter(name__icontains=searched['name'])
-            items_description = Item.objects.filter(description__icontains=searched['name'])
+            items_name = queryset.filter(name__icontains=searched['name'])
+            items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
         if 'item_type' in searched:
-            items_item_type = Item.objects.filter(item_type__exact=searched['item_type'])
+            items_item_type = queryset.filter(item_type__exact=searched['item_type'])
             items = items | items_item_type
         if 'category' in searched:
-            items_category1 = Item.objects.filter(category1__exact=searched['category'])
-            items_category2 = Item.objects.filter(category2__exact=searched['category'])
-            items_category3 = Item.objects.filter(category3__exact=searched['category'])
+            items_category1 = queryset.filter(category1__exact=searched['category'])
+            items_category2 = queryset.filter(category2__exact=searched['category'])
+            items_category3 = queryset.filter(category3__exact=searched['category'])
             items = items | items_category1 | items_category2 | items_category3
-        
         serialized_items = ItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:

@@ -28,6 +28,7 @@
                         <div class="control">
                             <div class="select">
                                 <select name="type" id="type" v-model="filter.item_type" >
+                                    <option value=null>Null</option>
                                     <option value="BR">{{ $t('request') }}</option>
                                     <option value="DN">{{ $t('donation') }}</option>
                                     <option value="LN">{{ $t('loan') }}</option>
@@ -65,16 +66,13 @@
                 </div>
                 <div class="column is-full">
                     <div class="field">
-                        <button class="button is-success" @click="submitFilters">{{ $t('search') }}</button>
+                        <button class="button is-success" @click="getItemsLocation">{{ $t('search') }}</button>
                     </div>
                 </div>
             </div>
         </Transition>
         
         <div class="p-3"></div>
-        <div style="display: none" id="location_x" data-json="{{ location_x }}"></div>
-        <div style="display: none" id="location_y" data-json="{{ location_y }}"></div>
-        <div style="display: none" id="name" data-json="{{ name }}"></div>
         <div id="mapid"></div>
 
     </div>
@@ -91,7 +89,10 @@ export default {
             map: {},
             locations: [],
             show: false,
-            filter: {}
+            filter: {},
+            items: [],
+            markers: {},
+            popup: {}
         }
     },
     async mounted() {
@@ -106,50 +107,101 @@ export default {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
+        this.filter.item_type = 'BR'
+        this.markers = new L.markerClusterGroup()
+        this.popup = L.popup()
         await this.getItemsLocation()
-        console.log(this.locations)
-
-        var markers = new L.MarkerClusterGroup();
-
-        for(let i = 0; i < this.locations.length; i++){
-            markers.addLayer(L.marker([this.locations[i]['location_y'], this.locations[i]['location_x']]));
-        }
-
-        this.map.addLayer(markers);
     },
     methods: {
         async getItemsLocation(){
             await axios
-                .get('/api/v1/actives/')
+                .post('/api/v1/requestFilter/', this.filter)
                 .then(response => {
+                    console.log(response.data)
+                    this.locations = []
+                    this.items = response.data
                     for(let i = 0; i < response.data.length; i++){
                         if(response.data[i]['location'] != null){
                             let refinedLocation = response.data[i]['location'].slice(17, -1)
                             const arrlocations = refinedLocation.split(" ")
                             let location = {
-                                'location_x': arrlocations[0],
-                                'location_y': arrlocations[1],
+                                'location_x': arrlocations[1],
+                                'location_y': arrlocations[0],
+                                'id': response.data[i]['id'],
+                                'increment': i
                             }
                             this.locations.push(location)
                         }
                     }
+                    this.addMarkersLocation()
                 })
                 .catch(error => {
-                    console.log(JSON.stringify(error))
+                    console.log(error)
                 })    
         },
-        readLocation(){
+        onMarkerClick(e){
+            // <div>
+            //     <label class="title">this.items[e.target.increment]['name']</label>
+            //     <p>this.items[e.target.increment]['description']</p>
+            //     <button class="button is-info is-small is-responsive" @click=goto(e.target.item_id)>Details</button>
+            // </div>
 
+            // "<div><label class=\"title\">"
+            // + this.items[e.target.increment]['name']
+            // + "</label><p>"
+            // + this.items[e.target.increment]['description']
+            // + "</p><router-link :to=\"{ name: \"itemDetail\", params: { id: "
+            // + e.target.item_id
+            // + "}}\" class=\"button is-info is-small is-responsive\">Details</router-link></div>"
+
+            let container = document.createElement('div')
+            let btn = document.createElement('button')
+            btn.innerHTML = "<label>coucou</label>"
+            btn.className = 'details'
+            btn.addEventListener('onclick', this.btnClick(e.target.item_id))
+            container.append(btn)
+
+            // elem.innerHTML = 
+            //     "<label class=\"title\">"
+            //     + this.items[e.target.increment]['name']
+            //     + "</label><p>"
+            //     + this.items[e.target.increment]['description']
+            //     + "</p>";
+            
+            // elem.addEventListener('onclick', this.goto(e.target.item_type))
+
+            this.popup
+                .setLatLng(e.latlng)
+                .setContent(
+                    container
+                )
+                .openOn(this.map);
+            
+            L.DomEvent.on(startBtn, 'click', () => {
+                alert("toto");
+            });
+            L.DomEvent.on(destBtn, 'click', () => {
+                alert("tata");
+            });
         },
-        submitFilters(){
-            axios
-                .post('/api/v1/requestFilter/', this.filter)
-                .then(response => {
-                    console.log(response.data)
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+        goto(item_id){
+            this.$router.push({ name: "itemDetail", params: { id: item_id}})
+        },
+        btnClick(item_id){
+            alert(item_id)
+        },
+        addMarkersLocation(){
+            if(this.map.hasLayer(this.markers)){
+                this.markers.clearLayers()
+            }
+            for(let i = 0; i < this.locations.length; i++){
+                let marker = L.circleMarker([this.locations[i]['location_y'], this.locations[i]['location_x']])
+                marker.item_id = this.locations[i]['id']
+                marker.increment = this.locations[i]['increment']
+                marker.on('click', this.onMarkerClick);
+                this.markers.addLayer(marker)
+            }
+            this.map.addLayer(this.markers)
         }
     },
 }

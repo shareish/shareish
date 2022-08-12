@@ -417,6 +417,7 @@ export default {
             axios
                 .post('api/v1/conversations/', formData)
                 .then(response => {
+                    console.log(response)
                     this.$router.push(`/dashboard/conversations/${response.data['id']}`)
                 })
                 .catch(error => {
