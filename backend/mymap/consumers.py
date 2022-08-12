@@ -51,30 +51,3 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(pk=user_id)
         conversation = Conversation.objects.get(pk=conversation_id)
         Message.objects.create(content=content, user=user, conversation=conversation)
-
-# from .models import Conversation
-# from .serializers import ConversationSerializer
-# from djangochannelsrestframework import permissions
-# from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-# from djangochannelsrestframework.mixins import (
-#     ListModelMixin,
-#     RetrieveModelMixin,
-#     PatchModelMixin,
-#     UpdateModelMixin,
-#     CreateModelMixin,
-#     DeleteModelMixin,
-# )
-
-# class ConversationConsumer(
-#         ListModelMixin,
-#         RetrieveModelMixin,
-#         PatchModelMixin,
-#         UpdateModelMixin,
-#         CreateModelMixin,
-#         DeleteModelMixin,
-#         GenericAsyncAPIConsumer,
-# ):
-
-#     queryset = Conversation.objects.all()
-#     serializer_class = ConversationSerializer()
-#     permission_classes = (permissions.AllowAny,)

@@ -71,6 +71,7 @@ export default {
             await axios
                 .get('/api/v1/actives/')
                 .then(response => {
+                    // response.data becomes response.data.results with the pagination
                     for(let i = 0; i < response.data.length; i++){
                         this.items.push(response.data[i])
                         if(response.data[i]['images'][0]){

@@ -51,9 +51,17 @@ export default {
             conversationID: null,
         }
     },
+    beforeRouteLeave (to, from, next) {
+        this.beforeWindowUnload()
+        next()
+    },
+    beforeDestroy() {
+        window.removeEventListener('beforeunload', this.beforeWindowUnload)
+    },
     async mounted() {
         this.conversationID = this.$route.params.id
         this.userID = this.$store.state.user.id
+        window.addEventListener('beforeunload', this.beforeWindowUnload)
         await this.getConversation()
         await this.getMessages()
         await this.createWebSocket()
@@ -131,6 +139,10 @@ export default {
             )
             this.message = ''
             return false;
+        },
+        beforeWindowUnload(e) {
+            console.log('coucou je ferme hein')
+            this.ws.close()  
         },
     },
 }

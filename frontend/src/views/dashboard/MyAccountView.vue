@@ -87,7 +87,7 @@
                                             <img :src="getImageItemURL(item.id)" alt="Placeholder image">
                                         </figure>
                                         <div v-else class="image is-4by3">
-                                            No content Image
+                                            <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
                                         </div>
                                     </div>
                                     <div class="card-content">
@@ -125,8 +125,7 @@
 
 <script>
 import axios from 'axios'
-
-
+import imagefinder from "../../assets/imagefinder.json"
 
 export default {
     name: 'MyAccount',
@@ -178,29 +177,30 @@ export default {
                 })
         },
         getItems(user) {
-            for(let i = 0; i < user.data['items'].length; i++){
-                axios
-                    .get(`/api/v1/items/${user.data['items'][i]}`)
-                    .then(response => {
-                        this.items.push(response.data)
-                        if(response.data['images'][0]){
+            axios
+                .get('/api/v1/user_items/')
+                .then(response => {
+                    console.log(response.data)
+                    this.items = response.data
+                    for(let i = 0; i < this.items.length; i++){
+                        if(this.items[i]['images'][0]){
                             axios
-                                .get(`/api/v1/images/${response.data['images'][0]}`)
+                                .get(`/api/v1/images/${this.items[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
                                     const localhost = 'http://localhost:8000'
                                     image = localhost.concat(image)
-                                    this.images[response.data['id']] = image
+                                    this.images[this.items[i]['id']] = image
                                 })
                                 .catch(error2 => {
                                     console.log(JSON.stringify(error2))
                                 })
                         }
-                    })
-                    .catch(error1 => {
-                        console.log(JSON.stringify(error1))
-                    })
-            }
+                    }
+                })
+                .catch(error => {
+                    console.log(JSON.stringify(error))
+                })
         },
         getImageURL(image){
             if(this.user['image'] == '' || this.user['image'] == undefined){
@@ -239,6 +239,9 @@ export default {
         },
         uploadImage(event){
             this.changes['image'] = event.target.files;
+        },
+        getImageURLDefault(category){
+            return imagefinder[category]
         },
     },
 }
