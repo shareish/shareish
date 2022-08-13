@@ -237,6 +237,7 @@ export default {
                 username: this.changes['username'],
                 first_name: this.changes['first_name'],
                 last_name: this.changes['last_name'],
+                description: this.changes['description'],
             }
 
             // axios
@@ -250,7 +251,7 @@ export default {
             //     })
 
             //Faire une nouvelle fonction qui fait office de vue pour delete les images liées à l'utilisateur
-            if(this.userImage != ''){
+            if(this.newImage != ''){
                 for(let i = 0; i < this.user['image'].length; i++){
                     axios
                         .delete(`/api/v1/user_image/${this.user['image'][i]}/`)

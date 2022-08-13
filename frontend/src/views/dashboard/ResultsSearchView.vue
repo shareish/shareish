@@ -60,7 +60,7 @@ export default {
         return {
             items: [],
             images: {},
-            images2: [],
+            imageUsers: [],
             search: '',
         }
     },
@@ -73,29 +73,56 @@ export default {
         async getItems() {
             const formData = new FormData()
             formData.append('search', this.search)
+
             await axios
                 .post('/api/v1/requestItems/', formData)
-                .then(response => {
-                    this.items = response.data
+                .then(async response => {
+                    let data = response.data
+                    
+                    for(let i = 0; i < data.length; i++){
+                        this.items.push(data[i])
+                        if(data[i]['images'][0]){
+                            await axios
+                                .get(`/api/v1/images/${data[i]['images'][0]}`)
+                                .then(response2 => {
+                                    var image = response2.data['image']
+                                    const localhost = 'http://localhost:8000'
+                                    image = localhost.concat(image)
+                                    this.images[data[i]['id']] = image
+                                })
+                                .catch(error => {
+                                    console.log(JSON.stringify(error))
+                                })
+                        }
+                        if(data[i]['user']){
+                            await axios
+                                .get(`/api/v1/webusers/${data[i]['user']}`)
+                                .then(async response3 => {
+                                    if(response3.data['image'][0]){
+                                        await axios
+                                        .get(`/api/v1/user_image/${response3.data['image'][0]}/`)
+                                        .then(responseImage => {
+                                            var image = responseImage.data['image']
+                                            const localhost = 'http://localhost:8000'
+                                            image = localhost.concat(image)
+                                            this.imageUsers[data[i]['id']] = image
+                                        })
+                                        .catch(error => {
+                                            console.log(error)
+                                        })
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log(JSON.stringify(error))
+                                })
+                        }
+                    }
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
-            console.log(this.items)
         },
-        async getImage(image_id){
-            var imageURL = ''
-            await axios
-                .get(`/api/v1/images/${image_id}`)
-                .then(response => {
-                    imageURL = response.data['image']
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-            return imageURL
-        },
-        async getImage2(image_id){
+        async getUserImage(image_id){
             var imageURL = ''
             await axios
                 .get(`/api/v1/images/${image_id}`)
@@ -114,10 +141,7 @@ export default {
             return imagefinder[category]
         },
         getSmallImageURL(index){
-            if(this.images2[index] == '' || this.images2[index] == undefined){
-                return ''
-            }
-            return this.images2[index]   
+            return this.imageUsers[index] 
         }
     },
 }
