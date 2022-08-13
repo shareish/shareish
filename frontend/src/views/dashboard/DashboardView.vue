@@ -74,7 +74,25 @@
         
         <div class="p-3"></div>
         <div id="mapid"></div>
-
+        <div class="container" id="edit">
+            <div class="modal" id="modal" style="z-index: 600;">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">{{ modalToShow['name'] }}</p>
+                        <button class="delete" aria-label="close" @click="closeEdit"></button>
+                    </header>
+                    <div class="modal-card-body">
+                        <p>{{ modalToShow['description'] }}</p>
+                    </div>
+                    <footer class="modal-card-foot">
+                        <div v-if="modalToShow['id']">
+                            <router-link :to="{ name: 'itemDetail', params: { id: modalToShow['id']}}" class="button is-info is-small is-responsive">Details</router-link>
+                        </div>
+                    </footer>
+                </div>
+            </div>                  
+        </div>
     </div>
 </template>
 
@@ -92,7 +110,7 @@ export default {
             filter: {},
             items: [],
             markers: {},
-            popup: {}
+            modalToShow: {}
         }
     },
     async mounted() {
@@ -109,7 +127,6 @@ export default {
 
         this.filter.item_type = 'BR'
         this.markers = new L.markerClusterGroup()
-        this.popup = L.popup()
         await this.getItemsLocation()
     },
     methods: {
@@ -146,48 +163,14 @@ export default {
                 })    
         },
         onMarkerClick(e){
-            // <div>
-            //     <label class="title">this.items[e.target.increment]['name']</label>
-            //     <p>this.items[e.target.increment]['description']</p>
-            //     <button class="button is-info is-small is-responsive" @click=goto(e.target.item_id)>Details</button>
-            // </div>
-
-            // "<div><label class=\"title\">"
-            // + this.items[e.target.increment]['name']
-            // + "</label><p>"
-            // + this.items[e.target.increment]['description']
-            // + "</p><router-link :to=\"{ name: \"itemDetail\", params: { id: "
-            // + e.target.item_id
-            // + "}}\" class=\"button is-info is-small is-responsive\">Details</router-link></div>"
-
-            let container = document.createElement('div')
-            let btn = document.createElement('button')
-            btn.innerHTML = "<label>coucou</label>"
-            btn.className = 'details'
-            btn.addEventListener('onclick', this.btnClick(e.target.item_id))
-            container.append(btn)
-
-            // elem.innerHTML = 
-            //     "<label class=\"title\">"
-            //     + this.items[e.target.increment]['name']
-            //     + "</label><p>"
-            //     + this.items[e.target.increment]['description']
-            //     + "</p>";
-            
-            // elem.addEventListener('onclick', this.goto(e.target.item_type))
-
-            this.popup
-                .setLatLng(e.latlng)
-                .setContent(
-                    container
-                )
-                .openOn(this.map);
+            this.modalToShow = this.items[e.target.increment]
+            let elem = document.getElementById("modal")
+            elem.classList.add("is-active")
         },
-        goto(item_id){
-            this.$router.push({ name: "itemDetail", params: { id: item_id}})
-        },
-        btnClick(item_id){
-            alert(item_id)
+        closeEdit(){
+            let elem = document.getElementById("modal")
+            elem.classList.remove("is-active")
+            this.modalToShow = {}
         },
         addMarkersLocation(){
             if(this.map.hasLayer(this.markers)){
@@ -209,15 +192,6 @@ export default {
 <style scoped>
     #mapid {
         height: 600px;
-    }
-
-    .v-enter-active,
-    .v-leave-active {
-        transition: opacity 0.1s ease;
-    }
-
-    .v-enter-from,
-    .v-leave-to {
-        opacity: 0;
+        z-index: 400;
     }
 </style>

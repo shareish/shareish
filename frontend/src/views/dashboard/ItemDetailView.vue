@@ -7,156 +7,159 @@
             <div class="column is-half">
                 <div class="columns is-multiline">
                     <div class="container" id="edit" v-if="$store.state.user.id == item.user">
-                        <div v-if="showModal">
-                            <div class="modal is-active">
-                                <div class="modal-background"></div>
-                                    <div class="modal-content">
-                                        <div class="box">
-                                            <label class="label">Name</label>
-                                            <p class="control has-icon has-icon-right">
-                                                <input class="input" placeholder="Name..." type="text" v-model="changes.name">
-                                            </p>
-                                            <label class="label">Item type</label>
-                                            <div class="control has-icon has-icon-right">
-                                                <div class="select">
-                                                    <select  v-model="changes.item_type">
-                                                        <option value="BR">Request</option>
-                                                        <option value="DN">Donation</option>
-                                                        <option value="LN">Loan</option>
-                                                    </select>
-                                                </div>
+                        <div id="modal" class="modal">
+                            <div class="modal-background"></div>
+                            <div class="modal-card" style="height: 80%;">
+                                <header class="modal-card-head">
+                                    <p class="modal-card-title">Edit</p>
+                                    <button class="delete" aria-label="close" @click="closeEdit"></button>
+                                </header>
+                                <div class="modal-card-body">
+                                    <div class="box">
+                                        <label class="label">Name</label>
+                                        <p class="control has-icon has-icon-right">
+                                            <input class="input" placeholder="Name..." type="text" v-model="changes.name">
+                                        </p>
+                                        <label class="label">Item type</label>
+                                        <div class="control has-icon has-icon-right">
+                                            <div class="select">
+                                                <select  v-model="changes.item_type">
+                                                    <option value="BR">Request</option>
+                                                    <option value="DN">Donation</option>
+                                                    <option value="LN">Loan</option>
+                                                </select>
                                             </div>
-
-                                            <label class="label">Category 1</label>
-                                            <div class="control has-icon has-icon-right">
-                                                <div class="select">
-                                                    <select v-model="changes.category1">
-                                                        <option value="FD">Food</option>
-                                                        <option value="AN">Animals</option>
-                                                        <option value="EN">Arts and Entertainments</option>
-                                                        <option value="CL">Collectors</option>
-                                                        <option value="HL">Helping hand</option>
-                                                        <option value="DY">DIY</option>
-                                                        <option value="BT">Beauty and Well-being</option>
-                                                        <option value="CH">Childhood</option>
-                                                        <option value="IT">IT and Multimedia</option>
-                                                        <option value="GD">Garden</option>
-                                                        <option value="HS">House</option>
-                                                        <option value="HD">Holidays and Week-end</option>
-                                                        <option value="BK">Books, CDs and DVDs</option>
-                                                        <option value="SP">Sport and Leisure</option>
-                                                        <option value="TS">Transport and vehicle</option>
-                                                        <option value="OT">Other</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <label class="label">Category 2</label>
-                                            <div class="control has-icon has-icon-right">
-                                                <div class="select">
-                                                    <select v-model="changes.category2">
-                                                        <option value="FD">Food</option>
-                                                        <option value="AN">Animals</option>
-                                                        <option value="EN">Arts and Entertainments</option>
-                                                        <option value="CL">Collectors</option>
-                                                        <option value="HL">Helping hand</option>
-                                                        <option value="DY">DIY</option>
-                                                        <option value="BT">Beauty and Well-being</option>
-                                                        <option value="CH">Childhood</option>
-                                                        <option value="IT">IT and Multimedia</option>
-                                                        <option value="GD">Garden</option>
-                                                        <option value="HS">House</option>
-                                                        <option value="HD">Holidays and Week-end</option>
-                                                        <option value="BK">Books, CDs and DVDs</option>
-                                                        <option value="SP">Sport and Leisure</option>
-                                                        <option value="TS">Transport and vehicle</option>
-                                                        <option value="OT">Other</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <label class="label">Category 3</label>
-                                            <div class="control has-icon has-icon-right">
-                                                <div class="select">
-                                                    <select v-model="changes.category3">
-                                                        <option value="FD">Food</option>
-                                                        <option value="AN">Animals</option>
-                                                        <option value="EN">Arts and Entertainments</option>
-                                                        <option value="CL">Collectors</option>
-                                                        <option value="HL">Helping hand</option>
-                                                        <option value="DY">DIY</option>
-                                                        <option value="BT">Beauty and Well-being</option>
-                                                        <option value="CH">Childhood</option>
-                                                        <option value="IT">IT and Multimedia</option>
-                                                        <option value="GD">Garden</option>
-                                                        <option value="HS">House</option>
-                                                        <option value="HD">Holidays and Week-end</option>
-                                                        <option value="BK">Books, CDs and DVDs</option>
-                                                        <option value="SP">Sport and Leisure</option>
-                                                        <option value="TS">Transport and vehicle</option>
-                                                        <option value="OT">Other</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <label class="label">Description</label>
-                                            <p class="control">
-                                                <textarea class="textarea" placeholder="Describe the item!" maxlength="500" v-model="changes.description">
-
-                                                </textarea>
-                                            </p>
-
-                                            <label>Address</label>
-                                            <div class="control has-icon has-icon-right">
-                                                <input type="text" class="input" placeholder="Address..." v-model="changes.address">
-                                            </div>
-
-                                            <label>Images</label>
-                                            <div class="field">
-                                                <div class="control">
-                                                    <div class="file has-name is-fullwidth">
-                                                        <label class="file-label">
-                                                            <input class="file-input" type="file" accept="image/*" multiple @change="uploadImage">
-                                                            <span class="file-cta">
-                                                            <span class="file-icon">
-                                                                <i class="fas fa-upload"></i>
-                                                            </span>
-                                                            <span class="file-label">
-                                                                Choose a file… (The previous images will be kept with the new ones)
-                                                            </span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <label>Recurrent item</label>
-                                            <div class="control">
-                                                <input type="checkbox" name="is_recurrent" v-model="changes.is_recurrent">
-                                            </div>
-
-                                            <label>Start date</label>
-                                            <div class="control">
-                                                <input class="column is-4 m-2" type="date" v-model="changes.startdate">
-                                            </div>
-
-                                            <label>End date</label>
-                                            <div class="control">
-                                                <input class="column is-4 m-2" type="date" v-model="changes.enddate">
-                                            </div>
-
-                                            <button class="button is-success" @click="editItem()">Save changes</button>
                                         </div>
+
+                                        <label class="label">Category 1</label>
+                                        <div class="control has-icon has-icon-right">
+                                            <div class="select">
+                                                <select v-model="changes.category1">
+                                                    <option value="FD">Food</option>
+                                                    <option value="AN">Animals</option>
+                                                    <option value="EN">Arts and Entertainments</option>
+                                                    <option value="CL">Collectors</option>
+                                                    <option value="HL">Helping hand</option>
+                                                    <option value="DY">DIY</option>
+                                                    <option value="BT">Beauty and Well-being</option>
+                                                    <option value="CH">Childhood</option>
+                                                    <option value="IT">IT and Multimedia</option>
+                                                    <option value="GD">Garden</option>
+                                                    <option value="HS">House</option>
+                                                    <option value="HD">Holidays and Week-end</option>
+                                                    <option value="BK">Books, CDs and DVDs</option>
+                                                    <option value="SP">Sport and Leisure</option>
+                                                    <option value="TS">Transport and vehicle</option>
+                                                    <option value="OT">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <label class="label">Category 2</label>
+                                        <div class="control has-icon has-icon-right">
+                                            <div class="select">
+                                                <select v-model="changes.category2">
+                                                    <option value="FD">Food</option>
+                                                    <option value="AN">Animals</option>
+                                                    <option value="EN">Arts and Entertainments</option>
+                                                    <option value="CL">Collectors</option>
+                                                    <option value="HL">Helping hand</option>
+                                                    <option value="DY">DIY</option>
+                                                    <option value="BT">Beauty and Well-being</option>
+                                                    <option value="CH">Childhood</option>
+                                                    <option value="IT">IT and Multimedia</option>
+                                                    <option value="GD">Garden</option>
+                                                    <option value="HS">House</option>
+                                                    <option value="HD">Holidays and Week-end</option>
+                                                    <option value="BK">Books, CDs and DVDs</option>
+                                                    <option value="SP">Sport and Leisure</option>
+                                                    <option value="TS">Transport and vehicle</option>
+                                                    <option value="OT">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <label class="label">Category 3</label>
+                                        <div class="control has-icon has-icon-right">
+                                            <div class="select">
+                                                <select v-model="changes.category3">
+                                                    <option value="FD">Food</option>
+                                                    <option value="AN">Animals</option>
+                                                    <option value="EN">Arts and Entertainments</option>
+                                                    <option value="CL">Collectors</option>
+                                                    <option value="HL">Helping hand</option>
+                                                    <option value="DY">DIY</option>
+                                                    <option value="BT">Beauty and Well-being</option>
+                                                    <option value="CH">Childhood</option>
+                                                    <option value="IT">IT and Multimedia</option>
+                                                    <option value="GD">Garden</option>
+                                                    <option value="HS">House</option>
+                                                    <option value="HD">Holidays and Week-end</option>
+                                                    <option value="BK">Books, CDs and DVDs</option>
+                                                    <option value="SP">Sport and Leisure</option>
+                                                    <option value="TS">Transport and vehicle</option>
+                                                    <option value="OT">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <label class="label">Description</label>
+                                        <p class="control">
+                                            <textarea class="textarea" placeholder="Describe the item!" maxlength="500" v-model="changes.description">
+
+                                            </textarea>
+                                        </p>
+
+                                        <label>Address</label>
+                                        <div class="control has-icon has-icon-right">
+                                            <input type="text" class="input" placeholder="Address..." v-model="changes.address">
+                                        </div>
+
+                                        <label>Images</label>
+                                        <div class="field">
+                                            <div class="control">
+                                                <div class="file has-name is-fullwidth">
+                                                    <label class="file-label">
+                                                        <input class="file-input" type="file" accept="image/*" multiple @change="uploadImage">
+                                                        <span class="file-cta">
+                                                        <span class="file-icon">
+                                                            <i class="fas fa-upload"></i>
+                                                        </span>
+                                                        <span class="file-label">
+                                                            Choose a file… (The previous images will be kept with the new ones)
+                                                        </span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <label>Recurrent item</label>
+                                        <div class="control">
+                                            <input type="checkbox" name="is_recurrent" v-model="changes.is_recurrent">
+                                        </div>
+
+                                        <label>Start date</label>
+                                        <div class="control">
+                                            <input class="column is-4 m-2" type="date" v-model="changes.startdate">
+                                        </div>
+
+                                        <label>End date</label>
+                                        <div class="control">
+                                            <input class="column is-4 m-2" type="date" v-model="changes.enddate">
+                                        </div>
+
                                     </div>
-                                <button class="modal-close is-large" @click="closeEdit()">
-                                    Close
-                                </button>
+                                </div>
+                                <footer class="modal-card-foot">
+                                    <button class="button is-success" @click="editItem()">Save changes</button>
+                                </footer>
                             </div>
-                        </div>                   
+                        </div>                 
                     </div>
                     
                     <div class="column is-full" v-if="$store.state.user.id == item.user">
-                        <button type="button" class="button is-info" @click="showModal = true">
+                        <button type="button" class="button is-info" @click="openModal">
                             Edit Item
                         </button>
                     </div>
@@ -263,7 +266,6 @@ export default {
         return {
             item: {},
             image: null,
-            showModal: false,
             changes: {},
             files: '',
             userImage: null,
@@ -387,10 +389,9 @@ export default {
                                 console.log(JSON.stringify(error));
                             });   
                     }
-                    this.showModal = false
                     this.item = response.data
                     this.item["address"] = address
-                    this.changes = Object.assign({}, this.item)
+                    this.closeEdit()
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
@@ -398,7 +399,12 @@ export default {
         },
         closeEdit(){
             this.changes = Object.assign({}, this.item)
-            this.showModal = false
+            let elem = document.getElementById("modal")
+            elem.classList.remove("is-active")
+        },
+        openModal(){
+            let elem = document.getElementById("modal")
+            elem.classList.add("is-active")
         },
         uploadImage(event){
             this.files = event.target.files;

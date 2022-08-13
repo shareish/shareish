@@ -186,7 +186,3 @@
 <style lang="scss">
   @import '../node_modules/bulma';
 </style>
-
-<style scoped>
-
-</style>
