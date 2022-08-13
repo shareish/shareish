@@ -342,10 +342,18 @@ export default {
         },
         async getUserImage(){
             await axios
-                    .get((`/api/v1/users/${this.item['user']}/`))
+                    .get((`/api/v1/webusers/${this.item['user']}/`))
                     .then(response => {
                         if(response.data['image']){
-                            this.userImage = response.data['image']
+                            axios
+                                .get(`/api/v1/user_image/${response.data['image'][0]}`)
+                                .then(response2 => {
+                                    var image = response2.data['image']
+                                    const localhost = 'http://localhost:8000'
+                                    image = localhost.concat(image)
+                                    this.userImage = image
+                                })
+                            
                         }
                         this.userName = response.data['email'] + ' (' + response.data['username'] + ')'
                     })

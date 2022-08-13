@@ -4,8 +4,8 @@
 
         <div class="columns is-centered is-multiline">
             <div class="column is-6 p-3 has-text-centered">
-                <figure class="image is-inline-block is-responsive is-96x96" v-if="getImageURL(user.image)">
-                    <img :src="getImageURL(user.image)" class="is-rounded">
+                <figure class="image is-inline-block is-responsive is-512x512" v-if="getImageURL(user.image)">
+                    <img id="profilPicture" :src="getImageURL()" class="is-rounded">
                 </figure>
                 <figure class="image is-inline-block is-responsive is-96x96" v-else>
                     <img src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
@@ -15,64 +15,71 @@
                     <p>{{ user.description }}</p>
                     <hr class="hr mx-auto has-text-centered">
                     <div class= "container" id="edit">
-                        <div v-if="showModal">
-                            <div class="modal is-active">
-                                <div class="modal-background"></div>
-                                    <div class="modal-content">
-                                        <div class="box">
-                                            <label class="label">Username</label>
-                                            <p class="control has-icon has-icon-right">
-                                                <input class="input" placeholder="Username..." type="text" v-model="changes.username">
-                                            </p>
-                                            <label class="label">Email</label>
-                                            <p class="control has-icon has-icon-right">
-                                                <input class="input" placeholder="Email..." type="email" v-model="changes.email">
-                                            </p>
-                                            <label class="label">First Name</label>
-                                            <p class="control has-icon has-icon-right">
-                                                <input class="input" placeholder="First Name..." type="text" v-model="changes.first_name">
-                                            </p>
-                                            <label class="label">Last Name</label>
-                                            <p class="control has-icon has-icon-right">
-                                                <input class="input" placeholder="Last Name..." type="text" v-model="changes.last_name">
-                                            </p>
-                                            <label class="label">Description</label>
-                                            <p class="control">
-                                                <textarea class="textarea" placeholder="Describe Yourself!" maxlength="300" v-model="changes.description">
+                        <div class="modal" id="modal">
+                            <div class="modal-background"></div>
+                            <div class="modal-card" style="height: 80%;">
+                                <header class="modal-card-head">
+                                    <p class="modal-card-title">Edit Profil</p>
+                                    <button class="delete" aria-label="close" @click="closeEdit"></button>
+                                </header>
+                                <div class="modal-card-body">
+                                    <div class="box">
+                                        <label class="label">Username</label>
+                                        <p class="control has-icon has-icon-right">
+                                            <input class="input" placeholder="Username..." type="text" v-model="changes.username">
+                                        </p>
+                                        <label class="label">Email</label>
+                                        <p class="control has-icon has-icon-right">
+                                            <input class="input" placeholder="Email..." type="email" v-model="changes.email">
+                                        </p>
+                                        <label class="label">First Name</label>
+                                        <p class="control has-icon has-icon-right">
+                                            <input class="input" placeholder="First Name..." type="text" v-model="changes.first_name">
+                                        </p>
+                                        <label class="label">Last Name</label>
+                                        <p class="control has-icon has-icon-right">
+                                            <input class="input" placeholder="Last Name..." type="text" v-model="changes.last_name">
+                                        </p>
+                                        <label class="label">Description</label>
+                                        <p class="control">
+                                            <textarea class="textarea" placeholder="Describe Yourself!" maxlength="300" v-model="changes.description">
 
-                                                </textarea>
-                                            </p>
-                                            <label>Images</label>
-                                            <div class="field">
-                                                <div class="control">
-                                                    <div class="file has-name is-fullwidth">
-                                                        <label class="file-label">
-                                                            <input class="file-input" type="file" accept="image/*" @change="uploadImage">
-                                                            <span class="file-cta">
-                                                            <span class="file-icon">
-                                                                <i class="fas fa-upload"></i>
-                                                            </span>
-                                                            <span class="file-label">
-                                                                Choose a profil picture...
-                                                            </span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
+                                            </textarea>
+                                        </p>
+                                        <label>Images</label>
+                                        <div class="field">
+                                            <div class="control">
+                                                <div class="file has-name is-fullwidth">
+                                                    <label class="file-label">
+                                                        <input class="file-input" type="file" accept="image/*" @change="uploadImage">
+                                                        <span class="file-cta">
+                                                        <span class="file-icon">
+                                                            <i class="fas fa-upload"></i>
+                                                        </span>
+                                                        <span class="file-label">
+                                                            Choose a profil picture...
+                                                        </span>
+                                                        </span>
+                                                    </label>
                                                 </div>
                                             </div>
-                                            <button class="button is-success" @click="editProfil()">Save changes</button>
                                         </div>
                                     </div>
-                                <button class="modal-close is-large" @click="closeEdit()">
-                                    Close
-                                </button>
+                                </div>
+                                <footer class="modal-card-foot">
+                                    <button class="button is-success" @click="editProfil()">Save changes</button>
+                                </footer>
                             </div>
                         </div>
 
-
-                        <button type="button"
-                                class="button is-info" 
-                                @click="showModal = true">Edit profil</button>
+                        <div class="columns is-centered">
+                            <button type="button" class="column p-2 is-3 button is-info" @click="openModal">Edit profil</button>
+                            <button @click="logout()" class="button column p-2 is-3 is-offset-3 is-danger">Log out</button>
+                        </div>
+                        
+                        <div class="has-text-centered">
+                                            
+                        </div>        
                     </div>
 
                     <div class="container">
@@ -115,9 +122,6 @@
                     </div>
                 </div>
                 <br>
-                <div class="has-text-centered">
-                    <button @click="logout()" class="button is-danger">Log out</button>                
-                </div>
             </div>
         </div>
     </div>
@@ -134,9 +138,10 @@ export default {
             user: {},
             items: [],
             images: {},
-            showModal: false,
+            userImage: '',
             changes: {},
             files: '',
+            newImage: '',
         }
     },
     mounted() {
@@ -163,24 +168,23 @@ export default {
                     }
                 })
         },
-        getUser() {
-            axios
+        async getUser() {
+            await axios
                 .get(`/api/v1/users/me/`)
-                .then(response => {
+                .then(async response => {
                     this.user = Object.assign({}, response.data)
                     this.changes = Object.assign({}, response.data)
-                    console.log(response.data)
-                    this.getItems(response)
+                    await this.getItems()
+                    await this.getImage()
                 })
                 .catch(error1 => {
                     console.log(JSON.stringify(error1))
                 })
         },
-        getItems(user) {
-            axios
+        async getItems() {
+            await axios
                 .get('/api/v1/user_items/')
                 .then(response => {
-                    console.log(response.data)
                     this.items = response.data
                     for(let i = 0; i < this.items.length; i++){
                         if(this.items[i]['images'][0]){
@@ -202,43 +206,105 @@ export default {
                     console.log(JSON.stringify(error))
                 })
         },
-        getImageURL(image){
-            if(this.user['image'] == '' || this.user['image'] == undefined){
-                return ''
+        async getImage(){
+            if(this.user['image'][0]){
+                await axios
+                .get(`/api/v1/user_image/${this.user['image'][0]}/`)
+                .then(response => {
+                    var image = response.data['image']
+                    const localhost = 'http://localhost:8000'
+                    image = localhost.concat(image)
+                    this.userImage = image
+                })
+                .catch(error => {
+                    console.log(error)
+                })
             }
-            return image
+        },
+        getImageURL(){
+            return this.userImage
         },
         getImageItemURL(index){
             return this.images[index]
         },
         getSmallImageURL(index){
-            return this.images2[index]
+            return this.imaes2[index]
         },
-        editProfil(){
+        async editProfil(){
             const formData = {
                 email: this.changes['email'],
                 password: this.changes['password'],
                 username: this.changes['username'],
                 first_name: this.changes['first_name'],
                 last_name: this.changes['last_name'],
-                image: this.changes['image'],
             }
-            axios
-                .patch(`/api/v1/users/me/`, formData)
+
+            // axios
+            //     .patch(`/api/v1/users/me/`, formData)
+            //     .then(response => {
+            //         this.user = response.data
+            //         this.closeEdit()
+            //     })
+            //     .catch(error => {
+            //         console.log(error)
+            //     })
+
+            //Faire une nouvelle fonction qui fait office de vue pour delete les images liées à l'utilisateur
+            if(this.userImage != ''){
+                for(let i = 0; i < this.user['image'].length; i++){
+                    axios
+                        .delete(`/api/v1/user_image/${this.user['image'][i]}/`)
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+                
+            }
+            
+            this.user['image'] = []
+            await axios
+                .patch('/api/v1/users/me/', formData)
                 .then(response => {
-                    this.showModal = false
                     this.user = response.data
+                    if(this.newImage != ''){
+                        const formData2 = new FormData();
+                        formData2.append('userID', this.user['id'])
+                        for(let i = 0; i < this.newImage.length; i++){
+                            let file = this.newImage[i];
+                            formData2.append('image', file);
+                        }
+                        axios
+                            .post('/api/v1/user_image/', formData2)
+                            .then(async response2 => {
+                                let image = response2.data['image']
+                                const localhost = 'http://localhost:8000'
+                                image = localhost.concat(image)
+                                this.userImage = image
+                                await this.getImage()
+                                document.getElementById("profilPicture").src = this.getImageURL()
+                                console.log(this.getImageURL())
+                            })
+                            .catch(error => {
+                                console.log(JSON.stringify(error));
+                            });
+                    }
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.log(JSON.stringify(error))
                 })
+            this.closeEdit()
+        },
+        openModal(){
+            let elem = document.getElementById("modal")
+            elem.classList.add("is-active")
         },
         closeEdit(){
             this.changes = Object.assign({}, this.user)
-            this.showModal = false
+            let elem = document.getElementById("modal")
+            elem.classList.remove("is-active")
         },
         uploadImage(event){
-            this.changes['image'] = event.target.files;
+            this.newImage = event.target.files
         },
         getImageURLDefault(category){
             return imagefinder[category]

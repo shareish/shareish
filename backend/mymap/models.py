@@ -48,10 +48,8 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     description = models.TextField(blank = True, max_length = 300)
-    image = models.ImageField(upload_to='tfe/uploads/', null=True, blank=True)
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['image']
     """
     Use what's in this to have a better database later:
     https://stackoverflow.com/questions/310540/best-practices-for-storing-postal-addresses-in-a-database-rdbms
@@ -78,6 +76,25 @@ class User(AbstractBaseUser):
 
     class Meta:
         ordering = ['sign_in_date']
+
+class UserImage(models.Model):
+    image = models.ImageField(upload_to='tfe/uploads/')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='image', on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        img = Image.open(self.image.path)
+
+        if img.height > 512 or img.width > 512:
+            output_size = (512, 512)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
+
+    def __str__(self) -> str:
+        return 'Image related to ' + self.user.username + '.'
+
+    class Meta:
+        ordering = ['user']
 
 class Item(models.Model):
     name = models.CharField(max_length=50)

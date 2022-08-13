@@ -4,7 +4,10 @@
             <div class="column is-4 is-responsive is-left">
                 <h1 class="title is-responsive">Add item</h1>
             </div>
-            <div class="column is-3 is-offset-5 is-right">
+            <div class="column is-3 is-offset-2 is-right">
+                <router-link to="/dashboard/autocomplete" class="button is-light is-medium is-responsive">Try autocomplete</router-link>
+            </div>
+            <div class="column is-3 is-right">
                 <router-link to="/dashboard/recurrents" class="button is-light is-medium is-responsive">Recurrent Items</router-link>
             </div>
             <div class="column is-two-thirds">
@@ -160,6 +163,7 @@
                     </figure>
                 </div>
             </div>
+            <figure class="column is-half" id="img-preview"></figure>
         </div>
         
 
@@ -218,6 +222,9 @@ export default {
             await this.getItem(this.$route.params.id)
             await this.getImages(this.item['images'])
         }
+        if(this.$route.params.name){
+            this.item['name'] = this.$route.params.name
+        }
     },
     methods: {
         async getItem(itemID){
@@ -256,6 +263,21 @@ export default {
         },
         uploadFile(event){
             this.files = event.target.files
+            console.log(this.files)
+            this.previewFile()
+        },
+        async previewFile(){
+            let imgPreview = document.getElementById("img-preview");
+            imgPreview.innerHTML = ''
+            imgPreview.classList.add("image")
+            imgPreview.classList.add("is-256x256")
+            for(let i = 0; i < this.files.length; i++){
+                let fileReader = new FileReader()
+                fileReader.readAsDataURL(this.files[i])
+                fileReader.addEventListener("load", function () {
+                    imgPreview.innerHTML += '<img src="' + this.result + '" />';
+                });
+            }
         },
         submitForm(){
             this.item['in_progress'] = true
@@ -269,7 +291,6 @@ export default {
                 }
             }
             if(this.item['id'] != undefined){
-                console.log('salut')
                 delete this.item['images']
                 axios
                     .patch(`/api/v1/items/${this.item['id']}/`, this.item)

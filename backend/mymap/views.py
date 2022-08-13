@@ -6,7 +6,8 @@
 # from django.contrib.auth import logout
 # import json
 # from django.core import serializers
-from .models import Item, ItemImage, Conversation, Message
+from unicodedata import category
+from .models import Item, ItemImage, Conversation, Message, UserImage
 # from .forms import SignUpForm, LoginForm, ItemForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -18,10 +19,15 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .pagination import ActivePaginationClass
 from django.core import serializers
-from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer
+from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer, UserImageSerializer
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import IsAuthenticated
+
+from .ai import findClass
+
+
 
 from geopy.geocoders import Nominatim
 locator = Nominatim(user_agent="shareish")
@@ -186,6 +192,7 @@ class RecurrentItemViewSet(ItemViewSet):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
 class ActiveItemViewSet(ItemViewSet):
+    pagination_class = ActivePaginationClass
     def get_queryset(self):
         return Item.objects.filter(in_progress=True)
 
@@ -232,6 +239,49 @@ class ItemImageViewSet(viewsets.ViewSet):
         try:
             image = ItemImage.objects.get(pk=pk)
         except ItemImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        image.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserImageViewSet(viewsets.ViewSet):
+
+    def list(self, request):
+        images = UserImage.objects.all()
+        serializer = UserImageSerializer(images, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        user = User.objects.get(pk = request.POST['userID'])
+        images = request.FILES.getlist('image')
+        for image in images:
+            newImage = UserImage(image = image, user = user)
+            newImage.save()
+            serialized_image = UserImageSerializer(newImage)
+        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None):
+        try:
+            image = UserImage.objects.get(pk=pk)
+        except UserImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserImageSerializer(image)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        try:
+            image = UserImage.objects.get(pk=pk)
+        except UserImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserImageSerializer(image, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        try:
+            image = UserImage.objects.get(pk=pk)
+        except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -283,7 +333,7 @@ def getAddress(request):
         address[2] = address[2][:-1]
         geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
         if geoloc != None:
-            return Response(geoloc.address)
+            return Response(geoloc.address, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #@login_required
@@ -291,6 +341,7 @@ def getAddress(request):
 def searchItemFilter(request):
     if request.method == "POST":
         searched = request.data
+        print(searched)
         items_name = None
         items_item_type = None
         items_category1 = None
@@ -298,11 +349,15 @@ def searchItemFilter(request):
         items_category3 = None
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
+        if 'name' not in searched and searched['item_type'] == 'null' and 'category' not in searched:
+            items = Item.objects.all()
+            serialized_items = ItemSerializer(items, many=True)
+            return Response(serialized_items.data, status=status.HTTP_200_OK)
         if 'name' in searched:
             items_name = queryset.filter(name__icontains=searched['name'])
             items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
-        if 'item_type' in searched:
+        if searched['item_type'] != 'null':
             items_item_type = queryset.filter(item_type__exact=searched['item_type'])
             items = items | items_item_type
         if 'category' in searched:
@@ -329,6 +384,17 @@ def searchItems(request):
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+from PIL import Image
+
+@api_view(['POST'])
+def predictClass(request):
+    if request.method == "POST":
+        if(request.FILES.get('files[]')):
+            class_found = findClass(request.FILES.get('files[]'))
+            return Response(class_found, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 #@login_required
 # def profil(request, user_id):

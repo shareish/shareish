@@ -1,11 +1,9 @@
 <template>
     <div class="page-my-account">
-        <h1 class="title has-text-centered">My Account</h1>
-
         <div class="columns is-centered is-multiline">
             <div class="column is-6 p-3 has-text-centered">
-                <figure class="image is-inline-block is-responsive is-96x96" v-if="getImageURL(user.image)">
-                    <img :src="getImageURL(user.image)" class="is-rounded">
+                <figure class="image is-inline-block is-responsive is-96x96" v-if="getImageURL()">
+                    <img :src="getImageURL()" class="is-rounded">
                 </figure>
                 <figure class="image is-inline-block is-responsive is-96x96" v-else>
                     <img src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
@@ -27,7 +25,7 @@
                                             <img :src="getImageItemURL(item.id)" alt="Placeholder image">
                                         </figure>
                                         <div v-else class="image is-4by3">
-                                            No content Image
+                                            <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
                                         </div>
                                     </div>
                                     <div class="card-content">
@@ -62,8 +60,7 @@
 
 <script>
 import axios from 'axios'
-
-
+import imagefinder from "../../assets/imagefinder.json"
 
 export default {
     name: 'UserDetail',
@@ -82,16 +79,32 @@ export default {
     methods: {
         getUser() {
             axios
-                .get(`/api/v1/users/${this.userID}/`)
+                .get(`/api/v1/webusers/${this.userID}/`)
                 .then(response => {
                     this.user = Object.assign({}, response.data)
                     this.changes = Object.assign({}, response.data)
                     console.log(response.data)
                     this.getItems(response)
+                    this.getImage(response)
                 })
                 .catch(error1 => {
                     console.log(JSON.stringify(error1))
                 })
+        },
+        async getImage(user){
+            if(user.data['image'][0]){
+                await axios
+                .get(`/api/v1/user_image/${user.data['image'][0]}/`)
+                .then(response => {
+                    var image = response.data['image']
+                    const localhost = 'http://localhost:8000'
+                    image = localhost.concat(image)
+                    this.userImage = image
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
         getItems(user) {
             for(let i = 0; i < user.data['items'].length; i++){
@@ -118,17 +131,17 @@ export default {
                     })
             }
         },
-        getImageURL(image){
-            if(this.user['image'] == '' || this.user['image'] == undefined){
-                return ''
-            }
-            return image
+        getImageURL(){
+            return this.userImage
         },
         getImageItemURL(index){
             return this.images[index]
         },
         getSmallImageURL(index){
             return this.images2[index]
+        },
+        getImageURLDefault(category){
+            return imagefinder[category]
         },
     },
 }

@@ -10,9 +10,9 @@ import AddItem from '../views/dashboard/AddItemView.vue'
 import Conversations from '../views/dashboard/ConversationsView.vue'
 import ConversationDetail from '../views/dashboard/ConversationDetailView.vue'
 import Recurrents from '../views/dashboard/RecurrentsListView.vue'
-import RecurrentDetail from '../views/dashboard/RecurrentDetailView.vue'
 import UserDetail from '../views/dashboard/UserDetailView.vue'
 import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
+import Autocomplete from '../views/dashboard/AutocompleteView.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
@@ -106,9 +106,9 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/recurrents/:id',
-        name: 'recurrentDetail',
-        component: RecurrentDetail,
+        path: '/dashboard/autocomplete',
+        name: 'autocomplete',
+        component: Autocomplete,
         meta: {
             requireLogin: true
         }

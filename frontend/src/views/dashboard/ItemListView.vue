@@ -13,9 +13,9 @@
                         <figure v-if="getImageURL(item.id)" class="image is-4by3">
                             <img :src="getImageURL(item.id)" alt="Placeholder image">
                         </figure>
-                        <div v-else class="image is-4by3">
+                        <figure v-else class="image is-4by3">
                            <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
-                        </div>
+                        </figure>
                     </div>
                     <div class="card-content">
                         <div class="media">
@@ -44,8 +44,25 @@
                         </div>
                     </div>
                 </div>
-
-
+            </div>
+            <div id="more" class="column is-3">
+                <a @click="showMore">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-1by1">
+                                <img class="is-rounded" src="../../../public/mymap/images/plus.png" alt="ShowMoreImage">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="content has-text-centered">
+                                Show more
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="column is-3 is-vcentered">
+                <progress id="loading" style="display: none;" class="progress is-danger " max="100">30%</progress>
             </div>
         </div>
     </div>
@@ -60,38 +77,61 @@ export default {
         return {
             items: [],
             images: {},
-            images2: []
+            imageUsers: [],
+            apiCall: '',
         }
     },
     async mounted() {
+        this.apiCall = '/api/v1/actives/?page=1'
         await this.getItems()
     },
     methods: {
         async getItems() {
+            let plus = document.getElementById('more')
+            let loading = document.getElementById('loading')
+            plus.style.display = "none"
+            loading.style.display = "block"
             await axios
-                .get('/api/v1/actives/')
-                .then(response => {
-                    // response.data becomes response.data.results with the pagination
-                    for(let i = 0; i < response.data.length; i++){
-                        this.items.push(response.data[i])
-                        if(response.data[i]['images'][0]){
-                            axios
-                                .get(`/api/v1/images/${response.data[i]['images'][0]}`)
+                .get(this.apiCall)
+                .then(async response => {
+                    let data = response.data.results
+                    this.apiCall = response.data.next
+                    if(this.apiCall == null){
+                        plus.remove()
+                        loading.remove()
+                    }
+                    for(let i = 0; i < data.length; i++){
+                        this.items.push(data[i])
+                        if(data[i]['images'][0]){
+                            await axios
+                                .get(`/api/v1/images/${data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
                                     const localhost = 'http://localhost:8000'
                                     image = localhost.concat(image)
-                                    this.images[response.data[i]['id']] = image
+                                    this.images[data[i]['id']] = image
                                 })
                                 .catch(error => {
                                     console.log(JSON.stringify(error))
                                 })
                         }
-                        if(response.data[i]['user']){
-                            axios
-                                .get(`/api/v1/users/${response.data[i]['user']}`)
-                                .then(response3 => {
-                                    this.images2[response.data[i]['id']] = response3.data['image']
+                        if(data[i]['user']){
+                            await axios
+                                .get(`/api/v1/webusers/${data[i]['user']}`)
+                                .then(async response3 => {
+                                    if(response3.data['image'][0]){
+                                        await axios
+                                        .get(`/api/v1/user_image/${response3.data['image'][0]}/`)
+                                        .then(responseImage => {
+                                            var image = responseImage.data['image']
+                                            const localhost = 'http://localhost:8000'
+                                            image = localhost.concat(image)
+                                            this.imageUsers[data[i]['id']] = image
+                                        })
+                                        .catch(error => {
+                                            console.log(error)
+                                        })
+                                    }
                                 })
                                 .catch(error => {
                                     console.log(JSON.stringify(error))
@@ -102,20 +142,10 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+                loading.style.display = "none"
+                plus.style.display = "block"
         },
         async getImage(image_id){
-            var imageURL = ''
-            await axios
-                .get(`/api/v1/images/${image_id}`)
-                .then(response => {
-                    imageURL = response.data['image']
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-            return imageURL
-        },
-        async getImage2(image_id){
             var imageURL = ''
             await axios
                 .get(`/api/v1/images/${image_id}`)
@@ -134,11 +164,20 @@ export default {
             return imagefinder[category]
         },
         getSmallImageURL(index){
-            if(this.images2[index] == '' || this.images2[index] == undefined){
-                return ''
-            }
-            return this.images2[index]   
+            return this.imageUsers[index]   
+        },
+        showMore(){
+            this.getItems()
         }
     },
 }
 </script>
+
+<style scoped>
+.is-vcentered {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center; /* used this for multiple child */
+  align-items: center; /* if an only child */
+}
+</style>
