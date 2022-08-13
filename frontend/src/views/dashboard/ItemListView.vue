@@ -145,18 +145,6 @@ export default {
                 loading.style.display = "none"
                 plus.style.display = "block"
         },
-        async getImage(image_id){
-            var imageURL = ''
-            await axios
-                .get(`/api/v1/images/${image_id}`)
-                .then(response => {
-                    imageURL = response.data['image']
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-            return imageURL
-        },
         getImageURL(index){
             return this.images[index]
         },
@@ -164,7 +152,7 @@ export default {
             return imagefinder[category]
         },
         getSmallImageURL(index){
-            return this.imageUsers[index]   
+            return this.imageUsers[index]
         },
         showMore(){
             this.getItems()
