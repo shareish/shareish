@@ -370,18 +370,24 @@ def searchItemFilter(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+from rest_framework.pagination import LimitOffsetPagination
+
 @api_view(['POST'])
 def searchItems(request):
     if request.method == "POST":
+        print(request.data)
+        print(request)
+        paginator = ActivePaginationClass()
         search = request.data['search']
         items = Item.objects.none()
         if search != None:
             items_name = Item.objects.filter(name__icontains=search)
             items_description = Item.objects.filter(description__icontains=search)
             items = items | items_description | items_name
+        items = paginator.paginate_queryset(items, request)
         serialized_items = ItemSerializer(items, many=True)
-        print(serialized_items.data)
-        return Response(serialized_items.data, status=status.HTTP_200_OK)
+        print(paginator.get_paginated_response(serialized_items.data))
+        return paginator.get_paginated_response(serialized_items.data)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

@@ -47,6 +47,25 @@
 
 
             </div>
+            <div id="more" class="column is-3">
+                <a @click="showMore">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-1by1">
+                                <img class="is-rounded" src="../../../public/mymap/images/plus.png" alt="ShowMoreImage">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="content has-text-centered">
+                                Show more
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="column is-3 is-vcentered">
+                <progress id="loading" style="display: none;" class="progress is-danger " max="100">30%</progress>
+            </div>
         </div>
     </div>
 </template>
@@ -62,23 +81,33 @@ export default {
             images: {},
             imageUsers: [],
             search: '',
+            apiCall: '',
         }
     },
     async mounted() {
+        this.apiCall = '/api/v1/requestItems/?page=1'
         this.search = this.$route.params['data']
         //TODO faire une recherche axios sur un nouveau ItemViewSet qu'il faut faire pour envoyer une liste d'id et en retirer cette liste.
         await this.getItems()
     },
     methods: {
         async getItems() {
+            let plus = document.getElementById('more')
+            let loading = document.getElementById('loading')
+            plus.style.display = "none"
+            loading.style.display = "block"
             const formData = new FormData()
             formData.append('search', this.search)
 
             await axios
-                .post('/api/v1/requestItems/', formData)
+                .post(this.apiCall, formData)
                 .then(async response => {
-                    let data = response.data
-                    
+                    let data = response.data.results
+                    this.apiCall = response.data.next
+                    if(this.apiCall == null){
+                        plus.remove()
+                        loading.remove()
+                    }
                     for(let i = 0; i < data.length; i++){
                         this.items.push(data[i])
                         if(data[i]['images'][0]){
@@ -121,6 +150,8 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+            loading.style.display = "none"
+            plus.style.display = "block"
         },
         async getUserImage(image_id){
             var imageURL = ''
@@ -142,7 +173,19 @@ export default {
         },
         getSmallImageURL(index){
             return this.imageUsers[index] 
+        },
+        showMore(){
+            this.getItems()
         }
     },
 }
 </script>
+
+<style scoped>
+.is-vcentered {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center; /* used this for multiple child */
+  align-items: center; /* if an only child */
+}
+</style>
