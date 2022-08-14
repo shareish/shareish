@@ -6,7 +6,7 @@
             </div>
 
             <div class="column is-6" v-for="conversation in conversations" v-bind:key="conversation.id">
-                <router-link :to="{ name: 'conversationDetail', params: { id: conversation.id }}" class="button is-light is-normal is-responsive is-hovered">{{ conversation.name }} ({{ conversation.buyer }} | {{ conversation.owner }})</router-link>
+                <router-link :to="{ name: 'conversationDetail', params: { id: conversation.id }}" class="button is-light is-normal is-responsive is-hovered">{{ conversation.slug }}</router-link>
             </div>
         </div>
     </div>

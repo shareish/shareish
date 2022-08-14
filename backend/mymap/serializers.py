@@ -33,7 +33,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     messages = serializers.PrimaryKeyRelatedField(many=True, queryset=Message.objects.all(), allow_null=True)
     class Meta:
         model = Conversation
-        fields = ['id', 'name', 'owner', 'buyer', 'messages']
+        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'messages']
     
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:

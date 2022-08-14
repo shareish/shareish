@@ -152,8 +152,6 @@ class Item(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
 
-    image = models.ImageField(upload_to='tfe/uploads/', null=True, blank=True)
-
     def __str__(self) -> str:
         return self.name + ' : ' + self.description + ' (' + self.category1 + ')'
 
@@ -181,8 +179,10 @@ class ItemImage(models.Model):
 
 class Conversation(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100, null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE, null=True)
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE, null=True)
+    item = models.ForeignKey(Item, related_name="conversations", on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['name']

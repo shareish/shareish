@@ -18,9 +18,6 @@
                 
             </div>
         </div>
-
-
-        This is the conversation {{ conversation.name }}.
         <div class="conv-messages"  v-for="message in messages" v-bind:key="message.id" id="conv-messages">
             <article class="message is-dark" v-if="message.user != userID">
                 <div class="message-body">

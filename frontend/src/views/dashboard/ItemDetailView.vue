@@ -426,6 +426,7 @@ export default {
                 'name': "" + this.item['id'] + this.item['user'] + this.$store.state.user.id,
                 'owner': this.item['user'],
                 'buyer': this.$store.state.user.id,
+                'item': this.item['id'],
                 'messages': [],
             }
             axios
