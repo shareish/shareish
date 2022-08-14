@@ -1,5 +1,25 @@
 <template>
     <div class="box">
+        <div class="mb-2">
+            <button class="button is-danger" @click="openModal">Delete Conversation</button>
+        </div>
+        <div class="container" id="confirm">
+            <div class="modal" id="modal">
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <div class="box">
+                        <h1 class="title">Do you really want to delete this conversation?</h1>
+                        <div class="columns is-centered p-2">
+                            <button class="button is-info column is-3 p-2" @click="deleteConversation">Delete</button>
+                            <button class="button is-danger column is-3 is-offset-3 p-2" @click="closeModal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+
         This is the conversation {{ conversation.name }}.
         <div class="conv-messages"  v-for="message in messages" v-bind:key="message.id" id="conv-messages">
             <article class="message is-dark" v-if="message.user != userID">
@@ -144,6 +164,25 @@ export default {
             console.log('coucou je ferme hein')
             this.ws.close()  
         },
+        openModal(){
+            let elem = document.getElementById("modal")
+            elem.classList.add("is-active")
+        },
+        closeModal(){
+            let elem = document.getElementById("modal")
+            elem.classList.remove("is-active")
+        },
+        deleteConversation(){
+            axios
+                .delete(`/api/v1/conversations/${this.conversationID}/`)
+                .then(_ => {
+                    this.$router.push('/dashboard/conversations')
+                })
+                .catch(error => {
+                    alert('You cannot delete this conversation.')
+                    console.log(JSON.stringify(error))
+                })
+        }
     },
 }
 </script>

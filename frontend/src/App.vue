@@ -1,52 +1,17 @@
 <template>
   <div id="wrapper">
-    <nav class="navbar is-fixed-top is-dark" style="z-index: 99999;">
+    <nav class="navbar is-fixed-top is-dark" id="navigation-bar" role="navigation" style="z-index: 99999;">
       <div class="navbar-brand">
         <router-link to="/dashboard" class="navbar-item">
           <img src='../public/mymap/images/logo.png' width="50" height="30" class="navbar-item" alt="Logo">
         </router-link>
-        <!-- <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-          <span aria-hidden="false">salut</span>
-          <span aria-hidden="true">coucou</span>
-          <span>gobaby</span>
-        </a> -->
-        <!-- <div class="navbar-burger">
-          <template v-if="$store.state.isAuthenticated">
-            <div class="navbar-item">
-              <div class="select is-rounded">
-                <select v-model="$i18n.locale" @change="changeLanguage">
-                  <option value="en">En</option>
-                  <option value="fr">Fr</option>
-                </select>
-              </div>
-            </div>
-            <router-link to="/dashboard/items" class="navbar-item">Items</router-link>
-            <router-link to="/dashboard/items/add" class="navbar-item">Add item</router-link>
-            <router-link to="/dashboard/my-account" class="navbar-item">My Account</router-link>
-            <router-link to="/dashboard/conversations" class="navbar-item">Chat Rooms</router-link>
-          </template>
-
-          <template v-else>
-            <router-link to="/" class="navbar-item">Home</router-link>
-            <div class="navbar-item">
-              <div class="select is-rounded">
-                <select v-model="$i18n.locale" @change="changeLanguage">
-                  <option value="en">En</option>
-                  <option value="fr">Fr</option>
-                </select>
-              </div>
-            </div>
-            <div class="navbar-item">
-              <div class="buttons">
-                <router-link to="/sign-up" class="button is-success"><strong>Sign up</strong></router-link>
-                <router-link to="/log-in" class="button is-light">Log in</router-link>
-              </div>
-            </div>
-          </template>
-        </div> -->
+        <button role="button" id="navigation-burger" class="navbar-burger" dataTarget="navigation-menu" @click="toggleDropdown">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
       </div>
-
-      <div class="navbar-menu">
+      <div id="navigation-menu" class="navbar-menu">
         <div class="navbar-start">
           <div class="navbar-item field has-addons">
             <div class="control is-expanded">
@@ -157,6 +122,11 @@
       }
     },
 
+    mounted(){
+      if(window.getComputedStyle)
+        console.log(window.getComputedStyle(document.getElementById('navigation-burger'), null).getPropertyValue("display"))
+    },
+
     data() {
         return {
             search: '',
@@ -178,6 +148,12 @@
         }else{
           this.$router.push({ name: 'resultsSearch', params: {data: this.search}})
         }
+      },
+      toggleDropdown(){
+        const nav = document.getElementById('navigation-menu')
+        const burger = document.getElementById('navigation-burger')
+        nav.classList.toggle("is-active")
+        burger.classList.toggle("is-active")
       }
     },
   }
@@ -185,4 +161,10 @@
 
 <style lang="scss">
   @import '../node_modules/bulma';
+  .is-vcentered {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center; /* used this for multiple child */
+    align-items: center; /* if an only child */
+  }
 </style>
