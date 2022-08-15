@@ -1,8 +1,14 @@
 <template>
     <div class="box">
-        <div class="mb-2">
-            <button class="button is-danger" @click="openModal">Delete Conversation</button>
+        <div class="columns">
+            <div class="column is-3 mb-2">
+                <button class="button is-danger is-responsive" @click="openModal">Delete Conversation</button>
+            </div>
+            <div class="column is-3 is-offset-3 mb-2">
+                <button class="button is-info is-responsive" @click="gotoItem">Go to Item</button>
+            </div>
         </div>
+        
         <div class="container" id="confirm">
             <div class="modal" id="modal">
                 <div class="modal-background"></div>
@@ -89,6 +95,7 @@ export default {
                 .get(`/api/v1/conversations/${this.conversationID}`)
                 .then(response => {
                     this.conversation = response.data
+                    console.log(this.conversation['item'])
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
@@ -179,6 +186,9 @@ export default {
                     alert('You cannot delete this conversation.')
                     console.log(JSON.stringify(error))
                 })
+        },
+        gotoItem(){
+            this.$router.push({ name: 'itemDetail', params: { id: this.conversation['item'] }})
         }
     },
 }
