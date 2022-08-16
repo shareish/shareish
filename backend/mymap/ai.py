@@ -3,6 +3,7 @@ from PIL import Image
 from torchvision import transforms
 from matplotlib import pyplot as plt
 from torchvision import models
+import os
 
 model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v3_large', weights=models.MobileNet_V3_Large_Weights.IMAGENET1K_V1)
 model.eval()
@@ -62,3 +63,36 @@ def findClass(filename):
         print(categories[top5_catid[i]], top5_prob[i].item())
 
     return categories[top5_catid[0]]
+
+def plot_image_grid(image_datas, path):
+    n = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
+    _, axarr = plt.subplots(2,5)
+    axarr[0,0].imshow(image_datas[1])
+    axarr[0,1].imshow(image_datas[2])
+    axarr[0,2].imshow(image_datas[3])
+    axarr[0,3].imshow(image_datas[4])
+    axarr[0,4].imshow(image_datas[5])
+    axarr[1,0].imshow(image_datas[6])
+    axarr[1,1].imshow(image_datas[7])
+    axarr[1,2].imshow(image_datas[8])
+    axarr[1,3].imshow(image_datas[9])
+    axarr[1,4].imshow(image_datas[10])
+
+    for i in range(2):
+        for j in range(5):
+            axarr[i, j].axis('off')
+            axarr[i, j].set_title('N = ' + str(n[i*5 + j]))
+    title = "1_3bis.svg"
+    plt.savefig(os.path.join(path, title))
+    plt.show()
+
+def testModel():
+    path = "../Testbedai/"
+    for filename in os.listdir(path):
+        file = os.path.join(path, filename)
+        print("Categories linked with file " + file + " are :")
+        findClass(file)
+        print()
+
+if __name__ == '__main__':
+    testModel()

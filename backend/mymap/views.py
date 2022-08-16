@@ -6,7 +6,6 @@
 # from django.contrib.auth import logout
 # import json
 # from django.core import serializers
-from unicodedata import category
 from .models import Item, ItemImage, Conversation, Message, UserImage
 # from .forms import SignUpForm, LoginForm, ItemForm
 from django.contrib.auth import get_user_model
@@ -26,8 +25,6 @@ from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 
 from .ai import findClass
-
-
 
 from geopy.geocoders import Nominatim
 locator = Nominatim(user_agent="shareish")
@@ -209,7 +206,6 @@ class ItemImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         item = Item.objects.get(pk = request.POST['itemID'])
-        print(request.FILES)
         images = request.FILES.getlist('files')
         for image in images:
             newImage = ItemImage(image = image, item = item)
