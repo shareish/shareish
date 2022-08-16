@@ -17,6 +17,8 @@ To link PostGIS to your PostgreSQL database, run this command in your postgres t
 
 
 pip 20.2.2
+numpy 1.18.5
+gdal 3.4.2
 djoser 2.1.0
 djangorestframework 3.13.1
 djangorestframework-simplejwt 4.8.0
