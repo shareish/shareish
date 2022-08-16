@@ -39,3 +39,11 @@ npm install -g @vue/cli
 Go into /tfe/frontend/
 	npm install
 	npm run serve (the frontent server is running)
+
+To run the backend
+	go to /tfe/backend/
+	run python mane.py runserver
+
+The database listen on port 5432 and run on port 8080
+Django listen on port 8000
+Vue listen on port 8081
