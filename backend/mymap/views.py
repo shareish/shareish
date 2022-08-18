@@ -351,8 +351,7 @@ def searchItemFilter(request):
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
         if 'name' not in searched and searched['item_type'] == 'null' and 'category' not in searched:
-            items = Item.objects.all()
-            serialized_items = MapItemSerializer(items, many=True)
+            serialized_items = MapItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
         if 'name' in searched:
             items_name = queryset.filter(name__icontains=searched['name'])

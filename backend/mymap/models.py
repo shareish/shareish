@@ -39,12 +39,12 @@ class MyUserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    first_name = models.CharField(max_length=50, blank=True)
-    last_name = models.CharField(max_length=20, blank=True)
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=20, null=True, blank=True)
     birth_date = models.DateField(default=date.today, blank=True)
     sign_in_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    username = models.CharField(max_length = 20, blank=True)
+    username = models.CharField(max_length = 20, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     description = models.TextField(blank = True, max_length = 300)
@@ -56,7 +56,7 @@ class User(AbstractBaseUser):
     """
 
     def __str__(self) -> str:
-        return self.first_name + " " + self.last_name + " (" + self.email + ")"
+        return self.email
 
     def has_perm(self, perm, obj=None):
         return True
@@ -85,7 +85,7 @@ class UserImage(models.Model):
             img.save(self.image.path)
 
     def __str__(self) -> str:
-        return 'Image related to ' + self.user.username + '.'
+        return 'Image related to ' + self.user.email + '.'
 
     class Meta:
         ordering = ['user']
@@ -96,7 +96,7 @@ class Item(models.Model):
     location = models.PointField(blank=True, geography=True, null=True)
     startdate = models.DateField(default=timezone.now)
     enddate = models.DateField(null=True)
-    in_progress = models.BooleanField(default=True)
+    in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
     
     class ItemType(models.TextChoices):
