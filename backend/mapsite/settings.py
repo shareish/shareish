@@ -94,9 +94,9 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST': "db",
-        'NAME': 'postgres',
-        'PASSWORD': "postgres",
+        'HOST': "127.0.0.1",
+        'NAME': 'db',
+        'PASSWORD': "Adrien99/99/99.",
         'PORT': "5432",
         'USER': "postgres",
     }
