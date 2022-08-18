@@ -5,6 +5,6 @@ import store from './store'
 import axios from 'axios'
 import i18n from './i18n'
 
-axios.defaults.baseURL = 'http://localhost:8000'
+axios.defaults.baseURL = 'http://localhost:8000' //A voir si ici ce n'est pas 0.0.0.0:8000
 
 createApp(App).use(i18n).use(store).use(router, axios).mount('#app')

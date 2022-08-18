@@ -64,9 +64,9 @@ services:
   ui:
     build:
       context: frontend
-      target: dev-stage #production-stage
+      target: production-stage #dev-stage
     volumes:
       - ./frontend:/app
     ports: # App is running on port 8081
-      - "8081:8080"
+      - "80:80"
     restart: unless-stopped
