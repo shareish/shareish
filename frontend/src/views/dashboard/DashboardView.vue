@@ -28,7 +28,7 @@
                         <div class="control">
                             <div class="select">
                                 <select name="type" id="type" v-model="filter.item_type" >
-                                    <option value=null>Null</option>
+                                    <option value=null>{{ $t('all') }}</option>
                                     <option value="BR">{{ $t('request') }}</option>
                                     <option value="DN">{{ $t('donation') }}</option>
                                     <option value="LN">{{ $t('loan') }}</option>
@@ -79,11 +79,11 @@
                 <div class="modal-background"></div>
                 <div class="modal-card">
                     <header class="modal-card-head">
-                        <p class="modal-card-title">{{ modalToShow['name'] }}</p>
+                        <p class="modal-card-title">{{ nameToShow }}</p>
                         <button class="delete" aria-label="close" @click="closeEdit"></button>
                     </header>
                     <div class="modal-card-body">
-                        <p>{{ modalToShow['description'] }}</p>
+                        <p>{{ descriptionToShow }}</p>
                     </div>
                     <footer class="modal-card-foot">
                         <div v-if="modalToShow['id']">
@@ -110,10 +110,13 @@ export default {
             filter: {},
             items: [],
             markers: {},
-            modalToShow: {}
+            modalToShow: {},
+            nameToShow: '',
+            descriptionToShow: ''
         }
     },
     async mounted() {
+        console.time('mount')
         this.map = L.map('mapid').locate({
             setView: true,
             maxZoom: 19,
@@ -125,20 +128,23 @@ export default {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
-        this.filter.item_type = 'BR'
+        this.filter.item_type = 'null'
         this.markers = new L.markerClusterGroup()
         await this.getItemsLocation()
+        console.timeEnd('mount')
     },
     methods: {
         async getItemsLocation(){
             console.log('time for receiving the informations and adding them to the this.location array :')
             console.time('timer')
+            console.time('timerRequest')
             await axios
                 .post('/api/v1/requestFilter/', this.filter)
                 .then(response => {
-                    console.log(response.data)
+                    console.timeEnd('timerRequest')
                     this.locations = []
                     this.items = response.data
+                    console.log(response.data)
                     for(let i = 0; i < response.data.length; i++){
                         if(response.data[i]['location'] != null){
                             let refinedLocation = response.data[i]['location'].slice(17, -1)
@@ -162,8 +168,17 @@ export default {
                     console.log(error)
                 })    
         },
-        onMarkerClick(e){
+        async onMarkerClick(e){
             this.modalToShow = this.items[e.target.increment]
+            await axios
+                .get(`/api/v1/mapnd/${this.modalToShow['id']}`)
+                .then(response => {
+                    this.nameToShow = response.data['name']
+                    this.descriptionToShow = response.data['description']
+                })
+                .catch(error => {
+                    console.log(error)
+                })
             let elem = document.getElementById("modal")
             elem.classList.add("is-active")
         },

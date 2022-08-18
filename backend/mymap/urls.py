@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import ActiveItemViewSet, ItemViewSet, ItemImageViewSet, UserViewSet, ConversationViewSet, MessageViewSet, RecurrentItemViewSet, ActiveItemViewSet, UserItemViewSet, UserImageViewSet
+from .views import ActiveItemViewSet, ItemViewSet, ItemImageViewSet, UserViewSet, ConversationViewSet, MessageViewSet, RecurrentItemViewSet, ActiveItemViewSet, UserItemViewSet, UserImageViewSet, MapNameAndDescriptionViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -13,6 +13,7 @@ router.register("recurrents", RecurrentItemViewSet, basename="recurrents")
 router.register("actives", ActiveItemViewSet, basename="actives")
 router.register("user_items", UserItemViewSet, basename='user_items')
 router.register("user_image", UserImageViewSet, basename="user_image")
+router.register("mapnd", MapNameAndDescriptionViewSet, basename="mapnd")
 
 urlpatterns = [
     path('', include(router.urls)),

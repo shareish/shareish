@@ -55,12 +55,12 @@ def findClass(filename):
 
     # Read the categories
     
-    categories = getCategories("imagenet_classes.txt")
+    categories = getCategories("./mymap/imagenet_classes.txt")
 
     # Show top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
     for i in range(top5_prob.size(0)):
-        print(categories[top5_catid[i]], top5_prob[i].item())
+        print(str(categories[top5_catid[i]]) + " & " + str(top5_prob[i].item()) + "\\\\")
 
     return categories[top5_catid[0]]
 
@@ -90,9 +90,14 @@ def testModel():
     path = "../Testbedai/"
     for filename in os.listdir(path):
         file = os.path.join(path, filename)
-        print("Categories linked with file " + file + " are :")
+        print("\\raisebox{-0.5\\totalheight}{\\includegraphics[width=0.3\\textwidth, height=30mm]{resources/TestModelImage/" + filename + "}} & \\begin{tabular}{c c}")
+        print()
+        print()
         findClass(file)
         print()
+        print("\\end{tabular}\\\\")
+        print()
+        print("\\hline")
 
 if __name__ == '__main__':
     testModel()

@@ -103,9 +103,6 @@ export default {
         },
         async getMessages() {
             let maxlength = this.conversation['messages'].length
-            // if(this.conversation['messages'].length < 5){
-            //     maxlength = this.conversation['messages'].length
-            // }
             for(let i = 0; i < maxlength; i++){
                 await axios
                     .get(`/api/v1/messages/${this.conversation['messages'][i]}`)
@@ -202,5 +199,3 @@ export default {
   align-items: center; /* if an only child */
 }
 </style>
-
-<!-- TODO le layout risque de ne pas être beau si nous avons beaucoup de messages -->

@@ -20,7 +20,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from django.core import serializers
-from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer, UserImageSerializer
+from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer, UserImageSerializer, MapItemSerializer, MapNameAndDescriptionSerializer
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 
@@ -145,7 +145,6 @@ class ItemViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def perform_create(self, serializer):
@@ -308,7 +307,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
         data['item'] = None
         data['slug'] = None
         serializer = self.get_serializer(data=data)
-        print(getattr(item, 'name'))
         if serializer.is_valid():
             slug = getattr(item, 'name') + ' (' + getattr(owner, 'username')+ ' and ' + getattr(buyer, 'username') + ')'
             self.perform_create(serializer, owner, buyer, item, slug)
@@ -324,11 +322,14 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
 
+class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
+    serializer_class = MapNameAndDescriptionSerializer
+    queryset = Item.objects.filter(in_progress=True)
+
 @api_view(['POST'])
 def getAddress(request):
     if request.method == "POST":
         address = request.data['SRID']
-        print(address)
         address = address.split(' ')
         address[1] = address[1][1:]
         address[2] = address[2][:-1]
@@ -342,7 +343,6 @@ def getAddress(request):
 def searchItemFilter(request):
     if request.method == "POST":
         searched = request.data
-        print(searched)
         items_name = None
         items_item_type = None
         items_category1 = None
@@ -352,7 +352,7 @@ def searchItemFilter(request):
         queryset = Item.objects.filter(in_progress=True)
         if 'name' not in searched and searched['item_type'] == 'null' and 'category' not in searched:
             items = Item.objects.all()
-            serialized_items = ItemSerializer(items, many=True)
+            serialized_items = MapItemSerializer(items, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
         if 'name' in searched:
             items_name = queryset.filter(name__icontains=searched['name'])
@@ -366,7 +366,7 @@ def searchItemFilter(request):
             items_category2 = queryset.filter(category2__exact=searched['category'])
             items_category3 = queryset.filter(category3__exact=searched['category'])
             items = items | items_category1 | items_category2 | items_category3
-        serialized_items = ItemSerializer(items, many=True)
+        serialized_items = MapItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -376,8 +376,6 @@ from rest_framework.pagination import LimitOffsetPagination
 @api_view(['POST'])
 def searchItems(request):
     if request.method == "POST":
-        print(request.data)
-        print(request)
         paginator = ActivePaginationClass()
         search = request.data['search']
         items = Item.objects.none()
@@ -387,7 +385,6 @@ def searchItems(request):
             items = items | items_description | items_name
         items = paginator.paginate_queryset(items, request)
         serialized_items = ItemSerializer(items, many=True)
-        print(paginator.get_paginated_response(serialized_items.data))
         return paginator.get_paginated_response(serialized_items.data)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)

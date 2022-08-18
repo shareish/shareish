@@ -8,6 +8,16 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3', 'user', 'images']
 
+class MapItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id', 'location']
+
+class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id', 'name', 'description']
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
     image = serializers.PrimaryKeyRelatedField(many=True, queryset=UserImage.objects.all(), allow_null=True)
