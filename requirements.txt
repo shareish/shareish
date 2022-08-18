@@ -1,6 +1,0 @@
-Django>=3.0,<4.0
-psycopg2>=2.8
-Pillow>=9.0.1
-numpy>=1.18.5
-libgdal>=3.2.0
-gdal>=3.3.2
