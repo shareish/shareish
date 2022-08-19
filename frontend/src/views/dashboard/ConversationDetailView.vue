@@ -118,7 +118,9 @@ export default {
             console.log("Starting connection to WebSocket Server")
 
             this.ws = new WebSocket(
-                'ws://localhost:8000/ws/'
+                'ws://'
+                + window.location.hostname 
+                + '/ws/'
                 + this.conversation['name']
                 + '/'
             )

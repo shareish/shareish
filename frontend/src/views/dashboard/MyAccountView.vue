@@ -192,7 +192,7 @@ export default {
                                 .get(`/api/v1/images/${this.items[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://localhost:8000'
+                                    const localhost = 'http://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[this.items[i]['id']] = image
                                 })
@@ -211,8 +211,9 @@ export default {
                 await axios
                 .get(`/api/v1/user_image/${this.user['image'][0]}/`)
                 .then(response => {
+                    console.log(response.data['image'])
                     var image = response.data['image']
-                    const localhost = 'http://localhost:8000'
+                    const localhost = 'http://' + window.location.hostname
                     image = localhost.concat(image)
                     this.userImage = image
                 })
@@ -278,7 +279,7 @@ export default {
                             .post('/api/v1/user_image/', formData2)
                             .then(async response2 => {
                                 let image = response2.data['image']
-                                const localhost = 'http://localhost:8000'
+                                const localhost = 'http://' + window.location.hostname
                                 image = localhost.concat(image)
                                 this.userImage = image
                                 await this.getImage()

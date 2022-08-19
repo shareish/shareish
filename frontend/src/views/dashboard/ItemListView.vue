@@ -45,7 +45,7 @@
                     </div>
                 </div>
             </div>
-            <div id="more" class="column is-3">
+            <div id="more" style="display: block;" class="column is-3">
                 <a @click="showMore">
                     <div class="card">
                         <div class="card-image">
@@ -79,26 +79,31 @@ export default {
             images: {},
             imageUsers: [],
             apiCall: '',
+            pageNumber: 1
         }
     },
     async mounted() {
         this.apiCall = '/api/v1/actives/?page=1'
+        this.toggleMoreLoad()
         await this.getItems()
+        this.toggleMoreLoad()
     },
     methods: {
         async getItems() {
-            let plus = document.getElementById('more')
-            let loading = document.getElementById('loading')
-            plus.style.display = "none"
-            loading.style.display = "block"
             await axios
                 .get(this.apiCall)
                 .then(async response => {
                     let data = response.data.results
-                    this.apiCall = response.data.next
-                    if(this.apiCall == null){
-                        plus.remove()
-                        loading.remove()
+                    if(response.data.next == null){
+                        let plus = document.getElementById('more')
+                        let loading = document.getElementById('loading')
+                        if(plus != null && loading != null){
+                            plus.remove()
+                            loading.remove()
+                        }
+                    }else{
+                        this.pageNumber++
+                        this.apiCall = '/api/v1/actives/?page=' + this.pageNumber
                     }
                     for(let i = 0; i < data.length; i++){
                         this.items.push(data[i])
@@ -107,7 +112,7 @@ export default {
                                 .get(`/api/v1/images/${data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://localhost:8000'
+                                    const localhost = 'http://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[data[i]['id']] = image
                                 })
@@ -124,7 +129,7 @@ export default {
                                         .get(`/api/v1/user_image/${response3.data['image'][0]}/`)
                                         .then(responseImage => {
                                             var image = responseImage.data['image']
-                                            const localhost = 'http://localhost:8000'
+                                            const localhost = 'http://' + window.location.hostname
                                             image = localhost.concat(image)
                                             this.imageUsers[data[i]['id']] = image
                                         })
@@ -142,8 +147,19 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
-                loading.style.display = "none"
-                plus.style.display = "block"
+        },
+        toggleMoreLoad(){
+            let plus = document.getElementById('more')
+            let loading = document.getElementById('loading')
+            if(plus != null && loading != null && plus.style != null && loading.style != null){
+                if(plus.style.display == 'block'){
+                    plus.style.display = 'none'
+                    loading.style.display = 'block'
+                }else{
+                    plus.style.display = 'block'
+                    loading.style.display = 'none'
+                }
+            }
         },
         getImageURL(index){
             return this.images[index]

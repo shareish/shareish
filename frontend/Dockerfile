@@ -2,6 +2,7 @@
 FROM node:16.13 as dev-stage
 WORKDIR /app
 COPY package*.json ./
+RUN rm -rf node_modules/
 RUN npm install
 COPY . .
 CMD ["npm", "run", "serve"]

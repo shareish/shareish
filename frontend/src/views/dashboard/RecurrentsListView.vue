@@ -65,7 +65,7 @@ export default {
                                 .get(`/api/v1/images/${response.data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://localhost:8000'
+                                    const localhost = 'http://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[response.data[i]['id']] = image
                                 })

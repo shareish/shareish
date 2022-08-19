@@ -12,7 +12,7 @@
         </button>
       </div>
       <div id="navigation-menu" class="navbar-menu">
-        <div class="navbar-start">
+        <div class="navbar-start" v-if="$store.state.isAuthenticated">
           <div class="navbar-item field has-addons">
             <div class="control is-expanded">
               <input type="text" class="input" placeholder="Search..." v-model="search">

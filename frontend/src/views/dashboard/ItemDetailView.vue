@@ -315,7 +315,7 @@ export default {
                         .get(`/api/v1/images/${this.item['images'][0]}`)
                         .then(response2 => {
                             this.image = response2.data['image']
-                            const localhost = 'http://localhost:8000'
+                            const localhost = 'http://' + window.location.hostname
                             this.image = localhost.concat(this.image)
                         })
                         .catch(error => {
@@ -349,7 +349,7 @@ export default {
                                 .get(`/api/v1/user_image/${response.data['image'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://localhost:8000'
+                                    const localhost = 'http://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.userImage = image
                                 })

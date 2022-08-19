@@ -253,7 +253,7 @@ export default {
                     .get(`/api/v1/images/${imagesIDs[i]}`)
                     .then(response => {
                         let name = response.data['image']
-                        const localhost = 'http://localhost:8000'
+                        const localhost = 'http://' + window.location.hostname
                         this.images.push(localhost.concat(name))
                     })
                     .catch(error => {
