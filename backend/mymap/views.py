@@ -398,7 +398,6 @@ def predictClass(request):
             return Response(class_found, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 #@login_required
 # def profil(request, user_id):
 #     print(user_id)

@@ -32,14 +32,24 @@
                 </select>
               </div>
             </div>
-            <router-link to="/dashboard/items" class="navbar-item">Items</router-link>
-            <router-link to="/dashboard/items/add" class="navbar-item">Add item</router-link>
-            <router-link to="/dashboard/my-account" class="navbar-item">My Account</router-link>
-            <router-link to="/dashboard/conversations" class="navbar-item">Chat Rooms</router-link>
+            <div class="navbar-item" @click="toggleDropdown()">
+              <router-link to="/dashboard/items">Items</router-link>
+            </div>
+            <div class="navbar-item" @click="toggleDropdown()">
+              <router-link to="/dashboard/items/add">Add item</router-link>
+            </div>
+            <div class="navbar-item" @click="toggleDropdown()">
+              <router-link to="/dashboard/my-account">My Account</router-link>
+            </div>
+            <div class="navbar-item" @click="toggleDropdown()">
+              <router-link to="/dashboard/conversations">Chat Rooms</router-link>
+            </div>
           </template>
 
           <template v-else>
-            <router-link to="/" class="navbar-item">Home</router-link>
+            <div class="navbar-item" @click="toggleDropdown()">
+              <router-link to="/">Home</router-link>
+            </div>
             <div class="navbar-item">
               <div class="select is-rounded">
                 <select v-model="$i18n.locale" @change="changeLanguage">
@@ -166,5 +176,9 @@
     flex-wrap: wrap;
     align-content: center; /* used this for multiple child */
     align-items: center; /* if an only child */
+  }
+  .wrapper {
+    margin-right: auto; /* 1 */
+    margin-left: auto; /* 1 */
   }
 </style>

@@ -20,5 +20,5 @@ urlpatterns = [
     path('requestFilter/', views.searchItemFilter, name='search_item_filter'),
     path('address/', views.getAddress, name='get_address'),
     path('requestItems/', views.searchItems, name='search_items'),
-    path('predictClass/', views.predictClass, name='predict_class')
+    path('predictClass/', views.predictClass, name='predict_class'),
 ]

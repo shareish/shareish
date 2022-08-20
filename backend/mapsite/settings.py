@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ul#-q0@ob@e1il^=564elf-&omouwr14nvm-8&)bf4%y^yiliq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['web']
 
 
 # Application definition
@@ -86,6 +86,15 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer'
     }
 }
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 
 # Database
@@ -178,16 +187,13 @@ REST_FRAMEWORK = {
     ),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8081",
-#     "http://127.0.0.1:8081",
-#     "http://localhost:8000",
-#     "http://127.0.0.1:8000",
-#     "http://localhost",
-#     "http://127.0.0.1",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://ui",
+    "http://localhost",
+    "http://shareish.montefiore.uliege.be"
+]
 
 DJOSER = {
     'SERIALIZERS': {
