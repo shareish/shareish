@@ -27,23 +27,23 @@ Set permissions to make it executable.
 > sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-Varify that docker-compose is correctly set up.
+Verify that docker-compose is correctly set up.
 
 ```
 > docker-compose --version
 ```
-It should output something like this
+It should output something like this:
 ```
 docker-compose version 1.29.2, build 5becea4c
 ```
 
-Build the containers
+Build the docker images.
 
 ```
 > docker-compose build
 ```
 
-Start the containers
+Start the docker containers.
 
 ```
 > docker-compose up
