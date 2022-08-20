@@ -93,25 +93,21 @@
                                         <figure v-if="getImageItemURL(item.id)" class="image is-4by3">
                                             <img :src="getImageItemURL(item.id)" alt="Placeholder image">
                                         </figure>
-                                        <div v-else class="image is-4by3">
-                                            <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
-                                        </div>
+                                        <figure v-else class="image is-4by3">
+                                        <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
+                                        </figure>
                                     </div>
                                     <div class="card-content">
                                         <div class="media">
-                                            <div class="media-left">
-                                                <figure class="image is-48x48">
-                                                <!-- <img :src="getSmallImageURL(item.id)" alt="Placeholder image"> -->User's photo
-                                                </figure>
-                                            </div>
                                             <div class="media-content">
                                                 <p class="title is-4">{{ item.name }}</p>
                                                 <p class="subtitle is-6">{{ item.category1 }}</p>
                                             </div>
                                         </div>
 
-                                        <div class="content">
+                                        <div class="content has-text-centered">
                                             {{ item.description }}
+                                            <br>
                                             <br>
                                             <router-link :to="{ name: 'itemDetail', params: { id: item.id }}" class="button is-info is-normal is-responsive">Details</router-link>
                                         </div>
@@ -192,8 +188,8 @@ export default {
                                 .get(`/api/v1/images/${this.items[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
-                                    image = localhost.concat(image)
+                                    const media = 'http://' + window.location.hostname
+                                    image = media.concat(image)
                                     this.images[this.items[i]['id']] = image
                                 })
                                 .catch(error2 => {
@@ -213,8 +209,8 @@ export default {
                 .then(response => {
                     console.log(response.data['image'])
                     var image = response.data['image']
-                    const localhost = 'http://' + window.location.hostname
-                    image = localhost.concat(image)
+                    const media = 'http://' + window.location.hostname
+                    image = media.concat(image)
                     this.userImage = image
                 })
                 .catch(error => {
@@ -279,8 +275,9 @@ export default {
                             .post('/api/v1/user_image/', formData2)
                             .then(async response2 => {
                                 let image = response2.data['image']
-                                const localhost = 'http://' + window.location.hostname
-                                image = localhost.concat(image)
+                                const media = 'http://' + window.location.hostname
+                                image = media.concat(image)
+                                console.log(image)
                                 this.userImage = image
                                 await this.getImage()
                                 document.getElementById("profilPicture").src = this.getImageURL()

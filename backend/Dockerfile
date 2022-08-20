@@ -25,6 +25,7 @@ ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
 WORKDIR /code
+RUN mkdir /code/mediafiles
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 

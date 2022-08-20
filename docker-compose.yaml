@@ -35,6 +35,7 @@
 version: '3.9'
 volumes:
   postgis-data:
+  media_volume:
 
 services:
   db:
@@ -51,6 +52,7 @@ services:
     build: backend
     volumes:
       - ./backend:/code
+      - media_volume:/code/mediafiles
     ports:
       - "8000:8000"
     environment:
@@ -67,6 +69,9 @@ services:
       target: production-stage #dev-stage
     volumes:
       - ./frontend:/app
+      - media_volume:/app/web/mediafiles
     ports: # App is running on port 8081
       - "80:80"
+    depends_on:
+      - web
     restart: unless-stopped

@@ -72,7 +72,7 @@ class User(AbstractBaseUser):
         ordering = ['sign_in_date']
 
 class UserImage(models.Model):
-    image = models.ImageField(upload_to='tfe/uploads/')
+    image = models.ImageField(upload_to='')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='image', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
@@ -153,7 +153,7 @@ class Item(models.Model):
         ordering = ['name']
 
 class ItemImage(models.Model):
-    image = models.ImageField(upload_to='tfe/uploads/')
+    image = models.ImageField(upload_to='')
     item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
