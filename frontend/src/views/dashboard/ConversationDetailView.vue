@@ -95,7 +95,6 @@ export default {
                 .get(`/api/v1/conversations/${this.conversationID}`)
                 .then(response => {
                     this.conversation = response.data
-                    console.log(this.conversation['item'])
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
@@ -164,7 +163,6 @@ export default {
             return false;
         },
         beforeWindowUnload(e) {
-            console.log('coucou je ferme hein')
             this.ws.close()  
         },
         openModal(){
@@ -197,7 +195,7 @@ export default {
 .is-vcentered {
   display: flex;
   flex-wrap: wrap;
-  align-content: center; /* used this for multiple child */
-  align-items: center; /* if an only child */
+  align-content: center;
+  align-items: center;
 }
 </style>

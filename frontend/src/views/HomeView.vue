@@ -6,7 +6,7 @@
       Shareish is a Master Thesis project by Adrien Guilliams under the supervision of Raphaël Marée.
       Shareish is an open-source web platform created to foster local indirect exchanges and citizen mutual aid.
       Have a look you will not be disappointed.
-      If you want to launch this initiative in your region, you can go on <a href="https://github.com/shareish/tfe">https://github.com/shareish/tfe</a> to see how to deploy this yourself.
+      If you want to launch this initiative in your region, you can go on <a href="https://github.com/shareish">https://github.com/shareish</a> to see how to deploy this yourself.
     </p>
   </div>
 </template>

@@ -1,6 +1,6 @@
 # TFE
 
-## Installation
+## Installation for deployment
 Download the folders and files
 
 Change the name of your host server name in the file main.js in /frontend/src/

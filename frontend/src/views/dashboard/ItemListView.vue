@@ -181,7 +181,7 @@ export default {
 .is-vcentered {
   display: flex;
   flex-wrap: wrap;
-  align-content: center; /* used this for multiple child */
-  align-items: center; /* if an only child */
+  align-content: center;
+  align-items: center;
 }
 </style>

@@ -88,7 +88,6 @@ export default {
     async mounted() {
         this.apiCall = '/api/v1/requestItems/?page=1'
         this.search = this.$route.params['data']
-        //TODO faire une recherche axios sur un nouveau ItemViewSet qu'il faut faire pour envoyer une liste d'id et en retirer cette liste.
         this.toggleMoreLoad()
         await this.getItems()
         this.toggleMoreLoad()
@@ -207,7 +206,6 @@ export default {
 .is-vcentered {
   display: flex;
   flex-wrap: wrap;
-  align-content: center; /* used this for multiple child */
-  align-items: center; /* if an only child */
-}
+  align-content: center;
+  align-items: center;}
 </style>

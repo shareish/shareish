@@ -83,7 +83,6 @@ export default {
                 .then(response => {
                     this.user = Object.assign({}, response.data)
                     this.changes = Object.assign({}, response.data)
-                    console.log(response.data)
                     this.getItems(response)
                     this.getImage(response)
                 })

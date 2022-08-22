@@ -223,8 +223,6 @@
                         <div class="column is-full"></div>
                     </div>
                 </div>
-                
-                <!-- We could show the info in a more beautiful way and the location on a small map -->
             </div>
             <div class="column is-third is-offset-3">
                 <figure class="image is-256x256">
@@ -338,7 +336,6 @@ export default {
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
-            console.log(this.item['user'])
         },
         async getUserImage(){
             await axios
@@ -432,7 +429,6 @@ export default {
             axios
                 .post('api/v1/conversations/', formData)
                 .then(response => {
-                    console.log(response)
                     this.$router.push(`/dashboard/conversations/${response.data['id']}`)
                 })
                 .catch(error => {
@@ -447,7 +443,7 @@ export default {
 .is-vcentered {
   display: flex;
   flex-wrap: wrap;
-  align-content: center; /* used this for multiple child */
-  align-items: center; /* if an only child */
+  align-content: center;
+  align-items: center;
 }
 </style>

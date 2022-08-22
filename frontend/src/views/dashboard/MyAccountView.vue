@@ -207,7 +207,6 @@ export default {
                 await axios
                 .get(`/api/v1/user_image/${this.user['image'][0]}/`)
                 .then(response => {
-                    console.log(response.data['image'])
                     var image = response.data['image']
                     const media = 'http://' + window.location.hostname
                     image = media.concat(image)
@@ -237,17 +236,6 @@ export default {
                 description: this.changes['description'],
             }
 
-            // axios
-            //     .patch(`/api/v1/users/me/`, formData)
-            //     .then(response => {
-            //         this.user = response.data
-            //         this.closeEdit()
-            //     })
-            //     .catch(error => {
-            //         console.log(error)
-            //     })
-
-            //Faire une nouvelle fonction qui fait office de vue pour delete les images liées à l'utilisateur
             if(this.newImage != ''){
                 for(let i = 0; i < this.user['image'].length; i++){
                     axios
@@ -277,11 +265,9 @@ export default {
                                 let image = response2.data['image']
                                 const media = 'http://' + window.location.hostname
                                 image = media.concat(image)
-                                console.log(image)
                                 this.userImage = image
                                 await this.getImage()
                                 document.getElementById("profilPicture").src = this.getImageURL()
-                                console.log(this.getImageURL())
                             })
                             .catch(error => {
                                 console.log(JSON.stringify(error));
@@ -311,5 +297,3 @@ export default {
     },
 }
 </script>
-
-<!-- TODO Améliorer le style et le nombre de fields qu'on peut changer dans le modal mais sinon c'est bieng-->

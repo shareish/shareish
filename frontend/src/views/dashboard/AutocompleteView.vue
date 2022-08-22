@@ -48,10 +48,7 @@ export default {
             this.file = event.target.files
             console.log(this.file)
         },
-        submitForm(){
-            // With more time I could have linked every outputs of ImageNet dataset to one of my categories and I could propose a category on top of a name.
-            // TODO Pass the image to AddItem => BUG
-            
+        submitForm(){            
             axios
                 .post('/api/v1/predictClass/', this.file)
                 .then(response => {

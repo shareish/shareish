@@ -1,36 +1,3 @@
-# version: "3.9"
-   
-# services:
-#   db:
-#     image: postgres
-#     volumes:
-#       - ./data/db:/var/lib/postgresql/data
-#     environment:
-#       - POSTGRES_DB=postgres
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=postgres
-
-#   postgis:
-#     image: postgis/postgis:14-3.2
-#     environment:
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=postgres
-  
-#   web:
-#     build: .
-#     command: python manage.py runserver 0.0.0.0:8000
-#     volumes:
-#       - .:/code
-#     ports:
-#       - ":7999"
-#     environment:
-#       - POSTGRES_NAME=postgres
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=postgres
-#     depends_on:
-#       - db
-
-
 # docker-compose build
 version: '3.9'
 volumes:
@@ -70,7 +37,7 @@ services:
     volumes:
       - ./frontend:/app
       - media_volume:/app/web/mediafiles
-    ports: # App is running on port 8081
+    ports: # App is running on port 80
       - "80:80"
     depends_on:
       - web

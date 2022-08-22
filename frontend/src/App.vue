@@ -133,8 +133,6 @@
     },
 
     mounted(){
-      if(window.getComputedStyle)
-        console.log(window.getComputedStyle(document.getElementById('navigation-burger'), null).getPropertyValue("display"))
     },
 
     data() {
@@ -160,6 +158,7 @@
         }
       },
       toggleDropdown(){
+        // Display or remove the dropdown menu on the screen.
         const nav = document.getElementById('navigation-menu')
         const burger = document.getElementById('navigation-burger')
         nav.classList.toggle("is-active")

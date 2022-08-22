@@ -41,7 +41,6 @@ def getCategories(filename):
 def findClass(filename):
     image = getImage(filename)
 
-    # move the input and model to GPU for speed if available
     if torch.cuda.is_available():
         image = image.to('cuda')
         model.to('cuda')
@@ -49,21 +48,18 @@ def findClass(filename):
     with torch.no_grad():
         output = model(image)
 
-    # Tensor of shape 1000, with confidence scores over Imagenet's 1000 classes
-    # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
-
-    # Read the categories
     
     categories = getCategories("./mymap/imagenet_classes.txt")
 
-    # Show top categories per image
     top5_prob, top5_catid = torch.topk(probabilities, 5)
     for i in range(top5_prob.size(0)):
         print(str(categories[top5_catid[i]]) + " & " + str(top5_prob[i].item()) + "\\\\")
 
     return categories[top5_catid[0]]
 
+# These two functions are implemented to plot the save the figures on files
+# and to write the results on a tabular in a latex document
 def plot_image_grid(image_datas, path):
     n = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
     _, axarr = plt.subplots(2,5)

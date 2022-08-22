@@ -116,7 +116,6 @@ export default {
         }
     },
     async mounted() {
-        console.time('mount')
         this.map = L.map('mapid').locate({
             setView: true,
             maxZoom: 19,
@@ -131,20 +130,14 @@ export default {
         this.filter.item_type = 'null'
         this.markers = new L.markerClusterGroup()
         await this.getItemsLocation()
-        console.timeEnd('mount')
     },
     methods: {
         async getItemsLocation(){
-            console.log('time for receiving the informations and adding them to the this.location array :')
-            console.time('timer')
-            console.time('timerRequest')
             await axios
                 .post('/api/v1/requestFilter/', this.filter)
                 .then(response => {
-                    console.timeEnd('timerRequest')
                     this.locations = []
                     this.items = response.data
-                    console.log(response.data)
                     for(let i = 0; i < response.data.length; i++){
                         if(response.data[i]['location'] != null){
                             let refinedLocation = response.data[i]['location'].slice(17, -1)
@@ -158,11 +151,7 @@ export default {
                             this.locations.push(location)
                         }
                     }
-                    console.timeEnd('timer')
-                    console.log('Time to add markers to the map and shows them (' + this.locations.length + ' markers)')
-                    console.time('timer2')
                     this.addMarkersLocation()
-                    console.timeEnd('timer2')
                 })
                 .catch(error => {
                     console.log(error)
