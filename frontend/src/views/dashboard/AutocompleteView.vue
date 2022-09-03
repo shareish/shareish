@@ -41,23 +41,35 @@ export default {
     data() {
         return {
             file: "",
+            imgData: '',
         }
+    },
+    mounted() {
+        document.title = "Shareish | Autocomplete"
     },
     methods: {
         uploadFile(event){
+            const reader = new FileReader()
+            reader.addEventListener('load', (event) => {
+                this.imgData = event.target.result
+            });
             this.file = event.target.files
-            console.log(this.file)
+            console.log(this.file[0])
+            reader.readAsDataURL(this.file[0]);
         },
         submitForm(){            
             axios
                 .post('/api/v1/predictClass/', this.file)
                 .then(response => {
-                    this.$router.push({ name: 'addItem', params: { name: response.data}})
+                    console.log(this.imgData)
+                    this.$router.push({ name: 'addItem', params: { name: response.data, imgData: this.imgData }})
                 })
                 .catch(error => {
                     console.log(error)
                 })
         },
+
+
     },
 }
 </script>

@@ -1,12 +1,9 @@
 <template>
     <div class="page-dashboard">
-        <div class="columns is-multiline">
-            <div class="column is-12">
-                <h1 class="title has-text-centered"> {{ $t('welcome') }} </h1>
-            </div>
-        </div>
-
-        <nav class="level-right">
+        <nav class="level">
+            <h1 class="level-left">
+                {{ $t('welcome') }}
+            </h1>
             <button class="button level-right" @click="show = !show">
                 <p v-if="show">{{ $t('hide') }}</p>
                 <p v-else>{{ $t('showFilter') }}</p>
@@ -93,12 +90,14 @@
                 </div>
             </div>                  
         </div>
+        <p>If you encounter problems about the tiles loading, please report this problem to <a href="https://www.openstreetmap.org/fixthemap">Open Street Map</a>.</p>
     </div>
 </template>
 
 <script>
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
+import 'leaflet-easybutton';
 import axios from 'axios'
 export default {
     name: 'Dashboard',
@@ -112,24 +111,63 @@ export default {
             markers: {},
             modalToShow: {},
             nameToShow: '',
-            descriptionToShow: ''
+            descriptionToShow: '',
+            latitude: null,
+            longitude: null,
+            zoom: null,
+            item_images: {},
+            popup: {},
         }
     },
     async mounted() {
-        this.map = L.map('mapid').locate({
-            setView: true,
-            maxZoom: 19,
-            enableHighAccuracy: true,
-        }).on("locationfound", (e) => this.map.setView(e.latlng, 16)).on("locationerror", () => this.map.setView([50.586276, 5.560470], 14));
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
-            maxZoom: 19,
-            zoom: 16,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(this.map);
+        document.title = "Shareish | Map"
 
-        this.filter.item_type = 'null'
-        this.markers = new L.markerClusterGroup()
-        await this.getItemsLocation()
+        this.item_images = new Map()
+        this.popup = L.popup({minWidth : 100, closeButton : false})
+
+        const setPosition = (position) => {
+            this.map.setView([position.coords.latitude, position.coords.longitude], this.zoom)
+        }
+
+        const success = (position) => {
+            this.latitude = position.coords.latitude
+            this.longitude = position.coords.longitude
+            this.zoom = 16
+            this.map = L.map('mapid').setView([this.latitude, this.longitude], this.zoom)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
+                maxZoom: 19,
+                zoom: 16,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(this.map);
+
+            L.easyButton('<i class="fa fa-map-marker"><i>', function(btn, map){
+                navigator.geolocation.getCurrentPosition(setPosition)
+            }).addTo(this.map);
+
+            this.filter.item_type = 'null'
+            this.markers = new L.markerClusterGroup()
+            this.getItemsLocation()
+        }
+
+        const error = () => {
+            this.latitude = 50.586276
+            this.longitude = 5.560470
+            this.zoom = 14
+            this.map = L.map('mapid').setView([this.latitude, this.longitude], this.zoom)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
+                maxZoom: 19,
+                zoom: 16,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(this.map);
+
+            this.filter.item_type = 'null'
+            this.markers = new L.markerClusterGroup()
+            this.getItemsLocation()
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error)
+
+        
     },
     methods: {
         async getItemsLocation(){
@@ -171,6 +209,33 @@ export default {
             let elem = document.getElementById("modal")
             elem.classList.add("is-active")
         },
+        async onMarkerHover(e){
+            this.popup.setLatLng(e.latlng)
+            this.popup.setContent("Coucou ça charge")
+            this.popup.openOn(this.map)
+            if(this.item_images.has(e.target.item_id) == false){
+                const formData = new FormData()
+                formData.append('id', e.target.item_id)
+                axios
+                    .post('/api/v1/getItemImage/', formData)
+                    .then(response => {
+                        const localhost = 'https://' + window.location.hostname
+                        this.item_images.set(e.target.item_id, localhost.concat(response.data['image']))
+                        this.popup.setContent('<figure class="image"><img src="' + localhost.concat(response.data['image']) + '" alt="Placeholder image" style="object-fit: cover; width: 100%; height: 100%"></figure>')
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            }else{
+                this.popup.setContent('<figure class="image"><img src="' + this.item_images.get(e.target.item_id) + '" alt="Placeholder image" style="object-fit: cover; width: 100%; height: 100%"></figure>')
+            }
+        },
+        getItemImage(id){
+            return this.item_images.get(id)
+        },
+        onMarkerOut(e){
+            this.popup.close()            
+        },
         closeEdit(){
             let elem = document.getElementById("modal")
             elem.classList.remove("is-active")
@@ -185,6 +250,8 @@ export default {
                 marker.item_id = this.locations[i]['id']
                 marker.increment = this.locations[i]['increment']
                 marker.on('click', this.onMarkerClick);
+                marker.on('mouseover', this.onMarkerHover)
+                marker.on('mouseout', this.onMarkerOut)
                 this.markers.addLayer(marker)
             }
             this.map.addLayer(this.markers)
@@ -195,7 +262,7 @@ export default {
 
 <style scoped>
     #mapid {
-        height: 600px;
+        height: 800px;
         z-index: 400;
     }
 </style>

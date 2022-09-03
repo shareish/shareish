@@ -2,6 +2,11 @@
     <div class="page-my-account">
         <h1 class="title has-text-centered">My Account</h1>
 
+        <div id="notif" class="is-centered notification is-success is-light" style="display: none;">
+            <button class="delete" @click="hideNotification()"></button>
+            Profile succesfully edited.
+        </div>
+
         <div class="columns is-centered is-multiline">
             <div class="column is-6 p-3 has-text-centered">
                 <figure class="image is-inline-block is-responsive is-512x512" v-if="getImageURL(user.image)">
@@ -19,11 +24,14 @@
                             <div class="modal-background"></div>
                             <div class="modal-card" style="height: 80%;">
                                 <header class="modal-card-head">
-                                    <p class="modal-card-title">Edit Profil</p>
+                                    <p class="modal-card-title">Edit Profile</p>
                                     <button class="delete" aria-label="close" @click="closeEdit"></button>
                                 </header>
                                 <div class="modal-card-body">
                                     <div class="box">
+                                        <p id="errorLog" class="is-danger" style="display: none;">
+                                            The changes applied are not valid.
+                                        </p>
                                         <label class="label">Username</label>
                                         <p class="control has-icon has-icon-right">
                                             <input class="input" placeholder="Username..." type="text" v-model="changes.username">
@@ -57,7 +65,7 @@
                                                             <i class="fas fa-upload"></i>
                                                         </span>
                                                         <span class="file-label">
-                                                            Choose a profil picture...
+                                                            Choose a profile picture...
                                                         </span>
                                                         </span>
                                                     </label>
@@ -73,13 +81,9 @@
                         </div>
 
                         <div class="columns is-centered">
-                            <button type="button" class="column p-2 is-3 button is-info" @click="openModal">Edit profil</button>
+                            <button type="button" class="column p-2 is-3 button is-info" @click="openModal">Edit profile</button>
                             <button @click="logout()" class="button column p-2 is-3 is-offset-3 is-danger">Log out</button>
-                        </div>
-                        
-                        <div class="has-text-centered">
-                                            
-                        </div>        
+                        </div>     
                     </div>
 
                     <div class="container">
@@ -141,6 +145,7 @@ export default {
         }
     },
     mounted() {
+        document.title = "Shareish | My Account"
         this.getUser()
     },
     methods: {
@@ -188,7 +193,7 @@ export default {
                                 .get(`/api/v1/images/${this.items[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const media = 'http://' + window.location.hostname
+                                    const media = 'https://' + window.location.hostname
                                     image = media.concat(image)
                                     this.images[this.items[i]['id']] = image
                                 })
@@ -208,7 +213,7 @@ export default {
                 .get(`/api/v1/user_image/${this.user['image'][0]}/`)
                 .then(response => {
                     var image = response.data['image']
-                    const media = 'http://' + window.location.hostname
+                    const media = 'https://' + window.location.hostname
                     image = media.concat(image)
                     this.userImage = image
                 })
@@ -227,6 +232,8 @@ export default {
             return this.imaes2[index]
         },
         async editProfil(){
+            let logAlert = document.getElementById("errorLog")
+            logAlert.style.display = 'none'
             const formData = {
                 email: this.changes['email'],
                 password: this.changes['password'],
@@ -263,7 +270,7 @@ export default {
                             .post('/api/v1/user_image/', formData2)
                             .then(async response2 => {
                                 let image = response2.data['image']
-                                const media = 'http://' + window.location.hostname
+                                const media = 'https://' + window.location.hostname
                                 image = media.concat(image)
                                 this.userImage = image
                                 await this.getImage()
@@ -273,15 +280,18 @@ export default {
                                 console.log(JSON.stringify(error));
                             });
                     }
+                    this.showNotification()
+                    this.closeEdit()
                 })
                 .catch(error => {
+                    logAlert.style.display = 'block'
                     console.log(JSON.stringify(error))
                 })
-            this.closeEdit()
         },
         openModal(){
             let elem = document.getElementById("modal")
             elem.classList.add("is-active")
+            this.hideNotification()
         },
         closeEdit(){
             this.changes = Object.assign({}, this.user)
@@ -293,6 +303,14 @@ export default {
         },
         getImageURLDefault(category){
             return imagefinder[category]
+        },
+        hideNotification(){
+            let elem = document.getElementById('notif')
+            elem.style.display = "none"
+        },
+        showNotification(){
+            let elem = document.getElementById('notif')
+            elem.style.display = "block"
         },
     },
 }

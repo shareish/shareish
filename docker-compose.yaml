@@ -37,8 +37,17 @@ services:
     volumes:
       - ./frontend:/app
       - media_volume:/app/web/mediafiles
-    ports: # App is running on port 80
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - web
     restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw

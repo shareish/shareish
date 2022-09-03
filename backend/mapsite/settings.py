@@ -111,6 +111,13 @@ DATABASES = {
     }
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'noreply.shareish@gmail.com'
+EMAIL_HOST_PASSWORD = 'zzvpkdzsqlyzllaj'
+EMAIL_USE_TLS = True
+
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 MEDIA_URL = '/media/'
 
@@ -195,7 +202,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://shareish.montefiore.uliege.be"
 ]
 
+DOMAIN = ('shareish.montefiore.uliege.be') 
+SITE_NAME = ('Shareish')
+
 DJOSER = {
+	'LOGIN_FIELD': 'email',
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
         'user': 'mymap.serializers.UserSerializer',
         'current_user': 'mymap.serializers.UserSerializer',

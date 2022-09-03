@@ -72,13 +72,14 @@ export default {
             userID: null,
         }
     },
-    mounted() {
+    async mounted() {
         this.userID = this.$route.params.id
-        this.getUser()
+        await this.getUser()
+        document.title = "Shareish | " + this.user['username']
     },
     methods: {
-        getUser() {
-            axios
+        async getUser() {
+            await axios
                 .get(`/api/v1/webusers/${this.userID}/`)
                 .then(response => {
                     this.user = Object.assign({}, response.data)
@@ -96,7 +97,7 @@ export default {
                 .get(`/api/v1/user_image/${user.data['image'][0]}/`)
                 .then(response => {
                     var image = response.data['image']
-                    const localhost = 'http://' + window.location.hostname
+                    const localhost = 'https://' + window.location.hostname
                     image = localhost.concat(image)
                     this.userImage = image
                 })
@@ -116,7 +117,7 @@ export default {
                                 .get(`/api/v1/images/${response.data['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
+                                    const localhost = 'https://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[response.data['id']] = image
                                 })

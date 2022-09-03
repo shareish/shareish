@@ -1,3 +1,4 @@
+from email import message
 from .models import Item, ItemImage, Conversation, Message, UserImage
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -50,11 +51,12 @@ class ItemViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if 'location' in request.data:
             address = request.data['location']
-            print(address)
             if address != '' and address != None and address.startswith("SRID=4326;POINT") == False:
                 geoloc = locator.geocode(address)
                 if geoloc != None:
                     request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+                else:
+                    return Response({"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -96,6 +98,7 @@ class ItemImageViewSet(viewsets.ViewSet):
     def create(self, request):
         item = Item.objects.get(pk = request.POST['itemID'])
         images = request.FILES.getlist('files')
+        print(images)
         for image in images:
             newImage = ItemImage(image = image, item = item)
             newImage.save()
@@ -285,4 +288,33 @@ def predictClass(request):
         if(request.FILES.get('files[]')):
             class_found = findClass(request.FILES.get('files[]'))
             return Response(class_found, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def getNotifications(request):
+    if request.method == 'GET':
+        user = request.user
+        notifications = 0
+        conversations_owner = Conversation.objects.filter(owner=user)
+        conversations_buyer = Conversation.objects.filter(buyer=user)
+        for conversation in conversations_owner:
+            if conversation.up2date_owner == False:
+                notifications += 1
+        for conversation in conversations_buyer:
+            if conversation.up2date_buyer == False:
+                notifications += 1
+        return Response(notifications, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def getItemImage(request):
+    if request.method == 'POST':
+        item = Item.objects.get(pk=request.data['id'])
+        images = ItemImage.objects.filter(item=item)
+        print(images)
+        if len(images) > 0:
+            image = images[0]
+            serialized_image = ItemImageSerializer(image, many=False)
+            return Response(serialized_image.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)

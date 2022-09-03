@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     image = serializers.PrimaryKeyRelatedField(many=True, queryset=UserImage.objects.all(), allow_null=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'items', 'description', 'image']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'items', 'description', 'image', 'is_active']
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
@@ -43,7 +43,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     messages = serializers.PrimaryKeyRelatedField(many=True, queryset=Message.objects.all(), allow_null=True)
     class Meta:
         model = Conversation
-        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'messages']
+        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'messages', 'up2date_owner', 'up2date_buyer']
     
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:

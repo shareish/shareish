@@ -15,10 +15,10 @@
         <div class="navbar-start" v-if="$store.state.isAuthenticated">
           <div class="navbar-item field has-addons">
             <div class="control is-expanded">
-              <input type="text" class="input" placeholder="Search..." v-model="search">
+              <input type="text" class="input" v-bind:placeholder="$t('search')" v-model="search">
             </div>
             <div class="control">
-              <button class="button is-light is-hovered" @click="submitSearch()">Search</button>
+              <button class="button is-light is-hovered" @click="submitSearch()">{{ $t('search') }}</button>
             </div>
           </div>
         </div>
@@ -33,22 +33,28 @@
               </div>
             </div>
             <div class="navbar-item" @click="toggleDropdown()">
-              <router-link to="/dashboard/items">Items</router-link>
+              <router-link to="/dashboard">{{ $t('map') }}</router-link>
             </div>
             <div class="navbar-item" @click="toggleDropdown()">
-              <router-link to="/dashboard/items/add">Add item</router-link>
+              <router-link to="/dashboard/items">{{ $t('browse') }}</router-link>
             </div>
             <div class="navbar-item" @click="toggleDropdown()">
-              <router-link to="/dashboard/my-account">My Account</router-link>
+              <router-link to="/dashboard/items/add">{{ $t('additem') }}</router-link>
             </div>
             <div class="navbar-item" @click="toggleDropdown()">
-              <router-link to="/dashboard/conversations">Chat Rooms</router-link>
+              <router-link to="/dashboard/my-account">{{ $t('my-account') }}</router-link>
+            </div>
+            <div class="navbar-item" @click="toggleDropdown()" v-if="$store.state.notifications > 0">
+              <router-link to="/dashboard/conversations">{{ $t('chatrooms') }} ({{ $store.state.notifications }})</router-link>
+            </div>
+            <div class="navbar-item" @click="toggleDropdown()" v-else>
+              <router-link to="/dashboard/conversations">{{ $t('chatrooms') }}</router-link>
             </div>
           </template>
 
           <template v-else>
             <div class="navbar-item" @click="toggleDropdown()">
-              <router-link to="/">Home</router-link>
+              <router-link to="/">{{ $t('home') }}</router-link>
             </div>
             <div class="navbar-item">
               <div class="select is-rounded">
@@ -60,8 +66,8 @@
             </div>
             <div class="navbar-item">
               <div class="buttons">
-                <router-link to="/sign-up" class="button is-success"><strong>Sign up</strong></router-link>
-                <router-link to="/log-in" class="button is-light">Log in</router-link>
+                <router-link to="/sign-up" class="button is-success" @click="toggleDropdown()"><strong>{{ $t('sign-up') }}</strong></router-link>
+                <router-link to="/log-in" class="button is-light" @click="toggleDropdown()">{{ $t('log-in') }}</router-link>
               </div>
             </div>
           </template>
@@ -78,34 +84,36 @@
                 <div class="column">
                     <!-- Content -->
                     <h6 class="title is-4 mb-4">Shareish</h6>
-                    <address> Université de Liège
-                        <br>Place du 20-Août, 7
-                        <br>B- 4000 Liège, Belgique
+                    <img src="./assets/montefiore_institute.svg" alt="Liège Université Montefiore Institute">
+                    <address> Montefiore Institute (B28)
+                        <br>10, Allée de la découverte
+                        <br>University of Liège
+                        <br>4000 Liège, Belgium
                     </address>
-                    <!--Replace this with a good address TODO-->
                 </div>
 
                 <div class="column">
                     <!-- Links -->
                     <h6 class="title is-4 mb-4">
-                        Useful links
+                        {{ $t('useful-links') }}
                     </h6>
                     <p>
-                        <a @click="goto('/')" class="text-reset">Home</a><br />
-                        <a @click="goto('/dashboard/my-account')" class="text-reset">Profil</a><br />
-                        <!--<a @click="goto('/add-item')" class="text-reset">Add item</a><br />
-                        <a @click="goto('/groups')" class="text-reset">Groups</a><br />-->
+                        <a @click="goto('/')" class="text-reset">{{ $t('about-us') }}</a><br />
+                        <a @click="goto('/dashboard/my-account')" class="text-reset">{{ $t('my-account') }}</a><br />
+                        <a @click="goto('/dashboard')" class="text-reset">{{ $t('map') }}</a><br />
+                        <a href="https://github.com/shareish">
+                          <img src="./assets/GitHub-Mark-32px.png" alt="https://github.com/shareish">
+                        </a><br />
                         
                     </p>
                 </div>
 
                 <div class="column">
                     <h6 class="title is-4 mb-4">
-                        Contact
+                        {{ $t('contact') }}
                     </h6>
                     <p>
-                        info@example.com
-                        <br><a href="tel:+3240123456">+32 4 012 34 56</a>
+                        <a href = "mailto: info@shareish.org">info@shareish.org</a>
                     </p>
 
                 </div>
@@ -130,9 +138,22 @@
       }else{
         axios.defaults.headers.common['Authorization'] = ""
       }
+
+
     },
 
     mounted(){
+      if(this.$store.state.isAuthenticated){
+        axios
+          .get('/api/v1/conversations_update/')
+          .then(response => {
+            console.log(response.data)
+            this.$store.state.notifications = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }
     },
 
     data() {
@@ -179,5 +200,9 @@
   .wrapper {
     margin-right: auto; /* 1 */
     margin-left: auto; /* 1 */
+  }
+  .footer {
+    height: 220px;
+    padding: 5mm;
   }
 </style>

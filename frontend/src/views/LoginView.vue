@@ -3,6 +3,10 @@
         <div class="column is-4 is-offset-4">
             <h1 class="title">Log In</h1>
 
+            <p id="errorLog" class="is-danger" style="display: none;">
+                The username or the password is invalid, or your account is not activated yet (go check your emails).
+            </p>
+
             <form @submit.prevent="submitForm">
                 <div class="field">
                     <label>Email</label>
@@ -28,6 +32,7 @@
                     </div>
                 </div>
             </form>
+            <router-link to="/reset-password">You forgot your password?</router-link>
         </div>
     </div>
 </template>
@@ -43,6 +48,9 @@ export default {
             errors: []
         }
     },
+    mounted() {
+        document.title = "Shareish | Log in"
+    },
     methods: {
         async submitForm(e){
             axios.defaults.headers.common["Authorization"] = ""
@@ -52,6 +60,9 @@ export default {
                 email: this.email,
                 password: this.password
             }
+
+            let logAlert = document.getElementById("errorLog")
+            logAlert.style.display = 'none'
             
             axios
                 .post("/api/v1/token/login/", formData)
@@ -72,16 +83,8 @@ export default {
                     this.$router.push('/dashboard')
                 })
                 .catch(error => {
-                    if(error.response){
-                        for (const property in error.response.data) {
-                            this.error.push(`${property}: ${error.response.data[property]}`)
-                        }
-                        console.log(JSON.stringify(error.response.data))
-                    }else if (error.message){
-                        console.log(JSON.stringify(error.message))
-                    }else{
-                        console.log(JSON.stringify(error))
-                    }
+                    logAlert.style.display = 'block'
+                    console.log(error)
                 })
         }
     },

@@ -8,6 +8,7 @@ export default createStore({
         },
         isAuthenticated: false,
         token: '',
+        notifications: 0,
     },
     getters: {},
     mutations: {

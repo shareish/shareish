@@ -3,6 +3,10 @@
         <div class="columns is-multiline">
             <div class="column is-full">
                 <h1 class="title">{{ item.name }}</h1>
+                <div id="notif" class="is-centered notification is-success is-light" style="display: none;">
+                    <button class="delete" @click="hideNotification()"></button>
+                    Profile succesfully edited.
+                </div>
             </div>
             <div class="column is-half">
                 <div class="columns is-multiline">
@@ -16,6 +20,9 @@
                                 </header>
                                 <div class="modal-card-body">
                                     <div class="box">
+                                        <p id="errorLog" class="is-danger" style="display: none;">
+                                            The changes applied are not valid.
+                                        </p>
                                         <label class="label">Name</label>
                                         <p class="control has-icon has-icon-right">
                                             <input class="input" placeholder="Name..." type="text" v-model="changes.name">
@@ -272,6 +279,7 @@ export default {
     },
     async mounted() {
         await this.getItem()
+        document.title = "Shareish | " + this.item['name']
     },
     methods: {
         getImgUrl(){
@@ -313,7 +321,7 @@ export default {
                         .get(`/api/v1/images/${this.item['images'][0]}`)
                         .then(response2 => {
                             this.image = response2.data['image']
-                            const localhost = 'http://' + window.location.hostname
+                            const localhost = 'https://' + window.location.hostname
                             this.image = localhost.concat(this.image)
                         })
                         .catch(error => {
@@ -346,13 +354,13 @@ export default {
                                 .get(`/api/v1/user_image/${response.data['image'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
+                                    const localhost = 'https://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.userImage = image
                                 })
                             
                         }
-                        this.userName = response.data['email'] + ' (' + response.data['username'] + ')'
+                        this.userName = response.data['username']
                     })
                     .catch(error => {
                         console.log(JSON.stringify(error))
@@ -378,6 +386,8 @@ export default {
                 this.changes["location"] = address
                 delete this.changes["address"]  
             }
+            let logAlert = document.getElementById("errorLog")
+            logAlert.style.display = 'none'
             axios
                 .put(`/api/v1/items/${this.item['id']}/`, this.changes)
                 .then(response => {
@@ -396,9 +406,11 @@ export default {
                     }
                     this.item = response.data
                     this.item["address"] = address
+                    this.showNotification()
                     this.closeEdit()
                 })
                 .catch(error => {
+                    logAlert.style.display = 'block'
                     console.log(JSON.stringify(error))
                 })
         },
@@ -410,6 +422,7 @@ export default {
         openModal(){
             let elem = document.getElementById("modal")
             elem.classList.add("is-active")
+            this.hideNotification()
         },
         uploadImage(event){
             this.files = event.target.files;
@@ -420,7 +433,7 @@ export default {
                 return false
             }
             const formData = {
-                'name': "" + this.item['id'] + this.item['user'] + this.$store.state.user.id,
+                'name': "" + this.item['id'] + "-" + this.item['user'] + "-" + this.$store.state.user.id,
                 'owner': this.item['user'],
                 'buyer': this.$store.state.user.id,
                 'item': this.item['id'],
@@ -434,6 +447,14 @@ export default {
                 .catch(error => {
                     console.log(error)
                 })
+        },
+        hideNotification(){
+            let elem = document.getElementById('notif')
+            elem.style.display = "none"
+        },
+        showNotification(){
+            let elem = document.getElementById('notif')
+            elem.style.display = "block"
         }
     },
 }

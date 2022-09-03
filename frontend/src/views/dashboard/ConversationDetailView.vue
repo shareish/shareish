@@ -27,12 +27,12 @@
         <div class="conv-messages"  v-for="message in messages" v-bind:key="message.id" id="conv-messages">
             <article class="message is-dark" v-if="message.user != userID">
                 <div class="message-body">
-                    {{ message.content }}
+                    ({{ getMessageDate(message.date) }}) {{ message.content }}
                 </div>
             </article>
             <article class="message" v-else>
                 <div class="message-body">
-                    {{ message.content }}
+                    ({{ getMessageDate(message.date) }}) {{ message.content }}
                 </div>
             </article>
         </div>
@@ -63,6 +63,7 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 export default {
     name: 'ConversationDetail',
     data() {
@@ -86,6 +87,7 @@ export default {
         this.userID = this.$store.state.user.id
         window.addEventListener('beforeunload', this.beforeWindowUnload)
         await this.getConversation()
+        document.title = "Shareish | Conversation Detail"
         await this.getMessages()
         await this.createWebSocket()
     },
@@ -117,20 +119,21 @@ export default {
             console.log("Starting connection to WebSocket Server")
 
             this.ws = new WebSocket(
-                'ws://'
-                + window.location.hostname 
+                'wss://'
+                + 'localhost:8000'
                 + '/ws/'
-                + this.conversation['name']
+                + this.conversation['id']
                 + '/'
             )
 
             this.ws.addEventListener("message", (e) => {
                 const data = JSON.parse(e.data)
+                let today = new Date()
                 if(data.content){
                     if(data.user_id == this.userID){
-                        document.querySelector('#conv-messages-new').innerHTML += '<article class="message"> <div class="message-body">' + data.content + '</div></article>'
+                        document.getElementById('conv-messages-new').innerHTML += '<article class="message"> <div class="message-body">' + '(' + today.toLocaleDateString("fr") + ') ' + data.content + '</div></article>'
                     }else{
-                        document.querySelector('#conv-messages-new').innerHTML += '<article class="message is-dark"> <div class="message-body">' + data.content + '</div></article>'
+                        document.getElementById('conv-messages-new').innerHTML += '<article class="message is-dark"> <div class="message-body">' + data.content + '</div></article>'
                     }
                     
                 }else{
@@ -138,10 +141,23 @@ export default {
                 }
             })
 
-            this.ws.onclose = function(e) {
+            this.ws.addEventListener('close', (e) => {
                 console.log(e)
+                console.log(this.userID)
+                
+                // const formData = new FormData()
+                // if(this.userID == this.conversation['owner']){
+                //     formData.append('up2date_owner', true)
+                // }else{
+                //     formData.append('up2date_buyer', true)
+                // }
+                // axios
+                //     .patch(`/api/v1/conversations/${this.conversationID}/`, formData)
+                //     .catch(error => {
+                //         console.log(error)
+                //     })
                 console.log("Closed")
-            }
+            });
 
             this.ws.onopen = function(e) {
                 console.log(e)
@@ -186,8 +202,37 @@ export default {
         },
         gotoItem(){
             this.$router.push({ name: 'itemDetail', params: { id: this.conversation['item'] }})
+        },
+        getMessageDate(message){
+            let date = new Date(message)
+            return date.toLocaleDateString("fr")
         }
     },
+    beforeRouteLeave(to, from, next){
+        if(this.$store.state.notifications > 0){
+            if (this.userID == this.conversation['owner']) {
+                if(this.conversation['up2date_owner'] == false){
+                    this.$store.state.notifications -= 1
+                }
+            } else {
+                if(this.conversation['up2date_buyer'] == false){
+                    this.$store.state.notifications -= 1
+                }
+            }
+        }
+        const formData = new FormData()
+        if (this.userID == this.conversation['owner']) {
+            formData.append('up2date_owner', true)
+        } else {
+            formData.append('up2date_buyer', true)
+        }
+        axios
+            .patch(`/api/v1/conversations/${this.conversationID}/`, formData)
+            .catch(error => {
+                console.log(error)
+            })
+        next()
+    }
 }
 </script>
 
