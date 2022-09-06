@@ -7,7 +7,7 @@ from datetime import date
 from PIL import Image
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, password=None, username=None, first_name=None, last_name=None):
+    def create_user(self, email, password, username, first_name, last_name):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -26,11 +26,14 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, email, password, username, first_name, last_name):
         """
         Creates and saves a superuser with the given email and password.
         """
         user = self.create_user(
+            username=username,
+            first_name=first_name,
+            last_name= last_name,
             email = email,
             password=password
         )
@@ -44,12 +47,13 @@ class User(AbstractBaseUser):
     birth_date = models.DateField(default=date.today, blank=True)
     sign_in_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    username = models.CharField(max_length = 20, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    username = models.CharField(max_length = 20, default='')
+    is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     description = models.TextField(blank = True, max_length = 300)
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
     """
     Use what's in this to have a better database later:
     https://stackoverflow.com/questions/310540/best-practices-for-storing-postal-addresses-in-a-database-rdbms
@@ -77,10 +81,11 @@ class UserImage(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
         img = Image.open(self.image.path)
 
-        if img.height > 512 or img.width > 512:
-            output_size = (512, 512)
+        if img.height > 256 or img.width > 256:
+            output_size = (256, 256)
             img.thumbnail(output_size)
             img.save(self.image.path)
 
@@ -160,8 +165,8 @@ class ItemImage(models.Model):
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
-        if img.height > 512 or img.width > 512:
-            output_size = (512, 512)
+        if img.height > 256 or img.width > 256:
+            output_size = (256, 256)
             img.thumbnail(output_size)
             img.save(self.image.path)
 
@@ -177,6 +182,9 @@ class Conversation(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE, null=True)
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, related_name="conversations", on_delete=models.CASCADE, null=True)
+
+    up2date_owner = models.BooleanField(default=True)
+    up2date_buyer = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['name']

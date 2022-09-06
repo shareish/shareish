@@ -13,6 +13,9 @@ import Recurrents from '../views/dashboard/RecurrentsListView.vue'
 import UserDetail from '../views/dashboard/UserDetailView.vue'
 import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
 import Autocomplete from '../views/dashboard/AutocompleteView.vue'
+import ResetPassword from '../views/ResetPassword.vue'
+import ResetPasswordConfirm from '../views/ResetPasswordConfirm.vue'
+import ActivateEmail from '../views/ActivateEmail.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
@@ -40,6 +43,21 @@ const routes = [{
         path: '/log-in',
         name: 'login',
         component: Login
+    },
+    {
+        path: '/reset-password',
+        name: 'resetPassword',
+        component: ResetPassword
+    },
+    {
+        path: '/password/reset/confirm/:uid/:token',
+        name: 'resetPasswordConfirm',
+        component: ResetPasswordConfirm
+    },
+    {
+        path: '/activate/:uid/:token',
+        name: 'activateEmail',
+        component: ActivateEmail
     },
     {
         path: '/dashboard',

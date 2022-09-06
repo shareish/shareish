@@ -25,5 +25,16 @@
     "sport": "Sport and Leisure",
     "transport": "Transport and vehicle",
     "other": "Other",
-    "search": "Search"
+    "search": "Search",
+    "chatrooms": "Chat Rooms",
+    "map": "Map",
+    "browse": "Browse Items",
+    "additem": "Add item",
+    "my-account": "My Account",
+    "sign-up": "Sign up",
+    "log-in": "Log in",
+    "useful-links": "Useful links",
+    "home": "Home",
+    "about-us": "About us",
+    "contact": "Contact"
 }

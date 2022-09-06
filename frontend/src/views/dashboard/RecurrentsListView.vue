@@ -51,6 +51,7 @@ export default {
         }
     },
     async mounted() {
+        document.title = "Shareish | Recurrent Items"
         await this.getItems()
     },
     methods: {
@@ -65,7 +66,7 @@ export default {
                                 .get(`/api/v1/images/${response.data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
+                                    const localhost = 'https://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[response.data[i]['id']] = image
                                 })

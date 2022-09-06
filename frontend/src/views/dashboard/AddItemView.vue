@@ -10,6 +10,9 @@
             <div class="column is-3 is-right">
                 <router-link to="/dashboard/recurrents" class="button is-light is-medium is-responsive">Recurrent Items</router-link>
             </div>
+            <div id="imageError" class="column is-full is-responsive is-left" style="display: none;">
+                <p class="is-danger">The size of the images is too big. The size of the images must be under 5 Mo.</p>
+            </div>
             <div class="column is-two-thirds">
                 <div class="field">
                     <label>Name of the article</label>
@@ -147,6 +150,7 @@
                         </div>
                     </div>
                 </div>
+                <p class="is-danger">The size of the images must be under 5Mo in total.</p>
             </div>
             <div class="column is-two-thirds">
                 <div class="field">
@@ -154,6 +158,9 @@
                     <div class="control">
                         <input type="text" class="input" name="location" v-model="item.location" required>
                     </div>
+                    <p id="errorAddress" class="is-danger" style="display: none;">
+                        The address is invalid, please indicate a new address.
+                    </p>
                 </div>
             </div>
             <div class="column is-half" v-if="item.images != undefined">
@@ -163,6 +170,7 @@
                     </figure>
                 </div>
             </div>
+            <figure class="column is-half" id="img-preview-auto"></figure>
             <figure class="column is-half" id="img-preview"></figure>
         </div>
         
@@ -212,21 +220,29 @@ export default {
     data() {
         return {
             item: {},
-            files: '',
+            files: {},
+            fileauto: '',
             image: '',
             images: [],
         }
     },
     async mounted() {
+        document.title = "Shareish | Add Item"
         if(this.$route.params.id){
             await this.getItem(this.$route.params.id)
             await this.getImages(this.item['images'])
         }
         if(this.$route.params.name){
             this.item['name'] = this.$route.params.name
+            await this.loadImage()
+            this.previewFile()
         }
     },
     methods: {
+        async loadImage(){
+            const blob = await (await fetch(this.$route.params.imgData)).blob()
+            this.fileauto = new File([blob], 'autocomplete.jpg', )
+        },
         async getItem(itemID){
             await axios
                 .get(`/api/v1/items/${itemID}`)
@@ -253,7 +269,7 @@ export default {
                     .get(`/api/v1/images/${imagesIDs[i]}`)
                     .then(response => {
                         let name = response.data['image']
-                        const localhost = 'http://' + window.location.hostname
+                        const localhost = 'https://' + window.location.hostname
                         this.images.push(localhost.concat(name))
                     })
                     .catch(error => {
@@ -262,11 +278,24 @@ export default {
             }
         },
         uploadFile(event){
+            let elem = document.getElementById('imageError')
+            elem.style.display = "none"
             this.files = event.target.files
-            console.log(this.files)
-            this.previewFile()
+            this.flushPreviewFile()
+            this.previewFiles()
         },
         async previewFile(){
+            let imgPreview = document.getElementById("img-preview-auto");
+            imgPreview.innerHTML = ''
+            imgPreview.classList.add("image")
+            imgPreview.classList.add("is-256x256")
+            let fileReader = new FileReader()
+            fileReader.readAsDataURL(this.fileauto)
+            fileReader.addEventListener("load", function () {
+                imgPreview.innerHTML += '<img src="' + this.result + '" />';
+            });
+        },
+        async previewFiles(){
             let imgPreview = document.getElementById("img-preview");
             imgPreview.innerHTML = ''
             imgPreview.classList.add("image")
@@ -279,7 +308,17 @@ export default {
                 });
             }
         },
+        flushPreviewFile(){
+            let imgPreview = document.getElementById("img-preview");
+            imgPreview.innerHTML = ''
+            imgPreview = document.getElementById("img-preview-auto");
+            imgPreview.innerHTML = ''
+        },
         submitForm(){
+            let eradd = document.getElementById('errorAddress')
+            let elem = document.getElementById('imageError')
+            eradd.style.display = 'none'
+            elem.style.display = "none"
             this.item['in_progress'] = true
             if(this.item['startdate'] == undefined){
                 this.item['startdate'] = moment().format('YYYY-MM-DD')
@@ -296,23 +335,30 @@ export default {
                     .patch(`/api/v1/items/${this.item['id']}/`, this.item)
                     .then(response => {
                         if(Object.keys(this.files).length > 0){
-                        
                             this.item['id'] = response.data['id']
                             let formData = new FormData();
                             formData.append('itemID', this.item['id'])
-                            for( var i = 0; i < this.files.length; i++ ){
+                            for(let i = 0; i < Object.keys(this.files).length; i++){
                                 let file = this.files[i];
                                 formData.append('files', file);
                             }
                             axios
                                 .post('/api/v1/images/', formData)
                                 .catch(error => {
+                                    if(error.response.status == 413){
+                                        let elem = document.getElementById('imageError')
+                                        elem.style.display = "block"
+                                    }
                                     console.log(JSON.stringify(error));
                                 });
                         }
+                        this.flushPreviewFile()
                         this.$router.push('/dashboard/items')
                     })
                     .catch(error => {
+                        if(error.response['data']['message'] && error.response['data']['message'] == "Bad location."){
+                            eradd.style.display = 'block'
+                        }
                         console.log(JSON.stringify(error))
                     })
             }else{
@@ -320,24 +366,34 @@ export default {
                 axios
                     .post('/api/v1/items/', this.item)
                     .then(response => {
-                        if(Object.keys(this.files).length > 0){
-                        
+                        if(Object.keys(this.files).length > 0 || this.fileauto != ''){
                             this.item['id'] = response.data['id']
                             let formData = new FormData();
                             formData.append('itemID', this.item['id'])
-                            for( var i = 0; i < this.files.length; i++ ){
+                            for(let i = 0; i < Object.keys(this.files).length; i++){
                                 let file = this.files[i];
                                 formData.append('files', file);
+                            }
+                            if(this.fileauto != ''){
+                                formData.append('files', this.fileauto)
                             }
                             axios
                                 .post('/api/v1/images/', formData)
                                 .catch(error => {
+                                    if(error.response.status == 413){
+                                        let elem = document.getElementById('imageError')
+                                        elem.style.display = "block"
+                                    }
                                     console.log(JSON.stringify(error));
                                 });
                         }
+                        this.fileauto = ''
                         this.$router.push('/dashboard/items')
                     })
                     .catch(error => {
+                        if(error.response.data.message && error.reponse.data.message == "Bad location."){
+                            eradd.style.display = 'block'
+                        }
                         console.log(JSON.stringify(error))
                     })
             }

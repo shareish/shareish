@@ -21,4 +21,6 @@ urlpatterns = [
     path('address/', views.getAddress, name='get_address'),
     path('requestItems/', views.searchItems, name='search_items'),
     path('predictClass/', views.predictClass, name='predict_class'),
+    path('conversations_update/', views.getNotifications, name='conversations_update'),
+    path('getItemImage/', views.getItemImage, name='get_item_image'),
 ]

@@ -88,6 +88,7 @@ export default {
     async mounted() {
         this.apiCall = '/api/v1/requestItems/?page=1'
         this.search = this.$route.params['data']
+        document.title = "Shareish | Search for " + this.search
         this.toggleMoreLoad()
         await this.getItems()
         this.toggleMoreLoad()
@@ -123,7 +124,7 @@ export default {
                                 .get(`/api/v1/images/${data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
+                                    const localhost = 'https://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[data[i]['id']] = image
                                 })
@@ -140,7 +141,7 @@ export default {
                                         .get(`/api/v1/user_image/${response3.data['image'][0]}/`)
                                         .then(responseImage => {
                                             var image = responseImage.data['image']
-                                            const localhost = 'http://' + window.location.hostname
+                                            const localhost = 'https://' + window.location.hostname
                                             image = localhost.concat(image)
                                             this.imageUsers[data[i]['id']] = image
                                         })

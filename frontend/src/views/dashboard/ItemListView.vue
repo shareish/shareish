@@ -10,8 +10,8 @@
                 <div class="card">
                     <div class="card-image">
 
-                        <figure v-if="getImageURL(item.id)" class="image is-4by3">
-                            <img :src="getImageURL(item.id)" alt="Placeholder image">
+                        <figure v-if="getImageURL(item.id)" class="image">
+                            <img :src="getImageURL(item.id)" alt="Placeholder image" style="object-fit: cover; width: 100%; height: 100%">
                         </figure>
                         <figure v-else class="image is-4by3">
                            <img :src="require('@/assets/categories/' + getImageURLDefault(item.category1))" alt="Placeholder image">
@@ -83,10 +83,12 @@ export default {
         }
     },
     async mounted() {
+        document.title = "Shareish | Items"
         this.apiCall = '/api/v1/actives/?page=1'
         this.toggleMoreLoad()
         await this.getItems()
         this.toggleMoreLoad()
+        
     },
     methods: {
         async getItems() {
@@ -112,7 +114,7 @@ export default {
                                 .get(`/api/v1/images/${data[i]['images'][0]}`)
                                 .then(response2 => {
                                     var image = response2.data['image']
-                                    const localhost = 'http://' + window.location.hostname
+                                    const localhost = 'https://' + window.location.hostname
                                     image = localhost.concat(image)
                                     this.images[data[i]['id']] = image
                                 })
@@ -129,7 +131,7 @@ export default {
                                         .get(`/api/v1/user_image/${response3.data['image'][0]}/`)
                                         .then(responseImage => {
                                             var image = responseImage.data['image']
-                                            const localhost = 'http://' + window.location.hostname
+                                            const localhost = 'https://' + window.location.hostname
                                             image = localhost.concat(image)
                                             this.imageUsers[data[i]['id']] = image
                                         })

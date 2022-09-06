@@ -13,6 +13,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.conversation_group_name, self.channel_name)
 
         await self.accept()
+        
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.conversation_group_name, self.channel_name)
@@ -50,4 +51,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
     def save_message(self, content, user_id, conversation_id):
         user = User.objects.get(pk=user_id)
         conversation = Conversation.objects.get(pk=conversation_id)
+        conversation.up2date_buyer = False
+        conversation.up2date_owner = False
+        conversation.save()
         Message.objects.create(content=content, user=user, conversation=conversation)
