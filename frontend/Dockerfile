@@ -2,9 +2,9 @@
 FROM node:16.13 as dev-stage
 WORKDIR /app
 COPY package*.json ./
-RUN rm -rf node_modules/
-RUN npm install
+RUN npm config set unsafe-perm true && npm install --force
 COPY . .
+RUN chown -R node:node /app/node_modules
 CMD ["npm", "run", "serve"]
 
 # build stage

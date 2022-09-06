@@ -26,8 +26,17 @@ SECRET_KEY = 'django-insecure-ul#-q0@ob@e1il^=564elf-&omouwr14nvm-8&)bf4%y^yiliq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['web', 'shareish.montefiore.uliege.be']
+DEV = True
+DEV_DOMAIN = "localhost:8081"
+DEV_URL = "http://" + DEV_DOMAIN
 
+PROD_DOMAIN = "shareish.montefiore.uliege.be"
+PROD_URL = "http://" + PROD_DOMAIN
+
+APP_DOMAIN = DEV_DOMAIN if DEV else PROD_DOMAIN
+APP_URL = DEV_URL if DEV else PROD_URL
+
+ALLOWED_HOSTS = ['web', APP_DOMAIN.split(":")[0]]
 
 # Application definition
 
@@ -194,16 +203,16 @@ REST_FRAMEWORK = {
     ),
 }
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = DEV
 
 CORS_ALLOWED_ORIGINS = [
     "http://ui",
     "http://localhost",
-    "http://shareish.montefiore.uliege.be"
+    APP_URL
 ]
 
-DOMAIN = ('shareish.montefiore.uliege.be') 
-SITE_NAME = ('Shareish')
+DOMAIN = APP_DOMAIN
+SITE_NAME = 'Shareish'
 
 DJOSER = {
 	'LOGIN_FIELD': 'email',

@@ -33,22 +33,13 @@ services:
   ui:
     build:
       context: frontend
-      target: production-stage
+      target: dev-stage
     volumes:
       - ./frontend:/app
       - /app/node_modules
       - media_volume:/app/web/mediafiles
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./certbot/conf/:/etc/nginx/ssl/:ro
     ports:
-      - "80:80"
-      - "443:443"
+      - "8081:8080"
     depends_on:
       - web
     restart: unless-stopped
-
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
