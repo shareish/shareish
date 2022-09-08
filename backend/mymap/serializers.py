@@ -30,14 +30,16 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
         fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name', )
 
 class UserImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
     class Meta:
         model = UserImage
-        fields = ['id', 'image', 'user']
+        fields = ['id', 'image', 'user', 'url']
 
 class ItemImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
     class Meta:
         model = ItemImage
-        fields = ['id', 'image', 'item']
+        fields = ['id', 'image', 'item', 'url']
 
 class ConversationSerializer(serializers.ModelSerializer):
     messages = serializers.PrimaryKeyRelatedField(many=True, queryset=Message.objects.all(), allow_null=True)

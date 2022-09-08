@@ -92,6 +92,14 @@ class UserImage(models.Model):
     def __str__(self) -> str:
         return 'Image related to ' + self.user.email + '.'
 
+    @property
+    def path(self):
+        return self.image.path
+
+    @property
+    def url(self):
+        return "{}/api/v1/user_image/{}/image".format(settings.API_URL, self.pk)
+
     class Meta:
         ordering = ['user']
 
@@ -172,6 +180,14 @@ class ItemImage(models.Model):
 
     def __str__(self) -> str:
         return 'Image related to ' + self.item.name + '.'
+
+    @property
+    def path(self):
+        return self.image.path
+
+    @property
+    def url(self):
+        return "{}/api/v1/item_image/{}/image".format(settings.API_URL, self.pk)
 
     class Meta:
         ordering = ['item']

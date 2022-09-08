@@ -1,16 +1,19 @@
 from email import message
+
+from django.http import FileResponse
+
 from .models import Item, ItemImage, Conversation, Message, UserImage
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer, UserImageSerializer, MapItemSerializer, MapNameAndDescriptionSerializer
 from .permissions import IsOwnerProfileOrReadOnly
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .ai import findClass
 
@@ -306,10 +309,10 @@ def getNotifications(request):
         return Response(notifications, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def getItemImage(request):
-    if request.method == 'POST':
-        item = Item.objects.get(pk=request.data['id'])
+@api_view(['GET'])
+def getFirstItemImage(request, id):
+    if request.method == 'GET':
+        item = Item.objects.get(pk=id)
         images = ItemImage.objects.filter(item=item)
         print(images)
         if len(images) > 0:
@@ -318,3 +321,29 @@ def getItemImage(request):
             return Response(serialized_image.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getUserImage(request, id):
+    if request.method != 'GET':
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    try:
+        image = UserImage.objects.get(pk=id)
+        return FileResponse(open(image.path, 'rb'))
+    except UserImage.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getItemImage(request, id):
+    if request.method != 'GET':
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    try:
+        image = ItemImage.objects.get(pk=id)
+        return FileResponse(open(image.path, 'rb'))
+    except ItemImage.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)

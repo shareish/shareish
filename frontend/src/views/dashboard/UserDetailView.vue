@@ -96,10 +96,7 @@ export default {
                 await axios
                 .get(`/api/v1/user_image/${user.data['image'][0]}/`)
                 .then(response => {
-                    var image = response.data['image']
-                    const localhost = 'https://' + window.location.hostname
-                    image = localhost.concat(image)
-                    this.userImage = image
+                    this.userImage = response.data['url']
                 })
                 .catch(error => {
                     console.log(error)
@@ -116,10 +113,7 @@ export default {
                             axios
                                 .get(`/api/v1/images/${response.data['images'][0]}`)
                                 .then(response2 => {
-                                    var image = response2.data['image']
-                                    const localhost = 'https://' + window.location.hostname
-                                    image = localhost.concat(image)
-                                    this.images[response.data['id']] = image
+                                    this.images[response.data['id']] = response2.data['image']
                                 })
                                 .catch(error2 => {
                                     console.log(JSON.stringify(error2))

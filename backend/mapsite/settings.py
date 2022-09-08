@@ -29,12 +29,15 @@ DEBUG = False
 DEV = True
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
+DEV_API_URL = "http://localhost:8000"
 
 PROD_DOMAIN = "shareish.montefiore.uliege.be"
 PROD_URL = "http://" + PROD_DOMAIN
+PROD_API_URL = PROD_URL
 
 APP_DOMAIN = DEV_DOMAIN if DEV else PROD_DOMAIN
 APP_URL = DEV_URL if DEV else PROD_URL
+API_URL = DEV_API_URL if DEV else PROD_API_URL
 
 ALLOWED_HOSTS = ['web', APP_DOMAIN.split(":")[0]]
 

@@ -210,28 +210,30 @@ export default {
             elem.classList.add("is-active")
         },
         async onMarkerHover(e){
-            this.popup.setLatLng(e.latlng)
-            this.popup.setContent("Coucou ça charge")
-            this.popup.openOn(this.map)
-            if(this.item_images.has(e.target.item_id) == false){
-                const formData = new FormData()
-                formData.append('id', e.target.item_id)
-                axios
-                    .post('/api/v1/getItemImage/', formData)
-                    .then(response => {
-                        const localhost = 'https://' + window.location.hostname
-                        this.item_images.set(e.target.item_id, localhost.concat(response.data['image']))
-                        this.popup.setContent('<figure class="image"><img src="' + localhost.concat(response.data['image']) + '" alt="Placeholder image" style="object-fit: cover; width: 100%; height: 100%"></figure>')
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    })
-            }else{
-                this.popup.setContent('<figure class="image"><img src="' + this.item_images.get(e.target.item_id) + '" alt="Placeholder image" style="object-fit: cover; width: 100%; height: 100%"></figure>')
+            const itemId = e.target.item_id;
+            this.popup.setLatLng(e.latlng);
+            this.popup.openOn(this.map);
+            try {
+                let url;
+                if(this.item_images.has(itemId) === false){
+                    const uri = `/api/v1/item/${itemId}/image/first`;
+                    const data = (await axios.get(uri)).data;
+                    this.item_images.set(itemId, data['url']);
+                    url = data['url'];
+                }
+                else {
+                    url = this.item_images.get(itemId);
+                }
+                this.popup.setContent(
+                    '<figure class="image">' +
+                    '<img src="' + url +
+                    '" style="object-fit: cover; width: 100%; height: 100%">' +
+                    '</figure>'
+                );
             }
-        },
-        getItemImage(id){
-            return this.item_images.get(id)
+            catch (error) {
+                console.log(error);
+            }
         },
         onMarkerOut(e){
             this.popup.close()            
