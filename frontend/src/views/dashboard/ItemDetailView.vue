@@ -218,8 +218,8 @@
                         <br>
                         <div class="columns is-multiline">
                             <router-link v-if="item.user !== undefined" :to="{ name: 'userDetail', params: { id: item.user }}" class="column is-3 ml-5">
-                                <figure v-if="getSmallImageURL()" class="image is-96x96">
-                                    <img class="is-rounded" :src="getSmallImageURL()" alt="Placeholder image">
+                                <figure v-if="userImage" class="image is-96x96">
+                                    <img class="is-rounded" :src="userImage" alt="Placeholder image">
                                 </figure>
                                 <figure class="image is-inline-block is-responsive is-96x96" v-else>
                                     <img class="is-rounded" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
@@ -311,63 +311,48 @@ export default {
                 })
         },
         async getItem() {
-            const itemID = this.$route.params.id
-            await axios
-                .get(`/api/v1/items/${itemID}/`)
-                .then(async response => {
-                    this.item = response.data
-                    if(this.item['images'][0]){
-                        await axios
-                        .get(`/api/v1/images/${this.item['images'][0]}`)
-                        .then(response2 => {
-                            this.image = response2.data['image']
-                            const localhost = 'https://' + window.location.hostname
-                            this.image = localhost.concat(this.image)
-                        })
-                        .catch(error => {
-                            console.log(JSON.stringify(error))
-                        })
+            const itemID = this.$route.params.id;
+            try {
+                this.item = (await axios.get(`/api/v1/items/${itemID}`)).data;
+
+                if (this.item['images'][0]) {
+                    const url = `/api/v1/images/${this.item['images'][0]}`;
+                    const data =  (await axios.get(url)).data;
+                    this.image = data['url'];
+                }
+
+                if (this.item['location'] !== null) {
+                    try {
+                        this.item['address'] = (await axios.post(
+                            `/api/v1/address/`,
+                            this.item['location']
+                        )).data;
                     }
-                    if(this.item['location'] != null){
-                        await axios
-                            .post('/api/v1/address/', this.item['location'])
-                            .then(response3 => {
-                                this.item['address'] = response3.data
-                            })
-                            .catch(error => {
-                                console.log(JSON.stringify(error))
-                            })
+                    catch (error) {
+                        console.log(JSON.stringify(error));
                     }
-                    await this.getUserImage()
-                    this.changes = Object.assign({}, this.item)
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+                }
+
+                await this.getUserImage();
+                this.changes = Object.assign({}, this.item);
+            }
+            catch (error) {
+                console.log(error);
+            }
         },
         async getUserImage(){
-            await axios
-                    .get((`/api/v1/webusers/${this.item['user']}/`))
-                    .then(response => {
-                        if(response.data['image']){
-                            axios
-                                .get(`/api/v1/user_image/${response.data['image'][0]}`)
-                                .then(response2 => {
-                                    var image = response2.data['image']
-                                    const localhost = 'https://' + window.location.hostname
-                                    image = localhost.concat(image)
-                                    this.userImage = image
-                                })
-                            
-                        }
-                        this.userName = response.data['username']
-                    })
-                    .catch(error => {
-                        console.log(JSON.stringify(error))
-                    })
-        },
-        getSmallImageURL(){
-            return this.userImage
+            try {
+                let uri = `/api/v1/webusers/${this.item['user']}/`;
+                const user = (await axios.get(uri)).data;
+                this.userName = user['username'];
+
+                uri = `/api/v1/user_image/${user['image'][0]}/`;
+                const data = (await axios.get(uri)).data;
+                this.userImage = data['url'];
+            }
+            catch (error) {
+                console.log(JSON.stringify(error));
+            }
         },
         editItem(){
             if(this.changes['startdate'] == undefined){

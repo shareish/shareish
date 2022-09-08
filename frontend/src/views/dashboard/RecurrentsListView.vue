@@ -65,10 +65,7 @@ export default {
                             axios
                                 .get(`/api/v1/images/${response.data[i]['images'][0]}`)
                                 .then(response2 => {
-                                    var image = response2.data['image']
-                                    const localhost = 'https://' + window.location.hostname
-                                    image = localhost.concat(image)
-                                    this.images[response.data[i]['id']] = image
+                                    this.images[response.data[i]['id']] = response2.data['url']
                                 })
                                 .catch(error => {
                                     console.log(JSON.stringify(error))

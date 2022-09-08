@@ -268,9 +268,7 @@ export default {
                 await axios
                     .get(`/api/v1/images/${imagesIDs[i]}`)
                     .then(response => {
-                        let name = response.data['image']
-                        const localhost = 'https://' + window.location.hostname
-                        this.images.push(localhost.concat(name))
+                        this.images.push(response.data['url'])
                     })
                     .catch(error => {
                         console.log(error)

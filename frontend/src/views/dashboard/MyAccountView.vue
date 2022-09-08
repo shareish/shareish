@@ -9,8 +9,8 @@
 
         <div class="columns is-centered is-multiline">
             <div class="column is-6 p-3 has-text-centered">
-                <figure class="image is-inline-block is-responsive is-512x512" v-if="getImageURL(user.image)">
-                    <img id="profilPicture" :src="getImageURL()" class="is-rounded">
+                <figure class="image is-inline-block is-responsive is-512x512" v-if="userImage">
+                    <img id="profilPicture" :src="userImage" class="is-rounded">
                 </figure>
                 <figure class="image is-inline-block is-responsive is-96x96" v-else>
                     <img src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
@@ -138,7 +138,7 @@ export default {
             user: {},
             items: [],
             images: {},
-            userImage: '',
+            userImage: null,
             changes: {},
             files: '',
             newImage: '',
@@ -183,47 +183,35 @@ export default {
                 })
         },
         async getItems() {
-            await axios
-                .get('/api/v1/user_items/')
-                .then(response => {
-                    this.items = response.data
-                    for(let i = 0; i < this.items.length; i++){
-                        if(this.items[i]['images'][0]){
-                            axios
-                                .get(`/api/v1/images/${this.items[i]['images'][0]}`)
-                                .then(response2 => {
-                                    var image = response2.data['image']
-                                    const media = 'https://' + window.location.hostname
-                                    image = media.concat(image)
-                                    this.images[this.items[i]['id']] = image
-                                })
-                                .catch(error2 => {
-                                    console.log(JSON.stringify(error2))
-                                })
+            try {
+                this.items = (await axios.get('/api/v1/user_items/')).data;
+                for (const item of this.items) {
+                    if (item['images'].length > 0) {
+                        try {
+                            const uri = `/api/v1/images/${item['images'][0]}`;
+                            this.images[item['id']] = (await axios.get(uri)).data['url'];
+                        }
+                        catch (error) {
+                            console.log(JSON.stringify(error))
                         }
                     }
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-        },
-        async getImage(){
-            if(this.user['image'][0]){
-                await axios
-                .get(`/api/v1/user_image/${this.user['image'][0]}/`)
-                .then(response => {
-                    var image = response.data['image']
-                    const media = 'https://' + window.location.hostname
-                    image = media.concat(image)
-                    this.userImage = image
-                })
-                .catch(error => {
-                    console.log(error)
-                })
+                }
+            }
+            catch (error) {
+                console.log(JSON.stringify(error))
             }
         },
-        getImageURL(){
-            return this.userImage
+        async getImage(){
+            if(this.user['image'].length > 0){
+              try {
+                const uri = `/api/v1/user_image/${this.user['image'][0]}/`;
+                const data = (await axios.get(uri)).data;
+                this.userImage = data['url'];
+              }
+              catch(error) {
+                  console.log(error)
+              }
+            }
         },
         getImageItemURL(index){
             return this.images[index]
@@ -268,13 +256,8 @@ export default {
                         }
                         axios
                             .post('/api/v1/user_image/', formData2)
-                            .then(async response2 => {
-                                let image = response2.data['image']
-                                const media = 'https://' + window.location.hostname
-                                image = media.concat(image)
-                                this.userImage = image
-                                await this.getImage()
-                                document.getElementById("profilPicture").src = this.getImageURL()
+                            .then(response2 => {
+                                this.userImage = response2.data['url']
                             })
                             .catch(error => {
                                 console.log(JSON.stringify(error));
