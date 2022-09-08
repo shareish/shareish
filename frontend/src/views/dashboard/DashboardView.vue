@@ -148,7 +148,7 @@ export default {
             this.filter.item_type = 'null'
             this.markers = new L.markerClusterGroup({
 		disableClusteringAtZoom: 16,
-		chunkedLoading: true,
+		chunkedLoading: true
 	    })
             this.getItemsLocation()
         }
@@ -166,7 +166,9 @@ export default {
 
             this.filter.item_type = 'null'
 	    this.markers = new L.markerClusterGroup({
-		disableClusteringAtZoom: 16})
+		disableClusteringAtZoom: 16,
+		chunkedLoading: true
+	    })
             this.getItemsLocation()
         }
 
