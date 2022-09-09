@@ -113,6 +113,7 @@ export default {
             nameToShow: '',
             descriptionToShow: '',
 	    typeToShow: '',
+	    userToShow: '',
             latitude: null,
             longitude: null,
             zoom: null,
@@ -133,11 +134,11 @@ export default {
         const success = (position) => {
             this.latitude = position.coords.latitude
             this.longitude = position.coords.longitude
-            this.zoom = 16
+            this.zoom = 14
             this.map = L.map('mapid').setView([this.latitude, this.longitude], this.zoom)
             L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png ', {
                 maxZoom: 19,
-                zoom: 16,
+                zoom: 10,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
             }).addTo(this.map);
 
@@ -148,15 +149,17 @@ export default {
             this.filter.item_type = 'null'
             this.markers = new L.markerClusterGroup({
 		disableClusteringAtZoom: 16,
-		chunkedLoading: true
+		chunkedLoading: true,
+		maxClusterRadius: 20
 	    })
             this.getItemsLocation()
+	    this.addExternalMarkersLocation()
         }
 
         const error = () => {
             this.latitude = 50.586276
             this.longitude = 5.560470
-            this.zoom = 14
+            this.zoom = 15
             this.map = L.map('mapid').setView([this.latitude, this.longitude], this.zoom)
             L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png ', {
                 maxZoom: 19,
@@ -170,6 +173,7 @@ export default {
 		chunkedLoading: true
 	    })
             this.getItemsLocation()
+	    this.addExternalMarkersLocation()
         }
 
         navigator.geolocation.getCurrentPosition(success, error)
@@ -223,6 +227,7 @@ export default {
 	
         async onMarkerHover(e){
             const itemId = e.target.item_id;
+	    await this.getItemNameUser(itemId)
             this.popup.setLatLng(e.latlng);
             this.popup.openOn(this.map);
             try {
@@ -239,7 +244,9 @@ export default {
                 this.popup.setContent(
                     '<figure class="image">' +
                     '<img src="' + url +
-                    '" style="object-fit: cover; width: 100%; height: 100%">' +
+		    '" style="object-fit: cover; width: 100%; height: 100%">' +
+			'<br>' + this.nameToShow + 
+			'<br>' + this.item_type + ' by ' + this.userToShow + 
                     '</figure>'
                 );
             }
@@ -248,6 +255,15 @@ export default {
             }
         },
 
+	//on external marker hover
+	async onEMarkerHover(e){
+	    var etype = e.target.type;
+	    var ename = e.target.name;
+	    this.popup.setLatLng(e.latlng);
+            this.popup.openOn(this.map);
+	    this.popup.setContent(ename+' <br>'+ '('+etype+' from OSM)');
+	},
+	
 	async getItemType(id){
 	    await axios
 		    .get(`/api/v1/items/${id}`)
@@ -258,6 +274,28 @@ export default {
                     console.log(error)
                 })
 	},
+
+	async getItemNameUser(id){
+	    await axios
+		    .get(`/api/v1/items/${id}`)
+                    .then(response => {
+			this.nameToShow = response.data['name']
+			var userid = response.data['user']
+			axios
+			    .get(`/api/v1/webusers/${userid}/`)
+			    .then(response2 => {
+				this.userToShow = response2.data['username']
+			    })
+			    .catch(error => {
+				console.log(JSON.stringify(error));
+			    })
+		    })
+	    	.catch(error => {
+                    console.log(error)
+                })
+	},
+
+	
 	
         onMarkerOut(e){
             this.popup.close()            
@@ -269,6 +307,141 @@ export default {
             this.modalToShow = {}
         },
 
+	async fetchAsync (url) {
+		let response = await fetch(url);
+		let data = await response.json();
+		return data;
+	},
+
+
+	async getOverPassElements(tagkey,tagvalue) {
+	    // "amenity"="public_bookcase"; "amenity"="give_box"; "amenity"="food_sharing"; "amenity"="freeshop"; emergency=drinking_water; emergency=defibrillator
+	    // social_facility=food_bank
+	    var overpassQuery = "\""+tagkey+"\""+'='+"\""+tagvalue+"\""
+	    var bounds = this.map.getBounds().getSouth() + ',' + this.map.getBounds().getWest() + ',' + this.map.getBounds().getNorth() + ',' + this.map.getBounds().getEast();
+	    var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
+            //var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
+            //var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
+            //var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
+	    var query = '?data=[out:json][timeout:15];(' + nodeQuery + ');out body geom;';
+            var baseUrl = 'http://overpass-api.de/api/interpreter';
+            var resultUrl = baseUrl + query;
+	    //console.log(resultUrl)
+	    var response = await this.fetchAsync(resultUrl) 
+	    return(response.elements)
+	},
+
+
+	createExternalMarkers(elements,icon){
+	    var emarkerList =[]
+	    for(let i = 0; i < elements.length; i++){
+		var emarker = {}
+		emarker = L.marker([elements[i]['lat'], elements[i]['lon']], {icon: icon})
+		emarker.type = elements[i]['tags']['amenity']
+		emarker.name = elements[i]['tags']['name']
+		emarker.on('mouseover', this.onEMarkerHover)
+		emarker.on('mouseout', this.onMarkerOut)
+		emarkerList.push(emarker)
+	    }
+	    return emarkerList
+	},
+	
+	async addExternalMarkersLocation(){
+	    //import of external markers through OSM overpass API
+	    //get public bookcases
+	    var public_bookcase_icon = new L.Icon({
+		iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var public_bookcases = await this.getOverPassElements("amenity","public_bookcase")
+	    console.log(public_bookcases)
+	    this.markers.addLayers(this.createExternalMarkers(public_bookcases,public_bookcase_icon))
+	    this.map.addLayer(this.markers)
+
+	    //get give_boxes
+	    var give_box_icon = new L.Icon({
+		iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var give_boxes = await this.getOverPassElements("amenity","give_box")
+	    console.log(give_boxes)
+	    this.markers.addLayers(this.createExternalMarkers(give_boxes,give_box_icon))
+	    this.map.addLayer(this.markers)
+
+
+	    //get drinking_water spots
+	    var drinking_water_icon = new L.Icon({
+		iconUrl: 'https://raw.githubusercontent.com/pietervdvn/MapComplete/develop/assets/themes/drinking_water/logo.svg',
+		//"license": "CC-BY-SA",
+		//"authors": [
+		//    "Pieter Fiers",
+		//    "Thibault Declercq",
+		//    "Pierre Barban",
+		//    "Joost Schouppe",
+		//    "Pieter Vander Vennet"
+		//],
+		//"sources": [
+		//    "https://osoc.be/editions/2020/cyclofix"
+		//]
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var drinking_water_spots = await this.getOverPassElements("amenity","drinking_water")
+	    console.log(drinking_water_spots)
+	    this.markers.addLayers(this.createExternalMarkers(drinking_water_spots,drinking_water_icon))
+	    this.map.addLayer(this.markers)
+
+
+	    //get freeshops
+	    var free_shop_icon = new L.Icon({
+		iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var free_shops = await this.getOverPassElements("amenity","free_shop")
+	    console.log(free_shops)
+	    this.markers.addLayers(this.createExternalMarkers(free_shops,free_shop_icon))
+	    this.map.addLayer(this.markers)
+
+	    //get defibrilators
+	    var aed_icon = new L.Icon({
+		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/ISO_7010_E010.svg',
+		// author: MaxxL
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var aeds = await this.getOverPassElements("emergency","defibrillator")
+	    console.log(aeds)
+	    this.markers.addLayers(this.createExternalMarkers(aeds,aed_icon))
+	    this.map.addLayer(this.markers)
+
+
+	    
+	    
+	    //ajouter au markers
+	    //https://gist.github.com/tyrasd/45e4a6a44c734497e82ccaae16a9c9ea
+	    //osmtogeojson
+	    //https://unpkg.com/osmtogeojson@2.2.12/osmtogeojson.js
+	    
+	},
+	
 	async addMarkersLocation(){
             if(this.map.hasLayer(this.markers)){
                 this.markers.clearLayers()
@@ -296,7 +469,7 @@ export default {
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 41],
 		iconAnchor: [12, 41],
-		popupAnchor: [1, -34],
+		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
 	    });
 	    var yellowIcon = new L.Icon({
@@ -304,7 +477,7 @@ export default {
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 41],
 		iconAnchor: [12, 41],
-		popupAnchor: [1, -34],
+		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
 	    });
 	    var redIcon = new L.Icon({
@@ -312,7 +485,7 @@ export default {
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 41],
 		iconAnchor: [12, 41],
-		popupAnchor: [1, -34],
+		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
 	    });
 	    var greyIcon = new L.Icon({
@@ -320,7 +493,7 @@ export default {
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 41],
 		iconAnchor: [12, 41],
-		popupAnchor: [1, -34],
+		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
 	    });
 
@@ -347,10 +520,8 @@ export default {
                 marker.on('mouseover', this.onMarkerHover)
                 marker.on('mouseout', this.onMarkerOut)
 		markerList.push(marker)
-                //this.markers.addLayer(marker)
             }
 	    this.markers.addLayers(markerList)
-            //this.map.addLayer(this.markers)
 	    this.map.addLayer(this.markers)
         }
     },
