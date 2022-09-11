@@ -84,11 +84,11 @@
                 <div class="column">
                     <!-- Content -->
                     <h6 class="title is-4 mb-4">Shareish</h6>
-                    <img src="./assets/montefiore_institute.svg" alt="Liège Université Montefiore Institute">
-                    <address> Montefiore Institute (B28)
-                        <br>10, Allée de la découverte
-                        <br>University of Liège
-                        <br>4000 Liège, Belgium
+                    <!-- <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
+                    <address> XXX Anonymous 
+                        <br>XXX Anonymous 
+                        <br>XXX Anonymous 
+    <br>XXX Anonymous (for Review)
                     </address>
                 </div>
 
@@ -101,7 +101,7 @@
                         <a @click="goto('/')" class="text-reset">{{ $t('about-us') }}</a><br />
                         <a @click="goto('/dashboard/my-account')" class="text-reset">{{ $t('my-account') }}</a><br />
                         <a @click="goto('/dashboard')" class="text-reset">{{ $t('map') }}</a><br />
-                        <a href="https://github.com/shareish">
+                        <a href="https://github.com/anonymous">
                           <img src="./assets/GitHub-Mark-32px.png" alt="https://github.com/shareish">
                         </a><br />
                         
