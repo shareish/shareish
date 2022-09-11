@@ -265,6 +265,7 @@ export default {
             this.popup.openOn(this.map);
 	    this.popup.setContent(ename+' <br>'+ '('+etype+' from OSM)');
 	},
+
 	
 	async getItemType(id){
 	    await axios
@@ -402,18 +403,8 @@ export default {
 
 	    //get drinking_water spots
 	    var drinking_water_icon = new L.Icon({
-		//iconUrl: 'https://raw.githubusercontent.com/pietervdvn/MapComplete/develop/assets/themes/drinking_water/logo.svg',
 		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/52/OCHA_humicons_water.png',
-		//"authors": [
-		//    "Pieter Fiers",
-		//    "Thibault Declercq",
-		//    "Pierre Barban",
-		//    "Joost Schouppe",
-		//    "Pieter Vander Vennet"
-		//],
-		//"sources": [
-		//    "https://osoc.be/editions/2020/cyclofix"
-		//]
+		// http://www.unocha.org/story/ocha-launches-500-free-humanitarian-symbols, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 31],
 		iconAnchor: [12, 41],
