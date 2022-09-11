@@ -178,7 +178,6 @@ export default {
 
         navigator.geolocation.getCurrentPosition(success, error)
 
-        
     },
     methods: {
         async getItemsLocation(){
@@ -259,6 +258,9 @@ export default {
 	async onEMarkerHover(e){
 	    var etype = e.target.type;
 	    var ename = e.target.name;
+	    if (ename === undefined) {
+		ename = ""
+	    }
 	    this.popup.setLatLng(e.latlng);
             this.popup.openOn(this.map);
 	    this.popup.setContent(ename+' <br>'+ '('+etype+' from OSM)');
@@ -320,13 +322,9 @@ export default {
 	    var overpassQuery = "\""+tagkey+"\""+'='+"\""+tagvalue+"\""
 	    var bounds = this.map.getBounds().getSouth() + ',' + this.map.getBounds().getWest() + ',' + this.map.getBounds().getNorth() + ',' + this.map.getBounds().getEast();
 	    var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
-            //var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
-            //var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
-            //var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
 	    var query = '?data=[out:json][timeout:15];(' + nodeQuery + ');out body geom;';
             var baseUrl = 'http://overpass-api.de/api/interpreter';
             var resultUrl = baseUrl + query;
-	    //console.log(resultUrl)
 	    var response = await this.fetchAsync(resultUrl) 
 	    return(response.elements)
 	},
@@ -337,7 +335,13 @@ export default {
 	    for(let i = 0; i < elements.length; i++){
 		var emarker = {}
 		emarker = L.marker([elements[i]['lat'], elements[i]['lon']], {icon: icon})
-		emarker.type = elements[i]['tags']['amenity']
+		console.log(elements[i])
+		if (elements[i]['tags']['amenity']) {
+		    emarker.type = elements[i]['tags']['amenity']
+		}
+		else if (elements[i]['tags']['emergency']) {
+		    emarker.type = elements[i]['tags']['emergency']
+		}
 		emarker.name = elements[i]['tags']['name']
 		emarker.on('mouseover', this.onEMarkerHover)
 		emarker.on('mouseout', this.onMarkerOut)
@@ -362,12 +366,31 @@ export default {
 	    this.markers.addLayers(this.createExternalMarkers(public_bookcases,public_bookcase_icon))
 	    this.map.addLayer(this.markers)
 
-	    //get give_boxes
-	    var give_box_icon = new L.Icon({
-		iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
+
+	    //get defibrilators
+	    var aed_icon = new L.Icon({
+		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/ISO_7010_E010.svg',
+		// author: MaxxL
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 		iconSize: [25, 41],
 		iconAnchor: [12, 41],
+		popupAnchor: [-10, -74],
+		shadowSize: [41, 41]
+	    });
+	    var aeds = await this.getOverPassElements("emergency","defibrillator")
+	    console.log(aeds)
+	    this.markers.addLayers(this.createExternalMarkers(aeds,aed_icon))
+	    this.map.addLayer(this.markers)
+
+
+	    
+	    //get give_boxes
+	    var give_box_icon = new L.Icon({
+		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Fridge_icon_2.png',
+		//Tommaso.sansone91, CC BY-SA 4.0
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [20, 31],
+		iconAnchor: [12, 31],
 		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
 	    });
@@ -379,8 +402,8 @@ export default {
 
 	    //get drinking_water spots
 	    var drinking_water_icon = new L.Icon({
-		iconUrl: 'https://raw.githubusercontent.com/pietervdvn/MapComplete/develop/assets/themes/drinking_water/logo.svg',
-		//"license": "CC-BY-SA",
+		//iconUrl: 'https://raw.githubusercontent.com/pietervdvn/MapComplete/develop/assets/themes/drinking_water/logo.svg',
+		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/52/OCHA_humicons_water.png',
 		//"authors": [
 		//    "Pieter Fiers",
 		//    "Thibault Declercq",
@@ -392,7 +415,7 @@ export default {
 		//    "https://osoc.be/editions/2020/cyclofix"
 		//]
 		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-		iconSize: [25, 41],
+		iconSize: [25, 31],
 		iconAnchor: [12, 41],
 		popupAnchor: [-10, -74],
 		shadowSize: [41, 41]
@@ -417,28 +440,6 @@ export default {
 	    this.markers.addLayers(this.createExternalMarkers(free_shops,free_shop_icon))
 	    this.map.addLayer(this.markers)
 
-	    //get defibrilators
-	    var aed_icon = new L.Icon({
-		iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/ISO_7010_E010.svg',
-		// author: MaxxL
-		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-		iconSize: [25, 41],
-		iconAnchor: [12, 41],
-		popupAnchor: [-10, -74],
-		shadowSize: [41, 41]
-	    });
-	    var aeds = await this.getOverPassElements("emergency","defibrillator")
-	    console.log(aeds)
-	    this.markers.addLayers(this.createExternalMarkers(aeds,aed_icon))
-	    this.map.addLayer(this.markers)
-
-
-	    
-	    
-	    //ajouter au markers
-	    //https://gist.github.com/tyrasd/45e4a6a44c734497e82ccaae16a9c9ea
-	    //osmtogeojson
-	    //https://unpkg.com/osmtogeojson@2.2.12/osmtogeojson.js
 	    
 	},
 	
