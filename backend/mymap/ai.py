@@ -4,6 +4,7 @@ from torchvision import transforms
 from matplotlib import pyplot as plt
 from torchvision import models
 import os
+import pytesseract
 
 model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v3_large', weights=models.MobileNet_V3_Large_Weights.IMAGENET1K_V1)
 model.eval()
@@ -37,10 +38,19 @@ def getCategories(filename):
     with open(filename, "r") as f:
         categories = [s.strip() for s in f.readlines()]
     return categories
-    
+
+
+def findOCR(filename):
+    predicted_result = pytesseract.image_to_string(Image.open(filename), lang='eng')
+    return predicted_result
+
+
 def findClass(filename):
     image = getImage(filename)
 
+    #call pytesseract for OCR
+    detected_text = findOCR(filename)
+    
     if torch.cuda.is_available():
         image = image.to('cuda')
         model.to('cuda')
@@ -56,7 +66,7 @@ def findClass(filename):
     for i in range(top5_prob.size(0)):
         print(str(categories[top5_catid[i]]) + " & " + str(top5_prob[i].item()) + "\\\\")
 
-    return categories[top5_catid[0]]
+    return categories[top5_catid[0]],detected_text
 
 # These two functions are implemented to plot the save the figures on files
 # and to write the results on a tabular in a latex document

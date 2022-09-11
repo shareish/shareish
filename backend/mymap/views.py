@@ -289,7 +289,11 @@ from PIL import Image
 def predictClass(request):
     if request.method == "POST":
         if(request.FILES.get('files[]')):
-            class_found = findClass(request.FILES.get('files[]'))
+            class_found, detected_text = findClass(request.FILES.get('files[]'))
+            print("predict output:")
+            print(class_found)
+            print(detected_text)
+            #to do: send response with class and detected text
             return Response(class_found, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 

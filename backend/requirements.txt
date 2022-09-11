@@ -14,3 +14,4 @@ asgiref==3.5.2
 geopy==2.2.0
 numpy==1.18.5
 psycopg2==2.9.3
+pytesseract==0.3.10
