@@ -324,7 +324,9 @@ export default {
 	    var bounds = this.map.getBounds().getSouth() + ',' + this.map.getBounds().getWest() + ',' + this.map.getBounds().getNorth() + ',' + this.map.getBounds().getEast();
 	    var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
 	    var query = '?data=[out:json][timeout:15];(' + nodeQuery + ');out body geom;';
-            var baseUrl = 'http://overpass-api.de/api/interpreter';
+            //var baseUrl = 'http://overpass-api.de/api/interpreter';
+	    //var baseUrl = 'https://overpass.kumi.systems/api/interpreter';
+	    var baseUrl = 'https://maps.mail.ru/osm/tools/overpass/api/interpreter';
             var resultUrl = baseUrl + query;
 	    var response = await this.fetchAsync(resultUrl) 
 	    return(response.elements)
