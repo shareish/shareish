@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue'
 import Dashboard from '../views/dashboard/DashboardView.vue'
 import SignUp from '../views/SignUpView.vue'
@@ -149,18 +149,20 @@ const routes = [{
     },
 ]
 
-const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
-    routes
-})
+// Create router instance
+const router = new VueRouter({
+    routes: routes,
+    linkActiveClass: 'is-active'
+});
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
         i18n.locale = localStorage.getItem('language') || 'en'
         next('/log-in')
-    } else {
+    }
+ else {
         next()
     }
 })
 
-export default router
+export default router;

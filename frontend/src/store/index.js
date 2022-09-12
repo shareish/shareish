@@ -1,6 +1,9 @@
-import { createStore } from 'vuex'
+import Vuex from 'vuex';
+import Vue from 'vue';
 
-export default createStore({
+Vue.use(Vuex);
+
+export default new Vuex.Store({
     state: {
         user: {
             email: '',

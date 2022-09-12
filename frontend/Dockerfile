@@ -1,5 +1,5 @@
 # dev stage
-FROM node:16.13 as dev-stage
+FROM node:14 as dev-stage
 WORKDIR /app
 COPY package*.json ./
 RUN npm config set unsafe-perm true && npm install --force
