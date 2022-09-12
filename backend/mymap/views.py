@@ -1,6 +1,6 @@
 from email import message
 
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 
 from .models import Item, ItemImage, Conversation, Message, UserImage
 from django.contrib.auth import get_user_model
@@ -283,18 +283,17 @@ def searchItems(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-from PIL import Image
 
 @api_view(['POST'])
 def predictClass(request):
     if request.method == "POST":
         if(request.FILES.get('files[]')):
             class_found, detected_text = findClass(request.FILES.get('files[]'))
-            print("predict output:")
-            print(class_found)
-            print(detected_text)
-            #to do: send response with class and detected text
-            return Response(class_found, status=status.HTTP_200_OK)
+            response = {
+                "suggested_class": class_found,
+                "detected_text": detected_text
+            }
+            return JsonResponse(response, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
