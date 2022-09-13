@@ -12,7 +12,7 @@
           <p>
             <strong class="is-size-4">{{ item.name }}</strong>
             <br>
-            <item-type-tag :type="item.item_type" /> <small>{{$t('by')}} @{{user.username}}</small>
+            <item-type-tag :type="item.item_type" /> <small v-if="user">{{$t('by')}} @{{user.username}}</small>
             <br>
             <small>{{formattedDate(item.startdate)}} </small>
             <template v-if="item.enddate"> {{$t('to')}} {{formattedDate(item.enddate)}}</template>
@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       user: null,
-      images: null,
+      images: [],
     }
   },
   computed: {

@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import * as L from 'leaflet'; // do not remove for markercluster
 import 'leaflet.markercluster';
 import 'leaflet-easybutton';
 import axios from 'axios'
