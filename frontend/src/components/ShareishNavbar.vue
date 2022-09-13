@@ -16,7 +16,7 @@
         {{$t('browse-items')}}
       </b-navbar-item>
 
-      <b-navbar-item tag="router-link" to="/items/add">
+      <b-navbar-item tag="router-link" to="/add-item">
         <i class="fas fa-plus"></i>
         {{$t('add-item')}}
       </b-navbar-item>

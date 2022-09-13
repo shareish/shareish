@@ -108,7 +108,7 @@ const routes = [{
         }
     },
     {
-        path: '/items/add',
+        path: '/add-item',
         name: 'addItem',
         component: AddItem,
         meta: {
@@ -149,11 +149,15 @@ const routes = [{
     },
 
     // Redirects for old urls
-    {path: '/dashboard', redirect: '/map'}
+    {path: '/dashboard', redirect: '/map'},
+    {path: '/dashboard/items', redirect: '/items'},
+    {path: '/dashboard/items/:id', redirect: '/items/:id'},
+    {path: '/dashboard/items/add', redirect: '/add-item'},
 ]
 
 // Create router instance
 const router = new VueRouter({
+    mode: 'history',
     routes: routes,
     linkActiveClass: 'is-active'
 });
@@ -161,7 +165,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
         i18n.locale = localStorage.getItem('language') || 'en'
-        next('/log-in')
+        next('/')
     }
  else {
         next()
