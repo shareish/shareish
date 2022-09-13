@@ -10,7 +10,9 @@
         "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.7.2",
         "axios": "^0.27.2",
+        "buefy": "^0.9.22",
         "bulma": "^0.9.4",
         "bulma-calendar": "^6.1.18",
         "core-js": "^3.8.3",

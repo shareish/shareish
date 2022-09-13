@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue'
-import Dashboard from '../views/dashboard/DashboardView.vue'
+import ItemsMap from '@/components/pages/ItemsMap';
 import SignUp from '../views/SignUpView.vue'
 import Login from '../views/LoginView.vue'
 import MyAccount from '../views/dashboard/MyAccountView.vue'
@@ -60,15 +60,15 @@ const routes = [{
         component: ActivateEmail
     },
     {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: Dashboard,
+        path: '/map',
+        name: 'itemsMap',
+        component: ItemsMap,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/my-account',
+        path: '/profile',
         name: 'myaccount',
         component: MyAccount,
         meta: {
@@ -76,7 +76,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/items',
+        path: '/items',
         name: 'items',
         component: Items,
         meta: {
@@ -84,7 +84,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/items/:id',
+        path: '/items/:id',
         name: 'itemDetail',
         component: ItemDetail,
         meta: {
@@ -108,7 +108,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/items/add',
+        path: '/items/add',
         name: 'addItem',
         component: AddItem,
         meta: {
@@ -132,7 +132,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/conversations',
+        path: '/conversations',
         name: 'conversations',
         component: Conversations,
         meta: {
@@ -140,13 +140,16 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/conversations/:id',
+        path: '/conversations/:id',
         name: 'conversationDetail',
         component: ConversationDetail,
         meta: {
             requireLogin: true
         }
     },
+
+    // Redirects for old urls
+    {path: '/dashboard', redirect: '/map'}
 ]
 
 // Create router instance

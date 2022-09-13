@@ -6,6 +6,12 @@ axios.defaults.baseURL = (process.env.NODE_ENV === "production") ? PROD_URL : DE
 
 import Vue from 'vue';
 
+import Buefy from 'buefy';
+import 'buefy/dist/buefy.css';
+Vue.use(Buefy, {
+  defaultIconPack: 'fas',
+});
+
 import VueRouter from 'vue-router';
 import router from './router';
 Vue.use(VueRouter);
