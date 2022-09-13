@@ -1,81 +1,99 @@
-export const categories = [
-  {
+export const categories = {
+  "FD": {
     "id": "FD",
     "slug": "food",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": "fas fa-utensils"
   },
-  {
+  "AN": {
     "id": "AN",
     "slug": "animals",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": "fas fa-paw"
   },
-  {
+  "EN": {
     "id": "EN",
     "slug": "aee",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "CL": {
     "id": "CL",
     "slug": "collectors",
-    "image-placeholder": ""
-  },{
+    "image-placeholder": "",
+    "icon": ""
+  },
+  "HL": {
     "id": "HL",
     "slug": "hh",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "DY": {
     "id": "DY",
     "slug": "diy",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "BT": {
     "id": "BT",
     "slug": "beauty",
-    "image-placeholder": ""
-  },{
+    "image-placeholder": "",
+    "icon": ""
+  },
+  "CH": {
     "id": "CH",
     "slug": "childhood",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "IT": {
     "id": "IT",
     "slug": "it",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "GD": {
     "id": "GD",
     "slug": "garden",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "HS": {
     "id": "HS",
     "slug": "house",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "HD": {
     "id": "HD",
     "slug": "holidays",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "BK": {
     "id": "BK",
     "slug": "book",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "SP": {
     "id": "SP",
     "slug": "sport",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "TS": {
     "id": "TS",
     "slug": "transport",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   },
-  {
+  "OT": {
     "id": "OT",
     "slug": "other",
-    "image-placeholder": ""
+    "image-placeholder": "",
+    "icon": ""
   }
-];
+};
 

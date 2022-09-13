@@ -238,29 +238,28 @@ def getAddress(request):
 def searchItemFilter(request):
     if request.method == "POST":
         searched = request.data
-        items_name = None
-        items_item_type = None
-        items_category1 = None
-        items_category2 = None
-        items_category3 = None
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
-        if 'name' not in searched and searched['item_type'] == 'null' and 'category' not in searched:
-            serialized_items = MapItemSerializer(queryset, many=True)
+
+        if (searched['name'] is None
+                and searched['item_type'] is None
+                and searched['category'] is None):
+            serialized_items = ItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
-        if 'name' in searched:
+
+        if searched['name'] is not None:
             items_name = queryset.filter(name__icontains=searched['name'])
             items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
-        if searched['item_type'] != 'null':
+        if searched['item_type'] is not None:
             items_item_type = queryset.filter(item_type__exact=searched['item_type'])
             items = items | items_item_type
-        if 'category' in searched:
+        if searched['category'] is not None:
             items_category1 = queryset.filter(category1__exact=searched['category'])
             items_category2 = queryset.filter(category2__exact=searched['category'])
             items_category3 = queryset.filter(category3__exact=searched['category'])
             items = items | items_category1 | items_category2 | items_category3
-        serialized_items = MapItemSerializer(items, many=True)
+        serialized_items = ItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)

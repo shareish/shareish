@@ -6,11 +6,28 @@ $primary: #3eaf7c;
 $primary-light: findLightColor($primary);
 $primary-dark: findDarkColor($primary);
 $primary-invert: findColorInvert($primary);
-$twitter: #4099FF;
-$twitter-invert: findColorInvert($twitter);
+$bookcase: #694B15;
+$bookcase-invert: findColorInvert($bookcase);
+$defibrillator: #4A8658;
+$defibrillator-invert: findColorInvert($defibrillator);
+$drinking-water: #5784B7;
+$drinking-water-invert: findColorInvert($drinking-water);
 
 // Lists and maps
-$custom-colors: null !default;
+$custom-colors: (
+  "bookcase": (
+    $bookcase,
+    $bookcase-invert
+  ),
+  "defibrillator": (
+    $defibrillator,
+    $defibrillator-invert
+  ),
+  "drinking-water": (
+    $drinking-water,
+    $drinking-water-invert
+  ),
+);
 $custom-shades: null !default;
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')

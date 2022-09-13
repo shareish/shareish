@@ -28,7 +28,7 @@ export default {
       return label;
     },
     categories() {
-      return categories;
+      return Object.values(categories);
     }
   }
 };
