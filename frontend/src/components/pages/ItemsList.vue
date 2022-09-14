@@ -9,7 +9,7 @@
     <div class="scrollable"  ref="listItems">
       <div class="columns" v-if="items && items.length">
         <div class="column" v-for="item in items" :key="`${item.id}-item-card`">
-          {{item}}
+          <item-card :item="item" />
         </div>
         <div class="column is-narrow vertical-center" v-if="!loadedAllItems">
           <button class="button is-primary" :class="{'is-loading': loading}" v-if="!loadedAllItems" @click="loadItems()">
@@ -29,10 +29,11 @@
 import _ from 'lodash';
 import ItemsFilters from '@/components/ItemsFilters';
 import axios from 'axios';
+import ItemCard from '@/components/ItemCard';
 
 export default {
   name: 'ItemsList',
-  components: {ItemsFilters},
+  components: {ItemsFilters, ItemCard},
   data() {
     return {
       searchString: null,
@@ -64,7 +65,7 @@ export default {
   methods: {
     scrollHandler: _.debounce(function() {
       let scrollBlock = document.getElementById("wrapper");
-      let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight === scrollBlock.scrollHeight);
+      let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
       if (bottom && !this.loadedAllItems) {
         this.loadItems();
       }
@@ -113,11 +114,13 @@ export default {
 
 .columns {
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: flex-start;
 }
 
 .column:not(.is-narrow) {
-  max-width: 12.5rem;
-  min-width: 12.5rem;
+  /*max-width: 25rem;*/
+  min-width: 25rem;
 }
 
 .vertical-center {

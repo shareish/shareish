@@ -30,9 +30,13 @@
         </div>
         <nav class="level is-mobile">
         <div class="level-left">
+          <router-link
+            :to="{ name: 'itemDetail', params: { id: item.id}}"
+          >
             <button class="button is-small is-primary level-item">
               <i class="fas fa-info-circle"></i> {{$t('i-am-interested')}}
             </button>
+          </router-link>
         </div>
       </nav>
       </div>

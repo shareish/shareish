@@ -2,6 +2,7 @@
   <b-field :label="label">
 
     <b-select :value="value" @input="$emit('input', $event)">
+      <option :value="null">{{$t('all')}}</option>
       <option
         v-for="category in categories"
         :value="category.id"

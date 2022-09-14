@@ -70,7 +70,6 @@
         </b-checkbox>
       </div>
 
-<!--                            <router-link :to="{ name: 'itemDetail', params: { id: modalToShow['id']}}" class="button is-info is-small is-responsive">Details</router-link>-->
     </div>
 </template>
 
