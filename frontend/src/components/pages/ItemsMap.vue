@@ -213,7 +213,10 @@ export default {
             category: this.selectedCategories
           })).data;
 
-          this.items = items.map(item => {
+          this.items = items.filter(item =>
+            // should not happen, but happens :)
+            item['location'] !== null
+          ).map(item => {
             let latLong = item['location'].slice(17, -1).split(' ');
             return {
               ...item,
