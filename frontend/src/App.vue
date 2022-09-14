@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" id="wrapper">
     <shareish-navbar />
 <!--            <div class="navbar-item">-->
 <!--              <div class="select is-rounded">-->
