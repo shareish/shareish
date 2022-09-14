@@ -1,7 +1,7 @@
 <template>
   <b-field grouped>
     <b-field expanded :label="$t('what-are-you-looking-for')">
-      <b-input :placeholder="$t('search...')"
+      <b-input :placeholder="$t('search-dot')"
         :value="searchString"
         @input="debounceSearchString"
         type="search"
