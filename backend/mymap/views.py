@@ -241,6 +241,9 @@ def searchItemFilter(request):
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
 
+        if searched['name'] == "":
+          searched['name'] = None
+
         if (searched['name'] is None
                 and searched['item_type'] is None
                 and searched['category'] is None):

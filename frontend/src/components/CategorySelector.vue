@@ -1,7 +1,7 @@
 <template>
   <b-field :label="label">
 
-    <b-select>
+    <b-select :value="value" @input="$emit('input', $event)">
       <option
         v-for="category in categories"
         :value="category.id"
@@ -18,11 +18,11 @@
 import {categories} from '@/categories';
 export default {
   name: 'CategorySelector',
-  props: ['number'],
+  props: ['number', 'value'],
   computed: {
     label() {
       let label = this.$t('item-category');
-      if (this.number !== null) {
+      if (this.number) {
         label += ` ${this.number}`;
       }
       return label;

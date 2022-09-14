@@ -1,6 +1,10 @@
 <template>
     <div class="page-dashboard">
-      <items-filters />
+      <items-filters
+        @update:selectedType="selectedType = $event"
+        @update:selectedCategory="selectedCategory = $event"
+        @update:searchString="searchString = $event"
+      />
 
       <l-map
         style="height: 800px"
@@ -185,8 +189,8 @@ export default {
             'free-shops': freeShopIcon
           },
           searchString: null,
-          selectedTypes: null,
-          selectedCategories: null,
+          selectedType: null,
+          selectedCategory: null,
           items: [],
         }
     },
@@ -197,6 +201,23 @@ export default {
         this.getItemsLocation(),
         this.fetchExtraLayersMakers()
       ])
+    },
+    watch: {
+      async selectedType() {
+        this.mapLoading = true;
+        await this.getItemsLocation();
+        this.mapLoading = false;
+      },
+      async selectedCategory() {
+        this.mapLoading = true;
+        await this.getItemsLocation();
+        this.mapLoading = false;
+      },
+      async searchString() {
+        this.mapLoading = true;
+        await this.getItemsLocation();
+        this.mapLoading = false;
+      }
     },
     methods: {
       setGeolocalizedPosition() {
@@ -209,8 +230,8 @@ export default {
         try {
           let items = (await axios.post('/api/v1/requestFilter/', {
             name: this.searchString,
-            item_type: this.selectedTypes,
-            category: this.selectedCategories
+            item_type: this.selectedType,
+            category: this.selectedCategory
           })).data;
 
           this.items = items.filter(item =>
@@ -284,7 +305,7 @@ export default {
         await this.fetchExtraLayersMakers();
         this.mapLoading = false;
       },
-    }
+    },
 }
 </script>
 
