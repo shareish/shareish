@@ -11,7 +11,7 @@
         <figure class="image is-5by3" :style="figureStyle" v-if="images.length > 0">
         </figure>
         <figure v-else class="image is-5by3">
-          <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+          <img :src="category1['image-placeholder']" alt="Placeholder image">
         </figure>
       </router-link>
 
@@ -157,5 +157,9 @@ export default {
 
 .title a {
   color: #4a4a4a !important;
+}
+
+.icon-text span {
+  margin-right: 0.5rem;
 }
 </style>

@@ -4,7 +4,7 @@
       <div class="media-left">
         <figure class="image is-128x128">
           <img v-if="images.length > 0" :src="images[0]" alt="Image">
-          <img v-else src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
+          <img v-else :src="category1['image-placeholder']" alt="Image">
         </figure>
       </div>
       <div class="media-content">
