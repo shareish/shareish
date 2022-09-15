@@ -58,3 +58,8 @@ upload-your-item-image,Upload your item image,
 name,Name,
 address,Address,
 description,Description,
+start-date,Start date,
+end-date,End date,
+save-as-recurrent-item,Save as recurrent item,
+submit,Submit,
+ends,ends,se termine

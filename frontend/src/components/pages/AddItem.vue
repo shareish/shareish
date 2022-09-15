@@ -24,30 +24,63 @@
     </div>
   </template>
   <template v-else-if="step === 2">
-    <section>
-      <b-field :label="$t('name')">
-        <b-input v-model="name" />
-      </b-field>
-      <b-field :label="$t('item-type')">
-        <b-select v-model="type" expanded>
-          <option value="BR">{{ $t('request') }}</option>
-          <option value="DN">{{ $t('donation') }}</option>
-          <option value="LN">{{ $t('loan') }}</option>
-        </b-select>
-      </b-field>
-      <div class="columns">
-        <category-selector class="column" number="1" v-model="category1" :nullable="false" expanded/>
-        <category-selector class="column" number="2" v-model="category2" :nullable="false" expanded/>
-        <category-selector class="column" number="3" v-model="category3" :nullable="false" expanded/>
+    <div class="columns">
+      <section class="column is-four-fifths">
+        <b-field :label="$t('name')">
+          <b-input v-model="name" />
+        </b-field>
+        <b-field :label="$t('item-type')">
+          <b-select v-model="type" expanded>
+            <option value="BR">{{ $t('request') }}</option>
+            <option value="DN">{{ $t('donation') }}</option>
+            <option value="LN">{{ $t('loan') }}</option>
+          </b-select>
+        </b-field>
+        <div class="columns">
+          <category-selector class="column" :number="1" v-model="category1" :nullable="false" expanded/>
+          <category-selector class="column" :number="2" v-model="category2" :nullable="false" expanded/>
+          <category-selector class="column" :number="3" v-model="category3" :nullable="false" expanded/>
+        </div>
+        <b-field :label="$t('address')">
+          <b-input v-model="location" />
+        </b-field>
+        <b-field :label="$t('description')">
+          <b-input type="textarea" expanded v-model="description" />
+        </b-field>
+        <b-field grouped>
+          <b-field :label="$t('start-date')" expanded>
+            <b-datepicker
+              icon-pack="fas"
+              icon="calendar"
+              v-model="startDate"
+            >
+            </b-datepicker>
+          </b-field>
+          <b-field :label="$t('end-date')" expanded>
+            <b-datepicker
+              icon-pack="fas"
+              icon="calendar"
+              v-model="endDate"
+              :min-date="startDate"
+            >
+            </b-datepicker>
+          </b-field>
+        </b-field>
+        <b-field>
+          <b-checkbox :value="isRecurrent">
+            <strong>{{$t('save-as-recurrent-item')}}</strong>
+          </b-checkbox>
+        </b-field>
+        <div class="container has-text-centered">
+          <button class="button is-primary" @click="submit">{{$t('submit')}}</button>
+        </div>
+      </section>
+      <div class="column">
+        <figure class="image is-256x256" v-if="filePreview">
+          <img :src="filePreview" />
+        </figure>
       </div>
-      <b-field :label="$t('address')">
-        <b-input v-model="location" />
-      </b-field>
-      <b-field :label="$t('description')">
-        <b-input type="textarea" expanded v-model="description" />
-      </b-field>
-
-    </section>
+    </div>
   </template>
   <template v-else>
     <div class="container has-text-centered buttons centered-container">
@@ -63,6 +96,7 @@
 import RecurrentItemsList from '@/components/RecurrentItemsList';
 import axios from 'axios';
 import CategorySelector from '@/components/CategorySelector';
+import moment from 'moment/moment';
 export default {
   name: 'AddItem',
   components: {CategorySelector, RecurrentItemsList},
@@ -70,6 +104,8 @@ export default {
     return {
       loading: false,
       step: 0,
+      errorCode: null,
+      errorMessage: null,
 
       file: null,
       filePreview: null,
@@ -90,7 +126,23 @@ export default {
       endDate: null
     }
   },
+  computed: {
+    error() {
+      return {
+        code: this.errorCode,
+        message: this.errorMessage
+      }
+    },
+  },
   watch: {
+    error() {
+      this.$buefy.snackbar.open({
+        duration: 5000,
+        type: 'is-danger',
+        message: `Error ${this.error.code}: ${this.error.message}`,
+        pauseOnHover: true,
+      })
+    }
   },
   methods: {
     async uploadFile(event) {
@@ -117,6 +169,84 @@ export default {
       }
       catch (error) {
         console.log(error);
+      }
+    },
+    async submit() {
+      this.errorCode = null;
+      this.errorMessage = null;
+
+      let startDate;
+      if (this.startDate) {
+        startDate = moment(this.startDate).format('YYYY-MM-DD');
+      }
+      else {
+        startDate = moment().format('YYYY-MM-DD');
+      }
+
+      let endDate;
+      if (this.endDate) {
+        endDate = moment(this.endDate).format('YYYY-MM-DD');
+      }
+
+      try {
+        let uri = '/api/v1/items/';
+        const item = (await axios.post(uri, {
+          name: this.name,
+          item_type: this.type,
+          category1: this.category1,
+          category2: (this.category2) ? this.category2 : '',
+          category3: (this.category3) ? this.category3 : '',
+          description: this.description,
+          location: this.location,
+          is_recurrent: this.isRecurrent,
+          startdate: startDate,
+          enddate: endDate,
+          images: []
+        })).data;
+
+        if (this.file && this.filePreview) {
+          const id = item.id;
+          try {
+            let uri = `/api/v1/images/`;
+            let formData = new FormData();
+            formData.append('itemID', id);
+            let files = [this.file];
+            let previews = [this.filePreview];
+            for(let i = 0; i < Object.keys(files).length; i++){
+              const file = files[i];
+              const preview = previews[i];
+              const blob = await (await fetch(preview)).blob();
+              const newFile = new File([blob], file.name);
+              formData.append('files', newFile);
+            }
+            await axios.post(uri, formData);
+
+          }
+          catch (error) {
+            console.log(error);
+            const response = error.response;
+            this.errorCode = response.status;
+            if (response.data.message) {
+              this.errorMessage = response.data.message;
+            }
+            else {
+              this.errorMessage = JSON.stringify(response.data);
+            }
+          }
+        }
+
+        await this.$router.push('/items');
+      }
+      catch (error) {
+        console.log(error);
+        const response = error.response;
+        this.errorCode = response.status;
+        if (response.data.message) {
+          this.errorMessage = response.data.message;
+        }
+        else {
+          this.errorMessage = JSON.stringify(response.data);
+        }
       }
     }
   }

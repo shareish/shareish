@@ -38,8 +38,8 @@
       <div class="content">
         {{item.description}}
         <br>
-        <small>{{formattedDate(item.startdate)}} </small>
-        <template v-if="item.enddate"> {{$t('to')}} {{formattedDate(item.enddate)}}</template>
+        <small>{{formattedDate(item.startdate)}} </small><br>
+        <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small>
       </div>
       <span v-for="category in categories" class="icon-text" :key="category.slug">
         <span class="icon">
