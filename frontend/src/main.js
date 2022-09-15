@@ -1,4 +1,4 @@
-const PROD_URL = 'https://shareish.montefiore.uliege.be';
+const PROD_URL = 'https://demo.shareish.org';
 const DEV_URL = 'http://localhost:8000';
 
 import axios from 'axios';

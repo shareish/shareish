@@ -31,7 +31,7 @@ DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
 
-PROD_DOMAIN = "shareish.montefiore.uliege.be"
+PROD_DOMAIN = "demo.shareish.org"
 PROD_URL = "http://" + PROD_DOMAIN
 PROD_API_URL = PROD_URL
 
