@@ -237,29 +237,27 @@
                 </figure>
             </div>
         </div>
+      <div class="columns is-multiline">
+        <div class="column is-3 m-2">
+          <button class="button is-info" @click="beginConversation()" >Begin a conversation</button>
+
+        </div>
+        <div v-if="item.is_recurrent && item.user == $store.state.user.id">
+          <div class="column is-3 is-offset-3 m-2">
+            <button class="button is-danger" @click="removeItem()" >Remove recurrent Item</button>
+          </div>
+          <div class="column is-3 is-offset-3 m-2">
+            <button class="button is-danger" @click="deleteItem()" >Delete Item</button>
+          </div>
+        </div>
+        <div v-else>
+          <div class="column is-3 is-centered m-2" v-if="item.user == $store.state.user.id">
+            <button class="button is-danger" @click="deleteItem()" >Delete Item</button>
+          </div>
+        </div>
+
+      </div>
     </div>
-
-<!--    <div class="columns is-multiline">-->
-<!--        <div class="column is-3 m-2">-->
-<!--            <button class="button is-info" @click="beginConversation()" >Begin a conversation</button>-->
-
-<!--        </div>-->
-<!--        <div v-if="item.is_recurrent && item.user == $store.state.user.id">-->
-<!--            <div class="column is-3 is-offset-3 m-2">-->
-<!--                <button class="button is-danger" @click="removeItem()" >Remove recurrent Item</button>  -->
-<!--            </div>-->
-<!--            <div class="column is-3 is-offset-3 m-2">-->
-<!--                <button class="button is-danger" @click="deleteItem()" >Delete Item</button>  -->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div v-else>-->
-<!--            <div class="column is-3 is-centered m-2" v-if="item.user == $store.state.user.id">-->
-<!--                <button class="button is-danger" @click="deleteItem()" >Delete Item</button>  -->
-<!--            </div>-->
-<!--        </div>-->
-<!--        -->
-<!--    </div>-->
-
     
 </template>
 
