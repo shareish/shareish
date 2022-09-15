@@ -8,7 +8,7 @@
 
     <div class="scrollable"  ref="listItems">
       <div class="columns" v-if="items && items.length">
-        <div class="column" v-for="item in items" :key="`${item.id}-item-card`">
+        <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
           <item-card :item="item" />
         </div>
         <div class="column is-narrow vertical-center" v-if="!loadedAllItems">
@@ -114,7 +114,7 @@ export default {
 
 .columns {
   flex-wrap: wrap;
-  justify-content: space-between;
+  /*justify-content: space-between;*/
   align-content: flex-start;
 }
 
