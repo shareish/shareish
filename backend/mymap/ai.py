@@ -4,6 +4,7 @@ from torchvision import transforms
 from matplotlib import pyplot as plt
 from torchvision import models
 import os
+import re
 import pytesseract
 
 model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v3_large', weights=models.MobileNet_V3_Large_Weights.IMAGENET1K_V1)
@@ -41,8 +42,10 @@ def getCategories(filename):
 
 
 def findOCR(filename):
-    predicted_result = pytesseract.image_to_string(Image.open(filename), lang='eng')
-    return predicted_result
+    #predicted_result = pytesseract.image_to_string(Image.open(filename), lang='eng')
+    predicted_result = pytesseract.image_to_string(Image.open(filename))
+    clean_predicted_result = re.sub(r'\n+', '\n', predicted_result).strip()
+    return clean_predicted_result
 
 
 def findClass(filename):
@@ -50,6 +53,7 @@ def findClass(filename):
 
     #call pytesseract for OCR
     detected_text = findOCR(filename)
+    print(detected_text)
     
     if torch.cuda.is_available():
         image = image.to('cuda')
