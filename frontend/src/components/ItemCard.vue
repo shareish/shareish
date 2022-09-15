@@ -38,8 +38,10 @@
       <div class="content">
         {{item.description}}
         <br>
-        <small>{{formattedDate(item.startdate)}} </small><br>
-        <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small>
+        <template v-if="!recurrentList">
+          <small>{{formattedDate(item.startdate)}} </small><br>
+          <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small>
+        </template>
       </div>
       <span v-for="category in categories" class="icon-text" :key="category.slug">
         <span class="icon">
@@ -47,6 +49,9 @@
         </span>
         <span>{{$t(category.slug)}}</span>
       </span>
+    </div>
+    <div class="card-footer" v-if="recurrentList">
+      <a class="card-footer-item" @click="$emit('submitAgain', item)">{{$t('submit-again')}}</a>
     </div>
   </div>
 </template>
@@ -60,7 +65,10 @@ import {categories} from '@/categories';
 export default {
   name: 'ItemCard',
   components: {ItemTypeTag},
-  props: ['item'],
+  props: {
+    item: Object,
+    recurrentList: {type: Boolean, default: false}
+  },
   data() {
     return {
       user: null,

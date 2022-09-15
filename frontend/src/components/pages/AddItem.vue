@@ -67,7 +67,7 @@
           </b-field>
         </b-field>
         <b-field>
-          <b-checkbox :value="isRecurrent">
+          <b-checkbox v-model="isRecurrent">
             <strong>{{$t('save-as-recurrent-item')}}</strong>
           </b-checkbox>
         </b-field>
@@ -87,7 +87,7 @@
       <button class="button is-primary is-large" @click="step = 1">{{$t('i-have-image')}}</button>
       <button class="button is-primary is-large is-outlined" @click="step = 2">{{$t('i-do-not-have-image')}}</button>
     </div>
-    <recurrent-items-list />
+    <recurrent-items-list @submitAgain="setRecurrentItem"/>
   </template>
 </div>
 </template>
@@ -248,6 +248,27 @@ export default {
           this.errorMessage = JSON.stringify(response.data);
         }
       }
+    },
+    async setRecurrentItem(item) {
+      this.name = item.name;
+      this.description = item.description;
+      this.type = item.item_type;
+      this.category1 = item.category1;
+      this.category2 = item.category2;
+      this.category3 = item.category3;
+
+      if (item.location !== null) {
+        try {
+          this.location = (await axios.post(`/api/v1/address/`, item.location)).data;
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
+
+      //TODO: set image files
+
+      this.step = 2;
     }
   }
 };
