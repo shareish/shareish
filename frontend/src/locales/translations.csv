@@ -1,71 +1,71 @@
 key,en,fr
 welcome,Welcome,Bienvenue
 map,Map,Carte
-browse-items,Browse items,
-add-item,Add item,
-conversations,Conversations,
-my-account,My account
-log-in,Log in,
-sign-up,Sign up,
-useful-links,Useful links,
-contact,Contact,
-about-us,About us,
-what-are-you-looking-for,What are you looking for?,
-item-type,Type,
-item-category,Category,
-request,Request,
-donation,Donation,
-loan,Loan,
-all,All,
-category,Category,
-food,Food,
-animals,Animals,
-aee,Arts and Entertainments,
-collectors,Collectors,
-hh,Helping hands,
-diy,DIY,
-beauty,Beauty and Well-being,
-childhood,Childhood,
-it,IT and Multimedia,
-garden,Garden,
-house,House,
-holidays,Holidays and Week-end,
-book,"Books, CDs and DVDs",
-sport,Sport and Leisure,
-transport,Transport and vehicle,
-other,Other,
-search-dot,Search...,
-bookcases,Bookcases,
-bookcase,Bookcase,
-defibrillators,Defibrillators,
-defibrillator,Defibrillator,
-give-boxes,Give boxes,
-give-box,Give box,
-drinking-water-spots,Drinking water spots,
-drinking-water-spot,Drinking water spot,
-free-shops,Free shops,
-free-shop,Free shop,
-from-osm,retrieved from OSM,
-by,by,
-i-am-interested,Details,
-button-load-more,Load more,
-no-items,No item,
-add-new-item,Add a new item,
-i-have-image,I have image for my item,
-i-do-not-have-image,I don't have image for my item,
-my-recurrent-items,My recurrent items,
-upload-your-item-image,Upload your item image,
-name,Name,
-address,Address,
-description,Description,
-start-date,Start date,
-end-date,End date,
-save-as-recurrent-item,Save as recurrent item,
-submit,Submit,
+browse-items,Browse items,Parcourir
+add-item,Add item,Ajouter
+conversations,Conversations,Conversations
+my-account,My account,Mon compte
+log-in,Log in,Connexion
+sign-up,Sign up,Création compte
+useful-links,Useful links,Liens utiles
+contact,Contact,Contact
+about-us,About us,À propos
+what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
+item-type,Type,Type
+item-category,Category,Catégorie
+request,Request,Requête
+donation,Donation,Don
+loan,Loan,Prêt
+all,All,Tous
+category,Category,Catégorie
+food,Food,Nourriture
+animals,Animals,Animaux
+aee,Arts and Culture and Entertainments,Arts Cultures Divertissements
+collectors,Collectors,Collections
+hh,Helping hands,Coups de main
+diy,DIY,Bricolage
+beauty,Wellness and Beauty,Beauté et bien-être
+childhood,Childhood,Enfance
+it,IT and Multimedia,Informatique et multimédia
+garden,Garden,Jardinage
+house,House and Decoration,Maison et décoration
+holidays,Holidays and Week-end,Vacances et week-ends
+book,"Books, CDs, DVDs, and Blu-rays","Livres, CDs, DVDs, Blu-rays"
+sport,Sport and Leisure,Sports et loisirs
+transport,Transport and vehicle,Transports et véhicules
+other,Other,Autres
+search-dot,Search...,Recherche...
+bookcases,Public bookcases,Micro-bibliothèques
+bookcase,Public bookcase,Micro-bibliothèque
+defibrillators,Defibrillators,Défibrillateurs
+defibrillator,Defibrillator,Défibrillateur
+give-boxes,Give boxes,Armoires de partage
+give-box,Give box,Armoire de partage
+drinking-water-spots,Drinking water spots,Points d'eau potable
+drinking-water-spot,Drinking water spot,Point d'eau potable
+free-shops,Free shops,Magasin gratuit
+free-shop,Free shop,Magasin gratuit
+from-osm,retrieved from OSM,récupéré via OSM
+by,by,par
+i-am-interested,Details,Détails
+button-load-more,Load more,Charger plus
+no-items,No item,Pas d'élément
+add-new-item,Add a new item,Ajout d'élément
+i-have-image,I have image for my item,J'ai une image pour mon élément
+i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon élément
+my-recurrent-items,My recurrent items,Mes éléments récurrents
+upload-your-item-image,Upload your item image,Transférer votre image d'élément
+name,Name,Nom
+address,Address,Adresse
+description,Description,Description
+start-date,Start date,Date de début
+end-date,End date,Date de fin
+save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
+submit,Submit,Soumettre
 ends,ends,se termine
-submit-again,Submit again,
-profile,Profile,
-my-conversations,My conversations,
-new-messages,New messages,
-open-conversation,Open conversation,
-no-conversation,No conversation,
+submit-again,Submit again,Soumettre à nouveau
+profile,Profile,Profil
+my-conversations,My conversations,Mes conversations
+new-messages,New messages,Nouveaux messages
+open-conversation,Open conversation,Ouvrir la conversation
+no-conversation,No conversation,Pas de conversation
