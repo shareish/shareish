@@ -117,6 +117,8 @@ const itemTypeIcons = {
   "BR": redIcon
 }
 
+const GEOLOCATION_TIMEOUT = 5000;
+
 export default {
   name: 'ItemsMap',
   components: {
@@ -135,7 +137,7 @@ export default {
         return {
           mapLoading: true,
           zoom: 14,
-          center: latLng(50.586276, 5.560470),
+          center: latLng(0,0),
           bounds: null,
           url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
@@ -244,7 +246,10 @@ export default {
         navigator.geolocation.getCurrentPosition(position => {
           const coords = position.coords;
           this.center = latLng(coords.latitude, coords.longitude);
-        })
+        }, (error) => {
+          this.zoom = 4;
+          console.log(error.message);
+        }, {timeout: GEOLOCATION_TIMEOUT});
       },
       async getItemsLocation() {
         try {
