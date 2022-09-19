@@ -29,6 +29,14 @@
     </template>
 
     <template #end>
+      <b-navbar-dropdown :label="$t(`language-${$i18n.locale}`)">
+        <b-navbar-item @click="changeLanguage('en')" :active="$i18n.locale === 'en'">
+          English
+        </b-navbar-item>
+        <b-navbar-item @click="changeLanguage('fr')" :active="$i18n.locale === 'fr'">
+          Français
+        </b-navbar-item>
+      </b-navbar-dropdown>
       <b-navbar-item tag="router-link" v-if="isAuthenticated" to="/profile">
         <i class="fas fa-user-circle"></i>
         {{$t('my-account')}}
@@ -76,7 +84,11 @@ export default {
           console.log(error);
         }
       }
-    }
+    },
+    changeLanguage(lang){
+      localStorage.setItem('language', lang);
+      this.$i18n.locale = lang;
+    },
   },
   mounted() {
     this.fetchConversationUpdates();
