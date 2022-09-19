@@ -53,7 +53,14 @@
               <l-popup>
                 <div v-if="marker.name"><strong>{{marker.name}}</strong></div>
                 <div class="is-grey">{{$t(extraLayer.slugMarker)}}</div>
-                <div class="is-grey is-size-7 has-text-right is-italic">({{$t('from-osm')}})</div>
+                <div class="is-grey is-size-7 has-text-right is-italic">
+                  <a :href="`https://openstreetmap.org/node/${marker.id}`" target="_blank">
+                    <span>
+                      <i class="fas fa-external-link-alt"></i>
+                    </span>
+                    <span>{{$t('from-osm')}}</span>
+                  </a>
+                </div>
               </l-popup>
             </l-marker>
           </l-layer-group>
@@ -315,5 +322,9 @@ export default {
 
 >>> .item-popup .leaflet-popup-content, >>> .item-popup .leaflet-popup-content p {
   margin: 0;
+}
+
+.fa-external-link-alt {
+  margin-right: 0.25rem;
 }
 </style>
