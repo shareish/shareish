@@ -19,8 +19,13 @@
             <i class="fas fa-street-view"></i>
           </button>
         </l-control>
-        <l-control class="control-loading fa-2x" position="bottomleft">
-          <i class="fas fa-spinner fa-pulse" v-show="mapLoading"></i>
+        <l-control position="bottomleft">
+          <div class="control-loading">
+            <i class="fas fa-spinner fa-2x fa-pulse" v-show="mapLoading"></i>
+          </div>
+          <div v-show="zoom < minZoomForExtraLayers" class="control-zoom-info leaflet-control-attribution">
+            {{$t('too-small-zoom')}}
+          </div>
         </l-control>
 
         <l-layer-group ref="layer">
@@ -37,33 +42,35 @@
             </l-marker>
           </v-marker-cluster>
         </l-layer-group>
-        <l-feature-group ref="markersFeatureGroup">
-          <l-layer-group
-            v-for="extraLayer in extraLayers"
-            :key="extraLayer.id"
-            :visible="extraLayer.visible"
-            :ref="extraLayer.id"
-          >
-            <l-marker
-              v-for="marker in extraLayer.markers"
-              :key="marker.id"
-              :lat-lng="marker.latLng"
-              :icon="extraLayersIcons[extraLayer.id]"
-            >
-              <l-popup>
-                <div v-if="marker.name"><strong>{{marker.name}}</strong></div>
-                <div class="is-grey">{{$t(extraLayer.slugMarker)}}</div>
-                <div class="is-grey is-size-7 has-text-right is-italic">
-                  <a :href="`https://openstreetmap.org/node/${marker.id}`" target="_blank">
-                    <span>
-                      <i class="fas fa-external-link-alt"></i>
-                    </span>
-                    <span>{{$t('from-osm')}}</span>
-                  </a>
-                </div>
-              </l-popup>
-            </l-marker>
+        <l-feature-group ref="markersFeatureGroup" v-if="zoom >= minZoomForExtraLayers">
+          <l-layer-group>
+            <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
+              <template v-for="extraLayer in extraLayers">
+                <l-marker
+                  v-for="marker in extraLayer.markers"
+                  :key="marker.id"
+                  :lat-lng="marker.latLng"
+                  :icon="extraLayersIcons[extraLayer.id]"
+                  :visible="extraLayer.visible"
+                >
+                  <l-popup>
+                    <div v-if="marker.name"><strong>{{marker.name}}</strong></div>
+                    <div class="is-grey">{{$t(extraLayer.slugMarker)}}</div>
+                    <div class="is-grey is-size-7 has-text-right is-italic">
+                      <a :href="`https://openstreetmap.org/node/${marker.id}`" target="_blank">
+                        <span>
+                          <i class="fas fa-external-link-alt"></i>
+                        </span>
+                        <span>{{$t('from-osm')}}</span>
+                      </a>
+                    </div>
+                  </l-popup>
+                </l-marker>
+              </template>
+            </v-marker-cluster>
           </l-layer-group>
+
+
         </l-feature-group>
       </l-map>
       <div class="extra-layers-selector block">
@@ -72,6 +79,7 @@
           :key="`${extraLayer.id}-visibility`"
           v-model="extraLayer.visible"
           :type="extraLayer.color"
+          :disabled="zoom < minZoomForExtraLayers"
         >
           {{$t(extraLayer.id)}}
         </b-checkbox>
@@ -139,6 +147,12 @@ export default {
             // disableClusteringAtZoom: 16,
             chunkedLoading: true,
             maxClusterRadius: 20
+          },
+          minZoomForExtraLayers: 10,
+          extraLayersMarkerClusterGroupOptions: {
+            disableClusteringAtZoom: 16,
+            chunkedLoading: true,
+            maxClusterRadius: 50
           },
           extraLayers: [
             {
@@ -259,7 +273,7 @@ export default {
         }
       },
       async fetchExtraLayersMakers() {
-        if (this.bounds === null) {
+        if (this.bounds === null || this.zoom < this.minZoomForExtraLayers) {
           return;
         }
 
@@ -326,5 +340,10 @@ export default {
 
 .fa-external-link-alt {
   margin-right: 0.25rem;
+}
+
+.control-zoom-info {
+  margin-left: -10px;
+  margin-bottom: -10px;
 }
 </style>
