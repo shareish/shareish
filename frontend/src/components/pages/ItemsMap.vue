@@ -28,6 +28,13 @@
           </div>
         </l-control>
 
+        <l-marker
+          v-if="userPosition"
+          :lat-lng="userPosition"
+          :icon="userPositionIcon"
+        />
+
+
         <l-layer-group ref="layer">
           <v-marker-cluster :options="markerClusterGroupOptions">
             <l-marker
@@ -103,7 +110,7 @@ import {
   publicBookcaseIcon,
   aedIcon,
   giveBoxIcon,
-  drinkingWaterIcon, freeShopIcon
+  drinkingWaterIcon, freeShopIcon, blueIcon
 } from '@/map-icons';
 
 import { latLng } from "leaflet";
@@ -117,7 +124,7 @@ const itemTypeIcons = {
   "BR": redIcon
 }
 
-const GEOLOCATION_TIMEOUT = 5000;
+const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
   name: 'ItemsMap',
@@ -210,6 +217,9 @@ export default {
             'drinking-water-spots': drinkingWaterIcon,
             'free-shops': freeShopIcon
           },
+          userPosition: null,
+          userPositionIcon: blueIcon,
+          userPositionWatcherId: null,
           searchString: null,
           selectedType: null,
           selectedCategory: null,
@@ -222,9 +232,19 @@ export default {
       await Promise.all([
         this.getItemsLocation(),
         this.fetchExtraLayersMakers()
-      ])
+      ]);
+
+      // Start watching user position
+      // TODO: investigate why it's not working
+      // this.userPositionWatcherId = navigator.geolocation.watchPosition(position => {
+      //   const coords = position.coords;
+      //   this.userPosition = latLng(coords.latitude, coords.longitude);
+      // }, () => {}, {timeout: GEOLOCATION_TIMEOUT});
     },
-    watch: {
+    beforeDestroy() {
+      // navigator.geolocation.clearWatch(this.userPositionWatcherId);
+    },
+  watch: {
       async selectedType() {
         this.mapLoading = true;
         await this.getItemsLocation();
@@ -246,8 +266,9 @@ export default {
         navigator.geolocation.getCurrentPosition(position => {
           const coords = position.coords;
           this.center = latLng(coords.latitude, coords.longitude);
+          this.userPosition = this.center;
         }, (error) => {
-          this.zoom = 4;
+          this.zoom = 2;
           console.log(error.message);
         }, {timeout: GEOLOCATION_TIMEOUT});
       },
