@@ -22,6 +22,7 @@ import ActivateEmail from '../views/ActivateEmail.vue'
 import store from '../store'
 import i18n from '@/i18n'
 import ItemsList from '@/components/pages/ItemsList';
+import Account from '@/components/pages/Account';
 
 const routes = [{
         path: '/',
@@ -73,7 +74,7 @@ const routes = [{
     {
         path: '/profile',
         name: 'myaccount',
-        component: MyAccount,
+        component: Account,
         meta: {
             requireLogin: true
         }
