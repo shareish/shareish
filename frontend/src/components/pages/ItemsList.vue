@@ -118,11 +118,6 @@ export default {
   align-content: flex-start;
 }
 
-.column:not(.is-narrow) {
-  /*max-width: 25rem;*/
-  min-width: 25rem;
-}
-
 .vertical-center {
   display: flex;
   flex-direction: row;

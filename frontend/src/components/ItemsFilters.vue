@@ -1,5 +1,5 @@
 <template>
-  <b-field grouped>
+  <b-field grouped group-multiline class="filters">
     <b-field expanded :label="$t('what-are-you-looking-for')">
       <b-input :placeholder="$t('search-dot')"
         :value="searchString"
@@ -58,5 +58,7 @@ export default {
 </script>
 
 <style scoped>
-
+.filters {
+  margin-bottom: 1.5rem !important;
+}
 </style>

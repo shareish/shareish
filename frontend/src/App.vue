@@ -19,41 +19,42 @@
     </section>
 
     <footer class="footer">
+      <div class="container">
         <div class="columns">
-                <div class="column">
-                    <!-- Content -->
-                    <h6 class="title is-4 mb-4">Shareish</h6>
-                    <!-- <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
-                    <address>
-                        XXX Anonymous
-                        <br>XXX Anonymous
-                        <br>XXX Anonymous
-                        <br>XXX Anonymous (for Review)
-                    </address>
-                </div>
-                <div class="column">
-                    <!-- Links -->
-                    <h6 class="title is-4 mb-4">
-                        {{ $t('useful-links') }}
-                    </h6>
-                    <p>
-                        <a @click="goto('/')" class="text-reset">{{ $t('about-us') }}</a><br />
-                        <a @click="goto('/profile')" class="text-reset">{{ $t('profile') }}</a><br />
-                        <a @click="goto('/map')" class="text-reset">{{ $t('map') }}</a><br />
-                        <a href="https://github.com/anonymous">
-                          <img src="./assets/GitHub-Mark-32px.png" alt="https://github.com/anonymous">
-                        </a>
-                    </p>
-                </div>
-                <div class="column">
-                    <h6 class="title is-4 mb-4">
-                        {{ $t('contact') }}
-                    </h6>
-                    <p>
-                        <a href="mailto: info@shareish.org">info@shareish.org</a>
-                    </p>
-                </div>
+          <div class="column">
+            <h6 class="title is-4 mb-4">Shareish</h6>
+            <!-- <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
+            <address>
+              XXX Anonymous
+              <br>XXX Anonymous
+              <br>XXX Anonymous
+              <br>XXX Anonymous (for Review)
+            </address>
+          </div>
+          <div class="column">
+            <h6 class="title is-4 mb-4">
+              {{ $t('useful-links') }}
+            </h6>
+            <p>
+              <a @click="goto('/')" class="text-reset">{{ $t('about-us') }}</a><br />
+              <a @click="goto('/profile')" class="text-reset">{{ $t('profile') }}</a><br />
+              <a @click="goto('/map')" class="text-reset">{{ $t('map') }}</a><br />
+              <a href="https://github.com/anonymous">
+                <img src="./assets/GitHub-Mark-32px.png" alt="https://github.com/anonymous">
+              </a>
+            </p>
+          </div>
+          <div class="column">
+            <h6 class="title is-4 mb-4">
+              {{ $t('contact') }}
+            </h6>
+            <p>
+              <a href="mailto: info@shareish.org">info@shareish.org</a>
+            </p>
+          </div>
         </div>
+      </div>
+
     </footer>
 
 
@@ -118,9 +119,5 @@
   .wrapper {
     margin-right: auto; /* 1 */
     margin-left: auto; /* 1 */
-  }
-  .footer {
-    height: 220px;
-    padding: 5mm;
   }
 </style>
