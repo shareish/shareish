@@ -2,7 +2,7 @@
 <div class="page-account">
   <h1 class="title">{{$t('my-account')}}</h1>
   <user-card  v-if="user" :user="user" editable @logout="logout" @edit="startEdition"/>
-  <h1 class="title">{{$t('my-recent-items')}}</h1>
+  <h1 class="title">{{$t('my-items')}}</h1>
   <div class="columns" v-if="items && items.length">
     <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
       <item-card :item="item" />
@@ -17,9 +17,10 @@
 <script>
 import UserCard from '@/components/UserCard';
 import axios from 'axios';
+import ItemCard from '@/components/ItemCard';
 export default {
   name: 'Account',
-  components: {UserCard},
+  components: {UserCard, ItemCard},
   data() {
     return {
       user: null,
@@ -78,5 +79,9 @@ export default {
 </script>
 
 <style scoped>
-
+.columns {
+  flex-wrap: wrap;
+  /*justify-content: space-between;*/
+  align-content: flex-start;
+}
 </style>
