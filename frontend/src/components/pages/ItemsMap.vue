@@ -44,7 +44,7 @@
               :icon="item.icon"
             >
               <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-                <item-map-popup :item="item" />
+                <item-map-popup :item="item" :users="users"/>
               </l-popup>
             </l-marker>
           </v-marker-cluster>
@@ -224,12 +224,14 @@ export default {
           selectedType: null,
           selectedCategory: null,
           items: [],
+          users: []
         }
     },
     async mounted() {
       document.title = "Shareish | Map";
       this.setGeolocalizedPosition();
       await Promise.all([
+        this.fetchUsers(),
         this.getItemsLocation(),
         this.fetchExtraLayersMakers()
       ]);
@@ -244,22 +246,21 @@ export default {
     beforeDestroy() {
       // navigator.geolocation.clearWatch(this.userPositionWatcherId);
     },
+  computed: {
+    filterParams() {
+      return {
+        item_type: this.selectedType,
+        category: this.selectedCategory,
+        name: this.searchString
+      };
+    }
+  },
   watch: {
       async selectedType() {
         this.mapLoading = true;
         await this.getItemsLocation();
         this.mapLoading = false;
       },
-      async selectedCategory() {
-        this.mapLoading = true;
-        await this.getItemsLocation();
-        this.mapLoading = false;
-      },
-      async searchString() {
-        this.mapLoading = true;
-        await this.getItemsLocation();
-        this.mapLoading = false;
-      }
     },
     methods: {
       setGeolocalizedPosition() {
@@ -275,9 +276,7 @@ export default {
       async getItemsLocation() {
         try {
           let items = (await axios.post('/api/v1/requestFilter/', {
-            name: this.searchString,
-            item_type: this.selectedType,
-            category: this.selectedCategory
+            ...this.filterParams
           })).data;
 
           this.items = items.filter(item =>
@@ -351,6 +350,15 @@ export default {
         await this.fetchExtraLayersMakers();
         this.mapLoading = false;
       },
+      async fetchUsers() {
+        try {
+          let uri = `/api/v1/webusers/`;
+          this.users = (await axios.get(uri)).data;
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
     },
 }
 </script>

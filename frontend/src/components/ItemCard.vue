@@ -8,7 +8,7 @@
       <router-link
         :to="{ name: 'itemDetail', params: { id: item.id}}"
       >
-        <figure class="image is-5by3" :style="figureStyle" v-if="images.length > 0">
+        <figure class="image is-5by3" :style="figureStyle" v-if="item.images.length > 0">
         </figure>
         <figure v-else class="image is-5by3">
           <img :src="category1['image-placeholder']" alt="Placeholder image">
@@ -67,15 +67,13 @@ export default {
   components: {ItemTypeTag},
   props: {
     item: Object,
-    recurrentList: {type: Boolean, default: false}
-  },
-  data() {
-    return {
-      user: null,
-      images: [],
-    }
+    recurrentList: {type: Boolean, default: false},
+    users: Array
   },
   computed: {
+    user() {
+      return this.users.find(user => user.id === this.item.user) || {};
+    },
     category1() {
       return this.category(this.item.category1);
     },
@@ -99,37 +97,16 @@ export default {
       return cat;
     },
     figureStyle() {
-      if (this.images.length === 0) {
+      if (this.item.images.length === 0) {
         return {};
       }
       return {
-        backgroundImage: `url("${(this.images[0])}")`,
+        backgroundImage: `url("${(this.item.images[0])}")`,
         'border-radius': '0.25rem 0.25rem 0 0'
       };
     }
   },
   methods: {
-    async fetchUser() {
-      try {
-        let uri = `/api/v1/webusers/${this.item['user']}/`;
-        this.user = (await axios.get(uri)).data;
-      }
-      catch (error) {
-        console.log(error);
-      }
-    },
-    async fetchImages() {
-      try {
-        if (this.item['images'][0]) {
-          const url = `/api/v1/images/${this.item['images'][0]}`;
-          const data =  (await axios.get(url)).data;
-          this.images = [data['url']];
-        }
-      }
-      catch (error) {
-        console.log(error);
-      }
-    },
     formattedDate(date) {
       return moment(date, "YYYY-MM-DD").fromNow();
     },
@@ -137,12 +114,6 @@ export default {
       return categories[category];
     }
   },
-  async mounted() {
-    await Promise.all([
-      this.fetchUser(),
-      this.fetchImages()
-    ]);
-  }
 };
 </script>
 

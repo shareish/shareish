@@ -1,15 +1,16 @@
 <template>
   <div class="item-list">
+
     <items-filters
       @update:selectedType="selectedType = $event"
       @update:selectedCategory="selectedCategory = $event"
       @update:searchString="searchString = $event"
     />
-
-    <div class="scrollable"  ref="listItems">
+    <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+    <div class="scrollable"  ref="listItems" v-else>
       <div class="columns" v-if="items && items.length">
         <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-          <item-card :item="item" />
+          <item-card :item="item" :users="users"/>
         </div>
         <div class="column is-narrow vertical-center" v-if="!loadedAllItems">
           <button class="button is-primary" :class="{'is-loading': loading}" v-if="!loadedAllItems" @click="loadItems()">
@@ -40,12 +41,14 @@ export default {
       selectedType: null,
       selectedCategory: null,
 
+      pageLoading: false,
       loading: false,
       page: 1,
       nbItemsPerPage: 20,
       loadedAllItems: false,
 
-      items: []
+      items: [],
+      users: []
     }
   },
   computed: {
@@ -95,11 +98,22 @@ export default {
       }
 
       this.loading = false;
+    },
+    async fetchUsers() {
+      try {
+        let uri = `/api/v1/webusers/`;
+        this.users = (await axios.get(uri)).data;
+      }
+      catch (error) {
+        console.log(error);
+      }
     }
   },
   async mounted() {
     document.title = "Shareish | Items";
-    await this.loadItems();
+    this.pageLoading = true;
+    await Promise.all([this.loadItems(), this.fetchUsers()]);
+    this.pageLoading = false;
   },
   created: function () {
     window.addEventListener('scroll', this.scrollHandler);

@@ -5,7 +5,7 @@
     <template v-else>
       <div class="columns" v-if="items && items.length">
         <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card-recurrent`">
-          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
+          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" :users="users"/>
         </div>
       </div>
       <div v-else>
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       items: [],
+      users: [],
       loading: true,
     }
   },
@@ -39,10 +40,19 @@ export default {
         console.log(error);
       }
     },
+    async fetchUsers() {
+      try {
+        let uri = `/api/v1/webusers/`;
+        this.users = (await axios.get(uri)).data;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }
   },
   async mounted() {
     this.loading = true;
-    await this.fetchItems();
+    await Promise.all([this.fetchItems(), this.fetchUsers()]);
     this.loading = false;
   }
 };

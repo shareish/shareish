@@ -1,11 +1,13 @@
 <template>
 <div class="page-account">
   <h1 class="title">{{$t('my-account')}}</h1>
-  <user-card  v-if="user" :user="user" editable @logout="logout" @edit="startEdition"/>
+  <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+  <user-card  v-else-if="user" :user="user" editable @logout="logout" @edit="startEdition"/>
   <h1 class="title">{{$t('my-items')}}</h1>
-  <div class="columns" v-if="items && items.length">
+  <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+  <div class="columns" v-else-if="items && items.length">
     <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-      <item-card :item="item" />
+      <item-card :item="item" :users="itemUsers"/>
     </div>
   </div>
   <div v-else>
@@ -24,7 +26,10 @@ export default {
   data() {
     return {
       user: null,
-      items: []
+      items: [],
+      itemUsers: [],
+
+      loading: true
     }
   },
   methods: {
@@ -41,6 +46,15 @@ export default {
       try {
         const uri = `/api/v1/user_items/`;
         this.items = (await axios.get(uri)).data;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
+    async fetchItemUsers() {
+      try {
+        let uri = `/api/v1/webusers/`;
+        this.itemUsers = (await axios.get(uri)).data;
       }
       catch (error) {
         console.log(error);
@@ -70,10 +84,13 @@ export default {
     }
   },
   async created() {
+    this.loading = true;
     await Promise.all([
       this.fetchUser(),
-      this.fetchItems()
+      this.fetchItems(),
+      this.fetchItemUsers()
     ]);
+    this.loading = false;
   }
 };
 </script>
