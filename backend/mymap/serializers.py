@@ -9,9 +9,11 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent',
-                  'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3',
-                  'user', 'images']
+        fields = [
+            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent',
+            'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3',
+            'user', 'images'
+        ]
 
 
 class MapItemSerializer(serializers.ModelSerializer):
@@ -24,6 +26,14 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'name', 'description']
+
+
+class ItemImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = ItemImage
+        fields = ['id', 'image', 'item', 'url']
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -54,17 +64,6 @@ class UserSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
         fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
-
-
-
-
-
-class ItemImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
-
-    class Meta:
-        model = ItemImage
-        fields = ['id', 'image', 'item', 'url']
 
 
 class ConversationSerializer(serializers.ModelSerializer):

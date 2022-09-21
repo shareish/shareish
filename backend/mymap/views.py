@@ -23,6 +23,8 @@ from geopy.geocoders import Nominatim
 
 locator = Nominatim(user_agent="shareish")
 
+LOCATION_PREFIX = "SRID=4326;POINT"
+
 
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
@@ -33,12 +35,16 @@ class ItemViewSet(viewsets.ModelViewSet):
         data = request.data
         if 'location' in data:
             address = data['location']
-            if address != '':
+            if address != '' and address is not None:
                 geoloc = locator.geocode(address)
                 if geoloc is not None:
-                    data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(
-                        geoloc.longitude
-                    ) + ")"
+                    data['location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
+                else:
+                    print("Warning: {} given but no location found.".format(address))
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
@@ -50,22 +56,19 @@ class ItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         if 'location' in request.data:
             address = request.data['location']
-            if address != '' and address is not None and not address.startswith("SRID=4326;POINT"):
+            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
                 geoloc = locator.geocode(address)
                 if geoloc is not None:
-                    request.data['location'] = "SRID=4326;POINT (" + str(
-                        geoloc.latitude
-                    ) + " " + str(geoloc.longitude) + ")"
+                    request.data['location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
                 else:
                     return Response(
                         {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
@@ -76,17 +79,6 @@ class ItemViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class RecurrentItemViewSet(ItemViewSet):
@@ -106,8 +98,8 @@ class UserItemViewSet(ItemViewSet):
         return Item.objects.filter(user=self.request.user)
 
 
+# TODO: why not model view set ?
 class ItemImageViewSet(viewsets.ViewSet):
-
     def list(self, request):
         images = ItemImage.objects.all()
         serializer = ItemImageSerializer(images, many=True)
@@ -151,7 +143,6 @@ class ItemImageViewSet(viewsets.ViewSet):
 
 
 class UserImageViewSet(viewsets.ViewSet):
-
     def list(self, request):
         images = UserImage.objects.all()
         serializer = UserImageSerializer(images, many=True)
