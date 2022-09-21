@@ -6,7 +6,7 @@
       @update:selectedCategory="selectedCategory = $event"
       @update:searchString="searchString = $event"
     />
-    <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+    <b-loading :active="pageLoading" :is-full-page="false" v-if="pageLoading" />
     <div class="scrollable"  ref="listItems" v-else>
       <div class="columns" v-if="items && items.length">
         <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
