@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
@@ -5,7 +6,7 @@ from .models import Conversation, Item, ItemImage, Message, UserImage
 
 User = get_user_model()
 
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -26,10 +27,36 @@ locator = Nominatim(user_agent="shareish")
 LOCATION_PREFIX = "SRID=4326;POINT"
 
 
+class ItemTypeFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        item_type = request.query_params.get('item_type')
+        if item_type is not None:
+            return queryset.filter(item_type=item_type)
+        return queryset
+
+
+class ItemCategoryFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        category = request.query_params.get('category')
+        if category is not None:
+            return queryset.filter(
+                Q(category1=category) | Q(category2=category) | Q(category3=category)
+            )
+        return queryset
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+
+    filter_backends = [
+        filters.SearchFilter, filters.OrderingFilter,
+        ItemTypeFilterBackend, ItemCategoryFilterBackend
+    ]
+    search_fields = ['name', 'description']
+    ordering_fields = '__all__'
+    ordering = ['-startdate']
 
     def create(self, request, *args, **kwargs):
         data = request.data

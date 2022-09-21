@@ -251,12 +251,12 @@ export default {
       return {
         item_type: this.selectedType,
         category: this.selectedCategory,
-        name: this.searchString
+        search: this.searchString
       };
     }
   },
   watch: {
-      async selectedType() {
+      async filterParams() {
         this.mapLoading = true;
         await this.getItemsLocation();
         this.mapLoading = false;
@@ -275,9 +275,7 @@ export default {
       },
       async getItemsLocation() {
         try {
-          let items = (await axios.post('/api/v1/requestFilter/', {
-            ...this.filterParams
-          })).data;
+          let items = (await axios.get('/api/v1/items/', {params: this.filterParams})).data;
 
           this.items = items.filter(item =>
             // should not happen, but happens :)

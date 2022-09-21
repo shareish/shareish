@@ -54,7 +54,7 @@ export default {
   computed: {
     params() {
       return {
-        name: this.searchString,
+        search: this.searchString,
         item_type: this.selectedType,
         category: this.selectedCategory
       }
@@ -83,8 +83,7 @@ export default {
 
       try {
         const uri = '/api/v1/actives/';
-        // TODO: endpoint should use filters...
-        const data = (await axios.get(uri, {params: {page: this.page}})).data;
+        const data = (await axios.get(uri, {params: {page: this.page, ...this.params}})).data;
 
         this.items.push(...data.results);
         this.page += 1;
