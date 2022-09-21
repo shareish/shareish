@@ -117,8 +117,8 @@ class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
     location = models.PointField(blank=True, geography=True, null=True)
-    startdate = models.DateField(default=timezone.now)
-    enddate = models.DateField(null=True)
+    startdate = models.DateTimeField(default=timezone.now)
+    enddate = models.DateTimeField(null=True)
     in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
 

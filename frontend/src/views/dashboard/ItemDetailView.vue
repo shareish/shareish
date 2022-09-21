@@ -354,7 +354,7 @@ export default {
         },
         editItem(){
             if(this.changes['startdate'] == undefined){
-                this.changes['startdate'] = moment().format('YYYY-MM-DD')
+                this.changes['startdate'] = moment().format('YYYY-MM-DD[T]HH:mm:ss')
             }
             if(this.changes['enddate']){
                 if(this.changes['enddate'] < this.changes['startdate']){

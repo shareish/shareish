@@ -49,21 +49,21 @@
         </b-field>
         <b-field grouped>
           <b-field :label="$t('start-date')" expanded>
-            <b-datepicker
+            <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
               v-model="startDate"
             >
-            </b-datepicker>
+            </b-datetimepicker>
           </b-field>
           <b-field :label="$t('end-date')" expanded>
-            <b-datepicker
+            <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
               v-model="endDate"
               :min-date="startDate"
             >
-            </b-datepicker>
+            </b-datetimepicker>
           </b-field>
         </b-field>
         <b-field>
@@ -177,15 +177,15 @@ export default {
 
       let startDate;
       if (this.startDate) {
-        startDate = moment(this.startDate).format('YYYY-MM-DD');
+        startDate = moment(this.startDate).format('YYYY-MM-DD[T]HH:mm:ss');
       }
       else {
-        startDate = moment().format('YYYY-MM-DD');
+        startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
       }
 
       let endDate;
       if (this.endDate) {
-        endDate = moment(this.endDate).format('YYYY-MM-DD');
+        endDate = moment(this.endDate).format('YYYY-MM-DD[T]HH:mm:ss');
       }
 
       try {

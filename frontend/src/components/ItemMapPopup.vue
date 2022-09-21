@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     formattedDate(date) {
-      return moment(date, "YYYY-MM-DD").fromNow();
+      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
     },
     category(category) {
       return categories[category];

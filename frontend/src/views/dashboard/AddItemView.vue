@@ -319,7 +319,7 @@ export default {
             elem.style.display = "none"
             this.item['in_progress'] = true
             if(this.item['startdate'] == undefined){
-                this.item['startdate'] = moment().format('YYYY-MM-DD')
+                this.item['startdate'] = moment().format('YYYY-MM-DD[T]HH:mm:ss')
             }
             if(this.item['enddate']){
                 if(this.item['enddate'] < this.item['startdate']){
