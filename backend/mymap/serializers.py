@@ -5,9 +5,7 @@ from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    images = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ItemImage.objects.all(), allow_null=True
-        )
+    images = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Item
@@ -28,12 +26,20 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 
+class UserImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = UserImage
+        fields = ['id', 'image', 'user', 'url']
+
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Item.objects.all(), allow_null=True
         )
-    image = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=UserImage.objects.all(), allow_null=True
+    image = serializers.StringRelatedField(
+        many=True
         )
 
     class Meta:
@@ -41,7 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email',
             'homepage_url', 'facebook_url', 'instagram_url',
-            'items', 'description', 'image', 'is_active'
+            'items', 'description', 'image', 'is_active',
         ]
 
 
@@ -50,12 +56,7 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
         fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
 
 
-class UserImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
 
-    class Meta:
-        model = UserImage
-        fields = ['id', 'image', 'user', 'url']
 
 
 class ItemImageSerializer(serializers.ModelSerializer):

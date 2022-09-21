@@ -99,7 +99,7 @@ class UserImage(models.Model):
             img.save(self.image.path)
 
     def __str__(self) -> str:
-        return 'Image related to ' + self.user.email + '.'
+        return self.url
 
     @property
     def path(self):
@@ -192,7 +192,7 @@ class ItemImage(models.Model):
             img.save(self.image.path)
 
     def __str__(self) -> str:
-        return 'Image related to ' + self.item.name + '.'
+        return self.url
 
     @property
     def path(self):
