@@ -1,12 +1,13 @@
 from django import forms
-from django.contrib.gis import admin as geoadmin
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.models import Group
+from django.contrib.gis import admin as geoadmin
 from django.core.exceptions import ValidationError
 
-from .models import Item, ItemImage, User, Conversation, Message
+from .models import Conversation, Item, ItemImage, Message
+
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -34,6 +35,7 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 class UserChangeForm(forms.ModelForm):
     """A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
@@ -43,13 +45,26 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'username', 'password', 'first_name', 'last_name', 'is_active', 'is_admin', 'description')
+        fields = (
+            'email',
+            'username',
+            'password',
+            'first_name',
+            'last_name',
+            'is_active',
+            'is_admin',
+            'description'
+        )
+
 
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('email', 'username', 'first_name', 'last_name', 'is_admin', 'description', 'image')
+    list_display = (
+        'email', 'username', 'first_name', 'last_name',
+        'is_admin', 'description', 'image'
+    )
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -67,11 +82,14 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+
 geoadmin.site.register(get_user_model(), UserAdmin)
 geoadmin.site.unregister(Group)
 
+
 class ItemAdmin(geoadmin.OSMGeoAdmin):
     list_display = ("name", "location", "description", "item_type", "user")
+
 
 geoadmin.site.register(Item)
 geoadmin.site.register(ItemImage)

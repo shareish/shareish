@@ -1,52 +1,79 @@
-from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
-from mymap.models import Item, ItemImage, User, Conversation, Message, UserImage
+from rest_framework import serializers
+
+from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
+
 
 class ItemSerializer(serializers.ModelSerializer):
-    images = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemImage.objects.all(), allow_null=True)
+    images = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ItemImage.objects.all(), allow_null=True
+        )
+
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3', 'user', 'images']
+        fields = ['id', 'name', 'description', 'location', 'in_progress', 'is_recurrent',
+                  'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3',
+                  'user', 'images']
+
 
 class MapItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'location']
 
+
 class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'name', 'description']
 
+
 class UserSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
-    image = serializers.PrimaryKeyRelatedField(many=True, queryset=UserImage.objects.all(), allow_null=True)
+    items = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Item.objects.all(), allow_null=True
+        )
+    image = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=UserImage.objects.all(), allow_null=True
+        )
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'items', 'description', 'image', 'is_active']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'items', 'description',
+                  'image', 'is_active']
+
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name', )
+        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
+
 
 class UserImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()
+
     class Meta:
         model = UserImage
         fields = ['id', 'image', 'user', 'url']
 
+
 class ItemImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()
+
     class Meta:
         model = ItemImage
         fields = ['id', 'image', 'item', 'url']
 
+
 class ConversationSerializer(serializers.ModelSerializer):
-    messages = serializers.PrimaryKeyRelatedField(many=True, queryset=Message.objects.all(), allow_null=True)
+    messages = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Message.objects.all(), allow_null=True
+        )
+
     class Meta:
         model = Conversation
-        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'messages', 'up2date_owner', 'up2date_buyer']
-    
+        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'messages', 'up2date_owner',
+                  'up2date_buyer']
+
+
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message

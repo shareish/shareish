@@ -1,9 +1,13 @@
 import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Conversation, Message
 from django.contrib.auth import get_user_model
+
+from .models import Conversation, Message
+
 User = get_user_model()
 from asgiref.sync import sync_to_async
+
 
 class ConversationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -13,7 +17,6 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.conversation_group_name, self.channel_name)
 
         await self.accept()
-        
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.conversation_group_name, self.channel_name)
@@ -41,12 +44,16 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         conversation_id = event['conversation_id']
         user_id = event['user_id']
 
-        await self.send(text_data=json.dumps({
-            'content': content,
-            'conversation': conversation_id,
-            'user_id': user_id
-        }))
-    
+        await self.send(
+            text_data=json.dumps(
+                {
+                    'content': content,
+                    'conversation': conversation_id,
+                    'user_id': user_id
+                }
+            )
+        )
+
     @sync_to_async
     def save_message(self, content, user_id, conversation_id):
         user = User.objects.get(pk=user_id)

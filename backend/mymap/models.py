@@ -1,10 +1,12 @@
-from django.contrib.gis.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.conf import settings
 from datetime import date
+
 from PIL import Image
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.gis.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password, username, first_name, last_name):
@@ -19,7 +21,7 @@ class MyUserManager(BaseUserManager):
             email=self.normalize_email(email),
             username=username,
             first_name=first_name,
-            last_name= last_name,
+            last_name=last_name,
         )
 
         user.set_password(password)
@@ -33,13 +35,14 @@ class MyUserManager(BaseUserManager):
         user = self.create_user(
             username=username,
             first_name=first_name,
-            last_name= last_name,
-            email = email,
+            last_name=last_name,
+            email=email,
             password=password
         )
         user.is_admin = True
         user.save(using=self._db)
         return user
+
 
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50, null=True, blank=True)
@@ -47,10 +50,10 @@ class User(AbstractBaseUser):
     birth_date = models.DateField(default=date.today, blank=True)
     sign_in_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    username = models.CharField(max_length = 20, default='')
+    username = models.CharField(max_length=20, default='')
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    description = models.TextField(blank = True, max_length = 300)
+    description = models.TextField(blank=True, max_length=300)
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
@@ -75,9 +78,12 @@ class User(AbstractBaseUser):
     class Meta:
         ordering = ['sign_in_date']
 
+
 class UserImage(models.Model):
     image = models.ImageField(upload_to='')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='image', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='image', on_delete=models.CASCADE
+        )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -103,6 +109,7 @@ class UserImage(models.Model):
     class Meta:
         ordering = ['user']
 
+
 class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
@@ -111,12 +118,12 @@ class Item(models.Model):
     enddate = models.DateField(null=True)
     in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
-    
+
     class ItemType(models.TextChoices):
         DONATION = 'DN', _('Donation')
         LOAN = 'LN', _('Loan')
         BARTER = 'BR', _('Request')
-    
+
     item_type = models.CharField(
         max_length=2,
         choices=ItemType.choices,
@@ -140,30 +147,33 @@ class Item(models.Model):
         SPORT = 'SP', _('Sport and Leisure')
         TRANSPORT = 'TS', _('Transport and vehicle')
         OTHER = 'OT', _('Other')
-    
+
     category1 = models.CharField(
         max_length=2,
-        choices = Categories.choices,
+        choices=Categories.choices,
         default='OT'
     )
     category2 = models.CharField(
         max_length=2,
-        choices = Categories.choices,
-        blank = True,
+        choices=Categories.choices,
+        blank=True,
     )
     category3 = models.CharField(
         max_length=2,
-        choices = Categories.choices,
-        blank = True,
+        choices=Categories.choices,
+        blank=True,
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True
+        )
 
     def __str__(self) -> str:
         return self.name + ' : ' + self.description + ' (' + self.category1 + ')'
 
     class Meta:
         ordering = ['name']
+
 
 class ItemImage(models.Model):
     image = models.ImageField(upload_to='')
@@ -192,12 +202,21 @@ class ItemImage(models.Model):
     class Meta:
         ordering = ['item']
 
+
 class Conversation(models.Model):
     name = models.CharField(max_length=100)
     slug = models.CharField(max_length=100, null=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE, null=True)
-    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE, null=True)
-    item = models.ForeignKey(Item, related_name="conversations", on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE,
+        null=True
+        )
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE,
+        null=True
+        )
+    item = models.ForeignKey(
+        Item, related_name="conversations", on_delete=models.CASCADE, null=True
+        )
 
     up2date_owner = models.BooleanField(default=True)
     up2date_buyer = models.BooleanField(default=True)
@@ -205,10 +224,15 @@ class Conversation(models.Model):
     class Meta:
         ordering = ['name']
 
+
 class Message(models.Model):
     content = models.TextField(null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="messages", on_delete=models.CASCADE, null=True)
-    conversation = models.ForeignKey(Conversation, related_name="messages", on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="messages", on_delete=models.CASCADE, null=True
+        )
+    conversation = models.ForeignKey(
+        Conversation, related_name="messages", on_delete=models.CASCADE, null=True
+        )
     date = models.DateTimeField(auto_now=True)
 
     class Meta:

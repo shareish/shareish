@@ -1,7 +1,12 @@
-from django.urls import path, include
-from . import views
-from .views import ActiveItemViewSet, ItemViewSet, ItemImageViewSet, UserViewSet, ConversationViewSet, MessageViewSet, RecurrentItemViewSet, ActiveItemViewSet, UserItemViewSet, UserImageViewSet, MapNameAndDescriptionViewSet
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
+from . import views
+from .views import (
+    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet,
+    MapNameAndDescriptionViewSet, MessageViewSet, RecurrentItemViewSet, UserImageViewSet,
+    UserItemViewSet, UserViewSet
+)
 
 router = DefaultRouter()
 router.register("items", ItemViewSet, basename="items")
