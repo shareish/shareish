@@ -43,7 +43,7 @@ give-boxes,Give boxes,Armoires de partage
 give-box,Give box,Armoire de partage
 drinking-water-spots,Drinking water spots,Points d'eau potable
 drinking-water-spot,Drinking water spot,Point d'eau potable
-free-shops,Free shops,Magasin gratuit
+free-shops,Free shops,Magasins gratuits
 free-shop,Free shop,Magasin gratuit
 from-osm,retrieved from OSM,récupéré via OSM
 by,by,par
@@ -73,3 +73,25 @@ language-en,English,Anglais
 language-fr,French,Français
 to,to,à
 too-small-zoom,Zoom to show more,Zoomez pour voir plus
+edit,Edit,
+log-out,Log out,
+my-items,My items,
+firstname,First name,
+lastname,Last name,
+username,Username,
+password,Password,
+biography,Biography
+homepage-link,Homepage link,
+facebook-link,Facebook link,
+instagram-link,Instagram link,
+email,Email,
+save,Save,
+cancel,Cancel,
+validations.messages._default,Invalid field,Champ incorrect
+validations.messages.required,This field is required,Champ obligatoire
+validations.messages.email,Must be a valid email address,Doit être une adresse e-mail valide
+validations.messages.is,Invalid confirmation,Confirmation incorrecte
+validations.messages.min,Must have at least {1} characters,Doit contenir au moins {1} caractères
+edit-my-account,Edit my account,
+notif-success-user-update,Your account has been updated successfully,
+notif-error-user-update,An error prevented your account to be updated,

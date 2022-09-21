@@ -18,6 +18,13 @@ Vue.use(VueRouter);
 
 import i18n from './i18n';
 
+import VeeValidate from 'vee-validate';
+Vue.use(VeeValidate, {
+  i18nRootKey: 'validations',
+  i18n,
+  inject: false
+});
+
 import store from './store';
 
 import App from './App.vue';

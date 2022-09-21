@@ -215,11 +215,12 @@ SITE_NAME = 'Shareish'
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,  # also send if email has changed
+    'SEND_CONFIRMATION_EMAIL': True,  # registration or activation
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'ACTIVATION_URL': 'activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
+
     'SERIALIZERS': {
         'user': 'mymap.serializers.UserSerializer',
         'current_user': 'mymap.serializers.UserSerializer',

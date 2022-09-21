@@ -20,6 +20,7 @@
 import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
+import EditAccountModal from '@/components/EditAccountModal';
 export default {
   name: 'Account',
   components: {UserCard, ItemCard},
@@ -79,8 +80,18 @@ export default {
         console.log(JSON.stringify(error));
       }
     },
+    updateUser(user) {
+      this.user = user;
+    },
     startEdition() {
-      //TODO
+      this.$buefy.modal.open({
+        parent: this,
+        props: {user: this.user},
+        events: {updateUser: this.updateUser},
+        component: EditAccountModal,
+        hasModalCard: true,
+        trapFocus: true,
+      })
     }
   },
   async created() {
