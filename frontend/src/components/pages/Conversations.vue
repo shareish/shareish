@@ -51,12 +51,13 @@ export default {
       this.loading = false;
     },
     isConversationUpToDate(conversation) {
-      if (this.$store.state.user.id === conversation['owner']) {
-        return conversation['up2date_owner'] === true;
-      }
-      else {
-        return conversation['up2date_buyer'] === true;
-      }
+      return true; //TODO: fix notifications for conversations
+      // if (this.$store.state.user.id === conversation['owner']) {
+      //   return conversation['up2date_owner'] === true;
+      // }
+      // else {
+      //   return conversation['up2date_buyer'] === true;
+      // }
     }
   },
   mounted() {

@@ -78,7 +78,9 @@ export default {
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
         try {
-          this.$store.state.notifications = (await axios.get('/api/v1/conversations_update')).data;
+          // TODO: fix notifications for conversations
+          // this.$store.state.notifications = (await axios.get('/api/v1/conversations_update')).data;
+          this.$store.state.notifications = 0;
         }
         catch (error) {
           console.log(error);
