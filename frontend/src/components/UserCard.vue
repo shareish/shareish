@@ -39,5 +39,19 @@ export default {
 </script>
 
 <style scoped>
+.media-left, .media-content {
+  margin-bottom: 1rem;
+}
 
+.media-content {
+  margin-right: 1rem;
+}
+
+.media-right {
+  margin-left: 0 !important;
+}
+
+.media {
+  flex-wrap: wrap;
+}
 </style>

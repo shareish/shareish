@@ -231,6 +231,7 @@ export default {
 <style scoped>
 div.icon-text {
   align-items: center;
+  justify-content: flex-start;
 }
 
 .is-vcentered {
