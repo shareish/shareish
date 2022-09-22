@@ -98,3 +98,11 @@ notif-error-user-update,An error prevented your account to be updated,
 add-message-dot,Add a message...,
 post-message,Post message,
 notif-error-send-message,An error prevented your message to be sent,
+availability,Availability,
+shared-by,Shared by,
+location,Location,
+no-address,No address provided,
+from,from,du
+since,since,depuis
+delete,Delete,
+start-conversation,Start conversation,

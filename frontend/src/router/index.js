@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import ItemsMap from '@/components/pages/ItemsMap';
 import SignUp from '../views/SignUpView.vue'
 import Login from '../views/LoginView.vue'
-import ItemDetail from '../views/dashboard/ItemDetailView.vue'
+import ItemDetails from '@/components/pages/ItemDetails'
 // import AddItem from '../views/dashboard/AddItemView.vue'
 import AddItem from '@/components/pages/AddItem'
 import Conversations from '@/components/pages/Conversations'
@@ -87,7 +87,7 @@ const routes = [{
     {
         path: '/items/:id',
         name: 'itemDetail',
-        component: ItemDetail,
+        component: ItemDetails,
         meta: {
             requireLogin: true
         }
