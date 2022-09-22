@@ -106,3 +106,5 @@ from,from,du
 since,since,depuis
 delete,Delete,
 start-conversation,Start conversation,
+avatar,Avatar,
+avatar-info,Only upload image to replace existing one.,

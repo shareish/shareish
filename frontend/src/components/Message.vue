@@ -1,8 +1,9 @@
 <template>
   <article class="media">
     <figure class="media-left">
-      <p class="image is-64x64">
-        <img src="https://bulma.io/images/placeholders/128x128.png">
+      <p class="image">
+        <img v-if="sender.image.length > 0" :src="sender.image[0]" />
+        <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
       </p>
     </figure>
     <div class="media-content">
@@ -37,5 +38,7 @@ export default {
 </script>
 
 <style scoped>
-
+.image {
+  width: 64px;
+}
 </style>

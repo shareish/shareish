@@ -177,7 +177,10 @@ class UserImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         user = User.objects.get(pk=request.POST['userID'])
-        images = request.FILES.getlist('image')
+        existings = UserImage.objects.filter(user=user)
+        for existing in existings:
+            existing.delete()
+        images = [request.FILES.get('image')]
         for image in images:
             new_image = UserImage(image=image, user=user)
             new_image.save()

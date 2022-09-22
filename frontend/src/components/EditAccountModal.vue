@@ -24,6 +24,25 @@
             :password-reveal="field === 'password'"
           />
         </b-field>
+        <b-field
+          :label="$t('avatar')"
+          :message="$t('avatar-info')"
+        >
+          <b-field
+            class="file is-primary"
+            :class="{'has-name': !!file}"
+          >
+            <b-upload v-model="file" class="file-label" accept="image/*" validationMessage="Please select a file">
+            <span class="file-cta">
+                <b-icon class="file-icon" icon="upload"></b-icon>
+                <span class="file-label">Click to upload</span>
+            </span>
+              <span class="file-name" v-if="file">
+                {{ file.name }}
+            </span>
+            </b-upload>
+          </b-field>
+        </b-field>
       </section>
       <footer class="modal-card-foot">
         <b-button
@@ -51,6 +70,7 @@ export default {
     return {
       internalUser: {},
       displayErrors: false,
+      file: null,
     }
   },
   computed: {
@@ -76,7 +96,20 @@ export default {
       }
 
       try {
+        if (this.file) {
+
+        }
         let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
+
+        if (this.file) {
+          let data = new FormData();
+          data.append('userID', this.user['id']);
+          data.append('image', this.file);
+          const image = (await axios.post('/api/v1/user_image/', data)).data;
+          user.image = [image.url];
+          this.file = null;
+        }
+
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',

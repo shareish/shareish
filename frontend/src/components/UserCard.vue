@@ -2,8 +2,9 @@
   <div class="box">
     <div class="media">
       <figure class="media-left">
-        <p class="image is-128x128">
-          <img src="https://bulma.io/images/placeholders/128x128.png" />
+        <p class="image">
+          <img v-if="user.image.length > 0" :src="user.image[0]" />
+          <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
         </p>
       </figure>
       <div class="media-content">
@@ -66,5 +67,9 @@ export default {
 
 .media {
   flex-wrap: wrap;
+}
+
+.image {
+  width: 128px;
 }
 </style>
