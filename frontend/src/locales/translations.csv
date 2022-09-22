@@ -95,3 +95,6 @@ validations.messages.min,Must have at least {1} characters,Doit contenir au moin
 edit-my-account,Edit my account,
 notif-success-user-update,Your account has been updated successfully,
 notif-error-user-update,An error prevented your account to be updated,
+add-message-dot,Add a message...,
+post-message,Post message,
+notif-error-send-message,An error prevented your message to be sent,
