@@ -6,8 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         user: {
-            email: '',
-            id: ''
+            email: null,
+            id: null
         },
         isAuthenticated: false,
         token: '',
@@ -24,9 +24,9 @@ export default new Vuex.Store({
                 state.isAuthenticated = false
             }
             if (localStorage.getItem('user_id')) {
-                state.user.id = localStorage.getItem('user_id')
+                state.user.id = Number(localStorage.getItem('user_id'));
             } else {
-                state.user.id = ''
+                state.user.id = null
             }
         },
 

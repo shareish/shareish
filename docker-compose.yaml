@@ -38,6 +38,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - media_volume:/app/web/mediafiles
+      - /etc/letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/conf/:/etc/nginx/ssl/:ro
     ports:
@@ -47,8 +48,8 @@ services:
       - web
     restart: unless-stopped
 
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
+#  certbot:
+#    image: certbot/certbot:latest
+#    volumes:
+#      - ./certbot/www/:/var/www/certbot/:rw
+#      - ./certbot/conf/:/etc/letsencrypt/:rw

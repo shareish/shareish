@@ -1,38 +1,77 @@
-from email import message
-
+from django.db.models import Q
 from django.http import FileResponse, JsonResponse
-
-from .models import Item, ItemImage, Conversation, Message, UserImage
 from django.contrib.auth import get_user_model
+
+from .models import Conversation, Item, ItemImage, Message, UserImage
+
 User = get_user_model()
 
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
-from mymap.serializers import ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer, UserImageSerializer, MapItemSerializer, MapNameAndDescriptionSerializer
+from mymap.serializers import (
+    ItemSerializer, UserSerializer, ItemImageSerializer,
+    ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer
+)
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .ai import findClass
 
 from geopy.geocoders import Nominatim
+
 locator = Nominatim(user_agent="shareish")
+
+LOCATION_PREFIX = "SRID=4326;POINT"
+
+
+class ItemTypeFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        item_type = request.query_params.get('item_type')
+        if item_type is not None:
+            return queryset.filter(item_type=item_type)
+        return queryset
+
+
+class ItemCategoryFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        category = request.query_params.get('category')
+        if category is not None:
+            return queryset.filter(
+                Q(category1=category) | Q(category2=category) | Q(category3=category)
+            )
+        return queryset
+
 
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
-    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
+    permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+
+    filter_backends = [
+        filters.SearchFilter, filters.OrderingFilter,
+        ItemTypeFilterBackend, ItemCategoryFilterBackend
+    ]
+    search_fields = ['name', 'description']
+    ordering_fields = '__all__'
+    ordering = ['-startdate']
 
     def create(self, request, *args, **kwargs):
         data = request.data
         if 'location' in data:
             address = data['location']
-            if address != '':
+            if address != '' and address is not None:
                 geoloc = locator.geocode(address)
-                if geoloc != None:
-                    data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+                if geoloc is not None:
+                    data['location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
+                else:
+                    print("Warning: {} given but no location found.".format(address))
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
@@ -40,26 +79,27 @@ class ItemViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         if 'location' in request.data:
             address = request.data['location']
-            if address != '' and address != None and address.startswith("SRID=4326;POINT") == False:
+            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
                 geoloc = locator.geocode(address)
-                if geoloc != None:
-                    request.data['location'] = "SRID=4326;POINT (" + str(geoloc.latitude) + " " + str(geoloc.longitude) + ")"
+                if geoloc is not None:
+                    request.data['location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
                 else:
-                    return Response({"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
+                    )
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -67,44 +107,38 @@ class ItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 class RecurrentItemViewSet(ItemViewSet):
     def get_queryset(self):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
+
 class ActiveItemViewSet(ItemViewSet):
     pagination_class = ActivePaginationClass
+
     def get_queryset(self):
         return Item.objects.filter(in_progress=True)
+
 
 class UserItemViewSet(ItemViewSet):
     def get_queryset(self):
         return Item.objects.filter(user=self.request.user)
 
-class ItemImageViewSet(viewsets.ViewSet):
 
+# TODO: why not model view set ?
+class ItemImageViewSet(viewsets.ViewSet):
     def list(self, request):
         images = ItemImage.objects.all()
         serializer = ItemImageSerializer(images, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        item = Item.objects.get(pk = request.POST['itemID'])
+        item = Item.objects.get(pk=request.POST['itemID'])
         images = request.FILES.getlist('files')
         print(images)
         for image in images:
-            newImage = ItemImage(image = image, item = item)
-            newImage.save()
+            new_image = ItemImage(image=image, item=item)
+            new_image.save()
         return Response(status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
@@ -134,20 +168,23 @@ class ItemImageViewSet(viewsets.ViewSet):
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class UserImageViewSet(viewsets.ViewSet):
 
+class UserImageViewSet(viewsets.ViewSet):
     def list(self, request):
         images = UserImage.objects.all()
         serializer = UserImageSerializer(images, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        user = User.objects.get(pk = request.POST['userID'])
-        images = request.FILES.getlist('image')
+        user = User.objects.get(pk=request.POST['userID'])
+        existings = UserImage.objects.filter(user=user)
+        for existing in existings:
+            existing.delete()
+        images = [request.FILES.get('image')]
         for image in images:
-            newImage = UserImage(image = image, user = user)
-            newImage.save()
-            serialized_image = UserImageSerializer(newImage)
+            new_image = UserImage(image=image, user=user)
+            new_image.save()
+            serialized_image = UserImageSerializer(new_image)
         return Response(serialized_image.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
@@ -177,10 +214,12 @@ class UserImageViewSet(viewsets.ViewSet):
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
+    permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+
 
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
@@ -191,10 +230,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        owner= User.objects.get(pk=data['owner'])
+        owner = User.objects.get(pk=data['owner'])
         buyer = User.objects.get(pk=data['buyer'])
         item = Item.objects.get(pk=data['item'])
-        already_exist = Conversation.objects.filter(owner=owner, buyer=buyer, item=item, name=data['name'])
+        already_exist = Conversation.objects.filter(
+            owner=owner, buyer=buyer, item=item, name=data['name']
+        )
         if already_exist:
             serializer = ConversationSerializer(already_exist[0], many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -204,7 +245,9 @@ class ConversationViewSet(viewsets.ModelViewSet):
         data['slug'] = None
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
-            slug = getattr(item, 'name') + ' (' + getattr(owner, 'username')+ ' and ' + getattr(buyer, 'username') + ')'
+            slug = getattr(item, 'name') + ' (' + getattr(owner, 'username') + ' and ' + getattr(
+                buyer, 'username'
+            ) + ')'
             self.perform_create(serializer, owner, buyer, item, slug)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -212,15 +255,20 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer, owner, buyer, item, slug):
         serializer.save(owner=owner, buyer=buyer, item=item, slug=slug)
-    
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    queryset = Message.objects.all()
+
+    def get_queryset(self):
+        conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
+        return Message.objects.filter(conversation=conversation)
+
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
     serializer_class = MapNameAndDescriptionSerializer
     queryset = Item.objects.filter(in_progress=True)
+
 
 @api_view(['POST'])
 def getAddress(request):
@@ -230,42 +278,44 @@ def getAddress(request):
         address[1] = address[1][1:]
         address[2] = address[2][:-1]
         geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
-        if geoloc != None:
+        if geoloc is not None:
             return Response(geoloc.address, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def searchItemFilter(request):
     if request.method == "POST":
         searched = request.data
-        items_name = None
-        items_item_type = None
-        items_category1 = None
-        items_category2 = None
-        items_category3 = None
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
-        if 'name' not in searched and searched['item_type'] == 'null' and 'category' not in searched:
-            serialized_items = MapItemSerializer(queryset, many=True)
+
+        if searched['name'] == "":
+            searched['name'] = None
+
+        if (searched['name'] is None
+                and searched['item_type'] is None
+                and searched['category'] is None):
+            serialized_items = ItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
-        if 'name' in searched:
+
+        if searched['name'] is not None:
             items_name = queryset.filter(name__icontains=searched['name'])
             items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
-        if searched['item_type'] != 'null':
+        if searched['item_type'] is not None:
             items_item_type = queryset.filter(item_type__exact=searched['item_type'])
             items = items | items_item_type
-        if 'category' in searched:
+        if searched['category'] is not None:
             items_category1 = queryset.filter(category1__exact=searched['category'])
             items_category2 = queryset.filter(category2__exact=searched['category'])
             items_category3 = queryset.filter(category3__exact=searched['category'])
             items = items | items_category1 | items_category2 | items_category3
-        serialized_items = MapItemSerializer(items, many=True)
+        serialized_items = ItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-from rest_framework.pagination import LimitOffsetPagination
 
 @api_view(['POST'])
 def searchItems(request):
@@ -273,7 +323,7 @@ def searchItems(request):
         paginator = ActivePaginationClass()
         search = request.data['search']
         items = Item.objects.none()
-        if search != None:
+        if search is not None:
             items_name = Item.objects.filter(name__icontains=search)
             items_description = Item.objects.filter(description__icontains=search)
             items = items | items_description | items_name
@@ -287,7 +337,7 @@ def searchItems(request):
 @api_view(['POST'])
 def predictClass(request):
     if request.method == "POST":
-        if(request.FILES.get('files[]')):
+        if request.FILES.get('files[]'):
             class_found, detected_text = findClass(request.FILES.get('files[]'))
             response = {
                 "suggested_class": class_found,
@@ -295,6 +345,7 @@ def predictClass(request):
             }
             return JsonResponse(response, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def getNotifications(request):
@@ -304,13 +355,14 @@ def getNotifications(request):
         conversations_owner = Conversation.objects.filter(owner=user)
         conversations_buyer = Conversation.objects.filter(buyer=user)
         for conversation in conversations_owner:
-            if conversation.up2date_owner == False:
+            if not conversation.up2date_owner:
                 notifications += 1
         for conversation in conversations_buyer:
-            if conversation.up2date_buyer == False:
+            if not conversation.up2date_buyer:
                 notifications += 1
         return Response(notifications, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def getFirstItemImage(request, id):

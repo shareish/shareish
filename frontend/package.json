@@ -10,14 +10,18 @@
         "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.7.2",
         "axios": "^0.27.2",
+        "buefy": "^0.9.22",
         "bulma": "^0.9.4",
         "bulma-calendar": "^6.1.18",
         "core-js": "^3.8.3",
         "cors": "^2.8.5",
         "leaflet": "^1.8.0",
         "leaflet-easybutton": "^2.4.0",
+        "lodash": "^4.17.21",
         "moment": "^2.29.4",
+        "vee-validate": "^2.2.4",
         "vue": "^2.6.11",
         "vue-i18n": "^8.27.2",
         "vue-meta": "^2.4.0",

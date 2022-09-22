@@ -1,4 +1,6 @@
 <template>
+  <div>
+
     <h1 class="title">
         Autocomplete adder
     </h1>
@@ -31,6 +33,8 @@
     <div class="field">
         <button class="button is-success" @click="submitForm">Submit</button>
     </div>
+
+  </div>
 </template>
 
 <script>

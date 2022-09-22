@@ -75,10 +75,10 @@ export default {
             conversationID: null,
         }
     },
-    beforeRouteLeave (to, from, next) {
-        this.beforeWindowUnload()
-        next()
-    },
+    // beforeRouteLeave (to, from, next) {
+    //     this.beforeWindowUnload()
+    //     next()
+    // },
     beforeDestroy() {
         window.removeEventListener('beforeunload', this.beforeWindowUnload)
     },

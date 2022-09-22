@@ -1,14 +1,20 @@
-from django.urls import path, include
-from . import views
-from .views import ActiveItemViewSet, ItemViewSet, ItemImageViewSet, UserViewSet, ConversationViewSet, MessageViewSet, RecurrentItemViewSet, ActiveItemViewSet, UserItemViewSet, UserImageViewSet, MapNameAndDescriptionViewSet
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
+from . import views
+from .views import (
+    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet,
+    MapNameAndDescriptionViewSet, MessageViewSet, RecurrentItemViewSet, UserImageViewSet,
+    UserItemViewSet, UserViewSet
+)
 
 router = DefaultRouter()
 router.register("items", ItemViewSet, basename="items")
 router.register("images", ItemImageViewSet, basename="images")
 router.register("webusers", UserViewSet, basename="webusers")
 router.register("conversations", ConversationViewSet, basename="conversations")
-router.register("messages", MessageViewSet, basename="messages")
+router.register(r'conversations/(?P<conversation_id>\d+)/messages', MessageViewSet,
+                basename="messages")
 router.register("recurrents", RecurrentItemViewSet, basename="recurrents")
 router.register("actives", ActiveItemViewSet, basename="actives")
 router.register("user_items", UserItemViewSet, basename='user_items')

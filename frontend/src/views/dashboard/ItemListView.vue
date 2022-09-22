@@ -5,7 +5,7 @@
                 <h1 class="title">Items</h1>
             </div>
 
-            <div class="column is-3" v-for="item in items" v-bind:key="item.id">
+            <div class="column is-3" v-for="item in items" v-bind:key="`${item.id}-item-card`">
 
                 <div class="card">
                     <div class="card-image">

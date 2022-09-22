@@ -1,2 +1,112 @@
 key,en,fr
 welcome,Welcome,Bienvenue
+map,Map,Carte
+browse-items,Browse items,Parcourir
+add-item,Add item,Ajouter
+conversations,Conversations,Conversations
+my-account,My account,Mon compte
+log-in,Log in,Connexion
+sign-up,Sign up,Création compte
+useful-links,Useful links,Liens utiles
+contact,Contact,Contact
+about-us,About us,À propos
+what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
+item-type,Type,Type
+item-category,Category,Catégorie
+request,Request,Requête
+donation,Donation,Don
+loan,Loan,Prêt
+all,All,Tous
+category,Category,Catégorie
+food,Food,Nourriture
+animals,Animals,Animaux
+aee,Arts and Culture and Entertainments,Arts Cultures Divertissements
+collectors,Collectors,Collections
+hh,Helping hands,Coups de main
+diy,DIY,Bricolage
+beauty,Wellness and Beauty,Beauté et bien-être
+childhood,Childhood,Enfance
+it,IT and Multimedia,Informatique et multimédia
+garden,Garden,Jardinage
+house,House and Decoration,Maison et décoration
+holidays,Holidays and Week-end,Vacances et week-ends
+book,"Books, CDs, DVDs, and Blu-rays","Livres, CDs, DVDs, Blu-rays"
+sport,Sport and Leisure,Sports et loisirs
+transport,Transport and vehicle,Transports et véhicules
+other,Other,Autres
+search-dot,Search...,Recherche...
+bookcases,Public bookcases,Micro-bibliothèques
+bookcase,Public bookcase,Micro-bibliothèque
+defibrillators,Defibrillators,Défibrillateurs
+defibrillator,Defibrillator,Défibrillateur
+give-boxes,Give boxes,Armoires de partage
+give-box,Give box,Armoire de partage
+drinking-water-spots,Drinking water spots,Points d'eau potable
+drinking-water-spot,Drinking water spot,Point d'eau potable
+free-shops,Free shops,Magasins gratuits
+free-shop,Free shop,Magasin gratuit
+from-osm,retrieved from OSM,récupéré via OSM
+by,by,par
+i-am-interested,Details,Détails
+button-load-more,Load more,Charger plus
+no-items,No item,Pas d'élément
+add-new-item,Add a new item,Ajout d'élément
+i-have-image,I have image for my item,J'ai une image pour mon élément
+i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon élément
+my-recurrent-items,My recurrent items,Mes éléments récurrents
+upload-your-item-image,Upload your item image,Transférer votre image d'élément
+name,Name,Nom
+address,Address,Adresse
+description,Description,Description
+start-date,Start date,Date de début
+end-date,End date,Date de fin
+save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
+submit,Submit,Soumettre
+ends,ends,se termine
+submit-again,Submit again,Soumettre à nouveau
+profile,Profile,Profil
+my-conversations,My conversations,Mes conversations
+new-messages,New messages,Nouveaux messages
+open-conversation,Open conversation,Ouvrir la conversation
+no-conversation,No conversation,Pas de conversation
+language-en,English,Anglais
+language-fr,French,Français
+to,to,à
+too-small-zoom,Zoom to show more,Zoomez pour voir plus
+edit,Edit,Editer
+log-out,Log out,Se déconnecter
+my-items,My items,Mes éléments
+firstname,First name,Prénom
+lastname,Last name,Nom
+username,Username,Nom d'utilisateur
+password,Password,Mot de passe
+biography,Biography,Biographie
+homepage-link,Homepage link,Page personnelle
+facebook-link,Facebook profile,Profil Facebook
+instagram-link,Instagram profile,Profil Instagram
+email,Email,E-mail
+save,Save,Enregistrer
+cancel,Cancel,Annuler
+validations.messages._default,Invalid field,Champ incorrect
+validations.messages.required,This field is required,Champ obligatoire
+validations.messages.email,Must be a valid email address,Doit être une adresse e-mail valide
+validations.messages.is,Invalid confirmation,Confirmation incorrecte
+validations.messages.min,Must have at least {1} characters,Doit contenir au moins {1} caractères
+edit-my-account,Edit my account,Modifier mon compte
+notif-success-user-update,Your account has been updated successfully,Votre compte a été mis à jour avec succès
+notif-error-user-update,An error prevented your account to be updated,Une erreur a empêché votre compte d'être mis à jour
+add-message-dot,Add a message...,Ajouter un message...
+post-message,Post message,Poster le message
+notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
+availability,Availability,Disponibilité
+shared-by,Shared by,Partagé par
+location,Location,Emplacement
+no-address,No address provided,Pas d'adresse renseignée
+from,from,du
+since,since,depuis
+delete,Delete,Supprimer
+start-conversation,Start conversation,Commencer une conversation
+avatar,Avatar,Avatar
+avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
+notif-success-item-delete,The item has been successfully deleted,L'élément a été correctement supprimé
+notif-error-item-delete,An error prevented the item to be deleted,Une erreur a empêché la suppression de l'élément

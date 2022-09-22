@@ -1,14 +1,13 @@
 import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue'
-import Dashboard from '../views/dashboard/DashboardView.vue'
+import ItemsMap from '@/components/pages/ItemsMap';
 import SignUp from '../views/SignUpView.vue'
 import Login from '../views/LoginView.vue'
-import MyAccount from '../views/dashboard/MyAccountView.vue'
-import Items from '../views/dashboard/ItemListView.vue'
-import ItemDetail from '../views/dashboard/ItemDetailView.vue'
-import AddItem from '../views/dashboard/AddItemView.vue'
-import Conversations from '../views/dashboard/ConversationsView.vue'
-import ConversationDetail from '../views/dashboard/ConversationDetailView.vue'
+import ItemDetails from '@/components/pages/ItemDetails'
+// import AddItem from '../views/dashboard/AddItemView.vue'
+import AddItem from '@/components/pages/AddItem'
+import Conversations from '@/components/pages/Conversations'
+import ConversationDetail from '@/components/pages/ConversationDetails'
 import Recurrents from '../views/dashboard/RecurrentsListView.vue'
 import UserDetail from '../views/dashboard/UserDetailView.vue'
 import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
@@ -19,6 +18,8 @@ import ActivateEmail from '../views/ActivateEmail.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
+import ItemsList from '@/components/pages/ItemsList';
+import Account from '@/components/pages/Account';
 
 const routes = [{
         path: '/',
@@ -60,33 +61,33 @@ const routes = [{
         component: ActivateEmail
     },
     {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: Dashboard,
+        path: '/map',
+        name: 'itemsMap',
+        component: ItemsMap,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/my-account',
+        path: '/profile',
         name: 'myaccount',
-        component: MyAccount,
+        component: Account,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/items',
+        path: '/items',
         name: 'items',
-        component: Items,
+        component: ItemsList,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: '/dashboard/items/:id',
+        path: '/items/:id',
         name: 'itemDetail',
-        component: ItemDetail,
+        component: ItemDetails,
         meta: {
             requireLogin: true
         }
@@ -108,7 +109,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/items/add',
+        path: '/add-item',
         name: 'addItem',
         component: AddItem,
         meta: {
@@ -132,7 +133,7 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/conversations',
+        path: '/conversations',
         name: 'conversations',
         component: Conversations,
         meta: {
@@ -140,17 +141,24 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/conversations/:id',
+        path: '/conversations/:id',
         name: 'conversationDetail',
         component: ConversationDetail,
         meta: {
             requireLogin: true
         }
     },
+
+    // Redirects for old urls
+    {path: '/dashboard', redirect: '/map'},
+    {path: '/dashboard/items', redirect: '/items'},
+    {path: '/dashboard/items/:id', redirect: '/items/:id'},
+    {path: '/dashboard/items/add', redirect: '/add-item'},
 ]
 
 // Create router instance
 const router = new VueRouter({
+    mode: 'history',
     routes: routes,
     linkActiveClass: 'is-active'
 });
@@ -158,7 +166,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
         i18n.locale = localStorage.getItem('language') || 'en'
-        next('/log-in')
+        next('/')
     }
  else {
         next()

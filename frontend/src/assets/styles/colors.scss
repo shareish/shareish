@@ -1,0 +1,99 @@
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
+
+// Set your colors
+$primary: #3eaf7c;
+$primary-light: findLightColor($primary);
+$primary-dark: findDarkColor($primary);
+$primary-invert: findColorInvert($primary);
+$bookcase: #694B15;
+$bookcase-invert: findColorInvert($bookcase);
+$defibrillator: #4A8658;
+$defibrillator-invert: findColorInvert($defibrillator);
+$drinking-water: #5784B7;
+$drinking-water-invert: findColorInvert($drinking-water);
+
+// Lists and maps
+$custom-colors: (
+  "bookcase": (
+    $bookcase,
+    $bookcase-invert
+  ),
+  "defibrillator": (
+    $defibrillator,
+    $defibrillator-invert
+  ),
+  "drinking-water": (
+    $drinking-water,
+    $drinking-water-invert
+  ),
+);
+$custom-shades: null !default;
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: mergeColorMaps(
+    (
+      "white": (
+        $white,
+        $black,
+      ),
+      "black": (
+        $black,
+        $white,
+      ),
+      "light": (
+        $light,
+        $light-invert,
+      ),
+      "dark": (
+        $dark,
+        $dark-invert,
+      ),
+      "primary": (
+        $primary,
+        $primary-invert,
+        $primary-light,
+        $primary-dark,
+      ),
+      "link": (
+        $link,
+        $link-invert,
+        $link-light,
+        $link-dark,
+      ),
+      "info": (
+        $info,
+        $info-invert,
+        $info-light,
+        $info-dark,
+      ),
+      "success": (
+        $success,
+        $success-invert,
+        $success-light,
+        $success-dark,
+      ),
+      "warning": (
+        $warning,
+        $warning-invert,
+        $warning-light,
+        $warning-dark,
+      ),
+      "danger": (
+        $danger,
+        $danger-invert,
+        $danger-light,
+        $danger-dark,
+      ),
+    ),
+    $custom-colors
+);
+
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
