@@ -108,3 +108,5 @@ delete,Delete,Supprimer
 start-conversation,Start conversation,Commencer une conversation
 avatar,Avatar,Avatar
 avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
+notif-success-item-delete,The item has been successfully deleted,L'élément a été correctement supprimé
+notif-error-item-delete,An error prevented the item to be deleted,Une erreur a empêché la suppression de l'élément

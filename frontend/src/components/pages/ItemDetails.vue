@@ -22,7 +22,7 @@
           <button class="button is-primary">
             {{$t('edit')}}
           </button>
-          <button class="button is-danger">
+          <button class="button is-danger" @click="deleteItem">
             {{$t('delete')}}
           </button>
         </div>
@@ -213,6 +213,27 @@ export default {
       }
       catch (error) {
         console.log(error);
+      }
+    },
+    async deleteItem() {
+      try {
+        await axios.delete(`/api/v1/items/${this.item['id']}/`);
+        this.$buefy.snackbar.open({
+          duration: 5000,
+          type: 'is-success',
+          message: this.$t('notif-success-item-delete'),
+          pauseOnHover: true,
+        });
+        await this.$router.push('/items');
+      }
+      catch (error) {
+        console.log(error);
+        this.$buefy.snackbar.open({
+          duration: 5000,
+          type: 'is-danger',
+          message: this.$t('notif-error-item-delete'),
+          pauseOnHover: true,
+        })
       }
     }
   },
