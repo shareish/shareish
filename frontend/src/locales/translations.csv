@@ -73,38 +73,38 @@ language-en,English,Anglais
 language-fr,French,Français
 to,to,à
 too-small-zoom,Zoom to show more,Zoomez pour voir plus
-edit,Edit,
-log-out,Log out,
-my-items,My items,
-firstname,First name,
-lastname,Last name,
-username,Username,
-password,Password,
-biography,Biography
-homepage-link,Homepage link,
-facebook-link,Facebook link,
-instagram-link,Instagram link,
-email,Email,
-save,Save,
-cancel,Cancel,
+edit,Edit,Editer
+log-out,Log out,Se déconnecter
+my-items,My items,Mes éléments
+firstname,First name,Prénom
+lastname,Last name,Nom
+username,Username,Nom d'utilisateur
+password,Password,Mot de passe
+biography,Biography,Biographie
+homepage-link,Homepage link,Page personnelle
+facebook-link,Facebook profile,Profil Facebook
+instagram-link,Instagram profile,Profil Instagram
+email,Email,E-mail
+save,Save,Enregistrer
+cancel,Cancel,Annuler
 validations.messages._default,Invalid field,Champ incorrect
 validations.messages.required,This field is required,Champ obligatoire
 validations.messages.email,Must be a valid email address,Doit être une adresse e-mail valide
 validations.messages.is,Invalid confirmation,Confirmation incorrecte
 validations.messages.min,Must have at least {1} characters,Doit contenir au moins {1} caractères
-edit-my-account,Edit my account,
-notif-success-user-update,Your account has been updated successfully,
-notif-error-user-update,An error prevented your account to be updated,
-add-message-dot,Add a message...,
-post-message,Post message,
-notif-error-send-message,An error prevented your message to be sent,
-availability,Availability,
-shared-by,Shared by,
-location,Location,
-no-address,No address provided,
+edit-my-account,Edit my account,Modifier mon compte
+notif-success-user-update,Your account has been updated successfully,Votre compte a été mis à jour avec succès
+notif-error-user-update,An error prevented your account to be updated,Une erreur a empêché votre compte d'être mis à jour
+add-message-dot,Add a message...,Ajouter un message...
+post-message,Post message,Poster le message
+notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
+availability,Availability,Disponibilité
+shared-by,Shared by,Partagé par
+location,Location,Emplacement
+no-address,No address provided,Pas d'adresse renseignée
 from,from,du
 since,since,depuis
-delete,Delete,
-start-conversation,Start conversation,
-avatar,Avatar,
-avatar-info,Only upload image to replace existing one.,
+delete,Delete,Supprimer
+start-conversation,Start conversation,Commencer une conversation
+avatar,Avatar,Avatar
+avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
