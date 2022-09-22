@@ -11,6 +11,19 @@
         <h2 class="subtitle is-4">@{{ user.username }}</h2>
         {{user.description}}
 
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <a class="level-item" v-if="user.homepage_url" :href="user.homepage_url">
+              <span class="icon is-small"><i class="fas fa-globe"></i></span>
+            </a>
+            <a class="level-item" v-if="user.facebook_url" :href="user.facebook_url">
+              <span class="icon is-small"><i class="fab fa-facebook"></i></span>
+            </a>
+            <a class="level-item" v-if="user.instagram_url" :href="user.instagram_url">
+              <span class="icon is-small"><i class="fab fa-instagram"></i></span>
+            </a>
+          </div>
+        </nav>
       </div>
       <div class="media-right" v-if="editable && canEdit">
         <div class="buttons">
