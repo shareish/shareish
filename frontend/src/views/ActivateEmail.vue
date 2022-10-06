@@ -1,15 +1,11 @@
 <template>
     <div class="columns">
         <div class="column is-4 is-offset-4">
-            <h1 class="title">Account activation</h1>
+            <h1 class="title">{{$t('activate-your-account')}}</h1>
 
-            <p id="errorLog" class="is-danger" style="display: none;">
-                The activation went wrong.
-            </p>
-
-            <form @submit.prevent="resendActivation">
+            <form @submit.prevent="resendActivation" v-if="allowResend">
                 <div class="field">
-                    <label>E-mail</label>
+                    <label>{{$t('email')}}</label>
                     <div class="control">
                         <input type="email" name="email" class="input" v-model="email" required>
                     </div>
@@ -17,11 +13,10 @@
 
                 <div class="field">
                     <div class="control">
-                        <button class="button is-success">Resend activation</button>
+                        <button class="button is-success">{{ $t('resend-activation') }}</button>
                     </div>
                 </div>
             </form>
-            <p id="resend" class="is-success" style="display: none;">The activation email has been resent.</p>
         </div>
     </div>
 </template>
@@ -29,70 +24,94 @@
 <script>
 import axios from 'axios'
 export default {
-    name : 'ResetPasswordConfirm',
+    name : 'ActivateEmail',
     data() {
         return {
-            email: ''
+            email: '',
+            errors: [],
+            allowResend: false
         }
     },
     mounted(){
         document.title = 'Shareish | Email Activation'
-        this.uid = this.$route.params.uid
-        this.token = this.$route.params.token
-        this.submitActivation()
+        this.uid = this.$route.params.uid;
+        this.token = this.$route.params.token;
+        this.submitActivation();
     },
     methods: {
         async submitActivation(){
-            axios.defaults.headers.common["Authorization"] = ""
-            localStorage.removeItem("token")
+          this.errors.splice(0);
+
+            axios.defaults.headers.common["Authorization"] = "";
+            localStorage.removeItem("token");
 
             const formData = {
                 uid: this.uid,
                 token: this.token
+            };
+
+            try {
+              await axios.post("/api/v1/users/activation/", formData);
+              await this.$router.push('/log-in');
             }
-
-            let logAlert = document.getElementById("errorLog")
-            logAlert.style.display = 'none'
-            
-            axios
-                .post("/api/v1/users/activation/", formData)
-                .then(response => {
-                    this.$router.push('/dashboard')
-                })
-                .catch(error => {
-                    logAlert.style.display = 'block'
-                    if(error.response){
-                        for (const property in error.response.data) {
-                            this.error.push(`${property}: ${error.response.data[property]}`)
-                        }
-                        console.log(JSON.stringify(error.response.data))
-                    }else if (error.message){
-                        console.log(JSON.stringify(error.message))
-                    }else{
-                        console.log(JSON.stringify(error))
+            catch(error) {
+              this.allowResend = true;
+              let errorMessage;
+              if(error.response){
+                for (const property in error.response.data) {
+                  if (Array.isArray(error.response.data[property])) {
+                    for (const idx in error.response.data[property]) {
+                      const message = error.response.data[property][idx];
+                      this.errors.push(`${property}: ${message}`);
                     }
-                })
+                  }
+                  else {
+                    this.errors.push(`${property}: ${error.response.data[property]}`);
+                  }
+                }
+                console.log(JSON.stringify(error.response.data));
+                errorMessage = this.errors.join('<br>');
+              }
+              else if (error.message){
+                console.log(JSON.stringify(error.message));
+                errorMessage = error.message;
+              }
+              else{
+                console.log(JSON.stringify(error));
+                errorMessage = this.$t('notif-error-email-activation');
+              }
+
+              this.$buefy.snackbar.open({
+                duration: 5000,
+                type: 'is-danger',
+                message: errorMessage,
+                pauseOnHover: true,
+              });
+            }
         },
-        resendActivation(){
-            let resend = document.getElementById("resend")
-            resend.style.display = 'none'
-
-            let logAlert = document.getElementById("errorLog")
-            logAlert.style.display = 'none'
-
+        async resendActivation(){
             const formData = {
                 email: this.email
             }
 
-            axios
-                .post("/api/v1/users/resend_activation/", formData)
-                .then(response => {
-                    resend.style.display = 'block'
-                })
-                .catch(error => {
-                    logAlert.style.display = 'block'
-                    console.log(error)
-                })
+            try {
+              await axios.post("/api/v1/users/resend_activation/", formData);
+              this.$buefy.snackbar.open({
+                duration: 5000,
+                type: 'is-success',
+                message: this.$t('notif-success-resend-activation'),
+                pauseOnHover: true,
+              });
+            }
+            catch(error) {
+              console.log(error);
+              this.$buefy.snackbar.open({
+                duration: 5000,
+                type: 'is-danger',
+                message: this.$t('notif-error-resend-activation'),
+                pauseOnHover: true,
+              });
+            }
         }
     },
 }
