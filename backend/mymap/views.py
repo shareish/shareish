@@ -121,9 +121,18 @@ class ActiveItemViewSet(ItemViewSet):
         return Item.objects.filter(in_progress=True)
 
 
+class UserItemFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user = request.query_params.get('id')
+        if user is not None:
+            return queryset.filter(user_id=int(user))
+        else:
+            return queryset.filter(user=request.user)
+
+
 class UserItemViewSet(ItemViewSet):
-    def get_queryset(self):
-        return Item.objects.filter(user=self.request.user)
+    queryset = Item.objects.all()
+    filter_backends = [UserItemFilterBackend]
 
 
 # TODO: why not model view set ?

@@ -20,6 +20,7 @@ import store from '../store'
 import i18n from '@/i18n'
 import ItemsList from '@/components/pages/ItemsList';
 import Account from '@/components/pages/Account';
+import UserProfile from '@/components/pages/UserProfile';
 
 const routes = [{
         path: '/',
@@ -72,6 +73,14 @@ const routes = [{
         path: '/profile',
         name: 'myaccount',
         component: Account,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: '/profile/:id',
+        name: 'userDetails',
+        component: UserProfile,
         meta: {
             requireLogin: true
         }

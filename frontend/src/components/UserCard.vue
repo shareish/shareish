@@ -3,12 +3,22 @@
     <div class="media">
       <figure class="media-left">
         <p class="image">
-          <img v-if="user.image.length > 0" :src="user.image[0]" />
-          <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
+          <router-link
+            :to="{ name: 'userDetails', params: { id: user.id}}"
+          >
+            <img v-if="user.image.length > 0" :src="user.image[0]" />
+            <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
+          </router-link>
         </p>
       </figure>
       <div class="media-content">
-        <h2 class="title is-3">{{ user.first_name }} {{ user.last_name}}</h2>
+        <h2 class="title is-3">
+          <router-link
+            :to="{ name: 'userDetails', params: { id: user.id}}"
+          >
+           {{ user.first_name }} {{ user.last_name}}
+          </router-link>
+        </h2>
         <h2 class="subtitle is-4">@{{ user.username }}</h2>
         {{user.description}}
 
@@ -72,4 +82,9 @@ export default {
 .image {
   width: 128px;
 }
+
+.title a {
+  color: #4a4a4a !important;
+}
+
 </style>

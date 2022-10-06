@@ -9,7 +9,17 @@
     <div class="media-content">
       <div class="content">
         <p>
-          <strong>{{sender.first_name}} {{sender.last_name}}</strong> · <small>@{{sender.username}}</small>
+          <strong>
+            <router-link :to="{ name: 'userDetails', params: { id: sender.id}}">
+             {{sender.first_name}} {{sender.last_name}}
+            </router-link>
+          </strong>
+          ·
+          <small>
+            <router-link :to="{ name: 'userDetails', params: { id: sender.id}}">
+              @{{sender.username}}
+            </router-link>
+          </small>
           <br>
           {{message.content}}
           <br>

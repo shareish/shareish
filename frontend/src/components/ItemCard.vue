@@ -32,7 +32,11 @@
             {{ item.name }}
             </router-link>
           </p>
-          <p class="subtitle is-6"><item-type-tag :type="item.item_type" /> <span v-if="user">{{$t('by')}} @{{user.username}}</span></p>
+          <p class="subtitle is-6"><item-type-tag :type="item.item_type" /> <span v-if="user">{{$t('by')}}
+            <router-link :to="{ name: 'userDetails', params: { id: user.id}}">
+              @{{user.username}}
+            </router-link>
+          </span></p>
         </div>
       </div>
       <div class="content">
