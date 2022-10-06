@@ -72,6 +72,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                     )
                 else:
                     print("Warning: {} given but no location found.".format(address))
+                    data['location'] = None
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
