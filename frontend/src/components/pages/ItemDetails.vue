@@ -77,7 +77,9 @@
                 </div>
               </div>
               <div class="content" v-if="address">
-                {{address}}
+                <router-link :to="`/map?id=${item.id}`">
+                  {{address}}
+                </router-link>
               </div>
               <div class="content" v-else>
                 <em>{{$t('no-address')}}</em>

@@ -42,6 +42,8 @@
               :key="item.id"
               :lat-lng="item.latLng"
               :icon="item.icon"
+              :ref="`marker-item-${item.id}`"
+              @ready="openRoutedItemPopup(item.id)"
             >
               <l-popup :options="{className:'item-popup', maxWidth: '500'}">
                 <item-map-popup :item="item" :users="users"/>
@@ -224,12 +226,19 @@ export default {
           selectedType: null,
           selectedCategory: null,
           items: [],
-          users: []
+          users: [],
+
+          routedItemError: false,
         }
     },
     async mounted() {
       document.title = "Shareish | Map";
-      this.setGeolocalizedPosition();
+      if (this.routedId) {
+        await this.setRoutedItem();
+      }
+      else {
+        this.setGeolocalizedPosition();
+      }
       await Promise.all([
         this.fetchUsers(),
         this.getItemsLocation(),
@@ -253,6 +262,9 @@ export default {
         category: this.selectedCategory,
         search: this.searchString
       };
+    },
+    routedId() {
+      return Number(this.$route.query.id);
     }
   },
   watch: {
@@ -263,6 +275,38 @@ export default {
       },
     },
     methods: {
+      async setRoutedItem() {
+        try {
+          if (this.routedId === null) {
+            this.setGeolocalizedPosition();
+            this.routedItemError = true;
+            console.log('Routed id is null');
+            return;
+          }
+          const item = (await axios.get(`/api/v1/items/${this.routedId}/`)).data;
+          if (item['location'] === null) {
+            this.setGeolocalizedPosition();
+            this.routedItemError = true;
+            console.log('Routed id location is null');
+            return;
+          }
+          const latLong = item['location'].slice(17, -1).split(' ');
+          this.center = latLng(...latLong);
+        }
+        catch (error) {
+          this.setGeolocalizedPosition();
+          this.routedItemError = true;
+          console.log(error);
+        }
+      },
+      openRoutedItemPopup(id) {
+        if (this.routedId && this.routedId === id && !this.routedItemError) {
+          this.$nextTick(() => {
+            this.$refs[`marker-item-${this.routedId}`][0].mapObject.openPopup();
+            //TODO: popup does not open when clustered. Probably need to to programmatically split the cluster.
+          });
+        }
+      },
       setGeolocalizedPosition() {
         navigator.geolocation.getCurrentPosition(position => {
           const coords = position.coords;
