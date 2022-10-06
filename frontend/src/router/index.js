@@ -1,8 +1,8 @@
 import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue'
 import ItemsMap from '@/components/pages/ItemsMap';
-import SignUp from '../views/SignUpView.vue'
-import Login from '../views/LoginView.vue'
+import SignUp from '../components/user-management/SignUpView.vue'
+import Login from '../components/user-management/LoginView.vue'
 import ItemDetails from '@/components/pages/ItemDetails'
 // import AddItem from '../views/dashboard/AddItemView.vue'
 import AddItem from '@/components/pages/AddItem'
@@ -12,9 +12,9 @@ import Recurrents from '../views/dashboard/RecurrentsListView.vue'
 import UserDetail from '../views/dashboard/UserDetailView.vue'
 import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
 import Autocomplete from '../views/dashboard/AutocompleteView.vue'
-import ResetPassword from '../views/ResetPassword.vue'
-import ResetPasswordConfirm from '../views/ResetPasswordConfirm.vue'
-import ActivateEmail from '../views/ActivateEmail.vue'
+import ResetPassword from '../components/user-management/ResetPassword.vue'
+import ResetPasswordConfirm from '../components/user-management/ResetPasswordConfirm.vue'
+import ActivateEmail from '../components/user-management/ActivateEmail.vue'
 
 import store from '../store'
 import i18n from '@/i18n'
