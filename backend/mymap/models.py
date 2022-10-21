@@ -96,7 +96,7 @@ class UserImage(models.Model):
         if img.height > 256 or img.width > 256:
             output_size = (256, 256)
             img.thumbnail(output_size)
-            img.save(self.image.path)
+            img.save(self.image.path, format=img.format)
 
     def __str__(self) -> str:
         return self.url
@@ -189,7 +189,7 @@ class ItemImage(models.Model):
         if img.height > 256 or img.width > 256:
             output_size = (256, 256)
             img.thumbnail(output_size)
-            img.save(self.image.path)
+            img.save(self.image.path, format=img.format)
 
     def __str__(self) -> str:
         return self.url
