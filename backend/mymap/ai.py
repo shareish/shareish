@@ -15,9 +15,12 @@ model.eval()
 
 
 def getImage(filename):
+    print(filename)
     resize = transforms.Resize((256, 256))
     normalize = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    image = transforms.functional.pil_to_tensor(Image.open(filename).convert('RGB'))
+    img = Image.open(filename).convert('RGB')
+    image = transforms.functional.pil_to_tensor(img)
+    print(img.size)
     image = resize.forward(image)
     image = image.unsqueeze(0)  # create a mini-batch as expected by the model
     image = image.to(dtype=torch.float32)

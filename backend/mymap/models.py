@@ -186,9 +186,14 @@ class ItemImage(models.Model):
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
-        if img.height > 256 or img.width > 256:
-            output_size = (256, 256)
-            img.thumbnail(output_size)
+        print(img.filename)
+        print(img.size)
+
+        MAX_SIZE = 1024
+        if img.height > MAX_SIZE or img.width > MAX_SIZE:
+            print("resize")
+            output_size = (MAX_SIZE, MAX_SIZE)
+            img.thumbnail(output_size, resample=Image.LANCZOS)
             img.save(self.image.path, format=img.format)
 
     def __str__(self) -> str:
