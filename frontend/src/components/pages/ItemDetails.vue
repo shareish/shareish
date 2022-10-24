@@ -19,7 +19,7 @@
           </button>
         </div>
         <div class="level-item buttons" v-else>
-          <button class="button is-primary">
+          <button class="button is-primary" @click="startEdition">
             {{$t('edit')}}
           </button>
           <button class="button is-danger" @click="deleteItem">
@@ -107,6 +107,7 @@ import moment from 'moment';
 import {categories} from '@/categories';
 import ItemTypeTag from '@/components/ItemTypeTag';
 import UserCard from '@/components/UserCard';
+import EditItemModal from "@/components/EditItemModal";
 
 export default {
   name: 'ItemDetails',
@@ -237,6 +238,22 @@ export default {
           pauseOnHover: true,
         })
       }
+    },
+    async updateItem(item) {
+      this.loading = true;
+      this.item = item;
+      await this.fetchAddress();
+      this.loading = false;
+    },
+    startEdition() {
+      this.$buefy.modal.open({
+        parent: this,
+        props: {item: this.item, address: this.address},
+        events: {updateItem: this.updateItem},
+        component: EditItemModal,
+        hasModalCard: true,
+        trapFocus: true,
+      })
     }
   },
   async mounted() {

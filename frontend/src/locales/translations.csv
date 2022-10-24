@@ -126,3 +126,8 @@ notif-error-password-reset-sent,An error prevented to reset your password.,Une e
 enter-new-password,Enter your new password here...,Entrez votre nouveau mot de passe ici...
 notif-success-password-reset,Your password has been changed.,Votre mot de passe a été modifié.
 notif-error-password-reset,An error prevented to change your password.,Une erreur a empêché la mise à jour de votre mot de passe.
+edit-item,Edit an item,Editer un élément
+notif-success-item-update,The item has been successfully edited,L'élément a été correctement édité
+notif-error-item-update,An error prevented the item to be edited,Une erreur a empêché l'édition de l'élément
+item-image,Image,Image
+item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.

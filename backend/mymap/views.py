@@ -144,12 +144,19 @@ class ItemImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         item = Item.objects.get(pk=request.POST['itemID'])
+        existings = ItemImage.objects.filter(item=item)
+        for existing in existings:
+            existing.delete()
         images = request.FILES.getlist('files')
+        if request.FILES.get('image') is not None:
+            images += [request.FILES.get('image')]
+
         print(images)
         for image in images:
             new_image = ItemImage(image=image, item=item)
             new_image.save()
-        return Response(status=status.HTTP_201_CREATED)
+            serialized_image = ItemImageSerializer(new_image)
+        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
