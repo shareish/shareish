@@ -2,7 +2,7 @@
 
 ## Installation for deployment
 
-The first step is to have a server URL that can be accessed through HTTP.
+The first step is to have a server that can be accessed through HTTP.
 
 Then, you need a SSL certificate (for HTTPS, used for geolocalization of users) for your domain. In our case, we use certbot that use let's encrypt certificate. 
 ```
@@ -12,11 +12,17 @@ Then, you need a SSL certificate (for HTTPS, used for geolocalization of users) 
 ```  
 When asked specify the URL associated to your server (e.g. shareish.org corresponding to the information of your server domain provider).
 
-Download the Shareish folders and files
 
-Change the name of your host server name in the file main.js in /frontend/src/
+Then, download the Shareish folders and files and unzip them in a directory on your server, e.g.  using:
 
-Download docker and start it on your device.
+```
+sudo curl -L https://github.com/shareish/shareish/archive/refs/heads/main.zip -o main.zip
+unzip main.zip 
+```
+
+Change the name of your host server name by editing the file main.js in the directory frontend/src/
+
+Download Docker and start it on your server:
 
 ```
 > curl https://get.docker.com | sh
@@ -48,7 +54,7 @@ It should output something like this:
 docker-compose version 1.29.2, build 5becea4c
 ```
 
-Build the docker images.
+Build the docker images of Shareish by executing the following command in the directory where you put Shareish folders:
 
 ```
 > docker-compose build
@@ -60,7 +66,7 @@ Start the docker containers.
 > docker-compose up -d
 ```
 
-When you need to change the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. If you want to refresh everything and prune every volumes on your server, you can type:
+When you need to update the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. If you want to refresh everything and prune every volumes on your server, you can type:
 
 ```
 > docker volumes prune -a
@@ -73,15 +79,15 @@ Do not forget to change the settings in the /backend/mapsite/settings.py file th
 ```
 
 ## Update of SSL certificate
-The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you download Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where shareish is installed has to be modified accordingly):
+The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you downloaded Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where shareish is installed has to be modified accordingly):
 ```
 > crontab -e
 16 3 * * * cd /SHAREISH_FOLDER && certbot renew -n --pre-hook "docker-compose stop" --post-hook "docker-compose up -d" >> /output.cron
 ```
 
-## Development with Docker-compose
+## Local development with Docker-compose (on your own computer)
 
-Shareish can be run in development environment using Docker-compose:
+Shareish can be run in development environment using Docker-compose on your own computer:
 
 1. Set `DEV=True` in `backend/mapsite/settings.py`.
 2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have 
@@ -101,5 +107,5 @@ See the logs in live: `docker compose logs` (in the root directory).
 To stop: `docker compose stop` (in the root directory).
 To remove container: `docker compose rm` (in the root directory, data is preserved).
 
-In development, there is hot reload: every time you save a file in backend or frontend, the 
-corresponding code is recompiled if needed and server restarted automatically (see the logs).
+In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the 
+corresponding code is recompiled if needed and the server is restarted automatically (see the logs).
