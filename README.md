@@ -1,7 +1,18 @@
 # SHAREISH
 
 ## Installation for deployment
-Download the folders and files
+
+The first step is to have a server URL that can be accessed through HTTP.
+
+Then, you need a SSL certificate (for HTTPS, used for geolocalization of users) for your domain. In our case, we use certbot that use let's encrypt certificate. 
+```
+> sudo snap install --classic certbot
+> sudo ln -s /snap/bin/certbot /usr/bin/certbot
+> sudo certbot certonly --standalone
+```  
+When asked specify the URL associated to your server (e.g. shareish.org corresponding to the information of your server domain provider).
+
+Download the Shareish folders and files
 
 Change the name of your host server name in the file main.js in /frontend/src/
 
@@ -59,6 +70,13 @@ Do not forget to change the settings in the /backend/mapsite/settings.py file th
 
 ```
 #CHANGE THIS WHEN CLONING THE PROJECT
+```
+
+## Update of SSL certificate
+The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you download Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where shareish is installed has to be modified accordingly):
+```
+> crontab -e
+16 3 * * * cd /SHAREISH_FOLDER && certbot renew -n --pre-hook "docker-compose stop" --post-hook "docker-compose up -d" >> /output.cron
 ```
 
 ## Development with Docker-compose
