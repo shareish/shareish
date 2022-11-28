@@ -24,7 +24,7 @@
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{$t('conversations')}}
-        <span v-if="unreadMessages > 0">&nbsp;({{unreadMessages}})</span>
+        &nbsp;<span class="tag is-rounded" v-if="unreadMessages > 0">{{unreadMessages}}</span>
       </b-navbar-item>
     </template>
 
@@ -60,10 +60,13 @@
 <script>
 import axios from 'axios';
 
+const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
+
 export default {
   name: 'ShareishNavbar',
   data() {
     return {
+      timeout: null
     }
   },
   computed: {
@@ -78,14 +81,14 @@ export default {
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
         try {
-          // TODO: fix notifications for conversations
-          // this.$store.state.notifications = (await axios.get('/api/v1/conversations_update')).data;
-          this.$store.state.notifications = 0;
+          this.$store.state.notifications = (await axios.get('/api/v1/notifications/')).data['unread_messages'];
         }
         catch (error) {
           console.log(error);
         }
       }
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(this.fetchConversationUpdates, NOTIFICATIONS_REFRESH_INTERVAL);
     },
     changeLanguage(lang){
       localStorage.setItem('language', lang);
@@ -94,6 +97,9 @@ export default {
   },
   mounted() {
     this.fetchConversationUpdates();
+  },
+  destroyed() {
+    clearTimeout(this.timeout);
   }
 };
 </script>

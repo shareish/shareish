@@ -52,8 +52,6 @@ class ConversationConsumer(AsyncWebsocketConsumer):
     def save_message(self, content, user_id, conversation_id, date):
         user = User.objects.get(pk=user_id)
         conversation = Conversation.objects.get(pk=conversation_id)
-        conversation.up2date_buyer = False
-        conversation.up2date_owner = False
         conversation.save()
         return Message.objects.create(
             content=content, user=user, conversation=conversation, date=date

@@ -46,6 +46,7 @@
 import ItemCard from '@/components/ItemCard';
 import Message from '@/components/Message';
 import axios from 'axios';
+
 export default {
   name: 'ConversationDetails',
   components: {ItemCard, Message},
@@ -128,6 +129,7 @@ export default {
           const data = JSON.parse(event.data);
           if (data.content) {
             this.messages.push(data);
+            this.updateNotifications();
           }
           this.ws.addEventListener('close', () => { console.log("Websocket has been closed.")});
         });
@@ -157,6 +159,20 @@ export default {
           pauseOnHover: true,
         })
       }
+    },
+    async updateNotifications() {
+      if (this.messages.length > 0) {
+        try {
+          const data = {
+            'conversation': this.conversationId,
+            'last_message': this.messages.slice(-1)[0]['id']
+          }
+          this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
     }
   },
   async mounted() {
@@ -168,6 +184,7 @@ export default {
       this.createWebSocket()
     ]);
     await this.fetchItem(); // need conversation fetched to get id
+    this.updateNotifications();
     this.loading = false;
   },
   beforeDestroy() {

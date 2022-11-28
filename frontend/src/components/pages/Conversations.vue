@@ -6,7 +6,11 @@
       <div class="box" v-for="conversation in conversations" :key="conversation.slug">
         <div class="level">
           <div class="level-left">
-            {{conversation.slug}} <span class="tag is-danger" v-if="!conversation.isUpToDate">{{$t('new-messages')}}</span>
+            {{conversation.slug}}
+            &nbsp;
+            <span class="tag is-danger" v-if="conversation.unread_messages > 0">
+              {{$tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages})}}
+            </span>
           </div>
           <div class="level-right">
             <router-link :to="{ name: 'conversationDetail', params: { id: conversation.id }}">
@@ -25,43 +29,41 @@
 <script>
 import axios from 'axios';
 
+const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
+
 export default {
   name: 'Conversations',
   data() {
     return {
-      loading: false,
-      conversations: []
+      loading: true,
+      conversations: [],
+
+      timeout: null
     }
   },
   methods: {
     async fetchConversations() {
-      this.loading = true;
       try {
         const conv = (await axios.get('/api/v1/conversations/')).data;
         this.conversations = conv.map(conversation => {
           return {
             ...conversation,
-            isUpToDate: this.isConversationUpToDate(conversation)
           }
         })
       }
       catch (error) {
         console.log(error);
       }
-      this.loading = false;
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
     },
-    isConversationUpToDate(conversation) {
-      return true; //TODO: fix notifications for conversations
-      // if (this.$store.state.user.id === conversation['owner']) {
-      //   return conversation['up2date_owner'] === true;
-      // }
-      // else {
-      //   return conversation['up2date_buyer'] === true;
-      // }
-    }
   },
   mounted() {
     this.fetchConversations();
+    this.loading = false;
+  },
+  destroyed() {
+    clearTimeout(this.timeout);
   }
 };
 </script>

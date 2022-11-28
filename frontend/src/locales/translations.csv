@@ -131,3 +131,4 @@ notif-success-item-update,The item has been successfully edited,L'élément a é
 notif-error-item-update,An error prevented the item to be edited,Une erreur a empêché l'édition de l'élément
 item-image,Image,Image
 item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
+unread-messages,- | 1 unread message | {count} unread messages,- | 1 message non lu | {count} messages non lus

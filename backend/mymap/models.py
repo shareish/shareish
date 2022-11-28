@@ -226,9 +226,6 @@ class Conversation(models.Model):
         Item, related_name="conversations", on_delete=models.CASCADE, null=True
         )
 
-    up2date_owner = models.BooleanField(default=True)
-    up2date_buyer = models.BooleanField(default=True)
-
     class Meta:
         ordering = ['name']
 
@@ -242,6 +239,7 @@ class Message(models.Model):
         Conversation, related_name="messages", on_delete=models.CASCADE, null=True
         )
     date = models.DateTimeField(auto_now=True)
+    seen = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['date']

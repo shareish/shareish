@@ -364,20 +364,42 @@ def predictClass(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def getNotifications(request):
+    def _get_unread_messages(user):
+        return Message.objects.filter(
+            Q(conversation__owner=user) | Q(conversation__buyer=user),
+            Q(seen=False), ~Q(user=user)
+        ).count()
+
     if request.method == 'GET':
         user = request.user
-        notifications = 0
-        conversations_owner = Conversation.objects.filter(owner=user)
-        conversations_buyer = Conversation.objects.filter(buyer=user)
-        for conversation in conversations_owner:
-            if not conversation.up2date_owner:
-                notifications += 1
-        for conversation in conversations_buyer:
-            if not conversation.up2date_buyer:
-                notifications += 1
-        return Response(notifications, status=status.HTTP_200_OK)
+        response = {
+            "unread_messages": _get_unread_messages(user)
+        }
+        return Response(response, status=status.HTTP_200_OK)
+    elif request.method == 'POST':
+        user = request.user
+        data = request.data
+        conversation = Conversation.objects.get(pk=data['conversation'])
+        if conversation is None \
+                or (conversation.buyer != user and conversation.owner != user):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        # Set all messages sent by other user as seen by current user for this conversation
+        count = Message.objects.filter(
+            Q(conversation__id=data['conversation']),
+            Q(id__lte=data['last_message']),
+            ~Q(user=user)
+        ).update(seen=True)
+        print(count)
+
+        # Return unread messages count for all conversations
+        response = {
+            "unread_messages": _get_unread_messages(user)
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
