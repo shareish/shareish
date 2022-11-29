@@ -33,7 +33,7 @@ export default {
         }
     },
     mounted(){
-        document.title = 'Shareish | Email Activation'
+        document.title = `Shareish | ${this.$t('activate-your-account')}`;
         this.uid = this.$route.params.uid;
         this.token = this.$route.params.token;
         this.submitActivation();

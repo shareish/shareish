@@ -232,7 +232,7 @@ export default {
         }
     },
     async mounted() {
-      document.title = "Shareish | Map";
+      document.title = `Shareish | ${this.$t('map')}`;
       if (this.routedId) {
         await this.setRoutedItem();
       }

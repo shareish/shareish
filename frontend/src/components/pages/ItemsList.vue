@@ -109,7 +109,7 @@ export default {
     }
   },
   async mounted() {
-    document.title = "Shareish | Items";
+    document.title = `Shareish | ${this.$t('items')}`;
     this.pageLoading = true;
     await Promise.all([this.loadItems(), this.fetchUsers()]);
     this.pageLoading = false;

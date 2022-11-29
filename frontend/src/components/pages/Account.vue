@@ -102,6 +102,9 @@ export default {
       this.fetchItemUsers()
     ]);
     this.loading = false;
+  },
+  mounted() {
+    document.title = `Shareish | ${this.$t('my-account')}`;
   }
 };
 </script>

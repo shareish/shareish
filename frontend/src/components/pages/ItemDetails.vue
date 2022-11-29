@@ -263,6 +263,7 @@ export default {
       this.fetchItem()
     ])
     await this.fetchAddress();
+    document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }
 };

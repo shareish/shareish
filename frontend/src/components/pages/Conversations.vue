@@ -72,6 +72,7 @@ export default {
   mounted() {
     this.fetchConversations();
     this.loading = false;
+    document.title = `Shareish | ${this.$t('my-conversations')}`;
   },
   destroyed() {
     clearTimeout(this.timeout);

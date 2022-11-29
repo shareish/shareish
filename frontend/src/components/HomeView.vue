@@ -59,7 +59,7 @@ export default {
   components: {
   },
   mounted() {
-    document.title = "Shareish | About Us"
+    document.title = "Shareish"
   },
   methods:{
     goto(url) {

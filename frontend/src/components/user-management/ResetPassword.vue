@@ -32,7 +32,7 @@ export default {
         }
     },
     mounted(){
-        document.title = 'Shareish | Password reset'
+        document.title = `Shareish | ${this.$t('reset-password')}`;
     },
     methods: {
         async submitForm(e) {

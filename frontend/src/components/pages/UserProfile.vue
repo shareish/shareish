@@ -87,6 +87,7 @@ export default {
       this.fetchItems(),
       this.fetchItemUsers()
     ]);
+    document.title = `Shareish | ${this.user.username}`;
     this.loading = false;
   }
 };

@@ -45,7 +45,7 @@ export default {
         }
     },
     mounted() {
-        document.title = "Shareish | Log in"
+        document.title = `Shareish | ${this.$t('log-in')}`;
     },
     methods: {
         async submitForm(e){

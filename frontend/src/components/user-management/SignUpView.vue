@@ -64,7 +64,7 @@ export default {
         }
     },
     mounted(){
-        document.title = 'Shareish | Sign up'
+        document.title = `Shareish | ${this.$t('sign-up')}`
     },
     methods: {
         async submitForm(e) {

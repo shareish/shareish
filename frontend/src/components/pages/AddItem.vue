@@ -270,6 +270,9 @@ export default {
 
       this.step = 2;
     }
+  },
+  mounted() {
+    document.title = `Shareish | ${this.$t('add-new-item')}`;
   }
 };
 </script>

@@ -186,6 +186,8 @@ export default {
     await this.fetchItem(); // need conversation fetched to get id
     this.updateNotifications();
     this.loading = false;
+
+    document.title = `Shareish | ${this.conversation.slug}`;
   },
   beforeDestroy() {
     if (this.ws) {

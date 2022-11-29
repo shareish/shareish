@@ -34,7 +34,7 @@ export default {
         }
     },
     mounted(){
-        document.title = 'Shareish | Reset Password Confirm';
+        document.title = `Shareish | ${this.$t('reset-password')}`;
         this.uid = this.$route.params.uid;
         this.token = this.$route.params.token;
     },
