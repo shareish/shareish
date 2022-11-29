@@ -68,15 +68,23 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     unread_messages = serializers.SerializerMethodField()
+    last_message = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
-        fields = ['id', 'name', 'owner', 'buyer', 'item', 'slug', 'unread_messages']
+        fields = [
+            'id', 'name', 'owner', 'buyer', 'item', 'slug',
+            'last_message', 'unread_messages'
+        ]
 
     def get_unread_messages(self, obj):
         user = self.context.get("request").user
         return Message.objects.filter(conversation=obj, seen=False).exclude(
             user=user.id).count()
+
+    def get_last_message(self, obj):
+        last_message = Message.objects.filter(conversation=obj).latest('date')
+        return MessageSerializer(last_message).data
 
 
 class MessageSerializer(serializers.ModelSerializer):

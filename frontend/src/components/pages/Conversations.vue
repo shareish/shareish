@@ -8,6 +8,8 @@
           <div class="level-left">
             {{conversation.slug}}
             &nbsp;
+            <div class="is-size-7 has-text-grey" v-if="conversation.lastUpdate">{{$t('last-message')}} {{formattedDate(conversation.lastUpdate)}}</div>
+            &nbsp;
             <span class="tag is-danger" v-if="conversation.unread_messages > 0">
               {{$tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages})}}
             </span>
@@ -28,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+import moment from 'moment';
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 
@@ -46,8 +49,13 @@ export default {
       try {
         const conv = (await axios.get('/api/v1/conversations/')).data;
         this.conversations = conv.map(conversation => {
+          let lastUpdate = null;
+          if (conversation.last_message) {
+            lastUpdate = conversation.last_message.date;
+          }
           return {
             ...conversation,
+            lastUpdate
           }
         })
       }
@@ -56,6 +64,9 @@ export default {
       }
       clearTimeout(this.timeout);
       this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
+    },
+    formattedDate(date) {
+      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
     },
   },
   mounted() {

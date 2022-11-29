@@ -132,3 +132,4 @@ notif-error-item-update,An error prevented the item to be edited,Une erreur a em
 item-image,Image,Image
 item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
 unread-messages,- | 1 unread message | {count} unread messages,- | 1 message non lu | {count} messages non lus
+last-message,Last message,Dernier message
