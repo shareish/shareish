@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
@@ -78,13 +79,20 @@ class ConversationSerializer(serializers.ModelSerializer):
         ]
 
     def get_unread_messages(self, obj):
-        user = self.context.get("request").user
+        request = self.context.get("request")
+        if request is None:
+            return 0
+
+        user = request.user
         return Message.objects.filter(conversation=obj, seen=False).exclude(
             user=user.id).count()
 
     def get_last_message(self, obj):
-        last_message = Message.objects.filter(conversation=obj).latest('date')
-        return MessageSerializer(last_message).data
+        try:
+            last_message = Message.objects.filter(conversation=obj).latest('date')
+            return MessageSerializer(last_message).data
+        except ObjectDoesNotExist:
+            return None
 
 
 class MessageSerializer(serializers.ModelSerializer):
