@@ -126,6 +126,15 @@ export default {
     itemId() {
       return this.$route.params.id;
     },
+    itemApiUri() {
+      let kind = this.$route.query.kind;
+      if (kind === 'user') {
+        return 'user_items';
+      } else if (kind === 'recurrent') {
+        return 'recurrents';
+      }
+      return 'items';
+    },
     currentUserId() {
       return this.$store.state.user.id;
     },
@@ -161,7 +170,7 @@ export default {
   methods: {
     async fetchItem() {
       try {
-        this.item = (await axios.get(`/api/v1/items/${this.itemId}/`)).data;
+        this.item = (await axios.get(`/api/v1/${this.itemApiUri}/${this.itemId}/`)).data;
       }
       catch (error) {
         console.log(error);

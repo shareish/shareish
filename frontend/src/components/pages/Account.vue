@@ -7,7 +7,7 @@
   <b-loading :active="loading" :is-full-page="false" v-if="loading" />
   <div class="columns" v-else-if="items && items.length">
     <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-      <item-card :item="item" :users="itemUsers"/>
+      <item-card :item="item" :users="itemUsers" :user-list="true"/>
     </div>
   </div>
   <div v-else>

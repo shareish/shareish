@@ -7,7 +7,7 @@
       <h1 class="title">{{$t('user-items')}}</h1>
       <div class="columns" v-if="items && items.length">
         <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-          <item-card :item="item" :users="itemUsers"/>
+          <item-card :item="item" :users="itemUsers" :user-list="true"/>
         </div>
       </div>
       <div v-else>

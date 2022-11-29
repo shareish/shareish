@@ -6,7 +6,7 @@
 <!--        <img v-else src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">-->
 <!--      </figure>      -->
       <router-link
-        :to="{ name: 'itemDetail', params: { id: item.id}}"
+        :to="{ name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}"
       >
         <figure class="image is-5by3" :style="figureStyle" v-if="item.images.length > 0">
         </figure>
@@ -27,7 +27,7 @@
         <div class="media-content">
           <p class="title is-4">
             <router-link
-              :to="{ name: 'itemDetail', params: { id: item.id}}"
+              :to="{ name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}"
             >
             {{ item.name }}
             </router-link>
@@ -72,6 +72,7 @@ export default {
   props: {
     item: Object,
     recurrentList: {type: Boolean, default: false},
+    userList: {type: Boolean, default: false},
     users: Array
   },
   computed: {
@@ -108,6 +109,21 @@ export default {
         backgroundImage: `url("${(this.item.images[0])}")`,
         'border-radius': '0.25rem 0.25rem 0 0'
       };
+    },
+    itemKind() {
+      if (this.recurrentList) {
+        return 'recurrent';
+      }
+      else if (this.userList) {
+        return 'user';
+      }
+      return null;
+    },
+    itemDetailQueryParams() {
+      if (this.itemKind) {
+        return {'kind': this.itemKind}
+      }
+      return {}
     }
   },
   methods: {
