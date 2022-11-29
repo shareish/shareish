@@ -1,23 +1,18 @@
 import VueRouter from 'vue-router';
-import HomeView from '../views/HomeView.vue'
+import store from '../store'
+import i18n from '@/i18n'
+
+import HomeView from '@/components/HomeView.vue'
 import ItemsMap from '@/components/pages/ItemsMap';
-import SignUp from '../components/user-management/SignUpView.vue'
-import Login from '../components/user-management/LoginView.vue'
+import SignUp from '@/components/user-management/SignUpView.vue'
+import Login from '@/components/user-management/LoginView.vue'
 import ItemDetails from '@/components/pages/ItemDetails'
-// import AddItem from '../views/dashboard/AddItemView.vue'
 import AddItem from '@/components/pages/AddItem'
 import Conversations from '@/components/pages/Conversations'
 import ConversationDetail from '@/components/pages/ConversationDetails'
-import Recurrents from '../views/dashboard/RecurrentsListView.vue'
-import UserDetail from '../views/dashboard/UserDetailView.vue'
-import ResultsSearch from '../views/dashboard/ResultsSearchView.vue'
-import Autocomplete from '../views/dashboard/AutocompleteView.vue'
-import ResetPassword from '../components/user-management/ResetPassword.vue'
-import ResetPasswordConfirm from '../components/user-management/ResetPasswordConfirm.vue'
-import ActivateEmail from '../components/user-management/ActivateEmail.vue'
-
-import store from '../store'
-import i18n from '@/i18n'
+import ResetPassword from '@/components/user-management/ResetPassword.vue'
+import ResetPasswordConfirm from '@/components/user-management/ResetPasswordConfirm.vue'
+import ActivateEmail from '@/components/user-management/ActivateEmail.vue'
 import ItemsList from '@/components/pages/ItemsList';
 import Account from '@/components/pages/Account';
 import UserProfile from '@/components/pages/UserProfile';
@@ -34,7 +29,7 @@ const routes = [{
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
         component: () =>
-            import ( /* webpackChunkName: "about" */ '../views/AboutView.vue')
+            import ( /* webpackChunkName: "about" */ '@/components/AboutView.vue')
     },
     {
         path: '/sign-up',
@@ -102,41 +97,9 @@ const routes = [{
         }
     },
     {
-        path: '/dashboard/results',
-        name: 'resultsSearch',
-        component: ResultsSearch,
-        meta: {
-            requireLogin: true
-        }
-    },
-    {
-        path: '/dashboard/users/:id',
-        name: 'userDetail',
-        component: UserDetail,
-        meta: {
-            requireLogin: true
-        }
-    },
-    {
         path: '/add-item',
         name: 'addItem',
         component: AddItem,
-        meta: {
-            requireLogin: true
-        }
-    },
-    {
-        path: '/dashboard/recurrents',
-        name: 'recurrents',
-        component: Recurrents,
-        meta: {
-            requireLogin: true
-        }
-    },
-    {
-        path: '/dashboard/autocomplete',
-        name: 'autocomplete',
-        component: Autocomplete,
         meta: {
             requireLogin: true
         }

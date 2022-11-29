@@ -1,19 +1,6 @@
 <template>
   <div class="wrapper" id="wrapper">
     <shareish-navbar />
-<!--            <div class="navbar-item">-->
-<!--              <div class="select is-rounded">-->
-<!--                <select v-model="$i18n.locale" @change="changeLanguage">-->
-<!--                  <option value="en">En</option>-->
-<!--                  <option value="fr">Fr</option>-->
-<!--                </select>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          <template v-else>-->
-<!--            <div class="navbar-item" @click="toggleDropdown()">-->
-<!--              <router-link to="/">{{ $t('home') }}</router-link>-->
-<!--            </div>-->
-
     <section class="section">
       <router-view />
     </section>
@@ -84,9 +71,6 @@
       goto(url) {
         this.$router.push(url)
       },
-      // changeLanguage(obj){
-      //   localStorage.setItem('language',obj.target.value)
-      // },
     },
   }
 </script>
