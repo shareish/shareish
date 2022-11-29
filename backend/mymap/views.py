@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
@@ -45,6 +47,14 @@ class ItemCategoryFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
+class ActiveItemFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter(
+            Q(in_progress=True),
+            Q(enddate__isnull=True) | Q(enddate__gte=datetime.now())
+        )
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
@@ -52,7 +62,8 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter,
-        ItemTypeFilterBackend, ItemCategoryFilterBackend
+        ItemTypeFilterBackend, ItemCategoryFilterBackend,
+        ActiveItemFilterBackend
     ]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
@@ -110,6 +121,11 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class RecurrentItemViewSet(ItemViewSet):
+    filter_backends = [
+        filters.SearchFilter, filters.OrderingFilter,
+        ItemTypeFilterBackend, ItemCategoryFilterBackend,
+    ]  # Do not need ActiveItemFilterBackend
+
     def get_queryset(self):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
