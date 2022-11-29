@@ -57,33 +57,7 @@ class UserChangeForm(forms.ModelForm):
         )
 
 
-class UserAdmin(BaseUserAdmin):
-    form = UserChangeForm
-    add_form = UserCreationForm
-
-    list_display = (
-        'email', 'username', 'first_name', 'last_name',
-        'is_admin', 'description', 'image'
-    )
-    list_filter = ('is_admin',)
-    fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'description')}),
-        ('Permissions', {'fields': ('is_admin',)}),
-        ('Image', {'fields': ('image',)}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'password1', 'password2'),
-        }),
-    )
-    search_fields = ('email',)
-    ordering = ('email',)
-    filter_horizontal = ()
-
-
-geoadmin.site.register(get_user_model(), UserAdmin)
+geoadmin.site.register(get_user_model())
 geoadmin.site.unregister(Group)
 
 
