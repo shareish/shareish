@@ -77,6 +77,12 @@ export default {
       return this.$store.state.notifications;
     }
   },
+  watch: {
+    async isAuthenticated(val) {
+      // Force update conversation notification when authenticated
+      await this.fetchConversationUpdates();
+    }
+  },
   methods: {
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
@@ -86,6 +92,9 @@ export default {
         catch (error) {
           console.log(error);
         }
+      }
+      else {
+        this.$store.state.notifications = 0;
       }
       clearTimeout(this.timeout);
       this.timeout = setTimeout(this.fetchConversationUpdates, NOTIFICATIONS_REFRESH_INTERVAL);
