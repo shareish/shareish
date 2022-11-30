@@ -20,3 +20,6 @@ class MymapConfig(AppConfig):
                 settings.EMAIL.activation(self.request, context).send(to)
 
         UserViewSet.perform_update = perform_update
+        # Start mail scheduler
+        from .mail import start_mail_scheduler
+        start_mail_scheduler()
