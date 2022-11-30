@@ -22,6 +22,8 @@ unzip main.zip
 
 Change the name of your host server name by editing the file main.js in the directory frontend/src/
 
+Then edit backend/mapsite/settings.py (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
+
 Download Docker and start it on your server:
 
 ```
@@ -89,6 +91,10 @@ The let's encrypt certificate has to be renewed every three months. It is possib
 
 Shareish can be run in development environment using Docker-compose on your own computer:
 
+First, clone the repository on your system:
+git clone https://github.com/shareish/shareish.git
+
+Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
 1. Set `DEV=True` in `backend/mapsite/settings.py`.
 2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have 
    strange issues with `npm`).
