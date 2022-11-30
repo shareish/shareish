@@ -20,6 +20,7 @@ services:
     volumes:
       - ./backend:/code
       - media_volume:/code/mediafiles
+      - static_volume:/static
     ports:
       - "8000:8000"
     environment:
@@ -38,6 +39,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - media_volume:/app/web/mediafiles
+      - static_volume:/app/web/static
       - /etc/letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/conf/:/etc/nginx/ssl/:ro
