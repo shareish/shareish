@@ -25,9 +25,9 @@ ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
 WORKDIR /code
-RUN mkdir /code/mediafiles
+RUN mkdir /code/mediafiles && mkdir /static
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 
 COPY . /code/
-CMD python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+CMD python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000
