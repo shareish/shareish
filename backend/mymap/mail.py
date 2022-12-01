@@ -30,21 +30,21 @@ def _prepare_mail_user(user):
 
     if unread_count > 0 and len(new_items) == 0:
         subject = "You have {} unread messages on Shareish".format(unread_count)
-        message = "Dear {}, you have {} unread messages on Shareish ({}).".format(
-            user.username, unread_count, settings.APP_URL)
+        message = "Dear {} {} ({}),{}You have {} unread messages on Shareish ({}).{}Please log in using your e-mail address to read them in the Conversations tab. ".format(
+            user.first_name, user.last_name, user.username, "\n\n", unread_count, settings.APP_URL, "\n\n")
         print(message)
 
     elif unread_count > 0 and len(new_items) > 0:
         subject = "You have {} unread messages on Shareish and {} new items near you".format(
             unread_count, len(new_items)
         )
-        message = "Dear {}, you have {} unread messages on Shareish ({}) and {} new items near you.".format(
-            user.username, unread_count, settings.APP_URL, len(new_items)
+        message = "Dear {} {} ({}), you have {} unread messages on Shareish ({}) and {} new items near you.".format(
+            user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, len(new_items)
         )
     elif len(new_items) > 0:
-        subject = "There are {} new items near you".format(len(new_items))
-        message = "Dear {}, there are {} new items near you on Shareish ({}).".format(
-            user.username, len(new_items), settings.APP_URL
+        subject = "There are {} new items near you on Shareish".format(len(new_items))
+        message = "Dear {} {} ({}), there are {} new items near you on Shareish ({}).".format(
+            user.first_name, user.last_name, user.username, len(new_items), settings.APP_URL
         )
     else:
         # Nothing new, abort
