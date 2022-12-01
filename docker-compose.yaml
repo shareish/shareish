@@ -3,6 +3,7 @@ version: '3.9'
 volumes:
   postgis-data:
   media_volume:
+  static_volume:
 
 services:
   db:
