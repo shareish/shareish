@@ -1,5 +1,7 @@
 # SHAREISH
 
+Shareish can be installed in production mode on a server ("Installation for deployment"), or in development mode for local development ("Local development with Docker-compose (on your own computer)"). See below for relevant installation instructions.
+
 ## Installation for deployment
 
 The first step is to have a server that can be accessed through HTTP.
