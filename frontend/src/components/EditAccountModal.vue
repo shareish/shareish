@@ -9,6 +9,9 @@
           @click="$emit('close')"/>
       </header>
       <section class="modal-card-body">
+        <!-- <b-field :label="$t('address')">
+          <b-input v-model="this.address" />
+        </b-field> -->
         <b-field
           v-for="{field, validationRules, type, translationKey} in editableFields"
           :key="field"
@@ -63,12 +66,13 @@ import axios from 'axios';
 export default {
   name: 'EditAccountModal',
   props: {
-    user: Object
+      user: Object,
   },
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-      internalUser: {},
+	internalUser: {},
+	address : null,
       displayErrors: false,
       file: null,
     }
@@ -80,17 +84,35 @@ export default {
         {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname'},
         {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username'},
         {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email'},
+	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation'},  
         // {field: 'password', validationRules: 'min:8', type: 'password', translationKey: 'password'},
         {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography'},
         {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link'},
         {field: 'facebook_url', validationRules: '', type: 'text', translationKey: 'facebook-link'},
         {field: 'instagram_url', validationRules: '', type: 'text', translationKey: 'instagram-link'},
+	
       ];
     },
   },
   methods: {
+    async fetchAddress() {
+      if (this.internalUser.ref_location === null) {
+        return;
+      }
+
+      try {
+        this.address = (await axios.post(
+          `/api/v1/address/`,
+          this.internalUser.ref_location
+        )).data;
+      }
+      catch (error) {
+        console.log(JSON.stringify(error));
+      }
+    },
     async save() {
       let result = await this.$validator.validateAll();
+      console.log(result);
       if(!result) {
         return;
       }
@@ -99,8 +121,10 @@ export default {
         if (this.file) {
 
         }
+	console.log("before axios users/me");
         let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
-
+	console.log("after axios users/me");
+	  
         if (this.file) {
           let data = new FormData();
           data.append('userID', this.user['id']);
@@ -130,11 +154,23 @@ export default {
       }
     },
   },
-  mounted() {
+  mounted_old() {
     this.internalUser = {...this.user};
+    //await this.fetchAddress();  
+    //this.internalUser.address = this.address;//new inspired by EditItemModal.vue  
+    delete this.internalUser.image;
+    delete this.internalUser.items;
+  },
+
+    async mounted() {
+    this.internalUser = {...this.user};
+    await this.fetchAddress();
+    console.log(this.address); 
     delete this.internalUser.image;
     delete this.internalUser.items;
   }
+
+    
 };
 </script>
 

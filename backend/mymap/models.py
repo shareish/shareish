@@ -57,6 +57,8 @@ class User(AbstractBaseUser):
     homepage_url = models.URLField(blank=True, null=True)
     facebook_url = models.URLField(blank=True, null=True)
     instagram_url = models.URLField(blank=True, null=True)
+    ref_location = models.PointField(blank=True, geography=True, null=True)
+    use_ref_loc = models.BooleanField(default=False)
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']

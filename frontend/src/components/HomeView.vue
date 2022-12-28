@@ -14,18 +14,6 @@ Shareish offers an <a @click="goto('/dashboard')" class="text-reset">interactive
 <br>
 <h2><b>Frequently asked questions (FAQ)</b></h2>
 
-<!--
-<p><b>What is the rationale and purpose of this site and what is generalized exchange ?</b><br>
-<i></i>
-
-<p><b>Isn't it dangerous to trust unknown people ?</b><br>
-<i></i>
-
-
-<p><b>Do you plan to replace the whole economy with mutual aid or are you willing to kill other non-profit non-technological initiatives (such as "SEL")</b><br>
-<i></i>
-//-->
-
 <p><b></b><br>
 <i></i>
 

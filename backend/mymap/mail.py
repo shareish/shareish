@@ -18,6 +18,8 @@ def _get_unread_messages_count(user):
 
 
 def _get_new_items_near_user(user):
+    #get items within distance
+    #among close items, get ones which startdate are less than 24h ?
     return []
 
 
@@ -32,7 +34,7 @@ def _prepare_mail_user(user):
         subject = "You have {} unread messages on Shareish".format(unread_count)
         message = "Dear {} {} ({}),{}You have {} unread messages on Shareish ({}).{}Please log in using your e-mail address to read them in the Conversations tab. ".format(
             user.first_name, user.last_name, user.username, "\n\n", unread_count, settings.APP_URL, "\n\n")
-        print(message)
+        #print(message)
 
     elif unread_count > 0 and len(new_items) > 0:
         subject = "You have {} unread messages on Shareish and {} new items near you".format(
