@@ -56,7 +56,8 @@ i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon 
 my-recurrent-items,My recurrent items,Mes éléments récurrents
 upload-your-item-image,Upload your item image,Transférer votre image d'élément
 name,Name,Nom
-address,Address,Adresse
+address,Reference address,Adresse de référence
+dwithin_notif,Maximum distance (km from reference address) for notifications,Distance maximale (en km par rapport à l'adresse de référence) pour les notifications
 description,Description,Description
 start-date,Start date,Date de début
 end-date,End date,Date de fin
@@ -84,6 +85,7 @@ biography,Biography,Biographie
 homepage-link,Homepage link,Page personnelle
 facebook-link,Facebook profile,Profil Facebook
 instagram-link,Instagram profile,Profil Instagram
+reflocation,Address,Adresse
 email,Email,E-mail
 save,Save,Enregistrer
 cancel,Cancel,Annuler
@@ -106,6 +108,7 @@ from,from,du
 since,since,depuis
 delete,Delete,Supprimer
 start-conversation,Start conversation,Commencer une conversation
+intro-first-message,"Hello, I am interested, how can we proceed ?","Bonjour, je suis intéressé, comment pouvons-nous procéder ?"
 avatar,Avatar,Avatar
 avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
 notif-success-item-delete,The item has been successfully deleted,L'élément a été correctement supprimé

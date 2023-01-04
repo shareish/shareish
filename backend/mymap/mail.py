@@ -4,8 +4,13 @@ from django.core.mail import send_mass_mail
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.conf import settings
+from django.utils import timezone
+from datetime import datetime, timedelta, time
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Point
 
 from .models import Message
+from .models import Item
 
 User = get_user_model()
 
@@ -18,14 +23,25 @@ def _get_unread_messages_count(user):
 
 
 def _get_new_items_near_user(user):
-    #get items within distance
-    #among close items, get ones which startdate are less than 24h ?
-    return []
+    #get items within 10km distance and which stardate is between yesterday and today
+    #print("-------------- in _get_new_items_near_user for " +user.username + "----------------")
+    today = datetime.now().date()
+    yesterday = today - timedelta(10)
+    if user.ref_location:
+        pnt = user.ref_location
+    else:
+        pnt = Point(0.0, 0.0)
+    return Item.objects.filter(
+        Q(startdate__lte = today, startdate__gte = yesterday),
+        Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
+        Q(user=user))   #~Q for items from another user
 
 
 def _prepare_mail_user(user):
-    unread_count = _get_unread_messages_count(user)
     new_items = _get_new_items_near_user(user)
+    print(new_items)
+    unread_count = _get_unread_messages_count(user)
+    
 
     # TODO: use template for emails
     # https://django-mail-templated.readthedocs.io/en/master/ ?
@@ -40,14 +56,22 @@ def _prepare_mail_user(user):
         subject = "You have {} unread messages on Shareish and {} new items near you".format(
             unread_count, len(new_items)
         )
-        message = "Dear {} {} ({}), you have {} unread messages on Shareish ({}) and {} new items near you.".format(
+        message = "Dear {} {} ({}),\n\n You have {} unread messages on Shareish ({}).\n\n You also have {} new items near you since yesterday:".format(
             user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, len(new_items)
         )
+        for i in range (len(new_items)):
+            message+="* {} (within {} km)\n".format(new_items[i].name, round(100*new_items[i].location.distance(user.ref_location),2))
+        message+="\nPlease log in to view them."
+        
     elif len(new_items) > 0:
         subject = "There are {} new items near you on Shareish".format(len(new_items))
-        message = "Dear {} {} ({}), there are {} new items near you on Shareish ({}).".format(
+        message = "Dear {} {} ({}),\n\nThere are {} new items near you on Shareish ({}) since yesterday:\n".format(
             user.first_name, user.last_name, user.username, len(new_items), settings.APP_URL
         )
+        for i in range (len(new_items)):
+            message+="* {} (within {} km)\n".format(new_items[i].name, round(100*new_items[i].location.distance(user.ref_location),2))
+        message+="\nPlease log in to view them."
+        
     else:
         # Nothing new, abort
         return None

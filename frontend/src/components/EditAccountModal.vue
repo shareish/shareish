@@ -84,7 +84,8 @@ export default {
         {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname'},
         {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username'},
         {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email'},
-	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation'},  
+	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation'},
+	{field: 'dwithin_notifications', validationRules: 'numeric|max_value:1000|min_value:0', type: 'text', translationKey: 'dwithin_notif'},  
         // {field: 'password', validationRules: 'min:8', type: 'password', translationKey: 'password'},
         {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography'},
         {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link'},
@@ -121,9 +122,7 @@ export default {
         if (this.file) {
 
         }
-	console.log("before axios users/me");
         let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
-	console.log("after axios users/me");
 	  
         if (this.file) {
           let data = new FormData();
