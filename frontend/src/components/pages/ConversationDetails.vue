@@ -98,7 +98,15 @@ export default {
 	      this.messageToSend='';
 	  }
 	  else {
-	      this.messageToSend=this.$t('intro-first-message');
+	      if (this.item.item_type === "DN") {
+		  this.messageToSend=this.$t('intro-donation-first-message');
+	      }
+	      else if (this.item.item_type === "BR") {
+		  this.messageToSend=this.$t('intro-request-first-message');
+	      }
+	      else if (this.item.item_type === "LN") {
+		  this.messageToSend=this.$t('intro-loan-first-message');
+	      }
 	  }
       },
     async fetchItem() {
