@@ -23,10 +23,10 @@ def _get_unread_messages_count(user):
 
 
 def _get_new_items_near_user(user):
-    #get items within 10km distance and which stardate is between yesterday and today
+    #get items within user dwithin distance and which stardate is between yesterday and today
     #print("-------------- in _get_new_items_near_user for " +user.username + "----------------")
     today = datetime.now().date()
-    yesterday = today - timedelta(10)
+    yesterday = today - timedelta(1)
     if user.ref_location:
         pnt = user.ref_location
     else:
@@ -34,7 +34,7 @@ def _get_new_items_near_user(user):
     return Item.objects.filter(
         Q(startdate__lte = today, startdate__gte = yesterday),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
-        Q(user=user))   #~Q for items from another user
+        ~Q(user=user))   #~Q for items from another user
 
 
 def _prepare_mail_user(user):
@@ -56,7 +56,7 @@ def _prepare_mail_user(user):
         subject = "You have {} unread messages on Shareish and {} new items near you".format(
             unread_count, len(new_items)
         )
-        message = "Dear {} {} ({}),\n\n You have {} unread messages on Shareish ({}).\n\n You also have {} new items near you since yesterday:".format(
+        message = "Dear {} {} ({}),\n\nYou have {} unread messages on Shareish ({}).\n\nYou also have {} new items near you since yesterday:\n".format(
             user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, len(new_items)
         )
         for i in range (len(new_items)):
@@ -118,7 +118,7 @@ def start_mail_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
     # TO TEST quickly, uncomment this line:
-    #scheduler.add_job(send_emails, trigger='cron', second=0)
+    # scheduler.add_job(send_emails, trigger='cron', second=0)
     # To configure cron:
     # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=cron
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)

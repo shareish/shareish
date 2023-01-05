@@ -10,8 +10,8 @@
       </header>
       <section class="modal-card-body">
         <!-- <b-field :label="$t('address')">
-          <b-input v-model="this.address" />
-        </b-field> -->
+          <b-input v-model="internalItem.ref_location" />
+        </b-field>//-->
         <b-field
           v-for="{field, validationRules, type, translationKey} in editableFields"
           :key="field"
@@ -67,12 +67,13 @@ export default {
   name: 'EditAccountModal',
   props: {
       user: Object,
+      address: String,
   },
   $_veeValidate: {validator: 'new'},
   data() {
     return {
 	internalUser: {},
-	address : null,
+	//address : null,
       displayErrors: false,
       file: null,
     }
@@ -102,7 +103,8 @@ export default {
       }
 
       try {
-        this.address = (await axios.post(
+        console.log("fetching address")	    
+        this.internalUser.ref_location = (await axios.post(
           `/api/v1/address/`,
           this.internalUser.ref_location
         )).data;
@@ -153,18 +155,10 @@ export default {
       }
     },
   },
-  mounted_old() {
-    this.internalUser = {...this.user};
-    //await this.fetchAddress();  
-    //this.internalUser.address = this.address;//new inspired by EditItemModal.vue  
-    delete this.internalUser.image;
-    delete this.internalUser.items;
-  },
 
     async mounted() {
     this.internalUser = {...this.user};
-    await this.fetchAddress();
-    console.log(this.address); 
+    await this.fetchAddress();    
     delete this.internalUser.image;
     delete this.internalUser.items;
   }
