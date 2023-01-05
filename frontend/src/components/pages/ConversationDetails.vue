@@ -28,7 +28,7 @@
             </div>
             <div class="field">
               <p class="control">
-                <button class="button" @click="sendMessage">{{$t('post-message')}}</button>
+    <button class="button" @click="sendMessage" :disabled="messageToSend===''">{{$t('post-message')}}</button>
               </p>
             </div>
           </div>
