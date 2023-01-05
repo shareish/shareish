@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ul#-q0@ob@e1il^=564elf-&omouwr14nvm-8&)bf4%y^yiliq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-DEV = True
+DEV = False
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -126,7 +126,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'noreply.shareish@gmail.com'
-EMAIL_HOST_PASSWORD = 'zzvpkdzsqlyzllaj'
+EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX''
+
 EMAIL_USE_TLS = True
 
 MEDIA_ROOT = BASE_DIR / "mediafiles"

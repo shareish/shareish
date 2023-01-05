@@ -70,6 +70,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ['-startdate']
 
     def create(self, request, *args, **kwargs):
+        #print("--------------  in ItemViewSet create ---------------")
         data = request.data
         if 'location' in data:
             address = data['location']
@@ -118,6 +119,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class RecurrentItemViewSet(ItemViewSet):
@@ -252,6 +254,60 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+
+    ##similar to ItemViewSet create
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        if 'ref_location' in data:
+            address = data['ref_location']
+            if address != '' and address is not None:
+                geoloc = locator.geocode(address)
+                if geoloc is not None:
+                    print("-------------------------- create user geoloc: {}".format(geoloc))
+                    data['ref_location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
+                else:
+                    print("Warning: {} given but no location found.".format(address))
+                    data['ref_location'] = None
+
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        if 'ref_location' in request.data:
+            address = request.data['ref_location']
+            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
+                geoloc = locator.geocode(address)
+                if geoloc is not None:
+                    print("-------------------------- update user geoloc: {}".format(geoloc))
+                    request.data['ref_location'] = "{} ({} {})".format(
+                        LOCATION_PREFIX,
+                        str(geoloc.latitude),
+                        str(geoloc.longitude)
+                    )
+                else:
+                    return Response(
+                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
+                    )
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, headers=headers)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ConversationViewSet(viewsets.ModelViewSet):

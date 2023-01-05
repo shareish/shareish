@@ -9,6 +9,9 @@
           @click="$emit('close')"/>
       </header>
       <section class="modal-card-body">
+        <!-- <b-field :label="$t('address')">
+          <b-input v-model="internalItem.ref_location" />
+        </b-field>//-->
         <b-field
           v-for="{field, validationRules, type, translationKey} in editableFields"
           :key="field"
@@ -63,12 +66,14 @@ import axios from 'axios';
 export default {
   name: 'EditAccountModal',
   props: {
-    user: Object
+      user: Object,
+      address: String,
   },
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-      internalUser: {},
+	internalUser: {},
+	//address : null,
       displayErrors: false,
       file: null,
     }
@@ -80,17 +85,37 @@ export default {
         {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname'},
         {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username'},
         {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email'},
+	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation'},
+	{field: 'dwithin_notifications', validationRules: 'numeric|max_value:1000|min_value:0', type: 'text', translationKey: 'dwithin_notif'},  
         // {field: 'password', validationRules: 'min:8', type: 'password', translationKey: 'password'},
         {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography'},
         {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link'},
         {field: 'facebook_url', validationRules: '', type: 'text', translationKey: 'facebook-link'},
         {field: 'instagram_url', validationRules: '', type: 'text', translationKey: 'instagram-link'},
+	
       ];
     },
   },
   methods: {
+    async fetchAddress() {
+      if (this.internalUser.ref_location === null) {
+        return;
+      }
+
+      try {
+        console.log("fetching address")	    
+        this.internalUser.ref_location = (await axios.post(
+          `/api/v1/address/`,
+          this.internalUser.ref_location
+        )).data;
+      }
+      catch (error) {
+        console.log(JSON.stringify(error));
+      }
+    },
     async save() {
       let result = await this.$validator.validateAll();
+      console.log(result);
       if(!result) {
         return;
       }
@@ -100,7 +125,7 @@ export default {
 
         }
         let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
-
+	  
         if (this.file) {
           let data = new FormData();
           data.append('userID', this.user['id']);
@@ -130,11 +155,15 @@ export default {
       }
     },
   },
-  mounted() {
+
+    async mounted() {
     this.internalUser = {...this.user};
+    await this.fetchAddress();    
     delete this.internalUser.image;
     delete this.internalUser.items;
   }
+
+    
 };
 </script>
 

@@ -56,7 +56,8 @@ i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon 
 my-recurrent-items,My recurrent items,Mes éléments récurrents
 upload-your-item-image,Upload your item image,Transférer votre image d'élément
 name,Name,Nom
-address,Address,Adresse
+address,Reference address,Adresse de référence
+dwithin_notif,Maximum distance (km from reference address) for notifications,Distance maximale (en km par rapport à l'adresse de référence) pour les notifications
 description,Description,Description
 start-date,Start date,Date de début
 end-date,End date,Date de fin
@@ -84,6 +85,7 @@ biography,Biography,Biographie
 homepage-link,Homepage link,Page personnelle
 facebook-link,Facebook profile,Profil Facebook
 instagram-link,Instagram profile,Profil Instagram
+reflocation,Address,Adresse
 email,Email,E-mail
 save,Save,Enregistrer
 cancel,Cancel,Annuler
@@ -96,7 +98,7 @@ edit-my-account,Edit my account,Modifier mon compte
 notif-success-user-update,Your account has been updated successfully,Votre compte a été mis à jour avec succès
 notif-error-user-update,An error prevented your account to be updated,Une erreur a empêché votre compte d'être mis à jour
 add-message-dot,Add a message...,Ajouter un message...
-post-message,Post message,Poster le message
+post-message,Send message,Envoyer le message
 notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
@@ -106,6 +108,9 @@ from,from,du
 since,since,depuis
 delete,Delete,Supprimer
 start-conversation,Start conversation,Commencer une conversation
+intro-donation-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
+intro-request-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
+intro-loan-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
 avatar,Avatar,Avatar
 avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
 notif-success-item-delete,The item has been successfully deleted,L'élément a été correctement supprimé

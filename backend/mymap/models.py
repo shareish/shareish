@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.gis.geos import Point
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password, username, first_name, last_name):
@@ -57,6 +57,9 @@ class User(AbstractBaseUser):
     homepage_url = models.URLField(blank=True, null=True)
     facebook_url = models.URLField(blank=True, null=True)
     instagram_url = models.URLField(blank=True, null=True)
+    ref_location = models.PointField(blank=True, geography=True, null=True, default=Point(0.0, 0.0))
+    use_ref_loc = models.BooleanField(default=False)
+    dwithin_notifications = models.PositiveSmallIntegerField(null=True,default=10, help_text='Enter maximum distance for new item notifications')
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
@@ -175,7 +178,8 @@ class Item(models.Model):
         return self.name + ' : ' + self.description + ' (' + self.category1 + ')'
 
     class Meta:
-        ordering = ['name']
+        #ordering = ['name']
+        ordering = ['startdate']
 
 
 class ItemImage(models.Model):

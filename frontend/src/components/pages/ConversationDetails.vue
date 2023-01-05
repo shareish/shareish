@@ -54,13 +54,13 @@ export default {
     return {
       conversation: {},
       users: [],
-      item: {},
+	item: {},
       messages: [],
 
       ws: null,
       loading: true,
       error: false,
-      messageToSend: ''
+      messageToSend: ''   //this.$t('intro-first-message'),
     }
   },
   computed: {
@@ -91,6 +91,24 @@ export default {
         this.error = true;
       }
     },
+    async autofillMessage(){
+	  //console.log(this.conversation)
+	  console.log(this.messages.length)
+	  if (this.messages.length > 0) {
+	      this.messageToSend='';
+	  }
+	  else {
+	      if (this.item.item_type === "DN") {
+		  this.messageToSend=this.$t('intro-donation-first-message');
+	      }
+	      else if (this.item.item_type === "BR") {
+		  this.messageToSend=this.$t('intro-request-first-message');
+	      }
+	      else if (this.item.item_type === "LN") {
+		  this.messageToSend=this.$t('intro-loan-first-message');
+	      }
+	  }
+      },
     async fetchItem() {
       try {
         const id = this.conversation.item;
@@ -185,6 +203,7 @@ export default {
     ]);
     await this.fetchItem(); // need conversation fetched to get id
     this.updateNotifications();
+    this.autofillMessage(),
     this.loading = false;
 
     document.title = `Shareish | ${this.conversation.slug}`;
