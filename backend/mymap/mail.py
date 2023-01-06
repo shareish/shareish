@@ -60,7 +60,7 @@ def _prepare_mail_user(user):
             user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, len(new_items)
         )
         for i in range (len(new_items)):
-            message+="* {} (within {} km)\n".format(new_items[i].name, round(100*new_items[i].location.distance(user.ref_location),2))
+            message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
         message+="\nPlease log in to view them."
         
     elif len(new_items) > 0:
@@ -69,7 +69,7 @@ def _prepare_mail_user(user):
             user.first_name, user.last_name, user.username, len(new_items), settings.APP_URL
         )
         for i in range (len(new_items)):
-            message+="* {} (within {} km)\n".format(new_items[i].name, round(100*new_items[i].location.distance(user.ref_location),2))
+            message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
         message+="\nPlease log in to view them."
         
     else:
@@ -116,9 +116,9 @@ def start_mail_scheduler():
             print('The scheduled email sending worked.')
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
+    #scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
     # TO TEST quickly, uncomment this line:
-    # scheduler.add_job(send_emails, trigger='cron', second=0)
+    scheduler.add_job(send_emails, trigger='cron', second=0)
     # To configure cron:
     # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=cron
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
