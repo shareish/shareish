@@ -18,21 +18,28 @@ donation,Donation,Don
 loan,Loan,Prêt
 all,All,Tous
 category,Category,Catégorie
-food,Food,Nourriture
-animals,Animals,Animaux
-aee,Arts and Culture and Entertainments,Arts Cultures Divertissements
+food,Food and Supplies,Aliments et provisions
+animals,Pets and Animals,Animaux de compagnie et animaux
+aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
 collectors,Collectors,Collections
-hh,Helping hands,Coups de main
-diy,DIY,Bricolage
+hh,Helping hands and Manual Labor,Coups de main et travail manuel
+adminit,Administrative tasks,Tâches administratives
+diy,Do-it-yourself and making,Bricolage
 beauty,Wellness and Beauty,Beauté et bien-être
+health,Health care,Soins de santé
+energy,Energy and heating,Énergie et chauffage
 childhood,Childhood,Enfance
-it,IT and Multimedia,Informatique et multimédia
-garden,Garden,Jardinage
-house,House and Decoration,Maison et décoration
-holidays,Holidays and Week-end,Vacances et week-ends
+clothes,Clothes,Vêtements
+it,Multimedia Hardware,Equipements multimédia
+cs,Computer Software,Logiciels informatiques
+garden,"Garden, Nature, and Environment","Jardinage, nature et environnement"
+house,Living spaces and housing,Lieux de vie et habitation
+tools,Tools and Equipments, Outils et ustenciles
+holidays,"Holidays, Week-ends, and Leisures","Vacances, Week-ends et Loisirs"
 book,"Books, CDs, DVDs, and Blu-rays","Livres, CDs, DVDs, Blu-rays"
-sport,Sport and Leisure,Sports et loisirs
-transport,Transport and vehicle,Transports et véhicules
+sport,Sports,Sports
+transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Livraison, Déménagement"
+vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
 other,Other,Autres
 search-dot,Search...,Recherche...
 bookcases,Public bookcases,Micro-bibliothèques

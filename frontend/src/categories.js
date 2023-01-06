@@ -27,7 +27,13 @@ export const categories = {
     "id": "HL",
     "slug": "hh",
     "image-placeholder": require('@/assets/categories/coupdepouce.jpg'),
-    "icon": "fas fa-hands-helping"
+    "icon": "fas fa-people-carry"
+  },
+    "AT": {
+    "id": "AT",
+    "slug": "adminit",
+    "image-placeholder": require('@/assets/categories/administrative.jpg'),
+    "icon": "fas fa-list"
   },
   "DY": {
     "id": "DY",
@@ -41,29 +47,59 @@ export const categories = {
     "image-placeholder": require('@/assets/categories/beauty.jpg'),
     "icon": "fas fa-smile-wink"
   },
+  "HE": {
+    "id": "HE",
+    "slug": "health",
+    "image-placeholder": require('@/assets/categories/health.jpg'), 
+    "icon": "fas fa-medkit"
+  },
+  "EY": {
+    "id": "EY",
+    "slug": "energy",
+    "image-placeholder": require('@/assets/categories/energy.jpg'), 
+    "icon": "fas fa-fire"
+  },
   "CH": {
     "id": "CH",
     "slug": "childhood",
     "image-placeholder": require('@/assets/categories/enfance.jpg'),
     "icon": "fas fa-child"
   },
+  "CO": {
+    "id": "CO",
+    "slug": "clothes",
+    "image-placeholder": require('@/assets/categories/clothes.jpg'),
+    "icon": "fas fa-shirt"
+  },
   "IT": {
     "id": "IT",
     "slug": "it",
     "image-placeholder": require('@/assets/categories/it.jpg'),
-    "icon": "fas fa-laptop"
+    "icon": "fas fa-tv"
+  },
+  "CS": {
+    "id": "CS",
+    "slug": "cs",
+    "image-placeholder": require('@/assets/categories/code.jpg'),
+    "icon": "fas fa-laptop-code"
   },
   "GD": {
     "id": "GD",
     "slug": "garden",
     "image-placeholder": require('@/assets/categories/jardin.jpg'),
-    "icon": "fas fa-tree"
+    "icon": "fas fa-seedling"
   },
   "HS": {
     "id": "HS",
     "slug": "house",
     "image-placeholder": require('@/assets/categories/maison.jpg'),
     "icon": "fas fa-home"
+  },
+  "EQ": {
+    "id": "EQ",
+    "slug": "tools",
+    "image-placeholder": require('@/assets/categories/tools.jpg'), 
+    "icon": "fas fa-tools"
   },
   "HD": {
     "id": "HD",
@@ -86,8 +122,14 @@ export const categories = {
   "TS": {
     "id": "TS",
     "slug": "transport",
-    "image-placeholder": require('@/assets/categories/transport.jpg'),
-    "icon": "fas fa-tram"
+    "image-placeholder": require('@/assets/categories/transport_delivery.jpg'),
+    "icon": "fas fa-truck-loading"
+  },
+  "VE": {
+    "id": "VE",
+    "slug": "vehicle",
+    "image-placeholder": require('@/assets/categories/means_of_transport.jpg'), 
+    "icon": "fas fa-car-side"
   },
   "OT": {
     "id": "OT",
@@ -96,4 +138,3 @@ export const categories = {
     "icon": "fas fa-star"
   }
 };
-
