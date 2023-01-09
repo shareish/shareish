@@ -69,7 +69,7 @@ export const categories = {
     "id": "CO",
     "slug": "clothes",
     "image-placeholder": require('@/assets/categories/clothes.jpg'),
-    "icon": "fas fa-shirt"
+    "icon": "fas fa-tshirt"
   },
   "IT": {
     "id": "IT",

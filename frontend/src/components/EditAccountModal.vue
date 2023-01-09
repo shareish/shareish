@@ -9,24 +9,21 @@
           @click="$emit('close')"/>
       </header>
       <section class="modal-card-body">
-        <!-- <b-field :label="$t('address')">
-          <b-input v-model="internalItem.ref_location" />
-        </b-field>//-->
-        <b-field
-          v-for="{field, validationRules, type, translationKey} in editableFields"
-          :key="field"
-          :label="$t(translationKey)"
-          :type="{'is-danger': errors.has(field)}"
-          :message="errors.first(field)"
-        >
-          <b-input
+	<template v-for="{field, validationRules, type, translationKey,helpTranslationKey} in editableFields">
+	  <b-field :key="field" :type="{'is-danger': errors.has(field)}" :message="errors.first(field)">
+	    <template #label> 
+	      <b-tooltip position="is-right" :key="field" :label="$t(helpTranslationKey)" multilined>{{$t(translationKey)}} <i class="icon far fa-question-circle"></i> </b-tooltip>
+	    </template>
+	  <b-input
             v-model="internalUser[field]"
             :name="field"
             v-validate="validationRules"
             :type="type"
             :password-reveal="field === 'password'"
-          />
-        </b-field>
+            />
+	 
+	  </b-field>
+	</template>
         <b-field
           :label="$t('avatar')"
           :message="$t('avatar-info')"
@@ -81,17 +78,17 @@ export default {
   computed: {
     editableFields() {
       return [
-        {field: 'first_name', validationRules: 'required', type: 'text', translationKey: 'firstname'},
-        {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname'},
-        {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username'},
-        {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email'},
-	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation'},
-	{field: 'dwithin_notifications', validationRules: 'numeric|max_value:1000|min_value:0', type: 'text', translationKey: 'dwithin_notif'},  
+          {field: 'first_name', validationRules: 'required', type: 'text', translationKey: 'firstname', helpTranslationKey: 'help_firstname'},
+        {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname', helpTranslationKey: 'help_lastname'},
+        {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username', helpTranslationKey: 'help_username'},
+        {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email', helpTranslationKey: 'help_email'},
+	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation', helpTranslationKey: 'help_ref_location'},
+	{field: 'dwithin_notifications', validationRules: 'numeric|max_value:1000|min_value:0', type: 'text', translationKey: 'dwithin_notif', helpTranslationKey: 'help_dwithin'},  
         // {field: 'password', validationRules: 'min:8', type: 'password', translationKey: 'password'},
-        {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography'},
-        {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link'},
-        {field: 'facebook_url', validationRules: '', type: 'text', translationKey: 'facebook-link'},
-        {field: 'instagram_url', validationRules: '', type: 'text', translationKey: 'instagram-link'},
+        {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography', helpTranslationKey: 'help_biography'},
+        {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link', helpTranslationKey: 'help_homepage'},
+        {field: 'facebook_url', validationRules: '', type: 'text', translationKey: 'facebook-link', helpTranslationKey: 'help_facebook'},
+        {field: 'instagram_url', validationRules: '', type: 'text', translationKey: 'instagram-link', helpTranslationKey: 'help_instagram'},
 	
       ];
     },

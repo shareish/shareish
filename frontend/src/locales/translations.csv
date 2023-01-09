@@ -22,7 +22,7 @@ food,Food and Supplies,Aliments et provisions
 animals,Pets and Animals,Animaux de compagnie et animaux
 aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
 collectors,Collectors,Collections
-hh,Helping hands and Manual Labor,Coups de main et travail manuel
+hh,Helping hands and Manual Labor,Coups de main et travaux manuels
 adminit,Administrative tasks,Tâches administratives
 diy,Do-it-yourself and making,Bricolage
 beauty,Wellness and Beauty,Beauté et bien-être
@@ -34,7 +34,7 @@ it,Multimedia Hardware,Equipements multimédia
 cs,Computer Software,Logiciels informatiques
 garden,"Garden, Nature, and Environment","Jardinage, nature et environnement"
 house,Living spaces and housing,Lieux de vie et habitation
-tools,Tools and Equipments, Outils et ustenciles
+tools,Tools and Equipments, Outils et ustensiles
 holidays,"Holidays, Week-ends, and Leisures","Vacances, Week-ends et Loisirs"
 book,"Books, CDs, DVDs, and Blu-rays","Livres, CDs, DVDs, Blu-rays"
 sport,Sports,Sports
@@ -63,8 +63,7 @@ i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon 
 my-recurrent-items,My recurrent items,Mes éléments récurrents
 upload-your-item-image,Upload your item image,Transférer votre image d'élément
 name,Name,Nom
-address,Reference address,Adresse de référence
-dwithin_notif,Maximum distance (km from reference address) for notifications,Distance maximale (en km par rapport à l'adresse de référence) pour les notifications
+address,Address,Adresse
 description,Description,Description
 start-date,Start date,Date de début
 end-date,End date,Date de fin
@@ -85,15 +84,26 @@ edit,Edit,Editer
 log-out,Log out,Se déconnecter
 my-items,My items,Mes éléments
 firstname,First name,Prénom
+help_firstname,Type your firstname (or an alias),Entrez votre prénom (ou un pseudonyme)
 lastname,Last name,Nom
+help_lastname,Type your lastname (or an alias),Entrez votre nom de famille (ou un pseudonyme)
 username,Username,Nom d'utilisateur
+help_username,Type a username (mandatory), Entrez un nom d'utilisateur/utilisatrice (obligatoire)
 password,Password,Mot de passe
 biography,Biography,Biographie
+help_biography,"Describe yourself, your hobbies, your motivation, anything else you want to share... This helps others to better know you.", "Décrivez-vous, vos passions, votre motivation, tout ce que vous voulez partager à votre sujet... Cela aide les autres à mieux vous connaître."
 homepage-link,Homepage link,Page personnelle
+help_homepage,Type the URL of your website if any,Entrez l'adresse de votre site web personnel si existant
 facebook-link,Facebook profile,Profil Facebook
+help_facebook,Type the URL of your Facebook account if any,"Entrez l'adresse de votre compte Facebook si existant"
 instagram-link,Instagram profile,Profil Instagram
-reflocation,Address,Adresse
+help_instagram,Type the URL of your Instagram account if any,"Entrez l'adresse de votre compte Instagram si existant"
+reflocation,Reference address,Adresse de référence
+help_ref_location,"Address (optional but recommended) to define your neighbordhood, so typically this is your home address. The more precise, the better, but you can use either streetname with or without the street number, the city or area name, your country. This information is not visible for others.","Adresse (facultative mais conseillée) pour définir votre voisinage, donc typiquement l'adresse de votre logement. Plus l'adresse est précise, mieux c'est mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier, le pays. Cette information n'est pas visible des autres utilisateurs."
+dwithin_notif,Distance (km) of your neighborhood,Rayon (en km) de votre voisinage
+help_dwithin,Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address),Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)
 email,Email,E-mail
+help_email,Type your e-mail address (mandatory), Entrez votre adresse e-mail (obligatoire)
 save,Save,Enregistrer
 cancel,Cancel,Annuler
 validations.messages._default,Invalid field,Champ incorrect
