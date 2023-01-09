@@ -7,12 +7,15 @@ conversations,Conversations,Conversations
 my-account,My account,Mon compte
 log-in,Log in,Connexion
 sign-up,Sign up,Créer un compte
+help_signup,"Basic information are required to create an account on Shareish. We suggest you to provide more detailed information in My Account after log in","Des informations de base sont demandées pour pouvoir créer un compte sur Shareish. Nous vous suggérons d'encoder vos informations plus détaillées après connexion dans le menu Mon Compte."
 useful-links,Useful links,Liens utiles
 contact,Contact,Contact
 about-us,About us,À propos
 what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
 item-type,Type,Type
+help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter"
 item-category,Category,Catégorie
+help_item_category,"Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items","Choisissez de 1 à 3 catégories pour décrire votre élément ce qui permet aux autres utilisateurs de plus rapidement chercher les éléments qui les intéressent"
 request,Request,Requête
 donation,Donation,Don
 loan,Loan,Prêt
@@ -23,7 +26,7 @@ animals,Pets and Animals,Animaux de compagnie et animaux
 aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
 collectors,Collectors,Collections
 hh,Helping hands and Manual Labor,Coups de main et travaux manuels
-adminit,Administrative tasks,Tâches administratives
+adminit,Administrative tasks,Tâche administratives
 diy,Do-it-yourself and making,Bricolage
 beauty,Wellness and Beauty,Beauté et bien-être
 health,Health care,Soins de santé
@@ -60,14 +63,20 @@ no-items,No item,Pas d'élément
 add-new-item,Add a new item,Ajout d'élément
 i-have-image,I have image for my item,J'ai une image pour mon élément
 i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon élément
+help_item_name,"Name or short title of your item. An AI algorithm suggests a name if you uploaded an item picture but you can edit it to make it more sound.","Nom ou titre court décrivant votre élément. Un algorithme suggère un nom si vous avez fourni une image, mais vous pouvez toujours l'éditer pour rendre le titre plus pertinent."
 my-recurrent-items,My recurrent items,Mes éléments récurrents
 upload-your-item-image,Upload your item image,Transférer votre image d'élément
 name,Name,Nom
 address,Address,Adresse
+help_item_address,"Address (optional but strongly recommended) of the item (where it is offered/requested). The more precise, the better, but you can use either streetname with or without the street number, the city or area name, your country.","Adresse (facultative mais fortement conseillée) de l'élément (où il est offert/demandé). Plus l'adresse est précise, mieux c'est, mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier, le pays."
 description,Description,Description
+help_item_description,"Describe as precisely as possible your item. E.g. if it is a good, you might add brand/model/sizes/year/... and what it can be useful for. If this is a request for service, try to be as precise as possible about the required work and estimated duration. This field is sometimes pre-filled by an AI algorithm based on the uploaded image but you can edit it.", "Décrivez aussi précisément que possible votre élément. Par exemple si c'est un bien, vous pourriez ajouter la marque/modèle/taille/année et à quoi ce bien peut être utile. Si c'est une demande de service soyez le plus précis possible à propos de la tâche et de la durée estimée."
 start-date,Start date,Date de début
 end-date,End date,Date de fin
+help_item_start_date,"Enter a different start date (by default it is now) if your item is not yet available/applicable","Entrez une date de début différente (par défaut l'heure actuelle) si votre élément n'est pas encore disponible/applicable"
+help_item_end_date,"Enter an end date if your item is valid for a limited period of time (e.g. expiration date for food, or period during which you wish to be helped)","Entrez une date de fin si votre élément a une période de validité limitée (p.ex. date limite de consommation pour de la nourriture, ou période pendant laquelle vous avez besoin d'une aide)"
 save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
+help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
 submit,Submit,Soumettre
 ends,ends,se termine
 submit-again,Submit again,Soumettre à nouveau
@@ -90,6 +99,7 @@ help_lastname,Type your lastname (or an alias),Entrez votre nom de famille (ou u
 username,Username,Nom d'utilisateur
 help_username,Type a username (mandatory), Entrez un nom d'utilisateur/utilisatrice (obligatoire)
 password,Password,Mot de passe
+help_password,Enter a password,Entrez un mot de passe
 biography,Biography,Biographie
 help_biography,"Describe yourself, your hobbies, your motivation, anything else you want to share... This helps others to better know you.", "Décrivez-vous, vos passions, votre motivation, tout ce que vous voulez partager à votre sujet... Cela aide les autres à mieux vous connaître."
 homepage-link,Homepage link,Page personnelle
@@ -103,7 +113,7 @@ help_ref_location,"Address (optional but recommended) to define your neighbordho
 dwithin_notif,Distance (km) of your neighborhood,Rayon (en km) de votre voisinage
 help_dwithin,Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address),Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)
 email,Email,E-mail
-help_email,Type your e-mail address (mandatory), Entrez votre adresse e-mail (obligatoire)
+help_email,"Type your e-mail address (mandatory, one account only per e-mail address)", "Entrez votre adresse e-mail (obligatoire, un seul compte par adresse e-mail)"
 save,Save,Enregistrer
 cancel,Cancel,Annuler
 validations.messages._default,Invalid field,Champ incorrect

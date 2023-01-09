@@ -26,29 +26,43 @@
   <template v-else-if="step === 2">
     <div class="columns">
       <section class="column is-four-fifths">
-        <b-field :label="$t('name')">
+        <b-field>
+	  <template #label>{{$t('name')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_name')" multilined><i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-input v-model="name" />
         </b-field>
-        <b-field :label="$t('item-type')">
+
+	<b-field>
+	  <template #label>{{$t('item-type')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_type')" multilined><i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-select v-model="type" expanded>
             <option value="BR">{{ $t('request') }}</option>
             <option value="DN">{{ $t('donation') }}</option>
             <option value="LN">{{ $t('loan') }}</option>
           </b-select>
         </b-field>
-        <div class="columns">
+
+	<div class="columns">
+	  <b-tooltip position="is-right" :label="$t('help_item_category')" multilined>
           <category-selector class="column" :number="1" v-model="category1" :nullable="false" expanded/>
           <category-selector class="column" :number="2" v-model="category2" :nullable="false" expanded/>
           <category-selector class="column" :number="3" v-model="category3" :nullable="false" expanded/>
+	  </b-tooltip>
         </div>
-        <b-field :label="$t('address')">
+        <b-field>
+	  <template #label>{{$t('address')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_address')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-input v-model="location" />
         </b-field>
-        <b-field :label="$t('description')">
+        <b-field>
+	  <template #label> {{$t('description')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_description')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-input type="textarea" expanded v-model="description" />
         </b-field>
         <b-field grouped>
-          <b-field :label="$t('start-date')" expanded>
+          <b-field expanded>
+	    <template #label> {{$t('start-date')}}
+	      <b-tooltip position="is-top" :label="$t('help_item_start_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
             <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
@@ -56,7 +70,9 @@
             >
             </b-datetimepicker>
           </b-field>
-          <b-field :label="$t('end-date')" expanded>
+          <b-field expanded>
+	    <template #label> {{$t('end-date')}}
+	      <b-tooltip position="is-top" :label="$t('help_item_end_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
             <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
@@ -68,7 +84,7 @@
         </b-field>
         <b-field>
           <b-checkbox v-model="isRecurrent">
-            <strong>{{$t('save-as-recurrent-item')}}</strong>
+            <strong>{{$t('save-as-recurrent-item')}}</strong><b-tooltip position="is-top" :label="$t('help_item_recurrent')" multilined><i class="icon far fa-question-circle"></i></b-tooltip>
           </b-checkbox>
         </b-field>
         <div class="container has-text-centered">

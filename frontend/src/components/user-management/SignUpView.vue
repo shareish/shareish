@@ -1,41 +1,51 @@
 <template>
     <div class="page-signup">
         <div class="column is-4 is-offset-4">
-            <h1 class="title">{{$t('sign-up')}}</h1>
-
+            <h1 class="title">{{$t('sign-up')}} <b-tooltip position="is-right" :label="$t('help_signup')" multilined> <i class="icon far fa-question-circle"></i> </b-tooltip></h1>
+	    
             <form @submit.prevent="submitForm">
                 <div class="field">
-                    <label>{{$t('email')}}</label>
-                    <div class="control">
-                        <input type="email" name="email" class="input" v-model="email" required>
+                  <label>{{$t('email')}}</label>
+                  <div class="control">
+		    <b-tooltip position="is-bottom" :label="$t('help_email')" multilined>
+		      <input type="email" name="email" class="input" v-model="email" required>
+		      </b-tooltip>
                     </div>
                 </div>
 
                 <div class="field">
                     <label>{{$t('username')}}</label>
                     <div class="control">
+		      <b-tooltip position="is-bottom" :label="$t('help_username')" multilined>
                         <input type="text" name="username" class="input" v-model="username" required>
+			</b-tooltip>
                     </div>
                 </div>
 
                 <div class="field">
                     <label>{{ $t('firstname') }}</label>
                     <div class="control">
+		      <b-tooltip position="is-bottom" :label="$t('help_firstname')" multilined>
                         <input type="text" name="first_name" class="input" v-model="first_name" required>
+		      </b-tooltip>
                     </div>
                 </div>
 
                 <div class="field">
                     <label>{{$t('lastname')}}</label>
                     <div class="control">
+		      <b-tooltip position="is-bottom" :label="$t('help_lastname')" multilined>
                         <input type="text" name="last_name" class="input" v-model="last_name" required>
+			</b-tooltip>
                     </div>
                 </div>
 
                 <div class="field">
-                    <label>{{$t('password')}}</label>
-                    <div class="control">
-                        <input type="password" name="password" class="input" v-model="password" required>
+                  <label>{{$t('password')}}</label>
+                  <div class="control">
+		    <b-tooltip position="is-bottom" :label="$t('help_password')" multilined>
+                      <input type="password" name="password" class="input" v-model="password" required>
+		    </b-tooltip>
                     </div>
                 </div>
 

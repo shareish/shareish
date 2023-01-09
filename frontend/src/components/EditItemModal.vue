@@ -12,7 +12,9 @@
         <b-field :label="$t('name')">
           <b-input v-model="internalItem.name" />
         </b-field>
-        <b-field :label="$t('item-type')">
+        <b-field>
+	  <template #label>{{$t('item-type')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_type')" multilined><i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-select v-model="internalItem.item_type" expanded>
             <option value="BR">{{ $t('request') }}</option>
             <option value="DN">{{ $t('donation') }}</option>
@@ -20,21 +22,30 @@
           </b-select>
         </b-field>
         <div class="columns">
+	  <b-tooltip position="is-top" :label="$t('help_item_category')" multilined>
           <category-selector class="column" :number="1" v-model="internalItem.category1"
                              :nullable="false" expanded/>
+	  
           <category-selector class="column" :number="2" v-model="internalItem.category2"
                              :nullable="false" expanded/>
           <category-selector class="column" :number="3" v-model="internalItem.category3"
                              :nullable="false" expanded/>
+	  </b-tooltip>
         </div>
-        <b-field :label="$t('address')">
+        <b-field>
+	  <template #label>{{$t('address')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_address')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-input v-model="internalItem.address" />
         </b-field>
-        <b-field :label="$t('description')">
+        <b-field>
+	  <template #label> {{$t('description')}}
+	  <b-tooltip position="is-right" :label="$t('help_item_description')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-input type="textarea" expanded v-model="internalItem.description" />
         </b-field>
         <b-field grouped>
-          <b-field :label="$t('start-date')" expanded>
+          <b-field expanded>
+	    <template #label> {{$t('start-date')}}
+	      <b-tooltip position="is-top" :label="$t('help_item_start_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
             <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
@@ -42,7 +53,9 @@
             >
             </b-datetimepicker>
           </b-field>
-          <b-field :label="$t('end-date')" expanded>
+          <b-field expanded>
+	    <template #label> {{$t('end-date')}}
+	      <b-tooltip position="is-top" :label="$t('help_item_end_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
             <b-datetimepicker
               icon-pack="fas"
               icon="calendar"
@@ -54,7 +67,7 @@
         </b-field>
         <b-field>
           <b-checkbox v-model="internalItem.is_recurrent">
-            <strong>{{$t('save-as-recurrent-item')}}</strong>
+             <strong>{{$t('save-as-recurrent-item')}}</strong> <b-tooltip position="is-top" :label="$t('help_item_recurrent')" multilined><i class="icon far fa-question-circle"></i></b-tooltip>
           </b-checkbox>
         </b-field>
 
