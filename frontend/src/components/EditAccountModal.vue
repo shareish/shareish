@@ -27,7 +27,9 @@
         <b-field
           :label="$t('avatar')"
           :message="$t('avatar-info')"
-        >
+          >
+	  <template #label> {{$t('avatar')}}
+	  <b-tooltip position="is-right" :label="$t('help_avatar')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
           <b-field
             class="file is-primary"
             :class="{'has-name': !!file}"
@@ -100,7 +102,6 @@ export default {
       }
 
       try {
-        console.log("fetching address")	    
         this.internalUser.ref_location = (await axios.post(
           `/api/v1/address/`,
           this.internalUser.ref_location
@@ -112,7 +113,6 @@ export default {
     },
     async save() {
       let result = await this.$validator.validateAll();
-      console.log(result);
       if(!result) {
         return;
       }
