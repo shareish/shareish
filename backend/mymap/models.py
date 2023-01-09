@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.geos import Point
 from django.contrib.contenttypes.fields import GenericRelation
-from hitcount.models import HitCountMixin, HitCount
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password, username, first_name, last_name):
@@ -118,7 +117,6 @@ class UserImage(models.Model):
         ordering = ['user']
 
 
-#class Item(models.Model,HitCountMixin):
 class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
@@ -127,10 +125,6 @@ class Item(models.Model):
     enddate = models.DateTimeField(null=True)
     in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
-    ##hit_count_generic = GenericRelation(
-    ##    HitCount, object_id_field='object_pk',
-    ##    related_query_name='hit_count_generic_relation'
-    ##)
     hitcount = models.IntegerField(verbose_name='Hit Count',default=0)
 
     

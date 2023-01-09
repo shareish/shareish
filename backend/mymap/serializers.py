@@ -4,8 +4,6 @@ from rest_framework import serializers
 
 from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
 
-from hitcount.models import HitCount
-
 
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)

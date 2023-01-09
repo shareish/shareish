@@ -24,7 +24,6 @@ from .ai import findClass
 
 from geopy.geocoders import Nominatim
 
-from hitcount.views import HitCountDetailView
 
 locator = Nominatim(user_agent="shareish")
 
@@ -58,13 +57,10 @@ class ActiveItemFilterBackend(filters.BaseFilterBackend):
 
 
 class ItemViewSet(viewsets.ModelViewSet):
-#class ItemViewSet(HitCountDetailView):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
-    #count_hit = True
-    
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter,
         ItemTypeFilterBackend, ItemCategoryFilterBackend,
