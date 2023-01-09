@@ -4,16 +4,18 @@ from rest_framework import serializers
 
 from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
 
+from hitcount.models import HitCount
+
 
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
-
+    
     class Meta:
         model = Item
         fields = [
             'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent',
             'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3',
-            'user', 'images'
+            'user', 'images','hitcount'
         ]
 
 

@@ -43,8 +43,9 @@
         {{item.description}}
         <br>
         <template v-if="!recurrentList">
-          <small>{{formattedDate(item.startdate)}} </small><br>
-          <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small>
+          <small>{{formattedDate(item.startdate)}} </small> <small v-if="item.hitcount > 0">- {{item.hitcount}} {{$t('views')}} </small><br>
+	  
+	  <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small>
         </template>
       </div>
       <span v-for="category in categories" class="icon-text" :key="category.slug">
@@ -128,7 +129,8 @@ export default {
   },
   methods: {
     formattedDate(date) {
-      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
+	//return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale("fr").fromNow();
+	return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
     },
     category(category) {
       return categories[category];

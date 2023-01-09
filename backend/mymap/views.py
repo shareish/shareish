@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Q
+from django.db.models import Q,F
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
@@ -23,6 +23,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .ai import findClass
 
 from geopy.geocoders import Nominatim
+
+from hitcount.views import HitCountDetailView
 
 locator = Nominatim(user_agent="shareish")
 
@@ -56,10 +58,13 @@ class ActiveItemFilterBackend(filters.BaseFilterBackend):
 
 
 class ItemViewSet(viewsets.ModelViewSet):
+#class ItemViewSet(HitCountDetailView):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
+    #count_hit = True
+    
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter,
         ItemTypeFilterBackend, ItemCategoryFilterBackend,
@@ -68,6 +73,12 @@ class ItemViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
     ordering = ['-startdate']
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Item.objects.filter(pk=instance.id).update(hitcount=F('hitcount') + 1)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         #print("--------------  in ItemViewSet create ---------------")
