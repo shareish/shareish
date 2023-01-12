@@ -143,7 +143,7 @@ class Item(models.Model):
         FOOD = 'FD', _('Food and Supplies')
         ANIMALS = 'AN', _('Pets and Animals')
         ENTERTAINMENT = 'EN', _('Arts, Culture, and Entertainments')
-        COLLECTORS = 'CL', _('Collectors')
+        COLLECTORS = 'CL', _('Collectibles and Decoratives')
         HELPING = 'HL', _('Helping hand and Manual Labor')
         ADMINIT = 'AT',  _('Administrative tasks')
         DIY = 'DY', _('Do-it-Yourself')
