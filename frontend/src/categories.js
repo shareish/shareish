@@ -113,6 +113,12 @@ export const categories = {
     "image-placeholder": require('@/assets/categories/books.jpg'),
     "icon": "fas fa-book"
   },
+    "MD": {
+    "id": "MD",
+    "slug": "media",
+    "image-placeholder": require('@/assets/categories/media.jpg'),
+    "icon": "fas fa-compact-disc"
+  },
   "SP": {
     "id": "SP",
     "slug": "sport",
