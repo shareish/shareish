@@ -13,11 +13,12 @@ contact,Contact,Contact
 about-us,About us,À propos
 what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
 item-type,Type,Type
-help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter"
+help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Événement pour un évènement gratuit et solidaire"
 item-category,Category,Catégorie
 help_item_category,"Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items","Choisissez de 1 à 3 catégories pour décrire votre élément ce qui permet aux autres utilisateurs de plus rapidement chercher les éléments qui les intéressent"
 request,Request,Requête
 donation,Donation,Don
+event,Event,Événement
 loan,Loan,Prêt
 all,All,Tous
 category,Category,Catégorie
