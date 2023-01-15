@@ -48,7 +48,7 @@ def _get_future_events_near_user(user):
     return Item.objects.filter(
         Q(startdate__lte = future_week, startdate__gte = today),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
-        Q(user=user))   #~Q for items from another user
+        ~Q(user=user))   #~Q for items from another user
 
 
 def _prepare_mail_user(user):
@@ -150,9 +150,9 @@ def start_mail_scheduler():
             print('The scheduled email sending worked.')
 
     scheduler = BackgroundScheduler()
-    #scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
+    scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
     # TO TEST quickly, uncomment this line:
-    scheduler.add_job(send_emails, trigger='cron', second=0)
+    #scheduler.add_job(send_emails, trigger='cron', second=0)
     # To configure cron:
     # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=cron
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
