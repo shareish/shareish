@@ -37,10 +37,26 @@ def _get_new_items_near_user(user):
         ~Q(user=user))   #~Q for items from another user
 
 
+def _get_future_events_near_user(user):
+    #get items (events) within user dwithin distance and which stardate is in the next 7 days
+    today = datetime.now().date()
+    future_week = today + timedelta(15)
+    if user.ref_location:
+        pnt = user.ref_location
+    else:
+        pnt = Point(0.0, 0.0)
+    return Item.objects.filter(
+        Q(startdate__lte = future_week, startdate__gte = today),
+        Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
+        Q(user=user))   #~Q for items from another user
+
+
 def _prepare_mail_user(user):
     new_items = _get_new_items_near_user(user)
-    print(new_items)
+    #print(new_items)
     unread_count = _get_unread_messages_count(user)
+    future_events = _get_future_events_near_user(user)
+    #print(future_events)
     
 
     # TODO: use template for emails
@@ -48,8 +64,15 @@ def _prepare_mail_user(user):
 
     if unread_count > 0 and len(new_items) == 0:
         subject = "You have {} unread messages on Shareish".format(unread_count)
-        message = "Dear {} {} ({}),{}You have {} unread messages on Shareish ({}).{}Please log in using your e-mail address to read them in the Conversations tab. ".format(
-            user.first_name, user.last_name, user.username, "\n\n", unread_count, settings.APP_URL, "\n\n")
+        message = "Dear {} {} ({}),\n\nYou have {} unread messages on Shareish ({}) available in the Conversation tab. ".format(
+            user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, "\n\n")
+
+        if len(future_events)>0:
+            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
+            for i in range (len(future_events)):
+                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
+
+        message+="\n\nPlease log in to view them."
         #print(message)
 
     elif unread_count > 0 and len(new_items) > 0:
@@ -61,6 +84,11 @@ def _prepare_mail_user(user):
         )
         for i in range (len(new_items)):
             message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
+        if len(future_events)>0:
+            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
+            for i in range (len(future_events)):
+                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
+        
         message+="\nPlease log in to view them."
         
     elif len(new_items) > 0:
@@ -70,8 +98,14 @@ def _prepare_mail_user(user):
         )
         for i in range (len(new_items)):
             message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
+
+        if len(future_events)>0:
+            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
+            for i in range (len(future_events)):
+                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
+                
         message+="\nPlease log in to view them."
-        
+
     else:
         # Nothing new, abort
         return None
@@ -116,9 +150,9 @@ def start_mail_scheduler():
             print('The scheduled email sending worked.')
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
+    #scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
     # TO TEST quickly, uncomment this line:
-    #scheduler.add_job(send_emails, trigger='cron', second=0)
+    scheduler.add_job(send_emails, trigger='cron', second=0)
     # To configure cron:
     # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=cron
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
