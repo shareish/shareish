@@ -47,6 +47,16 @@ export const blueIcon = new L.Icon({
 });
 
 // Special icons
+
+export const eventIcon = new L.Icon({
+  iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Map_marker_icon_%E2%80%93_Nicolas_Mollet_%E2%80%93_Group_%E2%80%93_People_%E2%80%93_Default.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 25],
+  iconAnchor: [12, 41],
+  popupAnchor: [0, -20],
+  shadowSize: [41, 41]
+});
+
 export const publicBookcaseIcon = new L.Icon({
   iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',

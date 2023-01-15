@@ -25,7 +25,7 @@
             </div>
           </div>
           <p>
-            {{item.description}}
+            {{truncate(item.description)}}
           </p>
         </div>
         <nav class="level is-mobile">
@@ -70,12 +70,15 @@ export default {
     },
   },
   methods: {
-    formattedDate(date) {
-      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
-    },
-    category(category) {
-      return categories[category];
-    }
+      formattedDate(date) {
+	  return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
+      },
+      truncate(description){
+	  return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
+      },
+      category(category) {
+	  return categories[category];
+      }
   },
 };
 </script>

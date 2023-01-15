@@ -6,15 +6,17 @@
 
 
 const itemTypeIcons = {
-  "DN": "is-success",
-  "LN": "is-warning",
-  "BR": "is-danger"
+    "DN": "is-success",
+    "LN": "is-warning",
+    "BR": "is-danger",
+    "EV": "is-info"
 }
 
 const itemTypeSlug = {
-  "DN": "donation",
-  "LN": "loan",
-  "BR": "request"
+    "DN": "donation",
+    "LN": "loan",
+    "BR": "request",
+    "EV": "event"
 }
 
 export default {

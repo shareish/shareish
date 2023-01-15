@@ -39,6 +39,7 @@
             <option value="BR">{{ $t('request') }}</option>
             <option value="DN">{{ $t('donation') }}</option>
             <option value="LN">{{ $t('loan') }}</option>
+	    <option value="EV">{{ $t('event') }}</option>
           </b-select>
         </b-field>
 

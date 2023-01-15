@@ -105,14 +105,15 @@ import axios from 'axios'
 import ItemsFilters from '@/components/ItemsFilters';
 
 import {
-  greenIcon,
-  yellowIcon,
-  redIcon,
-  greyIcon,
-  publicBookcaseIcon,
-  aedIcon,
-  giveBoxIcon,
-  drinkingWaterIcon, freeShopIcon, blueIcon
+    greenIcon,
+    yellowIcon,
+    redIcon,
+    greyIcon,
+    eventIcon,
+    publicBookcaseIcon,
+    aedIcon,
+    giveBoxIcon,
+    drinkingWaterIcon, freeShopIcon, blueIcon
 } from '@/map-icons';
 
 import { latLng } from "leaflet";
@@ -123,7 +124,8 @@ import ItemMapPopup from '@/components/ItemMapPopup';
 const itemTypeIcons = {
   "DN": greenIcon,
   "LN": yellowIcon,
-  "BR": redIcon
+  "BR": redIcon,
+  "EV": eventIcon
 }
 
 const GEOLOCATION_TIMEOUT = 10000;
@@ -325,7 +327,7 @@ export default {
             // should not happen, but happens :)
             item['location'] !== null
           ).map(item => {
-            let latLong = item['location'].slice(17, -1).split(' ');
+              let latLong = item['location'].slice(17, -1).split(' ');
             return {
               ...item,
               icon: itemTypeIcons[item['item_type']] || greyIcon,

@@ -119,7 +119,7 @@ class UserImage(models.Model):
 
 class Item(models.Model):
     name = models.CharField(max_length=50)
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=1000)
     location = models.PointField(blank=True, geography=True, null=True)
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
@@ -132,6 +132,7 @@ class Item(models.Model):
         DONATION = 'DN', _('Donation')
         LOAN = 'LN', _('Loan')
         BARTER = 'BR', _('Request')
+        EVENT = 'EV', _('Event')
 
     item_type = models.CharField(
         max_length=2,
@@ -185,9 +186,6 @@ class Item(models.Model):
         settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True
         )
 
-    def current_hit_count(self):
-        return self.hit_count.hits
-    
     def __str__(self) -> str:
         return self.name + ' : ' + self.description + ' (' + self.category1 + ')'
 
