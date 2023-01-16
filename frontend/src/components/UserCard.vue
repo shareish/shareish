@@ -20,6 +20,7 @@
           </router-link>
         </h2>
         <h2 class="subtitle is-4">@{{ user.username }}</h2>
+	({{$t('member_since')}} {{ user.sign_in_date }})<br><br>
         {{user.description}}
 
         <nav class="level is-mobile">
