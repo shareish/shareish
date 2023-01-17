@@ -64,6 +64,7 @@
                 </div>
               </div>
               <user-card :user="user"/>
+	      
             </article>
           </div>
           <div class="tile is-parent">
@@ -202,11 +203,12 @@ export default {
         console.log(JSON.stringify(error));
       }
     },
-    formattedDate(date) {
-      return moment(date, "YYYY-MM-DD[T]HH:mm:ss");
+      formattedDate(date) {
+	  moment.locale(this.$i18n.locale);
+	  return(moment(date).format('LLLL'));
     },
-    formattedDateFromNow(date) {
-      return this.formattedDate(date).fromNow();
+      formattedDateFromNow(date) {
+	  return moment(date).fromNow();
     },
     category(category) {
       return categories[category];

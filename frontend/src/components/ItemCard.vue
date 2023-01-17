@@ -43,8 +43,9 @@
         {{truncate(item.description)}}
         <br>
         <template v-if="!recurrentList">
+	  <small>{{formattedDate(item.startdate)}}</small> <br>
 	  <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small><br>
-	  <small>{{formattedDate(item.startdate)}} </small> <br><small v-if="item.hitcount > 0">{{item.hitcount}} {{$t('views')}} </small><br>
+	  <small v-if="item.hitcount > 0">{{item.hitcount}} {{$t('views')}} </small><br>
         </template>
       </div>
       <span v-for="category in categories" class="icon-text" :key="category.slug">
@@ -128,8 +129,7 @@ export default {
   },
   methods: {
       formattedDate(date) {
-	  //return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale("fr").fromNow();
-	  return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
+	  return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale(this.$i18n.locale).fromNow();
       },
       truncate(description){
 	  return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;

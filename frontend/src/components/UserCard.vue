@@ -20,7 +20,7 @@
           </router-link>
         </h2>
         <h2 class="subtitle is-4">@{{ user.username }}</h2>
-	({{$t('member_since')}} {{ user.sign_in_date }})<br><br>
+	({{$t('member_since')}} {{formattedDate(user.sign_in_date)}})<br><br>
         {{user.description}}
 
         <nav class="level is-mobile">
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import moment from 'moment/moment';
 export default {
   name: 'UserCard',
   props: {
@@ -59,6 +60,12 @@ export default {
     canEdit() {
       return this.user.id === this.$store.state.user.id;
     }
+  },
+  methods: {
+      formattedDate(date) {
+	  moment.locale(this.$i18n.locale);
+	  return(moment(date).format('LL'));
+    },
   }
 };
 </script>
