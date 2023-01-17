@@ -23,7 +23,7 @@ def _get_unread_messages_count(user):
 
 
 def _get_new_items_near_user(user):
-    #get items within user dwithin distance and which stardate is between yesterday and today
+    #get items within user dwithin distance and which stardate is between yesterday and today, not event
     #print("-------------- in _get_new_items_near_user for " +user.username + "----------------")
     today = datetime.now().date()
     yesterday = today - timedelta(1)
@@ -39,7 +39,7 @@ def _get_new_items_near_user(user):
 
 
 def _get_events_near_user(user):
-    #get items (events) within user dwithin distance and which stardate is in the next 7 days
+    #get items (events) within user dwithin distance 
     today = datetime.now().date()
     yesterday = today - timedelta(1)
     if user.ref_location:
@@ -49,7 +49,6 @@ def _get_events_near_user(user):
     return Item.objects.filter(
         Q(item_type='EV'),
         Q(creationdate__lte = today, creationdate__gte = yesterday),
-        #Q(startdate__lte = future_week, startdate__gte = today),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
         ~Q(user=user))   #~Q for items from another user
 
