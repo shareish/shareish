@@ -181,7 +181,7 @@ export default {
               id: 'defibrillators',
               slugMarker: 'defibrillator',
               markers: [],
-              visible: true,
+              visible: false,
               tagKey: 'emergency',
               tagValue: 'defibrillator',
               color: 'is-defibrillator'
