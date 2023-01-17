@@ -32,79 +32,87 @@ def _get_new_items_near_user(user):
     else:
         pnt = Point(0.0, 0.0)
     return Item.objects.filter(
-        Q(startdate__lte = today, startdate__gte = yesterday),
+        Q(creationdate__lte = today, creationdate__gte = yesterday),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
+        ~Q(item_type='EV'),
         ~Q(user=user))   #~Q for items from another user
 
 
-def _get_future_events_near_user(user):
+def _get_events_near_user(user):
     #get items (events) within user dwithin distance and which stardate is in the next 7 days
     today = datetime.now().date()
-    future_week = today + timedelta(15)
+    yesterday = today - timedelta(1)
     if user.ref_location:
         pnt = user.ref_location
     else:
         pnt = Point(0.0, 0.0)
     return Item.objects.filter(
-        Q(startdate__lte = future_week, startdate__gte = today),
+        Q(item_type='EV'),
+        Q(creationdate__lte = today, creationdate__gte = yesterday),
+        #Q(startdate__lte = future_week, startdate__gte = today),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
         ~Q(user=user))   #~Q for items from another user
 
-
 def _prepare_mail_user(user):
     new_items = _get_new_items_near_user(user)
-    #print(new_items)
     unread_count = _get_unread_messages_count(user)
-    future_events = _get_future_events_near_user(user)
-    #print(future_events)
-    
+    new_events = _get_events_near_user(user)
 
     # TODO: use template for emails
     # https://django-mail-templated.readthedocs.io/en/master/ ?
-
-    if unread_count > 0 and len(new_items) == 0:
-        subject = "You have {} unread messages on Shareish".format(unread_count)
-        message = "Dear {} {} ({}),\n\nYou have {} unread messages on Shareish ({}) available in the Conversation tab. ".format(
-            user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, "\n\n")
-
-        if len(future_events)>0:
-            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
-            for i in range (len(future_events)):
-                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
-
-        message+="\n\nPlease log in to view them."
-        #print(message)
-
-    elif unread_count > 0 and len(new_items) > 0:
-        subject = "You have {} unread messages on Shareish and {} new items near you".format(
-            unread_count, len(new_items)
-        )
-        message = "Dear {} {} ({}),\n\nYou have {} unread messages on Shareish ({}).\n\nYou also have {} new items near you since yesterday:\n".format(
-            user.first_name, user.last_name, user.username, unread_count, settings.APP_URL, len(new_items)
-        )
-        for i in range (len(new_items)):
-            message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
-        if len(future_events)>0:
-            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
-            for i in range (len(future_events)):
-                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
+    
+    if unread_count > 0:
+        subject_msg="{} unread message".format(unread_count)
+        if unread_count > 1:
+            subject_msg+="s"
+    else:
+        subject_msg=""
         
-        message+="\nPlease log in to view them."
+    if len(new_items) > 0:
+        subject_items="{} new item".format(len(new_items))
+        if len(new_items) > 1:
+            subject_items+="s"
+    else:
+        subject_items=""
         
-    elif len(new_items) > 0:
-        subject = "There are {} new items near you on Shareish".format(len(new_items))
-        message = "Dear {} {} ({}),\n\nThere are {} new items near you on Shareish ({}) since yesterday:\n".format(
-            user.first_name, user.last_name, user.username, len(new_items), settings.APP_URL
-        )
-        for i in range (len(new_items)):
-            message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
+    if len(new_events) > 0:
+        subject_events="{} new event".format(len(new_events))
+        if len(new_events) > 1:
+            subject_events+="s"
+    else:
+        subject_events=""
+    
+    if unread_count > 0 or len(new_items) > 0 or len(new_events) > 0:
+        subject = "[Shareish] Recent content on Shareish mutual aid platform ({} {} {})".format(subject_msg,subject_items,subject_events)
+        message = "Dear {} {} ({}),\n\nThere is new content since yesterday within your neighbourhood on Shareish mutual aid platform.\n".format(
+            user.first_name, user.last_name, user.username)
+        message+="Please login on {} (using your e-mail address) to view it.\n\n".format(settings.APP_URL)
+    
+        if unread_count > 0:
+            if unread_count > 1:
+                plural="s"
+            else:
+                plural=""
+            message += "You have {} unread message{}, available in the Conversations tab.\n\n".format(unread_count,plural)
+        if len(new_items) > 0:
+            if len(new_items)>1:
+                plural="s"
+            else:
+                plural=""
+            message += "You have {} new item{}, available in the Map or Browse tab:\n".format(len(new_items),plural)
+            for i in range (len(new_items)):
+                message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
+        if len(new_events) > 0:
+            if len(new_events)>1:
+                plural="s"
+            else:
+                plural=""
+            message += "\nYou have {} new event{}, available in the Map or Browse tab:\n".format(len(new_events),plural)
+            for i in range (len(new_events)):
+                message+="* {} (from {} to {}, within {} km)\n".format(new_events[i].name, new_events[i].startdate, new_events[i].enddate, round(100*new_events[i].location.distance(user.ref_location),2))
 
-        if len(future_events)>0:
-            message += "\n\nThere are also {} events planned in the next 15 days:\n".format(len(future_events))
-            for i in range (len(future_events)):
-                message+="* {} (from {} to {}, within {} km)\n".format(future_events[i].name, future_events[i].startdate, future_events[i].enddate, round(100*future_events[i].location.distance(user.ref_location),2))
-                
-        message+="\nPlease log in to view them."
+        message+="\nThese notifications can be configured on Shareish in My account - Edit."
+        message+="\n\nThe Shareish team.\n"
 
     else:
         # Nothing new, abort
@@ -112,7 +120,6 @@ def _prepare_mail_user(user):
 
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [user.email]
-
     return subject, message, from_email, recipient_list
 
 
