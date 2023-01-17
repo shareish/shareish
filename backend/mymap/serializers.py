@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email',
-            'homepage_url', 'facebook_url', 'instagram_url',
+            'sign_in_date','homepage_url', 'facebook_url', 'instagram_url',
             'ref_location', 'use_ref_loc', 'dwithin_notifications',
             'items', 'description', 'image', 'is_active',
         ]
