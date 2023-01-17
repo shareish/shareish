@@ -9,7 +9,7 @@ const itemTypeIcons = {
     "DN": "is-success",
     "LN": "is-warning",
     "BR": "is-danger",
-    "EV": "is-info"
+    "EV": "is-purple"
 }
 
 const itemTypeSlug = {

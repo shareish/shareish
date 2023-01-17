@@ -12,6 +12,8 @@ $defibrillator: #4A8658;
 $defibrillator-invert: findColorInvert($defibrillator);
 $drinking-water: #5784B7;
 $drinking-water-invert: findColorInvert($drinking-water);
+$purple: #7957D5;
+$purple-invert: findColorInvert($purple);
 
 // Lists and maps
 $custom-colors: (
@@ -26,6 +28,10 @@ $custom-colors: (
   "drinking-water": (
     $drinking-water,
     $drinking-water-invert
+  ),
+  "purple": (
+      $purple,
+      $purple-invert
   ),
 );
 $custom-shades: null !default;
