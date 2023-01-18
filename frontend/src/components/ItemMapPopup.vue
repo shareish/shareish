@@ -71,7 +71,7 @@ export default {
   },
   methods: {
       formattedDate(date) {
-	  return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
+	  return moment(date).locale(this.$i18n.locale).fromNow();
       },
       truncate(description){
 	  return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
