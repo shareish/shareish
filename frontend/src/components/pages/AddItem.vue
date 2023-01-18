@@ -101,8 +101,8 @@
   </template>
   <template v-else>
     <div class="container has-text-centered buttons centered-container">
-      <button class="button is-primary is-large" @click="step = 1">{{$t('i-have-image')}}</button>
-      <button class="button is-primary is-large is-outlined" @click="step = 2">{{$t('i-do-not-have-image')}}</button>
+      <b-tooltip position="is-left" :label="$t('help_item_ihaveimage')" multilined><button class="button is-primary is-large" @click="step = 1">{{$t('i-have-image')}}</button></b-tooltip>  &nbsp; &nbsp;    <b-tooltip position="is-right" :label="$t('help_item_noimage')" multilined><button class="button is-primary is-large is-outlined" @click="step = 2">{{$t('i-do-not-have-image')}}</button></b-tooltip>
+      
     </div>
     <recurrent-items-list @submitAgain="setRecurrentItem"/>
   </template>
