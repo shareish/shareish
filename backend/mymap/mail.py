@@ -43,7 +43,7 @@ def _get_events_near_user(user):
     #get items (events) within user dwithin distance
     #order by startdate (sooner to later)
     today = datetime.now().date()
-    yesterday = today - timedelta(10)
+    yesterday = today - timedelta(1)
     if user.ref_location:
         pnt = user.ref_location
     else:
