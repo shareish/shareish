@@ -2,12 +2,14 @@ from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.core.mail import send_mass_mail
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Q,F
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, timedelta, time
 from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import GEOSGeometry
 
 from .models import Message
 from .models import Item
@@ -24,33 +26,33 @@ def _get_unread_messages_count(user):
 
 def _get_new_items_near_user(user):
     #get items within user dwithin distance and which stardate is between yesterday and today, not event
-    #print("-------------- in _get_new_items_near_user for " +user.username + "----------------")
+    #order by distance from user ref_location
     today = datetime.now().date()
     yesterday = today - timedelta(1)
     if user.ref_location:
         pnt = user.ref_location
     else:
-        pnt = Point(0.0, 0.0)
+        pnt = GEOSGeometry('POINT(0.0 0.0)', srid=4326)
     return Item.objects.filter(
         Q(creationdate__lte = today, creationdate__gte = yesterday),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
         ~Q(item_type='EV'),
-        ~Q(user=user))   #~Q for items from another user
-
+        ~Q(user=user)).annotate(distance=Distance("location",pnt)).order_by("distance")
 
 def _get_events_near_user(user):
-    #get items (events) within user dwithin distance 
+    #get items (events) within user dwithin distance
+    #order by startdate (sooner to later)
     today = datetime.now().date()
-    yesterday = today - timedelta(1)
+    yesterday = today - timedelta(10)
     if user.ref_location:
         pnt = user.ref_location
     else:
-        pnt = Point(0.0, 0.0)
+        pnt = GEOSGeometry('POINT(0.0 0.0)', srid=4326)
     return Item.objects.filter(
         Q(item_type='EV'),
         Q(creationdate__lte = today, creationdate__gte = yesterday),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
-        ~Q(user=user))   #~Q for items from another user
+        Q(user=user)).annotate(delay=F('startdate')-today).order_by("delay")   #~Q for items from another user
 
 def _prepare_mail_user(user):
     new_items = _get_new_items_near_user(user)
@@ -98,17 +100,22 @@ def _prepare_mail_user(user):
                 plural="s"
             else:
                 plural=""
-            message += "You have {} new item{}, available in the Map or Browse tab:\n".format(len(new_items),plural)
+            message += "You have {} new item{}, available in the Map and Browse tab:\n".format(len(new_items),plural)
             for i in range (len(new_items)):
-                message+="* {} ({}, within {} km)\n".format(new_items[i].name, new_items[i].get_item_type_display(), round(100*new_items[i].location.distance(user.ref_location),2))
+                message+="* {} ({}, within {} km)\n".format(new_items[i].name,
+                                                            new_items[i].get_item_type_display(),
+                                                            round(100*new_items[i].location.distance(user.ref_location),2))
         if len(new_events) > 0:
             if len(new_events)>1:
                 plural="s"
             else:
                 plural=""
-            message += "\nYou have {} new event{}, available in the Map or Browse tab:\n".format(len(new_events),plural)
+            message += "\nYou have {} new event{}, available in the Map and Browse tab:\n".format(len(new_events),plural)
             for i in range (len(new_events)):
-                message+="* {} (from {} to {}, within {} km)\n".format(new_events[i].name, new_events[i].startdate, new_events[i].enddate, round(100*new_events[i].location.distance(user.ref_location),2))
+                message+="* {} (from {} to {}, within {} km)\n".format(new_events[i].name,
+                                                                       new_events[i].startdate.strftime("%B %d, %Y %H:%M"),
+                                                                       new_events[i].enddate.strftime("%B %d, %Y %H:%M"),
+                                                                       round(100*new_events[i].location.distance(user.ref_location),2))
 
         message+="\nThese notifications can be configured on Shareish in My account - Edit."
         message+="\n\nThe Shareish team.\n"
