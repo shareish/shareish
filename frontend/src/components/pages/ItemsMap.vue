@@ -66,11 +66,12 @@
                     <div v-if="marker.name"><strong>{{marker.name}}</strong></div>
                     <div class="is-grey">{{$t(extraLayer.slugMarker)}}</div>
                     <div class="is-grey is-size-7 has-text-right is-italic">
-                      <a :href="`https://openstreetmap.org/node/${marker.id}`" target="_blank">
+		      <a :href="getExtraMarkerURL(marker)" target="_blank">
                         <span>
                           <i class="fas fa-external-link-alt"></i>
                         </span>
-                        <span>{{$t('from-osm')}}</span>
+                        <!--<span>{{$t('from-osm')}}</span>//-->
+			<span>{{$t(getExtraMarkerSourceTransSlug(marker))}}</span>
                       </a>
                     </div>
                   </l-popup>
@@ -113,7 +114,7 @@ import {
     publicBookcaseIcon,
     aedIcon,
     giveBoxIcon,
-    drinkingWaterIcon, freeShopIcon, blueIcon
+    drinkingWaterIcon, freeShopIcon, fallingfruitIcon, blueIcon
 } from '@/map-icons';
 
 import { latLng } from "leaflet";
@@ -159,13 +160,14 @@ export default {
           markerClusterGroupOptions: {
             // disableClusteringAtZoom: 16,
             chunkedLoading: true,
-            maxClusterRadius: 20
+              maxClusterRadius: 25,
+	      disableClusteringAtZoom: 15
           },
           minZoomForExtraLayers: 10,
           extraLayersMarkerClusterGroupOptions: {
-            disableClusteringAtZoom: 16,
+            disableClusteringAtZoom: 15,
             chunkedLoading: true,
-            maxClusterRadius: 50
+            maxClusterRadius: 30
           },
           extraLayers: [
             {
@@ -212,6 +214,15 @@ export default {
               tagKey: 'amenity',
               tagValue: 'free_shop',
               color: 'is-warning'
+            },
+	      {
+              id: 'falling-fruits',
+              slugMarker: 'falling-fruit',
+              markers: [],
+              visible: true,
+              tagKey: 'ff',
+              tagValue: 'ffruit',
+              color: 'is-green'
             }
           ],
           extraLayersIcons: {
@@ -219,7 +230,8 @@ export default {
             'defibrillators': aedIcon,
             'give-boxes': giveBoxIcon,
             'drinking-water-spots': drinkingWaterIcon,
-            'free-shops': freeShopIcon
+            'free-shops': freeShopIcon,
+	    'falling-fruits': fallingfruitIcon  
           },
           userPosition: null,
           userPositionIcon: blueIcon,
@@ -347,21 +359,39 @@ export default {
         }
 
         this.extraLayers = await Promise.all(this.extraLayers.map(async extraLayer => {
-          try {
-            const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
-            const markers = elements.filter(element =>
-              element['lat'] !== null && element['lon'] !== null
-            ).map(element => {
-              return {
-                latitude: element['lat'],
-                longitude: element['lon'],
-                latLng: latLng(element['lat'], element['lon']),
-                type: element['tags'][extraLayer.tagKey],
-                name: element['tags']['name'],
-                id: element['id']
-              }
-            });
-            return {...extraLayer, markers};
+            try {
+		if (extraLayer.tagKey=='ff') {
+		    const elements = await this.getFallingFruitElements();
+		 const markers = elements.filter(element =>
+		      (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
+		  ).map(element => {
+		      return {
+			  latitude: element['lat'],
+			  longitude: element['lon'] || element['lng'],
+			  latLng: latLng(element['lat'], element['lng']),
+			  type: 'ffruit',
+			  name: element['type_names'][0],
+			  id: element['id']
+		      }
+		  })
+		  return {...extraLayer, markers};
+		}
+		else {
+		    const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
+		    const markers = elements.filter(element =>
+			(element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
+		    ).map(element => {
+			return {
+			    latitude: element['lat'],
+			    longitude: element['lon'] || element['lng'],
+			    latLng: latLng(element['lat'], element['lon']),
+			    type: element['tags'][extraLayer.tagKey],
+			    name: element['tags']['name'],
+			    id: element['id']
+			}
+		    })
+		    return {...extraLayer, markers};
+		}
           }
           catch (error) {
             console.log(error)
@@ -369,25 +399,59 @@ export default {
           }
         }));
       },
+	getExtraMarkerURL(marker) {
+	    if (marker.type=='ffruit') {
+		return('http://fallingfruit.org/locations/'+marker.id+'&locale='+this.$i18n.locale)
+	    }
+	    else {
+		return('https://openstreetmap.org/node/'+marker.id)
+		}
+	},
+	getExtraMarkerSourceTransSlug(marker) {
+	    if (marker.type=='ffruit') {
+		return('from-ff')
+	    }
+	    else {
+		return('from-osm')
+		}
+	},
+	async getFallingFruitElements() {
+	    try {
+		const ffbaseURL = 'https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale='+this.$i18n.locale+'&muni=1';
+		const ffcoords = '&nelat='+this.bounds.getNorthEast().lat+'&nelng='+this.bounds.getNorthEast().lng+'&swlat='+this.bounds.getSouthWest().lat+'&swlng='+this.bounds.getSouthWest().lng;
+		const ffURL = ffbaseURL+ffcoords
+		return(await axios.get(ffURL,
+				       {transformRequest: (data, headers) => {
+					   delete headers.common['Authorization'];
+					   return data;
+				       }
+				       })).data;
+
+	    }
+	    catch (error) {
+		console.log(error);
+		return []; // may happen if fallingfruit API returns an error
+            }	  
+	},
       async getOverPassElements(tagKey, tagValue) {
         // "amenity"="public_bookcase"; "amenity"="give_box"; "amenity"="food_sharing"; "amenity"="freeshop"; emergency=drinking_water; emergency=defibrillator
-        // social_facility=food_bank
-        const overpassQuery = `"${tagKey}"="${tagValue}"`;
-        const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
-        const nodeQuery = `node[${overpassQuery}](${bounds});`;
-        const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+          // social_facility=food_bank
 
-        //const baseURL = 'http://overpass-api.de/api';
-        //const baseURL = 'https://overpass.kumi.systems/api';
-        const baseURL = 'https://maps.mail.ru/osm/tools/overpass/api';
+              const overpassQuery = `"${tagKey}"="${tagValue}"`;
+              const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
+              const nodeQuery = `node[${overpassQuery}](${bounds});`;
+              const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        try {
-          return (await axios.get('/interpreter', {params: {data}, baseURL})).data['elements'];
-        }
-        catch (error) {
-          return []; // may happen if overpass API returns an error
-        }
-      },
+              //const baseURL = 'http://overpass-api.de/api';
+              //const baseURL = 'https://overpass.kumi.systems/api';
+              const baseURL = 'https://maps.mail.ru/osm/tools/overpass/api';
+              try {
+		  return (await axios.get('/interpreter', {params: {data}, baseURL})).data['elements'];
+              }
+              catch (error) {
+		  return []; // may happen if overpass API returns an error
+              }
+	  },
       async fetchMarkers() {
         // triggered when bounds changes
         this.mapLoading = true;
