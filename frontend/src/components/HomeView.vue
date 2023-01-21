@@ -18,7 +18,12 @@
 
 
 <p><b>{{$t('faq_nothing')}} </b><br>
-<i>{{$t('faq_nothing_answer')}}. </i></p><br>
+  <i>{{$t('faq_nothing_answer')}}. </i></p><br>
+
+<p><b>{{$t('faq_examples')}} </b><br>
+<i>{{$t('faq_examples_answer')}}. </i></p><br>
+
+<!-- can you give me exemples of services: promener chiens, faire courses, aller à la pharmacie, déposer qqun quelque part, citer exemple covid etc.... //-->
 
 <p><b>{{$t('faq_everything')}}</b><br>
 <i>{{$t('faq_everything_answer')}} </i></p><br>
