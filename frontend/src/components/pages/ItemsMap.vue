@@ -65,6 +65,7 @@
                   <l-popup>
                     <div v-if="marker.name"><strong>{{marker.name}}</strong></div>
                     <div class="is-grey">{{$t(extraLayer.slugMarker)}}</div>
+		    <div v-if="marker.description">{{marker.description}}</div>
                     <div class="is-grey is-size-7 has-text-right is-italic">
 		      <a :href="getExtraMarkerURL(marker)" target="_blank">
                         <span>
@@ -369,8 +370,9 @@ export default {
 			  latitude: element['lat'],
 			  longitude: element['lon'] || element['lng'],
 			  latLng: latLng(element['lat'], element['lng']),
-			  type: 'ffruit',
+			  type: 'ffruit', //element['description'], //'ffruit',
 			  name: element['type_names'][0],
+			  description: element['description'],
 			  id: element['id']
 		      }
 		  })
