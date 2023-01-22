@@ -1,6 +1,6 @@
 <template>
 <div class="page-add-item">
-  <h1 class="title">{{$t('add-new-item')}}</h1>
+  <h1 class="title">{{$t('add-new-item')}} <b-tooltip position="is-bottom" :label="$t('help_add_item')" multilined> <i class="icon far fa-question-circle"></i> </b-tooltip></h1>
   <b-loading :active="loading" :is-full-page="false" />
   <template v-if="step === 1">
     <h2 class="subtitle">{{$t('upload-your-item-image')}}</h2>

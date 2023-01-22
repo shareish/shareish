@@ -47,6 +47,7 @@
   "about-us": "À propos",
   "what-are-you-looking-for": "Que cherchez-vous?",
   "item-type": "Type",
+  "help_add_item": "Un élément peut être de plusieurs types (demande de bien ou service, offre de bien ou service, offre de prêt, événement) mais le formulaire d'encodage est identique. Si vous voulez encoder une donnée sur la voie publique comme une boîte à livres ou une source d'eau potable, il est préférable d'utiliser les outils prévus pour, voir la FAQ en page d'accueil",
   "help_item_type": "Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Événement pour un événement gratuit et solidaire",
   "help_item_ihaveimage": "Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)",
   "help_item_noimage": "Choisissez cette option si vous n'avez pas d'images pour votre élément (les images sont optionnelles et peuvent être uploadées ultérieurement)",
