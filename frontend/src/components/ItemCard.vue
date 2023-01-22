@@ -44,7 +44,8 @@
         <br>
         <template v-if="!recurrentList">
 	  <small>{{formattedDate(item.startdate)}}</small> <br>
-	  <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}}</small><br>
+	  <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}} <br></small>
+	  <small v-if="item.location && this.location">{{$t('at')}} &#177; {{getDistanceFromLatLonInKm()}} km </small><br> 
 	  <small v-if="item.hitcount > 0">{{item.hitcount}} {{$t('views')}} </small><br>
         </template>
       </div>
@@ -69,13 +70,37 @@ import {categories} from '@/categories';
 
 export default {
   name: 'ItemCard',
-  components: {ItemTypeTag},
+    components: {ItemTypeTag},
   props: {
     item: Object,
     recurrentList: {type: Boolean, default: false},
     userList: {type: Boolean, default: false},
-    users: Array
+      users: Array,
   },
+    data() {
+	return {
+	location:null,
+	gettingLocation: false,
+	    errorStr:null,
+	    }
+    },
+  created() {
+    //do we support geolocation
+    if(!("geolocation" in navigator)) {
+      this.errorStr = 'Geolocation is not available.';
+      return;
+    }
+
+    this.gettingLocation = true;
+    // get position
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.gettingLocation = false;
+      this.location = pos;
+    }, err => {
+      this.gettingLocation = false;
+      this.errorStr = err.message;
+    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
+  },  
   computed: {
     user() {
       return this.users.find(user => user.id === this.item.user) || {};
@@ -136,7 +161,27 @@ export default {
       },
       category(category) {
 	  return categories[category];
-      }
+      },
+      deg2rad(deg) {
+	  return deg * (Math.PI/180)
+      },
+      getDistanceFromLatLonInKm() {
+	  let latLong = this.item['location'].slice(17, -1).split(' ');
+	  var lat2=latLong[0];
+	  var lon2=latLong[1];
+	  var R = 6371; // Radius of the earth in km
+	  var dLat = this.deg2rad(lat2-this.location.coords.latitude);  // deg2rad below
+	  var dLon = this.deg2rad(lon2-this.location.coords.longitude); 
+	  var a = 
+	      Math.sin(dLat/2) * Math.sin(dLat/2) +
+	      Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) * 
+	      Math.sin(dLon/2) * Math.sin(dLon/2); 
+	  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+	  var d = R * c; // Distance in km
+	  return d.toFixed(2);
+	  //return d;
+      },
+
   },
 };
 </script>
