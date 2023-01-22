@@ -164,7 +164,7 @@ export default {
               maxClusterRadius: 25,
 	      disableClusteringAtZoom: 15
           },
-          minZoomForExtraLayers: 10,
+          minZoomForExtraLayers: 12,
           extraLayersMarkerClusterGroupOptions: {
             disableClusteringAtZoom: 15,
             chunkedLoading: true,
