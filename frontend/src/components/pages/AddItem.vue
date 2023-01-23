@@ -52,7 +52,8 @@
         </div>
         <b-field>
 	  <template #label>{{$t('address')}}
-	  <b-tooltip position="is-right" :label="$t('help_item_address')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
+	    <b-tooltip position="is-right" :label="$t('help_item_address')" multilined> <i class="icon far fa-question-circle"></i> </b-tooltip>
+	    <b-button @click="copyGeoLocAddress" size="is-small"><i class="icon fas fa-map-marker-alt"></i></b-button></template>
           <b-input v-model="location" />
         </b-field>
         <b-field>
@@ -119,30 +120,51 @@ export default {
   components: {CategorySelector, RecurrentItemsList},
   data() {
     return {
-      loading: false,
-      step: 0,
-      errorCode: null,
-      errorMessage: null,
+	loading: false,
+	step: 0,
+	errorCode: null,
+	errorMessage: null,
 
-      file: null,
-      filePreview: null,
+	file: null,
+	filePreview: null,
 
-      suggestedName: null,
-      suggestedDescription: null,
+	suggestedName: null,
+	suggestedDescription: null,
 
-      name: '',
-      description: '',
-      type: null,
-      category1: null,
-      category2: null,
-      category3: null,
-      location: '',
+	name: '',
+	description: '',
+	type: null,
+	category1: null,
+	category2: null,
+	category3: null,
+	location: '',
 
-      isRecurrent: false,
-      startDate: null,
-      endDate: null
+	geoloc: null,
+	gettingLocation: false,
+	errorStr:null,
+	
+	isRecurrent: false,
+	startDate: null,
+	endDate: null
     }
   },
+    created() {
+    //do we support geolocation
+    if(!("geolocation" in navigator)) {
+      this.errorStr = 'Geolocation is not available.';
+      return;
+    }
+
+    this.gettingLocation = true;
+    // get position
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.gettingLocation = false;
+      this.geoloc = pos;
+    }, err => {
+      this.gettingLocation = false;
+      this.errorStr = err.message;
+    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
+  },  
   computed: {
     error() {
       return {
@@ -161,7 +183,24 @@ export default {
       })
     }
   },
-  methods: {
+    methods: {
+	async copyGeoLocAddress() {
+	    //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
+	    var geoLocPoint='SRID=4326;POINT ('+this.geoloc.coords.latitude+' '+this.geoloc.coords.longitude+')'
+	    if (this.geoloc === null) {
+		return;
+	    }
+
+	    try {
+		this.location = (await axios.post(
+		    `/api/v1/address/`,
+		    geoLocPoint
+		)).data;
+	    }
+	    catch (error) {
+		console.log(JSON.stringify(error));
+	    }
+	},
     async uploadFile(event) {
       this.loading = true;
 

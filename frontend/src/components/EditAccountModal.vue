@@ -13,6 +13,7 @@
 	  <b-field :key="field" :type="{'is-danger': errors.has(field)}" :message="errors.first(field)">
 	    <template #label> 
 	      <b-tooltip position="is-right" :key="field" :label="$t(helpTranslationKey)" multilined>{{$t(translationKey)}} <i class="icon far fa-question-circle"></i> </b-tooltip>
+	      <b-button v-if="field=='ref_location'" @click="copyGeoLocAddress" size="is-small"><i class="icon fas fa-map-marker-alt"></i></b-button>
 	    </template>
 	  <b-input
             v-model="internalUser[field]"
@@ -66,17 +67,37 @@ export default {
   name: 'EditAccountModal',
   props: {
       user: Object,
-      address: String,
+      //address: String,
   },
   $_veeValidate: {validator: 'new'},
   data() {
     return {
 	internalUser: {},
 	//address : null,
-      displayErrors: false,
-      file: null,
+	displayErrors: false,
+	file: null,
+	geoloc: null,
+	gettingLocation: false,
+	errorStr:null,
     }
   },
+    created() {
+    //do we support geolocation
+    if(!("geolocation" in navigator)) {
+      this.errorStr = 'Geolocation is not available.';
+      return;
+    }
+
+    this.gettingLocation = true;
+    // get position
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.gettingLocation = false;
+      this.geoloc = pos;
+    }, err => {
+      this.gettingLocation = false;
+      this.errorStr = err.message;
+    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
+  },  
   computed: {
     editableFields() {
       return [
@@ -95,7 +116,24 @@ export default {
       ];
     },
   },
-  methods: {
+    methods: {
+	async copyGeoLocAddress() {
+	    //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
+	    var geoLocPoint='SRID=4326;POINT ('+this.geoloc.coords.latitude+' '+this.geoloc.coords.longitude+')'
+	    if (this.geoloc === null) {
+		return;
+	    }
+
+	    try {
+		this.internalUser.ref_location = (await axios.post(
+		    `/api/v1/address/`,
+		    geoLocPoint
+		)).data;
+	    }
+	    catch (error) {
+		console.log(JSON.stringify(error));
+	    }
+	},
     async fetchAddress() {
       if (this.internalUser.ref_location === null) {
         return;
@@ -154,10 +192,10 @@ export default {
   },
 
     async mounted() {
-    this.internalUser = {...this.user};
-    await this.fetchAddress();    
-    delete this.internalUser.image;
-    delete this.internalUser.items;
+	this.internalUser = {...this.user};
+	await this.fetchAddress();
+	delete this.internalUser.image;
+	delete this.internalUser.items;
   }
 
     
