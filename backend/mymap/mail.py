@@ -43,7 +43,7 @@ def _get_events_near_user(user):
     #get items (events) within user dwithin distance
     #order by startdate (sooner to later)
     today = datetime.now().date()
-    yesterday = today - timedelta(100)
+    yesterday = today - timedelta(1)
     if user.ref_location:
         pnt = user.ref_location
     else:
@@ -52,7 +52,7 @@ def _get_events_near_user(user):
         Q(item_type='EV'),
         Q(creationdate__lte = today, creationdate__gte = yesterday),
         Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
-        Q(user=user)).annotate(delay=F('startdate')-today).order_by("delay")   #~Q for items from another user
+        ~Q(user=user)).annotate(delay=F('startdate')-today).order_by("delay")   #~Q for items from another user
 
 def _prepare_mail_user(user):
     new_items = _get_new_items_near_user(user)
