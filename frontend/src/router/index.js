@@ -17,7 +17,8 @@ import ItemsList from '@/components/pages/ItemsList';
 import Account from '@/components/pages/Account';
 import UserProfile from '@/components/pages/UserProfile';
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         name: 'home',
         component: HomeView
@@ -60,7 +61,7 @@ const routes = [{
         path: '/map',
         name: 'itemsMap',
         component: ItemsMap,
-        meta: {
+	meta: {
             requireLogin: true
         }
     },
@@ -138,7 +139,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
         i18n.locale = localStorage.getItem('language') || 'en'
-        next('/')
+        next('/log-in')
     }
  else {
         next()

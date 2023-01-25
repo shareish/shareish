@@ -43,7 +43,7 @@ def _get_events_near_user(user):
     #get items (events) within user dwithin distance
     #order by startdate (sooner to later)
     today = datetime.now().date()
-    yesterday = today - timedelta(1)
+    yesterday = today - timedelta(100)
     if user.ref_location:
         pnt = user.ref_location
     else:
@@ -85,7 +85,7 @@ def _prepare_mail_user(user):
     
     if unread_count > 0 or len(new_items) > 0 or len(new_events) > 0:
         subject = "[Shareish] Recent content on Shareish mutual aid platform ({} {} {})".format(subject_msg,subject_items,subject_events)
-        message = "Dear {} {} ({}),\n\nThere is new content since yesterday within your neighbourhood on Shareish mutual aid platform.\n".format(
+        message = "Dear {} {} ({}),\n\nThere is new content since yesterday within your neighbourhood on Shareish mutual aid platform.\n\n".format(
             user.first_name, user.last_name, user.username)
         message+="Please login on {} (using your e-mail address) to view it.\n\n".format(settings.APP_URL)
     
@@ -102,9 +102,11 @@ def _prepare_mail_user(user):
                 plural=""
             message += "You have {} new item{}, available in the Map and Browse tab:\n".format(len(new_items),plural)
             for i in range (len(new_items)):
-                message+="* {} ({}, within {} km)\n".format(new_items[i].name,
-                                                            new_items[i].get_item_type_display(),
-                                                            round(100*new_items[i].location.distance(user.ref_location),2))
+                message+="* {} ({}, within {} km, {}/map?id={})\n".format(new_items[i].name,
+                                                                          new_items[i].get_item_type_display(),
+                                                                          round(100*new_items[i].location.distance(user.ref_location),2),
+                                                                          settings.APP_URL,
+                                                                          new_items[i].id)
         if len(new_events) > 0:
             if len(new_events)>1:
                 plural="s"
@@ -112,12 +114,14 @@ def _prepare_mail_user(user):
                 plural=""
             message += "\nYou have {} new event{}, available in the Map and Browse tab:\n".format(len(new_events),plural)
             for i in range (len(new_events)):
-                message+="* {} (from {} to {}, within {} km)\n".format(new_events[i].name,
-                                                                       new_events[i].startdate.strftime("%B %d, %Y %H:%M"),
-                                                                       new_events[i].enddate.strftime("%B %d, %Y %H:%M"),
-                                                                       round(100*new_events[i].location.distance(user.ref_location),2))
+                message+="* {} (from {} to {}, within {} km, {}/map?id={})\n".format(new_events[i].name,
+                                                                                     new_events[i].startdate.strftime("%B %d, %Y %H:%M"),
+                                                                                     new_events[i].enddate.strftime("%B %d, %Y %H:%M"),
+                                                                                     round(100*new_events[i].location.distance(user.ref_location),2),
+                                                                                     settings.APP_URL,
+                                                                                     new_events[i].id)
 
-        message+="\nThese notifications can be configured on Shareish in My account - Edit."
+        message+="\nThese notifications can be configured on Shareish in My account Edit ({}/profile)".format(settings.APP_URL)
         message+="\n\nThe Shareish team.\n"
 
     else:
