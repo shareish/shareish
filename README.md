@@ -1,8 +1,8 @@
 # SHAREISH
 
-Shareish can be installed in production mode on a server ("Installation for deployment"), or in development mode for local development ("Local development with Docker-compose (on your own computer)"). See below for relevant installation instructions.
+Shareish can be installed in production mode on a server ("Installation for deployment on a production server"), or in development mode for local development ("Local development with Docker-compose (on your own computer)"). See below for relevant installation instructions.
 
-## Installation for deployment
+## Installation for deployment on a production server
 
 The first step is to have a server that can be accessed through HTTP.
 
@@ -26,7 +26,7 @@ Change the name of your host server name by editing the file main.js in the dire
 
 Then edit backend/mapsite/settings.py (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
 
-Download Docker and start it on your server:
+Download Docker and start it on your server (https://docs.docker.com/engine/install/):
 
 ```
 > curl https://get.docker.com | sh
@@ -93,7 +93,9 @@ The let's encrypt certificate has to be renewed every three months. It is possib
 
 Shareish can be run in development environment using Docker-compose on your own computer:
 
-First, clone the repository on your system:
+Install Docker and Docker compose on your computer (https://docs.docker.com/engine/install/).
+
+Then, clone the Shareish repository on your system:
 git clone https://github.com/shareish/shareish.git
 
 Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
@@ -113,7 +115,7 @@ Backend is running at `http://localhost:8000`, and frontend at `http://localhost
 
 See the logs in live: `docker compose logs` (in the root directory).
 To stop: `docker compose stop` (in the root directory).
-To remove container: `docker compose rm` (in the root directory, data is preserved).
+To remove container: `docker compose rm` (in the root directory, data are kept in the volumes).
 
 In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the 
-corresponding code is recompiled if needed and the server is restarted automatically (see the logs).
+corresponding code is recompiled if needed and the server is restarted automatically (see the logs using docker compose logs -f web/ui/db).
