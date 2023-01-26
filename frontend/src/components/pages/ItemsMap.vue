@@ -196,7 +196,7 @@ export default {
               visible: true,
               tagKey: 'amenity',
               tagValue: 'give_box',
-              color: 'is-danger'
+              color: 'is-dark'
             },
             {
               id: 'drinking-water-spots',
@@ -419,7 +419,7 @@ export default {
 	},
 	async getFallingFruitElements() {
 	    try {
-		const ffbaseURL = 'https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale='+this.$i18n.locale+'&muni=1';
+		const ffbaseURL = 'https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale='+this.$i18n.locale+'&muni=0';
 		const ffcoords = '&nelat='+this.bounds.getNorthEast().lat+'&nelng='+this.bounds.getNorthEast().lng+'&swlat='+this.bounds.getSouthWest().lat+'&swlng='+this.bounds.getSouthWest().lng;
 		const ffURL = ffbaseURL+ffcoords
 		return(await axios.get(ffURL,
