@@ -115,7 +115,7 @@ import {
     publicBookcaseIcon,
     aedIcon,
     giveBoxIcon,
-    drinkingWaterIcon, freeShopIcon, fallingfruitIcon, blueIcon
+    drinkingWaterIcon, freeShopIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
 } from '@/map-icons';
 
 import { latLng } from "leaflet";
@@ -198,6 +198,24 @@ export default {
               tagValue: 'give_box',
               color: 'is-dark'
             },
+	      {
+              id: 'food-banks',
+              slugMarker: 'food-bank',
+              markers: [],
+              visible: true,
+              tagKey: 'social_facility',
+              tagValue: 'food_bank',
+              color: 'is-dark'
+              },
+	      {
+              id: 'soup-kitchens',
+              slugMarker: 'soup-kitchen',
+              markers: [],
+              visible: true,
+              tagKey: 'social_facility',
+              tagValue: 'soup_kitchen',
+              color: 'is-dark'
+            },
             {
               id: 'drinking-water-spots',
               slugMarker: 'drinking-water-spot',
@@ -227,12 +245,14 @@ export default {
             }
           ],
           extraLayersIcons: {
-            'bookcases': publicBookcaseIcon,
-            'defibrillators': aedIcon,
-            'give-boxes': giveBoxIcon,
-            'drinking-water-spots': drinkingWaterIcon,
-            'free-shops': freeShopIcon,
-	    'falling-fruits': fallingfruitIcon  
+              'bookcases': publicBookcaseIcon,
+              'defibrillators': aedIcon,
+              'give-boxes': giveBoxIcon,
+              'drinking-water-spots': drinkingWaterIcon,
+              'free-shops': freeShopIcon,
+	      'food-banks': foodBankIcon,
+	      'soup-kitchens': soupKitchenIcon,
+	      'falling-fruits': fallingfruitIcon  
           },
           userPosition: null,
           userPositionIcon: blueIcon,
