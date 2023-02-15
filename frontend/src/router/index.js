@@ -16,6 +16,7 @@ import ActivateEmail from '@/components/user-management/ActivateEmail.vue'
 import ItemsList from '@/components/pages/ItemsList';
 import Account from '@/components/pages/Account';
 import UserProfile from '@/components/pages/UserProfile';
+import Settings from "@/components/pages/Settings.vue";
 
 const routes = [
     {
@@ -61,7 +62,7 @@ const routes = [
         path: '/map',
         name: 'itemsMap',
         component: ItemsMap,
-	meta: {
+        meta: {
             requireLogin: true
         }
     },
@@ -121,12 +122,20 @@ const routes = [
             requireLogin: true
         }
     },
+    {
+        path: '/settings',
+        name: 'settings',
+        component: Settings,
+        meta: {
+            requireLogin: true
+        }
+    },
 
     // Redirects for old urls
     {path: '/dashboard', redirect: '/map'},
     {path: '/dashboard/items', redirect: '/items'},
     {path: '/dashboard/items/:id', redirect: '/items/:id'},
-    {path: '/dashboard/items/add', redirect: '/add-item'},
+    {path: '/dashboard/items/add', redirect: '/add-item'}
 ]
 
 // Create router instance
@@ -140,10 +149,9 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
         i18n.locale = localStorage.getItem('language') || 'en'
         next('/log-in')
-    }
- else {
+    } else {
         next()
     }
-})
+});
 
 export default router;

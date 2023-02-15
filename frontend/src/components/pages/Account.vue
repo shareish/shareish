@@ -2,7 +2,7 @@
   <div class="page-account">
     <h1 class="title">{{ $t('my-account') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
-    <user-card v-else-if="user" :user="user" editable @edit="startEdition" @logout="logout" />
+    <user-card v-else-if="user" :user="user" editable @edit="startEdition" />
     <h1 class="title">{{ $t('my-items') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <div v-else-if="items && items.length" class="columns">
@@ -57,23 +57,6 @@ export default {
         this.itemUsers = (await axios.get(uri)).data;
       } catch (error) {
         console.log(error);
-      }
-    },
-    async logout() {
-      try {
-        await axios.post('/api/v1/token/logout/');
-        axios.defaults.headers.common["Authorization"] = "";
-        localStorage.removeItem("token");
-        this.$store.commit('removeToken');
-        this.$store.commit('removeUserID');
-        await this.$router.push('/');
-      } catch (error) {
-        if (error.response) {
-          error = error.response.data;
-        } else if (error.message) {
-          error = error.message;
-        }
-        console.log(JSON.stringify(error));
       }
     },
     updateUser(user) {

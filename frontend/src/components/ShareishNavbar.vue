@@ -33,10 +33,24 @@
         <b-navbar-item :active="$i18n.locale === 'en'" @click="changeLanguage('en')">English</b-navbar-item>
         <b-navbar-item :active="$i18n.locale === 'fr'" @click="changeLanguage('fr')">Français</b-navbar-item>
       </b-navbar-dropdown>
-      <b-navbar-item v-if="isAuthenticated" tag="router-link" to="/profile">
-        <i class="fas fa-user-circle"></i>
-        {{ $t('my-account') }}
-      </b-navbar-item>
+      <b-navbar-dropdown v-if="isAuthenticated" :label="$t('my-account')">
+        <b-navbar-item tag="router-link" to="/profile">
+          <i class="fas fa-user-circle"></i>
+          Profile
+        </b-navbar-item>
+        <b-navbar-item tag="router-link" to="/settings">
+          <i class="fas fa-cog"></i>
+          Settings
+        </b-navbar-item>
+        <b-navbar-item @click="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </b-navbar-item>
+      </b-navbar-dropdown>
+<!--      <b-navbar-item v-if="isAuthenticated" tag="router-link" to="/profile">-->
+<!--        <i class="fas fa-user-circle"></i>-->
+<!--        {{ $t('my-account') }}-->
+<!--      </b-navbar-item>-->
       <b-navbar-item v-else tag="div">
         <div class="buttons">
           <router-link class="button is-primary" to="/sign-up">
@@ -76,7 +90,7 @@ export default {
   watch: {
     async isAuthenticated(val) {
       // Force update conversation notification when authenticated
-      await this.fetchConversationUpdates();
+      // await this.fetchConversationUpdates();
     }
   },
   methods: {
@@ -97,6 +111,23 @@ export default {
       localStorage.setItem('language', lang);
       this.$i18n.locale = lang;
     },
+    async logout() {
+      try {
+        await axios.post('/api/v1/token/logout/');
+        axios.defaults.headers.common["Authorization"] = "";
+        localStorage.removeItem("token");
+        this.$store.commit('removeToken');
+        this.$store.commit('removeUserID');
+        await this.$router.push('/');
+      } catch (error) {
+        if (error.response) {
+          error = error.response.data;
+        } else if (error.message) {
+          error = error.message;
+        }
+        console.log(JSON.stringify(error));
+      }
+    }
   },
   mounted() {
     this.fetchConversationUpdates();
