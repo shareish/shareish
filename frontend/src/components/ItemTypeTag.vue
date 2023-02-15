@@ -1,22 +1,20 @@
 <template>
-  <span class="tag is-normal" :class="color">{{$t(this.text)}}</span>
+  <span :class="color" class="tag is-normal">{{ $t(this.text) }}</span>
 </template>
 
 <script>
-
-
 const itemTypeIcons = {
-    "DN": "is-success",
-    "LN": "is-warning",
-    "BR": "is-danger",
-    "EV": "is-purple"
+  "DN": "is-success",
+  "LN": "is-warning",
+  "BR": "is-danger",
+  "EV": "is-purple"
 }
 
 const itemTypeSlug = {
-    "DN": "donation",
-    "LN": "loan",
-    "BR": "request",
-    "EV": "event"
+  "DN": "donation",
+  "LN": "loan",
+  "BR": "request",
+  "EV": "event"
 }
 
 export default {
@@ -32,7 +30,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-
-</style>

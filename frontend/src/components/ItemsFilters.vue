@@ -1,12 +1,12 @@
 <template>
-  <b-field grouped group-multiline class="filters">
-    <b-field expanded :label="$t('what-are-you-looking-for')">
+  <b-field class="filters" group-multiline grouped>
+    <b-field :label="$t('what-are-you-looking-for')" expanded>
       <b-input :placeholder="$t('search-dot')"
-        :value="searchString"
-        @input="debounceSearchString"
-        type="search"
-        icon-pack="fas"
-        icon="search">
+               :value="searchString"
+               icon="search"
+               icon-pack="fas"
+               type="search"
+               @input="debounceSearchString">
       </b-input>
     </b-field>
     <b-field :label="$t('item-type')">
@@ -15,7 +15,7 @@
         <option value="BR">{{ $t('request') }}</option>
         <option value="DN">{{ $t('donation') }}</option>
         <option value="LN">{{ $t('loan') }}</option>
-	<option value="EV">{{ $t('event') }}</option>
+        <option value="EV">{{ $t('event') }}</option>
       </b-select>
     </b-field>
     <category-selector v-model="selectedCategory"></category-selector>
@@ -36,9 +36,7 @@ export default {
       searchString: '',
     }
   },
-  computed: {
-
-  },
+  computed: {},
   watch: {
     selectedCategory() {
       this.$emit('update:selectedCategory', this.selectedCategory);

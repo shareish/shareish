@@ -1,113 +1,128 @@
 <template>
-<div class="page-add-item">
-  <h1 class="title">{{$t('add-new-item')}} <b-tooltip position="is-bottom" :label="$t('help_add_item')" multilined> <i class="icon far fa-question-circle"></i> </b-tooltip></h1>
-  <b-loading :active="loading" :is-full-page="false" />
-  <template v-if="step === 1">
-    <h2 class="subtitle">{{$t('upload-your-item-image')}}</h2>
-    <div class="container has-text-centered centered-container">
+  <div class="page-add-item">
+    <h1 class="title">
+      {{ $t('add-new-item') }}
+      <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
+        <i class="icon far fa-question-circle"></i>
+      </b-tooltip>
+    </h1>
+    <b-loading :active="loading" :is-full-page="false" />
+    <template v-if="step === 1">
+      <h2 class="subtitle">{{ $t('upload-your-item-image') }}</h2>
+      <div class="container has-text-centered centered-container">
         <div class="file is-boxed is-large">
           <label class="file-label">
-            <input class="file-input" type="file" accept="image/*" @change="uploadFile">
+            <input accept="image/*" class="file-input" type="file" @change="uploadFile">
             <span class="file-cta">
-              <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-              </span>
-              <span class="file-label">
-                  Choose a file…
-              </span>
+              <span class="file-icon"><i class="fas fa-upload"></i></span>
+              <span class="file-label">Choose a file…</span>
             </span>
-            <span class="file-name" v-if="file && file.length === 1">
-                {{ file[0].name }}
-            </span>
+            <span v-if="file && file.length === 1" class="file-name">{{ file[0].name }}</span>
           </label>
-      </div>
-    </div>
-  </template>
-  <template v-else-if="step === 2">
-    <div class="columns">
-      <section class="column is-four-fifths">
-        <b-field>
-	  <template #label>{{$t('name')}}
-	  <b-tooltip position="is-right" :label="$t('help_item_name')" multilined><i class="icon far fa-question-circle"></i></b-tooltip></template>
-          <b-input v-model="name" />
-        </b-field>
-
-	<b-field>
-	  <template #label>{{$t('item-type')}}
-	  <b-tooltip position="is-right" :label="$t('help_item_type')" multilined><i class="icon far fa-question-circle"></i></b-tooltip></template>
-          <b-select v-model="type" expanded>
-            <option value="BR">{{ $t('request') }}</option>
-            <option value="DN">{{ $t('donation') }}</option>
-            <option value="LN">{{ $t('loan') }}</option>
-	    <option value="EV">{{ $t('event') }}</option>
-          </b-select>
-        </b-field>
-
-	<div class="columns">
-	  <b-tooltip position="is-right" :label="$t('help_item_category')" multilined>
-          <category-selector class="column" :number="1" v-model="category1" :nullable="false" expanded/>
-          <category-selector class="column" :number="2" v-model="category2" :nullable="false" expanded/>
-          <category-selector class="column" :number="3" v-model="category3" :nullable="false" expanded/>
-	  </b-tooltip>
         </div>
-        <b-field>
-	  <template #label>{{$t('address')}}
-	    <b-tooltip position="is-right" :label="$t('help_item_address')" multilined> <i class="icon far fa-question-circle"></i> </b-tooltip>
-	    <b-button @click="copyGeoLocAddress" size="is-small"><i class="icon fas fa-map-marker-alt"></i></b-button></template>
-          <b-input v-model="location" />
-        </b-field>
-        <b-field>
-	  <template #label> {{$t('description')}}
-	  <b-tooltip position="is-right" :label="$t('help_item_description')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
-          <b-input type="textarea" expanded v-model="description" />
-        </b-field>
-        <b-field grouped>
-          <b-field expanded>
-	    <template #label> {{$t('start-date')}}
-	      <b-tooltip position="is-top" :label="$t('help_item_start_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
-            <b-datetimepicker
-              icon-pack="fas"
-              icon="calendar"
-              v-model="startDate"
-            >
-            </b-datetimepicker>
-          </b-field>
-          <b-field expanded>
-	    <template #label> {{$t('end-date')}}
-	      <b-tooltip position="is-top" :label="$t('help_item_end_date')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
-            <b-datetimepicker
-              icon-pack="fas"
-              icon="calendar"
-              v-model="endDate"
-              :min-date="startDate"
-            >
-            </b-datetimepicker>
-          </b-field>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="isRecurrent">
-            <strong>{{$t('save-as-recurrent-item')}}</strong><b-tooltip position="is-top" :label="$t('help_item_recurrent')" multilined><i class="icon far fa-question-circle"></i></b-tooltip>
-          </b-checkbox>
-        </b-field>
-        <div class="container has-text-centered">
-          <button class="button is-primary" @click="submit">{{$t('submit')}}</button>
-        </div>
-      </section>
-      <div class="column">
-        <figure class="image is-256x256" v-if="filePreview">
-          <img :src="filePreview" />
-        </figure>
       </div>
-    </div>
-  </template>
-  <template v-else>
-    <div class="container has-text-centered buttons centered-container">
-      <b-tooltip position="is-bottom" :label="$t('help_item_ihaveimage')" multilined><button class="button is-primary is-large" @click="step = 1">{{$t('i-have-image')}}</button></b-tooltip>  &nbsp; &nbsp;    <b-tooltip position="is-bottom" :label="$t('help_item_noimage')" multilined><button class="button is-primary is-large is-outlined" @click="step = 2">{{$t('i-do-not-have-image')}}</button></b-tooltip>
-      
-    </div>
-    <recurrent-items-list @submitAgain="setRecurrentItem"/>
-  </template>
-</div>
+    </template>
+    <template v-else-if="step === 2">
+      <div class="columns">
+        <section class="column is-four-fifths">
+          <b-field>
+            <template #label>{{ $t('name') }}
+              <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="name" />
+          </b-field>
+
+          <b-field>
+            <template #label>{{ $t('item-type') }}
+              <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-select v-model="type" expanded>
+              <option value="BR">{{ $t('request') }}</option>
+              <option value="DN">{{ $t('donation') }}</option>
+              <option value="LN">{{ $t('loan') }}</option>
+              <option value="EV">{{ $t('event') }}</option>
+            </b-select>
+          </b-field>
+
+          <div class="columns">
+            <b-tooltip :label="$t('help_item_category')" multilined position="is-right">
+              <category-selector v-model="category1" :nullable="false" :number="1" class="column" expanded />
+              <category-selector v-model="category2" :nullable="false" :number="2" class="column" expanded />
+              <category-selector v-model="category3" :nullable="false" :number="3" class="column" expanded />
+            </b-tooltip>
+          </div>
+          <b-field>
+            <template #label>{{ $t('address') }}
+              <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+              <b-button size="is-small" @click="copyGeoLocAddress">
+                <i class="icon fas fa-map-marker-alt"></i>
+              </b-button>
+            </template>
+            <b-input v-model="location" />
+          </b-field>
+          <b-field>
+            <template #label> {{ $t('description') }}
+              <b-tooltip :label="$t('help_item_description')" multilined position="is-right">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="description" expanded type="textarea" />
+          </b-field>
+          <b-field grouped>
+            <b-field expanded>
+              <template #label> {{ $t('start-date') }}
+                <b-tooltip :label="$t('help_item_start_date')" multilined position="is-top">
+                  <i class="icon far fa-question-circle"></i>
+                </b-tooltip>
+              </template>
+              <b-datetimepicker v-model="startDate" icon="calendar" icon-pack="fas"></b-datetimepicker>
+            </b-field>
+            <b-field expanded>
+              <template #label> {{ $t('end-date') }}
+                <b-tooltip :label="$t('help_item_end_date')" multilined position="is-top">
+                  <i class="icon far fa-question-circle"></i>
+                </b-tooltip>
+              </template>
+              <b-datetimepicker v-model="endDate" :min-date="startDate" icon="calendar" icon-pack="fas"></b-datetimepicker>
+            </b-field>
+          </b-field>
+          <b-field>
+            <b-checkbox v-model="isRecurrent">
+              <strong>{{ $t('save-as-recurrent-item') }}</strong>
+              <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </b-checkbox>
+          </b-field>
+          <div class="container has-text-centered">
+            <button class="button is-primary" @click="submit">{{ $t('submit') }}</button>
+          </div>
+        </section>
+        <div class="column">
+          <figure v-if="filePreview" class="image is-256x256">
+            <img :src="filePreview" />
+          </figure>
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="container has-text-centered buttons centered-container">
+        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom">
+          <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
+        </b-tooltip> &nbsp; &nbsp;
+        <b-tooltip :label="$t('help_item_noimage')" multilined position="is-bottom">
+          <button class="button is-primary is-large is-outlined" @click="step = 2">{{ $t('i-do-not-have-image') }}</button>
+        </b-tooltip>
+      </div>
+      <recurrent-items-list @submitAgain="setRecurrentItem" />
+    </template>
+  </div>
 </template>
 
 <script>
@@ -115,42 +130,43 @@ import RecurrentItemsList from '@/components/RecurrentItemsList';
 import axios from 'axios';
 import CategorySelector from '@/components/CategorySelector';
 import moment from 'moment/moment';
+
 export default {
   name: 'AddItem',
   components: {CategorySelector, RecurrentItemsList},
   data() {
     return {
-	loading: false,
-	step: 0,
-	errorCode: null,
-	errorMessage: null,
+      loading: false,
+      step: 0,
+      errorCode: null,
+      errorMessage: null,
 
-	file: null,
-	filePreview: null,
+      file: null,
+      filePreview: null,
 
-	suggestedName: null,
-	suggestedDescription: null,
+      suggestedName: null,
+      suggestedDescription: null,
 
-	name: '',
-	description: '',
-	type: null,
-	category1: null,
-	category2: null,
-	category3: null,
-	location: '',
+      name: '',
+      description: '',
+      type: null,
+      category1: null,
+      category2: null,
+      category3: null,
+      location: '',
 
-	geoloc: null,
-	gettingLocation: false,
-	errorStr:null,
-	
-	isRecurrent: false,
-	startDate: null,
-	endDate: null
+      geoloc: null,
+      gettingLocation: false,
+      errorStr: null,
+
+      isRecurrent: false,
+      startDate: null,
+      endDate: null
     }
   },
-    created() {
+  created() {
     //do we support geolocation
-    if(!("geolocation" in navigator)) {
+    if (!("geolocation" in navigator)) {
       this.errorStr = 'Geolocation is not available.';
       return;
     }
@@ -163,8 +179,8 @@ export default {
     }, err => {
       this.gettingLocation = false;
       this.errorStr = err.message;
-    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
-  },  
+    }, {maximumAge: 10000, timeout: 5000, enableHighAccuracy: true})
+  },
   computed: {
     error() {
       return {
@@ -183,24 +199,23 @@ export default {
       })
     }
   },
-    methods: {
-	async copyGeoLocAddress() {
-	    //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-	    var geoLocPoint='SRID=4326;POINT ('+this.geoloc.coords.latitude+' '+this.geoloc.coords.longitude+')'
-	    if (this.geoloc === null) {
-		return;
-	    }
+  methods: {
+    async copyGeoLocAddress() {
+      //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
+      var geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')'
+      if (this.geoloc === null) {
+        return;
+      }
 
-	    try {
-		this.location = (await axios.post(
-		    `/api/v1/address/`,
-		    geoLocPoint
-		)).data;
-	    }
-	    catch (error) {
-		console.log(JSON.stringify(error));
-	    }
-	},
+      try {
+        this.location = (await axios.post(
+            `/api/v1/address/`,
+            geoLocPoint
+        )).data;
+      } catch (error) {
+        console.log(JSON.stringify(error));
+      }
+    },
     async uploadFile(event) {
       this.loading = true;
 
@@ -222,8 +237,7 @@ export default {
         const predictions = (await axios.post('/api/v1/predictClass/', this.file)).data;
         this.suggestedName = predictions['suggested_class'];
         this.suggestedDescription = predictions['detected_text'];
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -234,8 +248,7 @@ export default {
       let startDate;
       if (this.startDate) {
         startDate = moment(this.startDate).format('YYYY-MM-DD[T]HH:mm:ss');
-      }
-      else {
+      } else {
         startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
       }
 
@@ -268,7 +281,7 @@ export default {
             formData.append('itemID', id);
             let files = [this.file];
             let previews = [this.filePreview];
-            for(let i = 0; i < Object.keys(files).length; i++){
+            for (let i = 0; i < Object.keys(files).length; i++) {
               const file = files[i];
               const preview = previews[i];
               const blob = await (await fetch(preview)).blob();
@@ -277,30 +290,26 @@ export default {
             }
             await axios.post(uri, formData);
 
-          }
-          catch (error) {
+          } catch (error) {
             console.log(error);
             const response = error.response;
             this.errorCode = response.status;
             if (response.data.message) {
               this.errorMessage = response.data.message;
-            }
-            else {
+            } else {
               this.errorMessage = JSON.stringify(response.data);
             }
           }
         }
 
         await this.$router.push('/items');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         const response = error.response;
         this.errorCode = response.status;
         if (response.data.message) {
           this.errorMessage = response.data.message;
-        }
-        else {
+        } else {
           this.errorMessage = JSON.stringify(response.data);
         }
       }
@@ -316,8 +325,7 @@ export default {
       if (item.location !== null) {
         try {
           this.location = (await axios.post(`/api/v1/address/`, item.location)).data;
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
         }
       }

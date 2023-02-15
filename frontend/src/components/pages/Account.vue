@@ -1,19 +1,19 @@
 <template>
-<div class="page-account">
-  <h1 class="title">{{$t('my-account')}}</h1>
-  <b-loading :active="loading" :is-full-page="false" v-if="loading" />
-  <user-card  v-else-if="user" :user="user" editable @logout="logout" @edit="startEdition"/>
-  <h1 class="title">{{$t('my-items')}}</h1>
-  <b-loading :active="loading" :is-full-page="false" v-if="loading" />
-  <div class="columns" v-else-if="items && items.length">
-    <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-      <item-card :item="item" :users="itemUsers" :user-list="true"/>
+  <div class="page-account">
+    <h1 class="title">{{ $t('my-account') }}</h1>
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <user-card v-else-if="user" :user="user" editable @edit="startEdition" @logout="logout" />
+    <h1 class="title">{{ $t('my-items') }}</h1>
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <div v-else-if="items && items.length" class="columns">
+      <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
+        <item-card :item="item" :user-list="true" :users="itemUsers" />
+      </div>
+    </div>
+    <div v-else>
+      {{ $t('no-items') }}
     </div>
   </div>
-  <div v-else>
-    {{$t('no-items')}}
-  </div>
-</div>
 </template>
 
 <script>
@@ -21,6 +21,7 @@ import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
 import EditAccountModal from '@/components/EditAccountModal';
+
 export default {
   name: 'Account',
   components: {UserCard, ItemCard},
@@ -38,8 +39,7 @@ export default {
       try {
         const uri = `/api/v1/users/me/`
         this.user = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -47,8 +47,7 @@ export default {
       try {
         const uri = `/api/v1/user_items/`;
         this.items = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -56,8 +55,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.itemUsers = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -69,12 +67,10 @@ export default {
         this.$store.commit('removeToken');
         this.$store.commit('removeUserID');
         await this.$router.push('/');
-      }
-      catch (error) {
+      } catch (error) {
         if (error.response) {
           error = error.response.data;
-        }
-        else if (error.message) {
+        } else if (error.message) {
           error = error.message;
         }
         console.log(JSON.stringify(error));
@@ -112,7 +108,6 @@ export default {
 <style scoped>
 .columns {
   flex-wrap: wrap;
-  /*justify-content: space-between;*/
   align-content: flex-start;
 }
 </style>

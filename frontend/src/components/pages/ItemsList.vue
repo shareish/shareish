@@ -2,27 +2,24 @@
   <div class="item-list">
 
     <items-filters
-      @update:selectedType="selectedType = $event"
-      @update:selectedCategory="selectedCategory = $event"
-      @update:searchString="searchString = $event"
+        @update:selectedType="selectedType = $event"
+        @update:selectedCategory="selectedCategory = $event"
+        @update:searchString="searchString = $event"
     />
-    <b-loading :active="pageLoading" :is-full-page="false" v-if="pageLoading" />
-    <div class="scrollable"  ref="listItems" v-else>
-      <div class="columns" v-if="items && items.length">
-        <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-          <item-card :item="item" :users="users"/>
+    <b-loading v-if="pageLoading" :active="pageLoading" :is-full-page="false" />
+    <div v-else ref="listItems" class="scrollable">
+      <div v-if="items && items.length" class="columns">
+        <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
+          <item-card :item="item" :users="users" />
         </div>
-        <div class="column is-narrow vertical-center" v-if="!loadedAllItems">
-          <button class="button is-primary" :class="{'is-loading': loading}" v-if="!loadedAllItems" @click="loadItems()">
-            {{$t('button-load-more')}}
+        <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
+          <button v-if="!loadedAllItems" :class="{'is-loading': loading}" class="button is-primary" @click="loadItems()">
+            {{ $t('button-load-more') }}
           </button>
         </div>
       </div>
-      <div v-else>
-        {{$t('no-items')}}
-      </div>
+      <div v-else>{{ $t('no-items') }}</div>
     </div>
-
   </div>
 </template>
 
@@ -66,14 +63,14 @@ export default {
     }
   },
   methods: {
-    scrollHandler: _.debounce(function() {
+    scrollHandler: _.debounce(function () {
       let scrollBlock = document.getElementById("wrapper");
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
       if (bottom && !this.loadedAllItems) {
         this.loadItems();
       }
     }, 100),
-    async loadItems(append=true) {
+    async loadItems(append = true) {
       this.loading = true;
       if (!append) {
         this.page = 1;
@@ -91,8 +88,7 @@ export default {
         if (data.next === null) {
           this.loadedAllItems = true;
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
 
@@ -102,8 +98,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.users = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     }
@@ -125,7 +120,6 @@ export default {
 </script>
 
 <style scoped>
-
 .columns {
   flex-wrap: wrap;
   /*justify-content: space-between;*/

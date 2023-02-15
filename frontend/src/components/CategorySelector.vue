@@ -1,21 +1,17 @@
 <template>
   <b-field :label="label">
-    <b-select :value="value" @input="$emit('input', $event)" :expanded="expanded">
-      <option :value="null" v-if="nullable">{{$t('all')}}</option>
-      <option
-        v-for="category in categories"
-        :value="category.id"
-        :key="category.id"
-      >
-        {{$t(category.slug)}}
+    <b-select :expanded="expanded" :value="value" @input="$emit('input', $event)">
+      <option v-if="nullable" :value="null">{{ $t('all') }}</option>
+      <option v-for="category in categories" :key="category.id" :value="category.id">
+        {{ $t(category.slug) }}
       </option>
     </b-select>
   </b-field>
-
 </template>
 
 <script>
 import {categories} from '@/categories';
+
 export default {
   name: 'CategorySelector',
   props: {
@@ -27,9 +23,8 @@ export default {
   computed: {
     label() {
       let label = this.$t('item-category');
-      if (this.number) {
+      if (this.number)
         label += ` ${this.number}`;
-      }
       return label;
     },
     categories() {
@@ -38,7 +33,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-
-</style>

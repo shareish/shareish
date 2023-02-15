@@ -10,20 +10,20 @@
       <div class="content">
         <p>
           <strong>
-            <router-link :to="{ name: 'userDetails', params: { id: sender.id}}">
-             {{sender.first_name}} {{sender.last_name}}
+            <router-link :to="{name: 'userDetails', params: {id: sender.id}}">
+              {{ sender.first_name }} {{ sender.last_name }}
             </router-link>
           </strong>
           ·
           <small>
-            <router-link :to="{ name: 'userDetails', params: { id: sender.id}}">
-              @{{sender.username}}
+            <router-link :to="{name: 'userDetails', params: {id: sender.id}}">
+              @{{ sender.username }}
             </router-link>
           </small>
-          <br>
-          {{message.content}}
-          <br>
-          <small class="has-text-grey">{{formattedDate}}</small>
+          <br />
+          {{ message.content }}
+          <br />
+          <small class="has-text-grey">{{ formattedDate }}</small>
         </p>
       </div>
     </div>
@@ -42,7 +42,7 @@ export default {
     },
     formattedDate() {
       return moment(this.message.date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
-    },
+    }
   }
 };
 </script>

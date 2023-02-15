@@ -13,9 +13,9 @@
             <!-- <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
             <address>
               XXX Anonymous
-              <br>XXX Anonymous
-              <br>XXX Anonymous
-              <br>XXX Anonymous (for Review)
+              <br />XXX Anonymous
+              <br />XXX Anonymous
+              <br />XXX Anonymous (for Review)
             </address>
           </div>
           <div class="column">

@@ -1,106 +1,98 @@
 <template>
   <div class="card">
     <div class="card-image">
-<!--      <figure class="image is-fullwidth">-->
-<!--        <img v-if="images.length > 0" :src="images[0]" alt="Image">-->
-<!--        <img v-else src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">-->
-<!--      </figure>      -->
-      <router-link
-        :to="{ name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}"
-      >
-        <figure class="image is-5by3" :style="figureStyle" v-if="item.images.length > 0">
+      <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
+        <figure v-if="item.images.length > 0" :style="figureStyle" class="image is-5by3">
         </figure>
         <figure v-else class="image is-5by3">
           <img :src="category1['image-placeholder']" alt="Placeholder image">
         </figure>
       </router-link>
-
-
     </div>
     <div class="card-content">
       <div class="media">
-<!--        <div class="media-left">-->
-<!--          <figure class="image is-48x48">-->
-<!--            <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">-->
-<!--          </figure>-->
-<!--        </div>-->
         <div class="media-content">
           <p class="title is-4">
-            <router-link
-              :to="{ name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}"
-            >
-            {{ item.name }}
+            <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
+              {{ item.name }}
             </router-link>
           </p>
-          <p class="subtitle is-6"><item-type-tag :type="item.item_type" /> <span v-if="user">{{$t('by')}}
-            <router-link :to="{ name: 'userDetails', params: { id: user.id}}">
-              @{{user.username}}
-            </router-link>
-          </span></p>
+          <p class="subtitle is-6">
+            <item-type-tag :type="item.item_type" />
+            <span v-if="user">
+              {{ $t('by') }}
+              <router-link :to="{name: 'userDetails', params: {id: user.id}}">
+                @{{ user.username }}
+              </router-link>
+            </span>
+          </p>
         </div>
       </div>
       <div class="content">
-        {{truncate(item.description)}}
-        <br>
+        {{ truncate(item.description) }}
+        <br />
         <template v-if="!recurrentList">
-	  <small>{{formattedDate(item.startdate)}}</small> <br>
-	  <small v-if="item.enddate"> {{$t('ends')}} {{formattedDate(item.enddate)}} <br></small>
-	  <small v-if="item.location && this.location">{{$t('at')}} &#177; {{getDistanceFromLatLonInKm()}} km </small><br> 
-	  <small v-if="item.hitcount > 0">{{item.hitcount}} {{$t('views')}} </small><br>
+          <small>{{ formattedDate(item.startdate) }}</small><br />
+          <small v-if="item.enddate"> {{ $t('ends') }} {{ formattedDate(item.enddate) }}</small><br />
+          <small v-if="item.location && this.location">{{ $t('at') }} &#177; {{ getDistanceFromLatLonInKm() }} km</small><br />
+          <small v-if="item.hitcount > 0">{{ item.hitcount }} {{ $t('views') }}</small><br />
         </template>
       </div>
-      <span v-for="category in categories" class="icon-text" :key="category.slug">
+      <span v-for="category in categories" :key="category.slug" class="icon-text">
         <span class="icon">
           <i :class="category.icon"></i>
         </span>
-        <span>{{$t(category.slug)}}</span>
+        <span>{{ $t(category.slug) }}</span>
       </span>
     </div>
-    <div class="card-footer" v-if="recurrentList">
-      <a class="card-footer-item" @click="$emit('submitAgain', item)">{{$t('submit-again')}}</a>
+    <div v-if="recurrentList" class="card-footer">
+      <a class="card-footer-item" @click="$emit('submitAgain', item)">{{ $t('submit-again') }}</a>
     </div>
   </div>
 </template>
 
 <script>
 import ItemTypeTag from '@/components/ItemTypeTag';
-import axios from 'axios';
 import moment from 'moment/moment';
 import {categories} from '@/categories';
 
 export default {
   name: 'ItemCard',
-    components: {ItemTypeTag},
+  components: {ItemTypeTag},
   props: {
     item: Object,
     recurrentList: {type: Boolean, default: false},
     userList: {type: Boolean, default: false},
-      users: Array,
+    users: Array
   },
-    data() {
-	return {
-	location:null,
-	gettingLocation: false,
-	    errorStr:null,
-	    }
-    },
+  data() {
+    return {
+      location: null,
+      gettingLocation: false,
+      errorStr: null,
+    }
+  },
   created() {
-    //do we support geolocation
-    if(!("geolocation" in navigator)) {
+    // Do we support geolocation
+    if (!("geolocation" in navigator)) {
       this.errorStr = 'Geolocation is not available.';
       return;
     }
 
     this.gettingLocation = true;
-    // get position
+    // Get position
     navigator.geolocation.getCurrentPosition(pos => {
       this.gettingLocation = false;
       this.location = pos;
     }, err => {
       this.gettingLocation = false;
       this.errorStr = err.message;
-    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
-  },  
+    }, {
+      maximumAge: 10000,
+      timeout: 5000,
+      enableHighAccuracy: true
+    });
+  },
   computed: {
     user() {
       return this.users.find(user => user.id === this.item.user) || {};
@@ -128,73 +120,54 @@ export default {
       return cat;
     },
     figureStyle() {
-      if (this.item.images.length === 0) {
-        return {};
-      }
-      return {
-        backgroundImage: `url("${(this.item.images[0])}")`,
-        'border-radius': '0.25rem 0.25rem 0 0'
-      };
+      return (this.item.images.length === 0) ? {} : {backgroundImage: `url("${(this.item.images[0])}")`, 'border-radius': '0.25rem 0.25rem 0 0'};
     },
     itemKind() {
       if (this.recurrentList) {
         return 'recurrent';
-      }
-      else if (this.userList) {
+      } else if (this.userList) {
         return 'user';
       }
       return null;
     },
     itemDetailQueryParams() {
-      if (this.itemKind) {
-        return {'kind': this.itemKind}
-      }
-      return {}
+      return (this.itemKind) ? {'kind': this.itemKind} : {};
     }
   },
   methods: {
-      formattedDate(date) {
-	  return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale(this.$i18n.locale).fromNow();
-      },
-      truncate(description){
-	  return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
-      },
-      category(category) {
-	  return categories[category];
-      },
-      deg2rad(deg) {
-	  return deg * (Math.PI/180)
-      },
-      getDistanceFromLatLonInKm() {
-	  let latLong = this.item['location'].slice(17, -1).split(' ');
-	  var lat2=latLong[0];
-	  var lon2=latLong[1];
-	  var R = 6371; // Radius of the earth in km
-	  var dLat = this.deg2rad(lat2-this.location.coords.latitude);  // deg2rad below
-	  var dLon = this.deg2rad(lon2-this.location.coords.longitude); 
-	  var a = 
-	      Math.sin(dLat/2) * Math.sin(dLat/2) +
-	      Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) * 
-	      Math.sin(dLon/2) * Math.sin(dLon/2); 
-	  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-	  var d = R * c; // Distance in km
-	  return d.toFixed(2);
-	  //return d;
-      },
+    formattedDate(date) {
+      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale(this.$i18n.locale).fromNow();
+    },
+    truncate(description) {
+      return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
+    },
+    category(category) {
+      return categories[category];
+    },
+    deg2rad(deg) {
+      return deg * (Math.PI / 180)
+    },
+    getDistanceFromLatLonInKm() {
+      let latLong = this.item['location'].slice(17, -1).split(' ');
+      var lat2 = latLong[0];
+      var lon2 = latLong[1];
+      var R = 6371; // Radius of the earth in km
+      var dLat = this.deg2rad(lat2 - this.location.coords.latitude);  // deg2rad below
+      var dLon = this.deg2rad(lon2 - this.location.coords.longitude);
+      var a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      var d = R * c; // Distance in km
+      return d.toFixed(2);
+    },
 
   },
 };
 </script>
 
 <style scoped>
-/*.image img {*/
-/*  width: auto;*/
-/*  height: auto;*/
-/*  max-width: 100%;*/
-/*  max-height: 100%;*/
-/*  margin: auto;*/
-/*}*/
-
 .image {
   background-repeat: no-repeat;
   background-position: center center;
