@@ -19,7 +19,7 @@
               {{ item.name }}
             </router-link>
           </p>
-<!--          <p class="mb-2">{{ truncate(item.description) }}</p>-->
+          <p class="mb-2">{{ truncate(item.description) }}</p>
           <p class="subtitle is-6 mt-0">
             <item-type-tag :type="item.item_type" />
             <span v-if="user">
