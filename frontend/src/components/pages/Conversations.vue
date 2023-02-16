@@ -1,29 +1,29 @@
 <template>
   <div class="page-add-item">
-    <h1 class="title">{{$t('my-conversations')}}</h1>
+    <h1 class="title">{{ $t('my-conversations') }}</h1>
     <b-loading :active="loading" :is-full-page="false" />
     <template v-if="conversations.length">
-      <div class="box" v-for="conversation in conversations" :key="conversation.slug">
+      <div v-for="conversation in conversations" :key="conversation.slug" class="box">
         <div class="level">
           <div class="level-left">
-            {{conversation.slug}}
-            &nbsp;
-            <div class="is-size-7 has-text-grey" v-if="conversation.lastUpdate">{{$t('last-message')}} {{formattedDate(conversation.lastUpdate)}}</div>
-            &nbsp;
-            <span class="tag is-danger" v-if="conversation.unread_messages > 0">
-              {{$tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages})}}
+            {{ conversation.slug }}
+            <div v-if="conversation.lastUpdate" class="is-size-7 has-text-grey">{{ $t('last-message') }}
+              {{ formattedDate(conversation.lastUpdate) }}
+            </div>
+            <span v-if="conversation.unread_messages > 0" class="tag is-danger">
+              {{ $tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages}) }}
             </span>
           </div>
           <div class="level-right">
-            <router-link :to="{ name: 'conversationDetail', params: { id: conversation.id }}">
-              <button class="button is-primary">{{$t('open-conversation')}}</button>
+            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id }}">
+              <button class="button is-primary">{{ $t('open-conversation') }}</button>
             </router-link>
           </div>
         </div>
       </div>
     </template>
     <div v-else>
-      <em>{{$t('no-conversation')}}</em>
+      <em>{{ $t('no-conversation') }}</em>
     </div>
   </div>
 </template>
@@ -40,7 +40,6 @@ export default {
     return {
       loading: true,
       conversations: [],
-
       timeout: null
     }
   },
@@ -58,8 +57,7 @@ export default {
             lastUpdate
           }
         })
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
       clearTimeout(this.timeout);
@@ -79,7 +77,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-
-</style>

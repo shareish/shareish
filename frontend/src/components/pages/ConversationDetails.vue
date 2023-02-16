@@ -1,45 +1,39 @@
 <template>
-<div class="page-conversation-details">
-  <h1 class="title">{{conversation.slug}}</h1>
-  <b-loading :active="loading" :is-full-page="false" v-if="loading"/>
-  <template v-else>
-    <div class="columns">
-      <div class="column is-two-thirds">
-        <message
-          v-for="message in messages"
-          :users="users"
-          :message="message"
-          :key="message.id"
-        />
+  <div class="page-conversation-details">
+    <h1 class="title">{{ conversation.slug }}</h1>
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <template v-else>
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <message v-for="message in messages" :key="message.id" :message="message" :users="users" />
 
-        <article class="media">
-          <figure class="media-left">
-            <p class="image">
-              <img v-if="currentUser.image.length > 0" :src="currentUser.image[0]" />
-              <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
-
-            </p>
-          </figure>
-          <div class="media-content">
-            <div class="field">
-              <p class="control">
-                <textarea class="textarea" :placeholder="$t('add-message-dot')" v-model="messageToSend"></textarea>
+          <article class="media">
+            <figure class="media-left">
+              <p class="image">
+                <img v-if="currentUser.image.length > 0" :src="currentUser.image[0]" />
+                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
               </p>
+            </figure>
+            <div class="media-content">
+              <div class="field">
+                <p class="control">
+                  <textarea v-model="messageToSend" :placeholder="$t('add-message-dot')" class="textarea"></textarea>
+                </p>
+              </div>
+              <div class="field">
+                <p class="control">
+                  <button :disabled="messageToSend===''" class="button" @click="sendMessage">{{ $t('post-message') }}</button>
+                </p>
+              </div>
             </div>
-            <div class="field">
-              <p class="control">
-    <button class="button" @click="sendMessage" :disabled="messageToSend===''">{{$t('post-message')}}</button>
-              </p>
-            </div>
-          </div>
-        </article>
+          </article>
+        </div>
+        <div class="column">
+          <item-card :item="item" :users="users" />
+        </div>
       </div>
-      <div class="column">
-        <item-card :users="users" :item="item" />
-      </div>
-    </div>
-  </template>
-</div>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -54,7 +48,7 @@ export default {
     return {
       conversation: {},
       users: [],
-	item: {},
+      item: {},
       messages: [],
 
       ws: null,
@@ -85,36 +79,31 @@ export default {
       try {
         const id = this.conversationId;
         this.conversation = (await axios.get(`/api/v1/conversations/${id}/`)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
     },
-    async autofillMessage(){
-	  //console.log(this.conversation)
-	  console.log(this.messages.length)
-	  if (this.messages.length > 0) {
-	      this.messageToSend='';
-	  }
-	  else {
-	      if (this.item.item_type === "DN") {
-		  this.messageToSend=this.$t('intro-donation-first-message');
-	      }
-	      else if (this.item.item_type === "BR") {
-		  this.messageToSend=this.$t('intro-request-first-message');
-	      }
-	      else if (this.item.item_type === "LN") {
-		  this.messageToSend=this.$t('intro-loan-first-message');
-	      }
-	  }
-      },
+    async autofillMessage() {
+      //console.log(this.conversation)
+      console.log(this.messages.length)
+      if (this.messages.length > 0) {
+        this.messageToSend = '';
+      } else {
+        if (this.item.item_type === "DN") {
+          this.messageToSend = this.$t('intro-donation-first-message');
+        } else if (this.item.item_type === "BR") {
+          this.messageToSend = this.$t('intro-request-first-message');
+        } else if (this.item.item_type === "LN") {
+          this.messageToSend = this.$t('intro-loan-first-message');
+        }
+      }
+    },
     async fetchItem() {
       try {
         const id = this.conversation.item;
         this.item = (await axios.get(`/api/v1/items/${id}/`)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -123,8 +112,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.users = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -133,8 +121,7 @@ export default {
       try {
         const id = this.conversationId;
         this.messages = (await axios.get(`/api/v1/conversations/${id}/messages/`)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -142,17 +129,20 @@ export default {
     async createWebSocket() {
       try {
         this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversationId}/`);
-        this.ws.onopen = () => { console.log("Websocket connected.")};
+        this.ws.onopen = () => {
+          console.log("Websocket connected.")
+        };
         this.ws.addEventListener('message', (event) => {
           const data = JSON.parse(event.data);
           if (data.content) {
             this.messages.push(data);
             this.updateNotifications();
           }
-          this.ws.addEventListener('close', () => { console.log("Websocket has been closed.")});
+          this.ws.addEventListener('close', () => {
+            console.log("Websocket has been closed.")
+          });
         });
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -160,16 +150,15 @@ export default {
     sendMessage() {
       try {
         this.ws.send(
-          JSON.stringify({
-            'content': this.messageToSend,
-            'conversation_id': this.conversationId,
-            'user_id': this.currentUserId,
-            'date': new Date()
-          })
+            JSON.stringify({
+              'content': this.messageToSend,
+              'conversation_id': this.conversationId,
+              'user_id': this.currentUserId,
+              'date': new Date()
+            })
         )
         this.messageToSend = '';
-      }
-      catch (error) {
+      } catch (error) {
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-danger',
@@ -186,8 +175,7 @@ export default {
             'last_message': this.messages.slice(-1)[0]['id']
           }
           this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
         }
       }
@@ -203,7 +191,7 @@ export default {
     ]);
     await this.fetchItem(); // need conversation fetched to get id
     this.updateNotifications();
-    this.autofillMessage(),
+    this.autofillMessage();
     this.loading = false;
 
     document.title = `Shareish | ${this.conversation.slug}`;

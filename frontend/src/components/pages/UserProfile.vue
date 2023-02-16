@@ -1,18 +1,16 @@
 <template>
   <div class="page-account">
-    <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
-      <h1 class="title">@{{user.username}}</h1>
-      <user-card  v-if="user" :user="user"/>
-      <h1 class="title">{{$t('user-items')}}</h1>
-      <div class="columns" v-if="items && items.length">
-        <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card`">
-          <item-card :item="item" :users="itemUsers" :user-list="true"/>
+      <h1 class="title">@{{ user.username }}</h1>
+      <user-card v-if="user" :user="user" />
+      <h1 class="title">{{ $t('user-items') }}</h1>
+      <div v-if="items && items.length" class="columns">
+        <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
+          <item-card :item="item" :user-list="true" :users="itemUsers" />
         </div>
       </div>
-      <div v-else>
-        {{$t('no-items')}}
-      </div>
+      <div v-else>{{ $t('no-items') }}</div>
     </template>
   </div>
 </template>
@@ -21,7 +19,7 @@
 import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
-import EditAccountModal from '@/components/EditAccountModal';
+
 export default {
   name: 'UserProfile',
   components: {UserCard, ItemCard},
@@ -50,8 +48,7 @@ export default {
       try {
         const uri = `/api/v1/webusers/${this.userId}/`
         this.user = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -59,8 +56,7 @@ export default {
       try {
         const uri = `/api/v1/user_items/`;
         this.items = (await axios.get(uri, {params: {id: this.userId}})).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -68,8 +64,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.itemUsers = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -96,7 +91,6 @@ export default {
 <style scoped>
 .columns {
   flex-wrap: wrap;
-  /*justify-content: space-between;*/
   align-content: flex-start;
 }
 </style>

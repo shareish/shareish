@@ -2,59 +2,53 @@
   <form @submit.prevent="save()">
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">{{$t('edit-my-account')}}</p>
+        <p class="modal-card-title">{{ $t('edit-my-account') }}</p>
         <button
-          type="button"
-          class="delete"
-          @click="$emit('close')"/>
+            class="delete"
+            type="button"
+            @click="$emit('close')" />
       </header>
       <section class="modal-card-body">
-	<template v-for="{field, validationRules, type, translationKey,helpTranslationKey} in editableFields">
-	  <b-field :key="field" :type="{'is-danger': errors.has(field)}" :message="errors.first(field)">
-	    <template #label> 
-	      <b-tooltip position="is-right" :key="field" :label="$t(helpTranslationKey)" multilined>{{$t(translationKey)}} <i class="icon far fa-question-circle"></i> </b-tooltip>
-	      <b-button v-if="field=='ref_location'" @click="copyGeoLocAddress" size="is-small"><i class="icon fas fa-map-marker-alt"></i></b-button>
-	    </template>
-	  <b-input
-            v-model="internalUser[field]"
-            :name="field"
-            v-validate="validationRules"
-            :type="type"
-            :password-reveal="field === 'password'"
+        <template v-for="{field, validationRules, type, translationKey,helpTranslationKey} in editableFields">
+          <b-field :key="field" :message="errors.first(field)" :type="{'is-danger': errors.has(field)}">
+            <template #label>
+              <b-tooltip :key="field" :label="$t(helpTranslationKey)" multilined position="is-right">
+                {{ $t(translationKey) }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+              <b-button v-if="field==='ref_location'" size="is-small" @click="copyGeoLocAddress">
+                <i class="icon fas fa-map-marker-alt"></i>
+              </b-button>
+            </template>
+            <b-input
+                v-model="internalUser[field]"
+                v-validate="validationRules"
+                :name="field"
+                :password-reveal="field === 'password'"
+                :type="type"
             />
-	 
-	  </b-field>
-	</template>
-        <b-field
-          :label="$t('avatar')"
-          :message="$t('avatar-info')"
-          >
-	  <template #label> {{$t('avatar')}}
-	  <b-tooltip position="is-right" :label="$t('help_avatar')" multilined> <i class="icon far fa-question-circle"></i></b-tooltip></template>
-          <b-field
-            class="file is-primary"
-            :class="{'has-name': !!file}"
-          >
-            <b-upload v-model="file" class="file-label" accept="image/*" validationMessage="Please select a file">
-            <span class="file-cta">
+          </b-field>
+        </template>
+        <b-field :label="$t('avatar')" :message="$t('avatar-info')">
+          <template #label> {{ $t('avatar') }}
+            <b-tooltip :label="$t('help_avatar')" multilined position="is-right">
+              <i class="icon far fa-question-circle"></i>
+            </b-tooltip>
+          </template>
+          <b-field :class="{'has-name': !!file}" class="file is-primary">
+            <b-upload v-model="file" accept="image/*" class="file-label" validationMessage="Please select a file">
+              <span class="file-cta">
                 <b-icon class="file-icon" icon="upload"></b-icon>
                 <span class="file-label">Click to upload</span>
-            </span>
-              <span class="file-name" v-if="file">
-                {{ file.name }}
-            </span>
+              </span>
+              <span v-if="file" class="file-name">{{ file.name }}</span>
             </b-upload>
           </b-field>
         </b-field>
       </section>
       <footer class="modal-card-foot">
-        <b-button
-          :label="$t('cancel')"
-          @click="$emit('close')" />
-        <b-button
-          :label="$t('save')"
-          @click="save"
-          type="is-primary" />
+        <b-button :label="$t('cancel')" @click="$emit('close')" />
+        <b-button :label="$t('save')" type="is-primary" @click="save" />
       </footer>
     </div>
   </form>
@@ -66,101 +60,156 @@ import axios from 'axios';
 export default {
   name: 'EditAccountModal',
   props: {
-      user: Object,
-      //address: String,
+    user: Object,
   },
   $_veeValidate: {validator: 'new'},
   data() {
     return {
-	internalUser: {},
-	//address : null,
-	displayErrors: false,
-	file: null,
-	geoloc: null,
-	gettingLocation: false,
-	errorStr:null,
+      internalUser: {},
+      displayErrors: false,
+      file: null,
+      geoloc: null,
+      gettingLocation: false,
+      errorStr: null,
     }
   },
-    created() {
-    //do we support geolocation
-    if(!("geolocation" in navigator)) {
+  created() {
+    // Do we support geolocation
+    if (!("geolocation" in navigator)) {
       this.errorStr = 'Geolocation is not available.';
       return;
     }
 
     this.gettingLocation = true;
-    // get position
+    // Get position
     navigator.geolocation.getCurrentPosition(pos => {
       this.gettingLocation = false;
       this.geoloc = pos;
     }, err => {
       this.gettingLocation = false;
       this.errorStr = err.message;
-    },{maximumAge:10000, timeout:5000,enableHighAccuracy: true})
-  },  
+    }, {
+      maximumAge: 10000,
+      timeout: 5000,
+      enableHighAccuracy: true
+    });
+  },
   computed: {
     editableFields() {
       return [
-          {field: 'first_name', validationRules: 'required', type: 'text', translationKey: 'firstname', helpTranslationKey: 'help_firstname'},
-        {field: 'last_name', validationRules: 'required', type: 'text', translationKey: 'lastname', helpTranslationKey: 'help_lastname'},
-        {field: 'username', validationRules: 'required', type: 'text', translationKey: 'username', helpTranslationKey: 'help_username'},
-        {field: 'email', validationRules: 'required|email', type: 'text', translationKey: 'email', helpTranslationKey: 'help_email'},
-	{field: 'ref_location', validationRules: '', type: 'text', translationKey: 'reflocation', helpTranslationKey: 'help_ref_location'},
-	{field: 'dwithin_notifications', validationRules: 'numeric|max_value:1000|min_value:0', type: 'text', translationKey: 'dwithin_notif', helpTranslationKey: 'help_dwithin'},  
+        {
+          field: 'first_name',
+          validationRules: 'required',
+          type: 'text',
+          translationKey: 'firstname',
+          helpTranslationKey: 'help_firstname'
+        },
+        {
+          field: 'last_name',
+          validationRules: 'required',
+          type: 'text',
+          translationKey: 'lastname',
+          helpTranslationKey: 'help_lastname'
+        },
+        {
+          field: 'username',
+          validationRules: 'required',
+          type: 'text',
+          translationKey: 'username',
+          helpTranslationKey: 'help_username'
+        },
+        {
+          field: 'email',
+          validationRules: 'required|email',
+          type: 'text',
+          translationKey: 'email',
+          helpTranslationKey: 'help_email'
+        },
+        {
+          field: 'ref_location',
+          validationRules: '',
+          type: 'text',
+          translationKey: 'reflocation',
+          helpTranslationKey: 'help_ref_location'
+        },
+        {
+          field: 'dwithin_notifications',
+          validationRules: 'numeric|max_value:1000|min_value:0',
+          type: 'text',
+          translationKey: 'dwithin_notif',
+          helpTranslationKey: 'help_dwithin'
+        },
         // {field: 'password', validationRules: 'min:8', type: 'password', translationKey: 'password'},
-        {field: 'description', validationRules: '', type: 'textarea', translationKey: 'biography', helpTranslationKey: 'help_biography'},
-        {field: 'homepage_url', validationRules: '', type: 'text', translationKey: 'homepage-link', helpTranslationKey: 'help_homepage'},
-        {field: 'facebook_url', validationRules: '', type: 'text', translationKey: 'facebook-link', helpTranslationKey: 'help_facebook'},
-        {field: 'instagram_url', validationRules: '', type: 'text', translationKey: 'instagram-link', helpTranslationKey: 'help_instagram'},
-	
+        {
+          field: 'description',
+          validationRules: '',
+          type: 'textarea',
+          translationKey: 'biography',
+          helpTranslationKey: 'help_biography'
+        },
+        {
+          field: 'homepage_url',
+          validationRules: '',
+          type: 'text',
+          translationKey: 'homepage-link',
+          helpTranslationKey: 'help_homepage'
+        },
+        {
+          field: 'facebook_url',
+          validationRules: '',
+          type: 'text',
+          translationKey: 'facebook-link',
+          helpTranslationKey: 'help_facebook'
+        },
+        {
+          field: 'instagram_url',
+          validationRules: '',
+          type: 'text',
+          translationKey: 'instagram-link',
+          helpTranslationKey: 'help_instagram'
+        },
+
       ];
     },
   },
-    methods: {
-	async copyGeoLocAddress() {
-	    //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-	    var geoLocPoint='SRID=4326;POINT ('+this.geoloc.coords.latitude+' '+this.geoloc.coords.longitude+')'
-	    if (this.geoloc === null) {
-		return;
-	    }
-
-	    try {
-		this.internalUser.ref_location = (await axios.post(
-		    `/api/v1/address/`,
-		    geoLocPoint
-		)).data;
-	    }
-	    catch (error) {
-		console.log(JSON.stringify(error));
-	    }
-	},
-    async fetchAddress() {
-      if (this.internalUser.ref_location === null) {
+  methods: {
+    async copyGeoLocAddress() {
+      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
+      if (this.geoloc === null)
         return;
-      }
+
+      var geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')'
 
       try {
         this.internalUser.ref_location = (await axios.post(
-          `/api/v1/address/`,
-          this.internalUser.ref_location
+            `/api/v1/address/`,
+            geoLocPoint
         )).data;
+      } catch (error) {
+        console.log(JSON.stringify(error));
       }
-      catch (error) {
+    },
+    async fetchAddress() {
+      if (this.internalUser.ref_location === null)
+        return;
+
+      try {
+        this.internalUser.ref_location = (await axios.post(
+            `/api/v1/address/`,
+            this.internalUser.ref_location
+        )).data;
+      } catch (error) {
         console.log(JSON.stringify(error));
       }
     },
     async save() {
       let result = await this.$validator.validateAll();
-      if(!result) {
+      if (!result)
         return;
-      }
 
       try {
-        if (this.file) {
-
-        }
         let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
-	  
+
         if (this.file) {
           let data = new FormData();
           data.append('userID', this.user['id']);
@@ -178,8 +227,7 @@ export default {
         });
         this.$emit('close');
         this.$emit('updateUser', user);
-      }
-      catch(error) {
+      } catch (error) {
         console.log(error);
         this.$buefy.snackbar.open({
           duration: 5000,
@@ -188,20 +236,13 @@ export default {
           pauseOnHover: true,
         })
       }
-    },
+    }
   },
-
-    async mounted() {
-	this.internalUser = {...this.user};
-	await this.fetchAddress();
-	delete this.internalUser.image;
-	delete this.internalUser.items;
+  async mounted() {
+    this.internalUser = {...this.user};
+    await this.fetchAddress();
+    delete this.internalUser.image;
+    delete this.internalUser.items;
   }
-
-    
 };
 </script>
-
-<style scoped>
-
-</style>

@@ -76,7 +76,7 @@ export default {
                   }
                 }
                 console.log(JSON.stringify(error.response.data));
-                errorMessage = this.errors.join('<br>');
+                errorMessage = this.errors.join('<br />');
               }
               else if (error.message){
                 console.log(JSON.stringify(error.message));

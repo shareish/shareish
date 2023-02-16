@@ -1,53 +1,49 @@
 <template>
-  <b-navbar type="is-primary" shadow class="navbar">
+  <b-navbar class="navbar" shadow type="is-primary">
     <template #brand>
-      <b-navbar-item tag="router-link" :to="{ path: '/' }">
+      <b-navbar-item :to="{path: '/' }" tag="router-link">
         <strong>Shareish</strong>
       </b-navbar-item>
     </template>
-    <template #start v-if="isAuthenticated">
+    <template v-if="isAuthenticated" #start>
       <b-navbar-item tag="router-link" to="/map">
         <i class="far fa-map"></i>
-        {{$t('map')}}
+        {{ $t('map') }}
       </b-navbar-item>
 
       <b-navbar-item tag="router-link" to="/items">
         <i class="fas fa-binoculars"></i>
-        {{$t('browse-items')}}
+        {{ $t('browse-items') }}
       </b-navbar-item>
 
       <b-navbar-item tag="router-link" to="/add-item">
         <i class="fas fa-plus"></i>
-        {{$t('add-item')}}
+        {{ $t('add-item') }}
       </b-navbar-item>
 
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
-        {{$t('conversations')}}
-        &nbsp;<span class="tag is-rounded" v-if="unreadMessages > 0">{{unreadMessages}}</span>
+        {{ $t('conversations') }}
+        &nbsp;<span v-if="unreadMessages > 0" class="tag is-rounded">{{ unreadMessages }}</span>
       </b-navbar-item>
     </template>
 
     <template #end>
       <b-navbar-dropdown :label="$t(`language-${$i18n.locale}`)">
-        <b-navbar-item @click="changeLanguage('en')" :active="$i18n.locale === 'en'">
-          English
-        </b-navbar-item>
-        <b-navbar-item @click="changeLanguage('fr')" :active="$i18n.locale === 'fr'">
-          Français
-        </b-navbar-item>
+        <b-navbar-item :active="$i18n.locale === 'en'" @click="changeLanguage('en')">English</b-navbar-item>
+        <b-navbar-item :active="$i18n.locale === 'fr'" @click="changeLanguage('fr')">Français</b-navbar-item>
       </b-navbar-dropdown>
-      <b-navbar-item tag="router-link" v-if="isAuthenticated" to="/profile">
+      <b-navbar-item v-if="isAuthenticated" tag="router-link" to="/profile">
         <i class="fas fa-user-circle"></i>
-        {{$t('my-account')}}
+        {{ $t('my-account') }}
       </b-navbar-item>
-      <b-navbar-item tag="div" v-else>
+      <b-navbar-item v-else tag="div">
         <div class="buttons">
-          <router-link to="/sign-up" class="button is-primary">
+          <router-link class="button is-primary" to="/sign-up">
             <i class="fas fa-user-plus"></i>
             <strong>{{ $t('sign-up') }}</strong>
           </router-link>
-          <router-link to="/log-in" class="button is-light">
+          <router-link class="button is-light" to="/log-in">
             <i class="fas fa-sign-in-alt"></i>
             {{ $t('log-in') }}
           </router-link>
@@ -88,18 +84,16 @@ export default {
       if (this.isAuthenticated) {
         try {
           this.$store.state.notifications = (await axios.get('/api/v1/notifications/')).data['unread_messages'];
-        }
-        catch (error) {
+        } catch (error) {
           console.log(error);
         }
-      }
-      else {
+      } else {
         this.$store.state.notifications = 0;
       }
       clearTimeout(this.timeout);
       this.timeout = setTimeout(this.fetchConversationUpdates, NOTIFICATIONS_REFRESH_INTERVAL);
     },
-    changeLanguage(lang){
+    changeLanguage(lang) {
       localStorage.setItem('language', lang);
       this.$i18n.locale = lang;
     },

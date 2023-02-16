@@ -1,18 +1,15 @@
 <template>
   <div>
-    <h1 class="title">{{$t('my-recurrent-items')}}</h1>
-    <b-loading :active="loading" :is-full-page="false" v-if="loading" />
+    <h1 class="title">{{ $t('my-recurrent-items') }}</h1>
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
-      <div class="columns" v-if="items && items.length">
-        <div class="column is-one-quarter" v-for="item in items" :key="`${item.id}-item-card-recurrent`">
-          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" :users="users"/>
+      <div v-if="items && items.length" class="columns">
+        <div v-for="item in items" :key="`${item.id}-item-card-recurrent`" class="column is-one-quarter">
+          <item-card :item="item" :recurrent-list="true" :users="users" @submitAgain="$emit('submitAgain', $event)" />
         </div>
       </div>
-      <div v-else>
-        {{$t('no-items')}}
-      </div>
+      <div v-else>{{ $t('no-items') }}</div>
     </template>
-
   </div>
 </template>
 
@@ -35,8 +32,7 @@ export default {
       try {
         const uri = '/api/v1/recurrents/';
         this.items = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -44,8 +40,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.users = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     }
@@ -61,12 +56,10 @@ export default {
 <style scoped>
 .columns {
   flex-wrap: wrap;
-  /*justify-content: space-between;*/
   align-content: flex-start;
 }
 
 .column:not(.is-narrow) {
-  /*max-width: 25rem;*/
   min-width: 25rem;
 }
 </style>

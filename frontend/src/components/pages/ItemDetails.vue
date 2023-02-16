@@ -1,105 +1,87 @@
 <template>
-<div class="page-item-details">
-  <b-loading :active="loading" v-if="loading" :is-full-page="false"/>
-  <template v-else>
-    <h1 class="title">{{item.name}} <item-type-tag :type="item.item_type" /></h1>
-    <div class="block level">
-      <div class="level-left">
-        <div v-for="category in categories" class="icon-text level-item" :key="category.slug">
-        <span class="icon is-large">
-          <i class="fa-2x" :class="category.icon"></i>
-        </span>
-          <span class="is-size-5">{{$t(category.slug)}}</span>
+  <div class="page-item-details">
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <template v-else>
+      <h1 class="title">{{ item.name }} <item-type-tag :type="item.item_type" /></h1>
+      <div class="block level">
+        <div class="level-left">
+          <div v-for="category in categories" :key="category.slug" class="icon-text level-item">
+            <span class="icon is-large"><i :class="category.icon" class="fa-2x"></i></span>
+            <span class="is-size-5">{{ $t(category.slug) }}</span>
+          </div>
+        </div>
+        <div class="level-right">
+          <div v-if="!isOwner" class="level-item">
+            <button class="button is-primary" @click="startConversation">{{ $t('start-conversation') }}</button>
+          </div>
+          <div v-else class="level-item buttons">
+            <button class="button is-primary" @click="startEdition">{{ $t('edit') }}</button>
+            <button class="button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
+          </div>
         </div>
       </div>
-      <div class="level-right">
-        <div class="level-item" v-if="!isOwner">
-          <button class="button is-primary" @click="startConversation">
-            {{$t('start-conversation')}}
-          </button>
-        </div>
-        <div class="level-item buttons" v-else>
-          <button class="button is-primary" @click="startEdition">
-            {{$t('edit')}}
-          </button>
-          <button class="button is-danger" @click="deleteItem">
-            {{$t('delete')}}
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="tile is-ancestor">
-      <div class="tile is-vertical">
-        <div class="tile is-parent">
-          <article class="tile is-child box has-background-white-ter">
-            <div class="content is-size-4">
-              {{ item.description }}
+      <div class="tile is-ancestor">
+        <div class="tile is-vertical">
+          <div class="tile is-parent">
+            <article class="tile is-child box has-background-white-ter">
+              <div class="content is-size-4">{{ item.description }}</div>
+            </article>
+          </div>
+          <div class="tile">
+            <div class="tile is-parent is-vertical">
+              <article class="tile is-child box has-background-primary-light">
+                <div class="title is-size-4">
+                  <div class="icon-text">
+                    <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
+                    <span>{{ $t('availability') }}</span>
+                  </div>
+                </div>
+                <p class="content is-size-6">
+                  <span v-if="item.enddate">{{ $t('from') }} {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})</span>
+                  <span v-else>{{ $t('since') }} {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})</span><br />
+                  <span v-if="item.enddate">{{ $t('to') }} {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})</span>
+                </p>
+              </article>
+              <article class="tile is-child box has-background-white-ter">
+                <div class="title is-size-4">
+                  <div class="icon-text">
+                    <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
+                    <span>{{ $t('shared-by') }}</span>
+                  </div>
+                </div>
+                <user-card :user="user" />
+              </article>
             </div>
+            <div class="tile is-parent">
+              <article class="tile is-child box is-primary">
+                <div class="title is-size-4">
+                  <div class="icon-text">
+                    <span class="icon is-medium"><i class="fas fa-map-pin"></i></span>
+                    <span>{{ $t('location') }}</span>
+                  </div>
+                </div>
+                <div v-if="address" class="content">
+                  <router-link :to="`/map?id=${item.id}`">
+                    {{ address }}
+                  </router-link>
+                </div>
+                <div v-else class="content">
+                  <em>{{ $t('no-address') }}</em>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div v-if="item.images.length > 0" class="tile is-parent is-4">
+          <article class="tile is-child box is-vcentered">
+            <figure v-if="item.images[0]" class="image is-256x256 ">
+              <img :src="item.images[0]" />
+            </figure>
           </article>
         </div>
-        <div class="tile">
-          <div class="tile is-parent is-vertical">
-            <article class="tile is-child box has-background-primary-light">
-              <div class="title is-size-4">
-                <div class="icon-text">
-                  <span class="icon is-medium">
-                    <i class="fas fa-calendar-day"></i>
-                  </span>
-                  <span>{{$t('availability')}}</span>
-                </div>
-              </div>
-              <p class="content is-size-6">
-                <span v-if="item.enddate">{{$t('from')}} {{formattedDate(item.startdate)}} ({{formattedDateFromNow(item.startdate)}}) </span>
-                <span v-else>{{$t('since')}} {{formattedDate(item.startdate)}} ({{formattedDateFromNow(item.startdate)}}) </span><br>
-                <span v-if="item.enddate">{{$t('to')}} {{formattedDate(item.enddate)}} ({{formattedDateFromNow(item.enddate)}}) </span>
-              </p>
-            </article>
-            <article class="tile is-child box has-background-white-ter">
-              <div class="title is-size-4">
-                <div class="icon-text">
-                  <span class="icon is-medium">
-                    <i class="fas fa-hand-holding-heart"></i>
-                  </span>
-                  <span>{{$t('shared-by')}}</span>
-                </div>
-              </div>
-              <user-card :user="user"/>
-	      
-            </article>
-          </div>
-          <div class="tile is-parent">
-            <article class="tile is-child box is-primary">
-              <div class="title is-size-4">
-                <div class="icon-text">
-                <span class="icon is-medium">
-                  <i class="fas fa-map-pin"></i>
-                </span>
-                  <span>{{$t('location')}}</span>
-                </div>
-              </div>
-              <div class="content" v-if="address">
-                <router-link :to="`/map?id=${item.id}`">
-                  {{address}}
-                </router-link>
-              </div>
-              <div class="content" v-else>
-                <em>{{$t('no-address')}}</em>
-              </div>
-            </article>
-          </div>
-        </div>
-
       </div>
-      <div class="tile is-parent is-4" v-if="item.images.length > 0">
-        <article class="tile is-child box is-vcentered">
-          <figure class="image is-256x256 " v-if="item.images[0]">
-            <img :src="item.images[0]" />
-          </figure>
-        </article>
-      </div>
-    </div>
-  </template>
-</div>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -172,8 +154,7 @@ export default {
     async fetchItem() {
       try {
         this.item = (await axios.get(`/api/v1/${this.itemApiUri}/${this.itemId}/`)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -182,8 +163,7 @@ export default {
       try {
         let uri = `/api/v1/webusers/`;
         this.users = (await axios.get(uri)).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.error = true;
       }
@@ -195,20 +175,19 @@ export default {
 
       try {
         this.address = (await axios.post(
-          `/api/v1/address/`,
-          this.item.location
+            `/api/v1/address/`,
+            this.item.location
         )).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(JSON.stringify(error));
       }
     },
-      formattedDate(date) {
-	  moment.locale(this.$i18n.locale);
-	  return(moment(date).format('LLLL'));
+    formattedDate(date) {
+      moment.locale(this.$i18n.locale);
+      return (moment(date).format('LLLL'));
     },
-      formattedDateFromNow(date) {
-	  return moment(date).fromNow();
+    formattedDateFromNow(date) {
+      return moment(date).fromNow();
     },
     category(category) {
       return categories[category];
@@ -224,8 +203,7 @@ export default {
         }
         const response = await axios.post('api/v1/conversations/', data);
         await this.$router.push(`/conversations/${response.data['id']}`);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
@@ -239,8 +217,7 @@ export default {
           pauseOnHover: true,
         });
         await this.$router.push('/items');
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         this.$buefy.snackbar.open({
           duration: 5000,
