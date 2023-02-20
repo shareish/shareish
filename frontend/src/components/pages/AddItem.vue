@@ -144,7 +144,8 @@ export default {
       file: null,
       filePreview: null,
 
-      suggestedName: null,
+	suggestedName: null,
+	suggestedCategory: null,
       suggestedDescription: null,
 
       name: '',
@@ -227,7 +228,8 @@ export default {
       reader.readAsDataURL(this.file[0]);
       await this.fetchPredictions();
 
-      this.name = this.suggestedName;
+	this.name = this.suggestedName;
+	this.category1 = this.suggestedCategory;
       this.description = this.suggestedDescription;
       this.step = 2;
       this.loading = false;
@@ -235,8 +237,9 @@ export default {
     async fetchPredictions() {
       try {
         const predictions = (await axios.post('/api/v1/predictClass/', this.file)).data;
-        this.suggestedName = predictions['suggested_class'];
-        this.suggestedDescription = predictions['detected_text'];
+          this.suggestedName = predictions['suggested_class'];
+	  this.suggestedCategory = predictions['suggested_category'];
+          this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
       } catch (error) {
         console.log(error);
       }

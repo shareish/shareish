@@ -3,6 +3,7 @@ import re
 
 import pytesseract
 import torch
+import json
 from PIL import Image
 from matplotlib import pyplot as plt
 from torchvision import models, transforms
@@ -12,6 +13,12 @@ model = torch.hub.load(
     weights=models.MobileNet_V3_Large_Weights.IMAGENET1K_V1
     )
 model.eval()
+
+
+print("Loading imageNet classes and mapped categories")
+with open("./mymap/imagenet_class_index.json", "r") as jsonfile:
+    categories = json.load(jsonfile)
+
 
 
 def getImage(filename):
@@ -50,12 +57,6 @@ def showImage(image):
     plt.close(f)
 
 
-def getCategories(filename):
-    with open(filename, "r") as f:
-        categories = [s.strip() for s in f.readlines()]
-    return categories
-
-
 def findOCR(filename):
     # predicted_result = pytesseract.image_to_string(Image.open(filename), lang='eng')
     predicted_result = pytesseract.image_to_string(Image.open(filename))
@@ -79,13 +80,13 @@ def findClass(filename):
 
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
 
-    categories = getCategories("./mymap/imagenet_classes.txt")
-
     top5_prob, top5_catid = torch.topk(probabilities, 5)
     for i in range(top5_prob.size(0)):
-        print(str(categories[top5_catid[i]]) + " & " + str(top5_prob[i].item()) + "\\\\")
+        print(categories[str(top5_catid[i].item())][1] + " & " + str(top5_prob[i].item()) + "\\\\")
 
-    return categories[top5_catid[0]], detected_text
+    #mapped category in json file
+    detected_category = categories[str(top5_catid[0].item())][2]
+    return categories[str(top5_catid[0].item())][1], detected_category, detected_text
 
 
 # These two functions are implemented to plot the save the figures on files
