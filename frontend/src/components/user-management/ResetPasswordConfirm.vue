@@ -42,9 +42,6 @@ export default {
         async submitForm(e){
             this.errors.splice(0);
 
-            axios.defaults.headers.common["Authorization"] = "";
-            localStorage.removeItem("token");
-
             const formData = {
                 uid: this.uid,
                 token: this.token,
@@ -53,7 +50,7 @@ export default {
 
             try {
               await axios.post("/api/v1/users/reset_password_confirm/", formData);
-              await this.$router.push('/log-in');
+              await this.$router.push('/');
               this.$buefy.snackbar.open({
                 duration: 5000,
                 type: 'is-success',

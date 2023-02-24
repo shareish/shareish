@@ -49,9 +49,6 @@ export default {
     },
     methods: {
         async submitForm(e){
-            axios.defaults.headers.common["Authorization"] = "";
-            localStorage.removeItem("token");
-
             const formData = {
                 email: this.email,
                 password: this.password
@@ -60,8 +57,8 @@ export default {
             try {
               const response = await axios.post("/api/v1/token/login/", formData);
               const token = response.data.auth_token;
-              this.$store.commit('setToken', token);
               axios.defaults.headers.common["Authorization"] = "Token " + token;
+              this.$store.commit('setToken', token);
               localStorage.setItem("token", token);
 
               const user = (await axios.get("api/v1/users/me/")).data;
