@@ -202,7 +202,7 @@ notif-error-email-activation,Something went wrong during email activation,Quelqu
 notif-success-email-activation,"The email address has been activated successfully!","L'adresse email a été validée avec succès!"
 activate-your-account,Activate your account,Activation de votre compte
 resend-activation,Resend activation email,Renvoyer l'e-mail d'activation
-notif-success-resend-activation,"A new activation link has been sent to your email","Un nouveau lien de validation a été envoyé à votre adresse email"
+notif-success-resend-activation,"A new activation link has been sent to your email address","Un nouveau lien de validation a été envoyé à votre adresse email"
 notif-error-resend-activation,Something went wrong during sending of activation link,Quelque chose s'est mal passé lors de l'envoi du lien d'activation.
 reset-password,Reset password,Réinitialiser le mot de passe
 notif-success-password-reset-sent,Check your emails to continue the password reset procedure,Vérifiez vos emails pour continuer la procédure de réinitialisation du mot de passe
