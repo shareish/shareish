@@ -76,7 +76,7 @@ class User(AbstractBaseUser):
     mail_notif_freq_conversations = models.CharField(
         max_length=1,
         choices=MailNotificationFrequenciesConversations.choices,
-        default=MailNotificationFrequenciesConversations.INSTANTLY
+        default=MailNotificationFrequenciesConversations.DAILY
     )
     mail_notif_freq_events = models.CharField(
         max_length=1,
@@ -91,7 +91,7 @@ class User(AbstractBaseUser):
     dwithin_notifications = models.PositiveSmallIntegerField(
         null=True,
         default=10,
-        help_text='Enter maximum distance for new item notifications'
+        help_text='Enter maximum distance for new item and event notifications'
     )
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
