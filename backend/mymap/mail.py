@@ -257,26 +257,26 @@ def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequen
         'events': 0
     }
 
-    # Conversations: mails preparation
+    # Conversations: emails preparation
     for user in users_conversations:
         prepared_mail = _prepare_mail_notif_conversations(user, frequency, connection)
         if prepared_mail:
             to_send.append(prepared_mail)
             to_send_types_count['conversations'] += 1
 
-    # # Events: mails preparation
-    # for user in users_events:
-    #     prepared_mail = _prepare_mail_notif_events(user, frequency, connection)
-    #     if prepared_mail:
-    #         to_send.append(prepared_mail)
-    #         to_send_types_count['events'] += 1
-    #
-    # # Items: mails preparation
-    # for user in users_items:
-    #     prepared_mail = _prepare_mail_notif_items(user, frequency, connection)
-    #     if prepared_mail:
-    #         to_send.append(prepared_mail)
-    #         to_send_types_count['items'] += 1
+    # Events: emails preparation
+    for user in users_events:
+        prepared_mail = _prepare_mail_notif_events(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['events'] += 1
+
+    # Items: emails preparation
+    for user in users_items:
+        prepared_mail = _prepare_mail_notif_items(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['items'] += 1
 
 
     # Send list of prepared mails
@@ -320,7 +320,6 @@ def start_mail_scheduler():
 
         try:
             limit = int(limit)
-        # invalid literal for int()
         except ValueError:
             # Fail silently.
             return value
@@ -343,7 +342,7 @@ def start_mail_scheduler():
     # once a day: at 8 o'clock
     scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='cron', hour=8)
 
-    # once a week: every friday
+    # once a week: every friday at 8 o'clock
     scheduler.add_job(send_emails, args=[MailNotificationFrequencies.WEEKLY], trigger='cron', day_of_week='fri', hour=8)
 
     # To test quickly (10s delay between checks), uncomment line below.
