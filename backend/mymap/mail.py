@@ -14,6 +14,8 @@ from mail_templated import EmailMessage
 from .models import Message, MailNotificationFrequencies
 from .models import Item
 
+from django.db import connection as dbconnection
+
 User = get_user_model()
 
 to_show = {
@@ -29,11 +31,13 @@ item_types = {
     "EV": "Event"
 }
 
-def _get_unread_messages_count(user):
-    return Message.objects.filter(
+def _get_unread_messages(user):
+    messages = Message.objects.filter(
         Q(conversation__owner=user) | Q(conversation__buyer=user),
         Q(seen=False), ~Q(user=user)
-    ).count()
+    )
+
+    return messages[:to_show['conversations']], messages.count()
 
 
 def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
@@ -151,7 +155,7 @@ def send_mail_notif_new_single_item_published(item, user_that_published):
 def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequencies, connection):
     # Get the messages don't take into account the frequency
     # It takes all the pending conversations
-    n = _get_unread_messages_count(user)
+    unread_messages, n = _get_unread_messages(user)
 
     if n > 0:
         if frequency == MailNotificationFrequencies.DAILY:
@@ -164,6 +168,7 @@ def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequenci
             "digest": digest,
             "n": n,
             "user": user,
+            "unread_messages": unread_messages,
             "app_url": settings.APP_URL,
             "to_show": to_show['conversations']
         }
@@ -259,19 +264,19 @@ def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequen
             to_send.append(prepared_mail)
             to_send_types_count['conversations'] += 1
 
-    # Events: mails preparation
-    for user in users_events:
-        prepared_mail = _prepare_mail_notif_events(user, frequency, connection)
-        if prepared_mail:
-            to_send.append(prepared_mail)
-            to_send_types_count['events'] += 1
-
-    # Items: mails preparation
-    for user in users_items:
-        prepared_mail = _prepare_mail_notif_items(user, frequency, connection)
-        if prepared_mail:
-            to_send.append(prepared_mail)
-            to_send_types_count['items'] += 1
+    # # Events: mails preparation
+    # for user in users_events:
+    #     prepared_mail = _prepare_mail_notif_events(user, frequency, connection)
+    #     if prepared_mail:
+    #         to_send.append(prepared_mail)
+    #         to_send_types_count['events'] += 1
+    #
+    # # Items: mails preparation
+    # for user in users_items:
+    #     prepared_mail = _prepare_mail_notif_items(user, frequency, connection)
+    #     if prepared_mail:
+    #         to_send.append(prepared_mail)
+    #         to_send_types_count['items'] += 1
 
 
     # Send list of prepared mails
@@ -302,6 +307,36 @@ def start_mail_scheduler():
     @register.filter
     def sub(value, arg):
         return value - arg
+
+    @register.filter
+    def ellipsis(value, limit=80):
+        """
+        Truncates a string after a given number of chars keeping whole words.
+
+        Usage:
+            {{ string|truncatesmart }}
+            {{ string|truncatesmart:50 }}
+        """
+
+        try:
+            limit = int(limit)
+        # invalid literal for int()
+        except ValueError:
+            # Fail silently.
+            return value
+
+        # Return the string itself if length is smaller or equal to the limit
+        if len(value) <= limit:
+            return value
+
+        # Cut the string
+        value = value[:limit]
+
+        # Break into words and remove the last
+        words = value.split(' ')[:-1]
+
+        # Join the words and return
+        return ' '.join(words) + '...'
 
     scheduler = BackgroundScheduler()
 

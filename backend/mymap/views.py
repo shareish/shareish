@@ -61,8 +61,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
     filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter,
-        ItemTypeFilterBackend, ItemCategoryFilterBackend,
+        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
         ActiveItemFilterBackend
     ]
     search_fields = ['name', 'description']
@@ -76,7 +75,6 @@ class ItemViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        print("--------------  in ItemViewSet create ---------------")
         data = request.data
         if 'location' in data:
             address = data['location']
@@ -102,7 +100,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
         if item.item_type != "EV":
-            from .mail import send_mail_notif_new_single_item_published, send_mail_notif_new_single_event_published
+            from .mail import send_mail_notif_new_single_item_published
             send_mail_notif_new_single_item_published(item, self.request.user)
         else:
             from .mail import send_mail_notif_new_single_event_published
@@ -164,7 +162,6 @@ class UserItemViewSet(ItemViewSet):
     filter_backends = [UserItemFilterBackend]
 
 
-# TODO: why not model view set ?
 class ItemImageViewSet(viewsets.ViewSet):
     def list(self, request):
         images = ItemImage.objects.all()
@@ -173,14 +170,13 @@ class ItemImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         item = Item.objects.get(pk=request.POST['itemID'])
-        existings = ItemImage.objects.filter(item=item)
-        for existing in existings:
-            existing.delete()
+        existing_images = ItemImage.objects.filter(item=item)
+        for existing_image in existing_images:
+            existing_image.delete()
         images = request.FILES.getlist('files')
         if request.FILES.get('image') is not None:
             images += [request.FILES.get('image')]
 
-        print(images)
         for image in images:
             new_image = ItemImage(image=image, item=item)
             new_image.save()
@@ -274,7 +270,6 @@ class UserViewSet(viewsets.ModelViewSet):
             if address != '' and address is not None:
                 geoloc = locator.geocode(address)
                 if geoloc is not None:
-                    print("-------------------------- create user geoloc: {}".format(geoloc))
                     data['ref_location'] = "{} ({} {})".format(
                         LOCATION_PREFIX,
                         str(geoloc.latitude),
@@ -302,7 +297,6 @@ class UserViewSet(viewsets.ModelViewSet):
             if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
                 geoloc = locator.geocode(address)
                 if geoloc is not None:
-                    print("-------------------------- update user geoloc: {}".format(geoloc))
                     request.data['ref_location'] = "{} ({} {})".format(
                         LOCATION_PREFIX,
                         str(geoloc.latitude),
@@ -392,9 +386,7 @@ def searchItemFilter(request):
         if searched['name'] == "":
             searched['name'] = None
 
-        if (searched['name'] is None
-                and searched['item_type'] is None
-                and searched['category'] is None):
+        if searched['name'] is None and searched['item_type'] is None and searched['category'] is None:
             serialized_items = ItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
 
@@ -435,14 +427,13 @@ def searchItems(request):
 
 @api_view(['POST'])
 def predictClass(request):
-    if request.method == "POST":
-        if request.FILES.get('files[]'):
-            class_found, detected_text = findClass(request.FILES.get('files[]'))
-            response = {
-                "suggested_class": class_found,
-                "detected_text": detected_text
-            }
-            return JsonResponse(response, status=status.HTTP_200_OK)
+    if request.method == "POST" and request.FILES.get('files[]'):
+        class_found, detected_text = findClass(request.FILES.get('files[]'))
+        response = {
+            "suggested_class": class_found,
+            "detected_text": detected_text
+        }
+        return JsonResponse(response, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -464,17 +455,15 @@ def getNotifications(request):
         user = request.user
         data = request.data
         conversation = Conversation.objects.get(pk=data['conversation'])
-        if conversation is None \
-                or (conversation.buyer != user and conversation.owner != user):
+        if conversation is None or (conversation.buyer != user and conversation.owner != user):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # Set all messages sent by other user as seen by current user for this conversation
-        count = Message.objects.filter(
+        Message.objects.filter(
             Q(conversation__id=data['conversation']),
             Q(id__lte=data['last_message']),
             ~Q(user=user)
         ).update(seen=True)
-        print(count)
 
         # Return unread messages count for all conversations
         response = {
@@ -490,7 +479,6 @@ def getFirstItemImage(request, id):
     if request.method == 'GET':
         item = Item.objects.get(pk=id)
         images = ItemImage.objects.filter(item=item)
-        print(images)
         if len(images) > 0:
             image = images[0]
             serialized_image = ItemImageSerializer(image, many=False)
