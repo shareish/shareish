@@ -130,6 +130,14 @@ const routes = [
             requireLogin: true
         }
     },
+    {
+        path: '/settings/:page',
+        name: 'settingsPage',
+        component: Settings,
+        meta: {
+            requireLogin: true
+        }
+    },
 
     // Redirects for old urls
     {path: '/dashboard', redirect: '/map'},

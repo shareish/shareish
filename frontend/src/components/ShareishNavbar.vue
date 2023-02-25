@@ -1,7 +1,7 @@
 <template>
   <b-navbar class="navbar" shadow type="is-primary">
     <template #brand>
-      <b-navbar-item :to="{path: '/' }" tag="router-link">
+      <b-navbar-item :to="{path: '/'}" tag="router-link">
         <strong>Shareish</strong>
       </b-navbar-item>
     </template>
@@ -10,24 +10,20 @@
         <i class="far fa-map"></i>
         {{ $t('map') }}
       </b-navbar-item>
-
       <b-navbar-item tag="router-link" to="/items">
         <i class="fas fa-binoculars"></i>
         {{ $t('browse-items') }}
       </b-navbar-item>
-
       <b-navbar-item tag="router-link" to="/add-item">
         <i class="fas fa-plus"></i>
         {{ $t('add-item') }}
       </b-navbar-item>
-
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{ $t('conversations') }}
         &nbsp;<span v-if="unreadMessages > 0" class="tag is-rounded">{{ unreadMessages }}</span>
       </b-navbar-item>
     </template>
-
     <template #end>
       <b-navbar-dropdown :label="$t(`language-${$i18n.locale}`)">
         <b-navbar-item :active="$i18n.locale === 'en'" @click="changeLanguage('en')">English</b-navbar-item>
@@ -36,21 +32,17 @@
       <b-navbar-dropdown v-if="isAuthenticated" :label="$t('my-account')">
         <b-navbar-item tag="router-link" to="/profile">
           <i class="fas fa-user-circle"></i>
-          Profile
+          {{ $t('profile') }}
         </b-navbar-item>
         <b-navbar-item tag="router-link" to="/settings">
           <i class="fas fa-cog"></i>
-          Settings
+          {{ $t('settings') }}
         </b-navbar-item>
         <b-navbar-item @click="logout()">
           <i class="fas fa-sign-out-alt"></i>
-          Logout
+          {{ $t('log-out') }}
         </b-navbar-item>
       </b-navbar-dropdown>
-<!--      <b-navbar-item v-if="isAuthenticated" tag="router-link" to="/profile">-->
-<!--        <i class="fas fa-user-circle"></i>-->
-<!--        {{ $t('my-account') }}-->
-<!--      </b-navbar-item>-->
       <b-navbar-item v-else tag="div">
         <div class="buttons">
           <router-link class="button is-primary" to="/sign-up">
@@ -90,7 +82,7 @@ export default {
   watch: {
     async isAuthenticated(val) {
       // Force update conversation notification when authenticated
-      // await this.fetchConversationUpdates();
+      await this.fetchConversationUpdates();
     }
   },
   methods: {

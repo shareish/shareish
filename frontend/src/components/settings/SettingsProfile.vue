@@ -10,7 +10,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['first_name']" v-validate="'required'" name="first_name" type="text" />
+            <b-input v-model="internalUser['first_name']" v-validate="'required'" name="first_name" type="text" />
           </b-field>
         </div>
       </div>
@@ -23,7 +23,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['last_name']" v-validate="'required'" name="last_name" type="text" />
+            <b-input v-model="internalUser['last_name']" v-validate="'required'" name="last_name" type="text" />
           </b-field>
         </div>
       </div>
@@ -36,7 +36,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['username']" v-validate="'required'" name="username" type="text" />
+            <b-input v-model="internalUser['username']" v-validate="'required'" name="username" type="text" />
           </b-field>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
-        <b-input v-model="user['description']" v-validate="'required'" name="description" type="textarea" />
+        <b-input v-model="internalUser['description']" v-validate="'required'" name="description" type="textarea" />
       </b-field>
     </div>
     <div class="tile is-ancestor">
@@ -62,7 +62,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['homepage_url']" name="homepage_url" type="text" />
+            <b-input v-model="internalUser['homepage_url']" name="homepage_url" type="text" />
           </b-field>
         </div>
       </div>
@@ -75,7 +75,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['facebook_url']" name="facebook_url" type="text" />
+            <b-input v-model="internalUser['facebook_url']" name="facebook_url" type="text" />
           </b-field>
         </div>
       </div>
@@ -88,7 +88,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="user['instagram_url']" name="instagram_url" type="text" />
+            <b-input v-model="internalUser['instagram_url']" name="instagram_url" type="text" />
           </b-field>
         </div>
       </div>
@@ -118,14 +118,14 @@ export default {
   },
   created() {
     document.title = 'Shareish | Settings: Profile';
-    this.internalUser = this.user;
+    this.internalUser = {...this.user};
   },
   methods: {
     async save() {
       let result = await this.$validator.validateAll();
       if (result) {
         try {
-          let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
+          let updatedUser = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -134,9 +134,9 @@ export default {
             pauseOnHover: true,
           });
 
-          this.$emit('updateUser', user);
+          this.$emit('updateUser', updatedUser);
 
-          this.internalUser = user;
+          this.internalUser = updatedUser;
         } catch (error) {
           console.log(error);
           this.$buefy.snackbar.open({

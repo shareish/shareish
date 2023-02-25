@@ -1,21 +1,33 @@
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.schedulers.background import BackgroundScheduler
-from django.core.mail import send_mass_mail
+from django.core import mail
 from django.contrib.auth import get_user_model
-from django.db.models import Q,F
+from django.db.models import Q, F
 from django.conf import settings
-from django.utils import timezone
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import Point
-from django.contrib.gis.geos import GEOSGeometry
+from django.template.defaulttags import register
 
-from .models import Message
+from mail_templated import EmailMessage
+
+from .models import Message, MailNotificationFrequencies
 from .models import Item
 
 User = get_user_model()
 
+to_show = {
+    'conversations': 3,
+    'items': 5,
+    'events': 3
+}
+
+item_types = {
+    "DN": "Donation",
+    "LN": "Loan",
+    "BR": "Request",
+    "EV": "Event"
+}
 
 def _get_unread_messages_count(user):
     return Message.objects.filter(
@@ -24,137 +36,254 @@ def _get_unread_messages_count(user):
     ).count()
 
 
-def _get_new_items_near_user(user):
-    #get items within user dwithin distance and which stardate is between yesterday and today, not event
-    #order by distance from user ref_location
-    today = datetime.now().date()
-    yesterday = today - timedelta(1)
-    if user.ref_location:
-        pnt = user.ref_location
+def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
+    end = datetime.now().date()
+    if frequency == MailNotificationFrequencies.DAILY:
+        start = end - timedelta(days=1)
+    elif frequency == MailNotificationFrequencies.WEEKLY:
+        start = end - timedelta(days=7)
     else:
-        pnt = GEOSGeometry('POINT(0.0 0.0)', srid=4326)
-    return Item.objects.filter(
-        Q(creationdate__lte = today, creationdate__gte = yesterday),
-        Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
+        return ([], 0)
+
+    # Items sorted by distance
+    queryset = Item.objects.filter(
+        Q(creationdate__lte=end, creationdate__gte=start),
+        Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
         ~Q(item_type='EV'),
-        ~Q(user=user)).annotate(distance=Distance("location",pnt)).order_by("distance")
+        ~Q(user=user)
+    ).annotate(distance=Distance("location", user.ref_location)).order_by("distance")
 
-def _get_events_near_user(user):
-    #get items (events) within user dwithin distance
-    #order by startdate (sooner to later)
-    today = datetime.now().date()
-    yesterday = today - timedelta(1)
-    if user.ref_location:
-        pnt = user.ref_location
+    return (queryset[:to_show['items']], queryset.count())
+
+
+def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies):
+    end = datetime.now().date()
+    if frequency == MailNotificationFrequencies.DAILY:
+        start = end - timedelta(days=1)
+    elif frequency == MailNotificationFrequencies.WEEKLY:
+        start = end - timedelta(days=7)
     else:
-        pnt = GEOSGeometry('POINT(0.0 0.0)', srid=4326)
-    return Item.objects.filter(
+        return ([], 0)
+
+    # Events sorted by delay before event starting
+    queryset = Item.objects.filter(
         Q(item_type='EV'),
-        Q(creationdate__lte = today, creationdate__gte = yesterday),
-        Q(location__dwithin=(pnt,D(km=user.dwithin_notifications))),
-        ~Q(user=user)).annotate(delay=F('startdate')-today).order_by("delay")   #~Q for items from another user
+        Q(creationdate__lte=end, creationdate__gte=start),
+        Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
+        ~Q(user=user)
+    ).annotate(
+        delay=F('startdate') - end,
+        distance=Distance("location", user.ref_location)
+    ).order_by("delay")
 
-def _prepare_mail_user(user):
-    new_items = _get_new_items_near_user(user)
-    unread_count = _get_unread_messages_count(user)
-    new_events = _get_events_near_user(user)
+    return (queryset[:to_show['events']], queryset.count())
 
-    # TODO: use template for emails
-    # https://django-mail-templated.readthedocs.io/en/master/ ?
-    
-    if unread_count > 0:
-        subject_msg="{} unread message".format(unread_count)
-        if unread_count > 1:
-            subject_msg+="s"
-    else:
-        subject_msg=""
-        
-    if len(new_items) > 0:
-        subject_items="{} new item".format(len(new_items))
-        if len(new_items) > 1:
-            subject_items+="s"
-    else:
-        subject_items=""
-        
-    if len(new_events) > 0:
-        subject_events="{} new event".format(len(new_events))
-        if len(new_events) > 1:
-            subject_events+="s"
-    else:
-        subject_events=""
-    
-    if unread_count > 0 or len(new_items) > 0 or len(new_events) > 0:
-        subject = "[Shareish] Recent content on Shareish mutual aid platform ({} {} {})".format(subject_msg,subject_items,subject_events)
-        message = "Dear {} {} ({}),\n\nThere is new content since yesterday within your neighbourhood on Shareish mutual aid platform.\n\n".format(
-            user.first_name, user.last_name, user.username)
-        message+="Please login on {} (using your e-mail address) to view it.\n\n".format(settings.APP_URL)
-    
-        if unread_count > 0:
-            if unread_count > 1:
-                plural="s"
-            else:
-                plural=""
-            message += "You have {} unread message{}, available in the Conversations tab.\n\n".format(unread_count,plural)
-        if len(new_items) > 0:
-            if len(new_items)>1:
-                plural="s"
-            else:
-                plural=""
-            message += "You have {} new item{}, available in the Map and Browse tab:\n".format(len(new_items),plural)
-            for i in range (len(new_items)):
-                message+="* {} ({}, within {} km, {}/map?id={})\n".format(new_items[i].name,
-                                                                          new_items[i].get_item_type_display(),
-                                                                          round(100*new_items[i].location.distance(user.ref_location),2),
-                                                                          settings.APP_URL,
-                                                                          new_items[i].id)
-        if len(new_events) > 0:
-            if len(new_events)>1:
-                plural="s"
-            else:
-                plural=""
-            message += "\nYou have {} new event{}, available in the Map and Browse tab:\n".format(len(new_events),plural)
-            for i in range (len(new_events)):
-                message+="* {} (from {} to {}, within {} km, {}/map?id={})\n".format(new_events[i].name,
-                                                                                     new_events[i].startdate.strftime("%B %d, %Y %H:%M"),
-                                                                                     new_events[i].enddate.strftime("%B %d, %Y %H:%M"),
-                                                                                     round(100*new_events[i].location.distance(user.ref_location),2),
-                                                                                     settings.APP_URL,
-                                                                                     new_events[i].id)
 
-        message+="\nThese notifications can be configured on Shareish in My account Edit ({}/profile)".format(settings.APP_URL)
-        message+="\n\nThe Shareish team.\n"
+def _plural(n: int):
+    return "" if n == 1 else "s"
 
-    else:
-        # Nothing new, abort
-        return None
 
-    from_email = settings.EMAIL_HOST_USER
-    recipient_list = [user.email]
-    return subject, message, from_email, recipient_list
+def send_mail_notif_new_single_event_published(event, user_that_published):
+    users = User.objects.filter(
+        Q(is_active=True),
+        Q(mail_notif_freq_events=MailNotificationFrequencies.INSTANTLY),
+        Q(ref_location__isnull=False),
+        ~Q(pk=user_that_published.id)
+    ).annotate(
+        distance_from_event=Distance("ref_location", event.location)
+    ).filter(distance_from_event__lte=F("dwithin_notifications") * 1000)
+
+    connection = mail.get_connection(fail_silently=True)
+    to_send = []
+
+    for user in users:
+        context = {
+            "user": user,
+            "event": event,
+            "app_url": settings.APP_URL
+        }
+
+        email = EmailMessage('emails/notif_new_single_event_published.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+
+        if not email._is_rendered:
+            email.render()
+
+        to_send.append(email)
+
+    if len(to_send) > 0:
+        delivered = connection.send_messages(to_send)
+        print("Successfully delivered {}/{} emails".format(delivered, len(to_send)))
+
+
+def send_mail_notif_new_single_item_published(item, user_that_published):
+    users = User.objects.filter(
+        Q(is_active=True),
+        Q(mail_notif_freq_items=MailNotificationFrequencies.INSTANTLY),
+        Q(ref_location__isnull=False),
+        ~Q(pk=user_that_published.id)
+    ).annotate(
+        distance_from_item=Distance("ref_location", item.location)
+    ).filter(distance_from_item__lte=F("dwithin_notifications") * 1000)
+
+    connection = mail.get_connection(fail_silently=True)
+    to_send = []
+
+    for user in users:
+        context = {
+            "user": user,
+            "item": item,
+            "item_type": item_types[item.item_type],
+            "app_url": settings.APP_URL
+        }
+
+        email = EmailMessage('emails/notif_new_single_item_published.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+
+        if not email._is_rendered:
+            email.render()
+
+        to_send.append(email)
+
+    if len(to_send) > 0:
+        delivered = connection.send_messages(to_send)
+        print("Successfully delivered {}/{} emails".format(delivered, len(to_send)))
+
+
+def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequencies, connection):
+    # Get the messages don't take into account the frequency
+    # It takes all the pending conversations
+    n = _get_unread_messages_count(user)
+
+    if n > 0:
+        if frequency == MailNotificationFrequencies.DAILY:
+            digest = "Daily conversations digest"
+        else:
+            digest = "Recent conversations"
+
+
+        context = {
+            "digest": digest,
+            "n": n,
+            "user": user,
+            "app_url": settings.APP_URL,
+            "to_show": to_show['conversations']
+        }
+
+        email = EmailMessage('emails/notif_digest_conversations.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+
+        if not email._is_rendered:
+            email.render()
+
+        return email
+
+
+def _prepare_mail_notif_events(user, frequency: MailNotificationFrequencies, connection):
+    new_events, n = _get_last_new_events_near_user(user, frequency)
+
+    if n > 0:
+
+        if frequency == MailNotificationFrequencies.DAILY:
+            digest = "Daily events digest"
+        elif frequency == MailNotificationFrequencies.WEEKLY:
+            digest = "Weekly events digest"
+        else:
+            digest = "Recent events"
+
+        context = {
+            "digest": digest,
+            "n": n,
+            "user": user,
+            "new_events": new_events,
+            "app_url": settings.APP_URL,
+            "to_show": to_show['events']
+        }
+
+        email = EmailMessage('emails/notif_digest_events.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+
+        if not email._is_rendered:
+            email.render()
+
+        return email
+
+
+def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, connection):
+    new_items, n = _get_last_new_items_near_user(user, frequency)
+
+    if n > 0:
+
+        if frequency == MailNotificationFrequencies.DAILY:
+            digest = "Daily items digest"
+        elif frequency == MailNotificationFrequencies.WEEKLY:
+            digest = "Weekly items digest"
+        else:
+            digest = "Recent items"
+
+        context = {
+            "digest": digest,
+            "n": n,
+            "user": user,
+            "new_items": new_items,
+            "app_url": settings.APP_URL,
+            "item_types": item_types,
+            "to_show": to_show['items']
+        }
+
+        email = EmailMessage('emails/notif_digest_items.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+
+        if not email._is_rendered:
+            email.render()
+
+        return email
 
 
 # To be scheduled
-def send_emails():
-    # Get all activated users
-    users = User.objects.filter(is_active=True)
+def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequencies.DAILY):
+    # Get all activated users who have their notifications frequency equals to the one of the scheduler's job
+    users_conversations = User.objects.filter(is_active=True, mail_notif_freq_conversations=frequency)
+    users_events = User.objects.filter(is_active=True, mail_notif_freq_events=frequency, ref_location__isnull=False)
+    users_items = User.objects.filter(is_active=True, mail_notif_freq_items=frequency, ref_location__isnull=False)
 
-    # For each user, prepare mail to send (if any)
+    # Establish connection for the email sending
+    connection = mail.get_connection(fail_silently=True)
+
     to_send = []
-    for user in users:
-        mail = _prepare_mail_user(user)
-        if mail:
-            to_send.append(mail)
+    to_send_types_count = {
+        'conversations': 0,
+        'items': 0,
+        'events': 0
+    }
+
+    # Conversations: mails preparation
+    for user in users_conversations:
+        prepared_mail = _prepare_mail_notif_conversations(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['conversations'] += 1
+
+    # Events: mails preparation
+    for user in users_events:
+        prepared_mail = _prepare_mail_notif_events(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['events'] += 1
+
+    # Items: mails preparation
+    for user in users_items:
+        prepared_mail = _prepare_mail_notif_items(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['items'] += 1
+
 
     # Send list of prepared mails
     # https://docs.djangoproject.com/en/4.1/topics/email/#send-mass-mail
     # https://docs.djangoproject.com/en/4.1/topics/email/#send-mail
     # It uses EMAIL_* parameters from settings.py
     if len(to_send) > 0:
-        delivered = send_mass_mail(
-            to_send,
-            fail_silently=True,
-        )
-        print("Successfully delivered {}/{} emails".format(delivered, len(to_send)))
+        delivered = connection.send_messages(to_send)
+        print("Successfully delivered {}/{} emails:".format(delivered, len(to_send)))
+        print("\t{} for conversations".format(to_send_types_count['conversations']))
+        print("\t{} for events".format(to_send_types_count['events']))
+        print("\t{} for items".format(to_send_types_count['items']))
     else:
         print("No scheduled emails to send.")
 
@@ -166,13 +295,27 @@ def start_mail_scheduler():
         else:
             print('The scheduled email sending worked.')
 
+    @register.filter
+    def get_item(dictionary, key):
+        return dictionary.get(key)
+
+    @register.filter
+    def sub(value, arg):
+        return value - arg
+
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_emails, trigger='cron', hour=8, minute=0)
-    # TO TEST quickly, uncomment this line:
-    #scheduler.add_job(send_emails, trigger='cron', second=0)
-    # To configure cron:
-    # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=cron
+
+    # once a day: at 8 o'clock
+    scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='cron', hour=8)
+
+    # once a week: every friday
+    scheduler.add_job(send_emails, args=[MailNotificationFrequencies.WEEKLY], trigger='cron', day_of_week='fri', hour=8)
+
+    # To test quickly (10s delay between checks), uncomment line below.
+    # Update args parameter to tell who are the job's targets
+    # MailNotificationFrequencies.DAILY = all users that have at least one of the 3 notif settings set on Daily
+    # scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='interval', seconds=10)
+
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+
     scheduler.start()
-
-

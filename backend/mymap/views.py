@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Q,F
+from django.db.models import Q, F
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
@@ -23,7 +23,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .ai import findClass
 
 from geopy.geocoders import Nominatim
-
 
 locator = Nominatim(user_agent="shareish")
 
@@ -77,7 +76,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        #print("--------------  in ItemViewSet create ---------------")
+        print("--------------  in ItemViewSet create ---------------")
         data = request.data
         if 'location' in data:
             address = data['location']
@@ -101,7 +100,13 @@ class ItemViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        item = serializer.save(user=self.request.user)
+        if item.item_type != "EV":
+            from .mail import send_mail_notif_new_single_item_published, send_mail_notif_new_single_event_published
+            send_mail_notif_new_single_item_published(item, self.request.user)
+        else:
+            from .mail import send_mail_notif_new_single_event_published
+            send_mail_notif_new_single_event_published(item, self.request.user)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -126,7 +131,6 @@ class ItemViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class RecurrentItemViewSet(ItemViewSet):
@@ -314,7 +318,6 @@ class UserViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class ConversationViewSet(viewsets.ModelViewSet):

@@ -1,37 +1,37 @@
 <template>
   <div class="page-account container">
-    <h1 class="title mb-6">Settings & Notifications</h1>
+    <h1 class="title mb-6">{{ $t('settings') }} & {{ $t('notifications') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <div v-else class="columns is-variable" id="settings-split">
       <aside class="menu column">
-        <p class="menu-label">General</p>
+        <p class="menu-label">{{ $t('general') }}</p>
         <ul class="menu-list">
           <li>
-            <a :class="{'is-active': currentView === 'profile'}" @click="changeView('profile')">
+            <router-link to="/settings/profile" :class="{'is-active': currentView === 'profile'}">
               <i class="fas fa-user-circle"></i>
-              Profile
-            </a>
+              {{ $t('profile') }}
+            </router-link>
           </li>
           <li>
-            <a :class="{'is-active': currentView === 'privacy'}" @click="changeView('privacy')">
+            <router-link to="/settings/privacy" :class="{'is-active': currentView === 'privacy'}">
               <i class="fas fa-lock"></i>
-              Privacy
-            </a>
+              {{ $t('privacy') }}
+            </router-link>
           </li>
           <li>
-            <a :class="{'is-active': currentView === 'account'}" @click="changeView('account')">
+            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
               <i class="fas fa-cog"></i>
-              Account
-            </a>
+              {{ $t('account') }}
+            </router-link>
           </li>
         </ul>
-        <p class="menu-label">Notifications</p>
+        <p class="menu-label">{{ $t('notifications') }}</p>
         <ul class="menu-list">
           <li>
-            <a :class="{'is-active': currentView === 'notifications'}" @click="changeView('notifications')">
+            <router-link to="/settings/notifications" :class="{'is-active': currentView === 'notifications'}">
               <i class="fas fa-bell"></i>
-              Notifications
-            </a>
+              {{ $t('notifications') }}
+            </router-link>
           </li>
         </ul>
       </aside>
@@ -58,13 +58,16 @@ export default {
       loading: true,
       user: null,
       geoloc: null,
-      currentView: 'profile'
+      currentView: null,
+      possibleViews: ['profile', 'privacy', 'account', 'notifications']
     }
   },
   async created() {
+    this.loading = true;
+
     document.title = 'Shareish | Settings';
 
-    this.loading = true;
+    this.currentView = (this.possibleViews.includes(this.$route.params.page)) ? this.$route.params.page : 'profile';
 
     await this.fetchUser();
 
@@ -121,9 +124,11 @@ export default {
     },
     updateUser(user) {
       this.user = user;
-    },
-    changeView(view) {
-      this.currentView = view;
+    }
+  },
+  watch: {
+    $route() {
+      this.currentView = (this.possibleViews.includes(this.$route.params.page)) ? this.$route.params.page : 'profile';
     }
   }
 };

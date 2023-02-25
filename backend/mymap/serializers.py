@@ -7,26 +7,29 @@ from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
 
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
-    
+
     class Meta:
         model = Item
         fields = [
-            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent',
-            'startdate', 'enddate', 'item_type', 'category1', 'category2', 'category3',
-            'user', 'images','hitcount'
+            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type',
+            'category1', 'category2', 'category3', 'user', 'images', 'hitcount'
         ]
 
 
 class MapItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['id', 'location']
+        fields = [
+            'id', 'location'
+        ]
 
 
 class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description']
+        fields = [
+            'id', 'name', 'description'
+        ]
 
 
 class ItemImageSerializer(serializers.ModelSerializer):
@@ -34,7 +37,9 @@ class ItemImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemImage
-        fields = ['id', 'image', 'item', 'url']
+        fields = [
+            'id', 'image', 'item', 'url'
+        ]
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -42,30 +47,29 @@ class UserImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserImage
-        fields = ['id', 'image', 'user', 'url']
+        fields = [
+            'id', 'image', 'user', 'url'
+        ]
 
 
 class UserSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Item.objects.all(), allow_null=True
-        )
-    image = serializers.StringRelatedField(
-        many=True
-        )
+    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
+    image = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'first_name', 'last_name', 'email',
-            'sign_in_date','homepage_url', 'facebook_url', 'instagram_url',
-            'ref_location', 'use_ref_loc', 'dwithin_notifications',
-            'items', 'description', 'image', 'is_active',
+            'id', 'username', 'first_name', 'last_name', 'email', 'sign_in_date', 'homepage_url', 'facebook_url',
+            'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'items', 'description', 'image',
+            'is_active', 'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items'
         ]
 
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('id', 'email', 'password', 'username', 'first_name', 'last_name',)
+        fields = [
+            'id', 'email', 'password', 'username', 'first_name', 'last_name'
+        ]
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -75,8 +79,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = [
-            'id', 'name', 'owner', 'buyer', 'item', 'slug',
-            'last_message', 'unread_messages'
+            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'last_message', 'unread_messages'
         ]
 
     def get_unread_messages(self, obj):
@@ -85,8 +88,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             return 0
 
         user = request.user
-        return Message.objects.filter(conversation=obj, seen=False).exclude(
-            user=user.id).count()
+        return Message.objects.filter(conversation=obj, seen=False).exclude(user=user.id).count()
 
     def get_last_message(self, obj):
         try:
@@ -99,4 +101,6 @@ class ConversationSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ['id', 'conversation', 'content', 'user', 'date', 'seen']
+        fields = [
+            'id', 'conversation', 'content', 'user', 'date', 'seen'
+        ]
