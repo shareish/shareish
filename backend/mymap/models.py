@@ -216,12 +216,8 @@ class ItemImage(models.Model):
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
-        print(img.filename)
-        print(img.size)
-
         MAX_SIZE = 1024
         if img.height > MAX_SIZE or img.width > MAX_SIZE:
-            print("resize")
             output_size = (MAX_SIZE, MAX_SIZE)
             img.thumbnail(output_size, resample=Image.LANCZOS)
             img.save(self.image.path, format=img.format)
@@ -249,6 +245,7 @@ class Conversation(models.Model):
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE,
                               null=True)
     item = models.ForeignKey(Item, related_name="conversations", on_delete=models.CASCADE, null=True)
+    lastmessagedate = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['name']

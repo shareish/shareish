@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from mymap.models import Conversation, Item, ItemImage, Message, User, UserImage
+from .models import Conversation, Item, ItemImage, Message, User, UserImage
 
 
 class ItemSerializer(serializers.ModelSerializer):

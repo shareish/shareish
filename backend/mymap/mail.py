@@ -14,9 +14,11 @@ from mail_templated import EmailMessage
 from .models import Message, MailNotificationFrequencies
 from .models import Item
 
-from django.db import connection as dbconnection
-
 User = get_user_model()
+
+# Time required between two conversation messages to be
+# considered new and sending an email notification (in minutes)
+delay_instant_notif_conversations = 10
 
 to_show = {
     'conversations': 3,
@@ -30,6 +32,7 @@ item_types = {
     "BR": "Request",
     "EV": "Event"
 }
+
 
 def _get_unread_messages(user):
     messages = Message.objects.filter(
@@ -47,7 +50,7 @@ def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
     elif frequency == MailNotificationFrequencies.WEEKLY:
         start = end - timedelta(days=7)
     else:
-        return ([], 0)
+        return [], 0
 
     # Items sorted by distance
     queryset = Item.objects.filter(
@@ -57,7 +60,7 @@ def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
         ~Q(user=user)
     ).annotate(distance=Distance("location", user.ref_location)).order_by("distance")
 
-    return (queryset[:to_show['items']], queryset.count())
+    return queryset[:to_show['items']], queryset.count()
 
 
 def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies):
@@ -67,7 +70,7 @@ def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies)
     elif frequency == MailNotificationFrequencies.WEEKLY:
         start = end - timedelta(days=7)
     else:
-        return ([], 0)
+        return [], 0
 
     # Events sorted by delay before event starting
     queryset = Item.objects.filter(
@@ -80,11 +83,33 @@ def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies)
         distance=Distance("location", user.ref_location)
     ).order_by("delay")
 
-    return (queryset[:to_show['events']], queryset.count())
+    return queryset[:to_show['events']], queryset.count()
 
 
-def _plural(n: int):
-    return "" if n == 1 else "s"
+def send_mail_notif_new_message_received(conversation, message_content, receiver):
+    connection = mail.get_connection(fail_silently=True)
+
+    context = {
+        "receiver": receiver,
+        "conversation": conversation,
+        "message_content": message_content,
+        "app_url": settings.APP_URL
+    }
+
+    email = EmailMessage(
+        'emails/notif_new_message_received.tpl',
+        context,
+        settings.EMAIL_HOST_USER,
+        [receiver.email],
+        connection=connection
+    )
+
+    if not email.is_rendered:
+        email.render()
+
+    email.send()
+
+    print("Successfully delivered instant conversation email notification")
 
 
 def send_mail_notif_new_single_event_published(event, user_that_published):
@@ -107,9 +132,10 @@ def send_mail_notif_new_single_event_published(event, user_that_published):
             "app_url": settings.APP_URL
         }
 
-        email = EmailMessage('emails/notif_new_single_event_published.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+        email = EmailMessage('emails/notif_new_single_event_published.tpl', context, settings.EMAIL_HOST_USER,
+                             [user.email], connection=connection)
 
-        if not email._is_rendered:
+        if not email.is_rendered:
             email.render()
 
         to_send.append(email)
@@ -140,9 +166,10 @@ def send_mail_notif_new_single_item_published(item, user_that_published):
             "app_url": settings.APP_URL
         }
 
-        email = EmailMessage('emails/notif_new_single_item_published.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+        email = EmailMessage('emails/notif_new_single_item_published.tpl', context, settings.EMAIL_HOST_USER,
+                             [user.email], connection=connection)
 
-        if not email._is_rendered:
+        if not email.is_rendered:
             email.render()
 
         to_send.append(email)
@@ -163,7 +190,6 @@ def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequenci
         else:
             digest = "Recent conversations"
 
-
         context = {
             "digest": digest,
             "n": n,
@@ -173,9 +199,15 @@ def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequenci
             "to_show": to_show['conversations']
         }
 
-        email = EmailMessage('emails/notif_digest_conversations.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+        email = EmailMessage(
+            'emails/notif_digest_conversations.tpl',
+            context,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            connection=connection
+        )
 
-        if not email._is_rendered:
+        if not email.is_rendered:
             email.render()
 
         return email
@@ -202,9 +234,15 @@ def _prepare_mail_notif_events(user, frequency: MailNotificationFrequencies, con
             "to_show": to_show['events']
         }
 
-        email = EmailMessage('emails/notif_digest_events.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+        email = EmailMessage(
+            'emails/notif_digest_events.tpl',
+            context,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            connection=connection
+        )
 
-        if not email._is_rendered:
+        if not email.is_rendered:
             email.render()
 
         return email
@@ -232,9 +270,15 @@ def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, conn
             "to_show": to_show['items']
         }
 
-        email = EmailMessage('emails/notif_digest_items.tpl', context, settings.EMAIL_HOST_USER, [user.email], connection=connection)
+        email = EmailMessage(
+            'emails/notif_digest_items.tpl',
+            context,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            connection=connection
+        )
 
-        if not email._is_rendered:
+        if not email.is_rendered:
             email.render()
 
         return email
@@ -278,7 +322,6 @@ def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequen
             to_send.append(prepared_mail)
             to_send_types_count['items'] += 1
 
-
     # Send list of prepared mails
     # https://docs.djangoproject.com/en/4.1/topics/email/#send-mass-mail
     # https://docs.djangoproject.com/en/4.1/topics/email/#send-mail
@@ -314,8 +357,8 @@ def start_mail_scheduler():
         Truncates a string after a given number of chars keeping whole words.
 
         Usage:
-            {{ string|truncatesmart }}
-            {{ string|truncatesmart:50 }}
+            {{ string|ellipsis }}
+            {{ string|ellipsis:50 }}
         """
 
         try:

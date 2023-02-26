@@ -1,7 +1,7 @@
 {% extends "mail_templated/base.tpl" %}
 
 {% block subject %}
-    [Shareish] {{ digest }} for Shareish mutual aid platform ({{ n }} new item{% if n != 1 %}s{% endif %}
+    [Shareish] {{ digest }} for Shareish mutual aid platform ({{ n }} new messages{% if n != 1 %}s{% endif %})
 {% endblock %}
 
 {% block text %}
@@ -9,8 +9,16 @@
     {{ text|linebreaks }}
     Some people are waiting for your answer on Shareish mutual aid platform.{{ text|linebreaks }}
     {{ text|linebreaks }}
-    You have {{ n }} unread message{% if n != 1 %}s{% endif %} available in the conversations tab ({{ app_url }}/conversations).
+    You have {{ n }} unread message{% if n != 1 %}s{% endif %} available in the conversations tab ({{ app_url }}/conversations).{{ text|linebreaks }}
     {{ text|linebreaks }}
+    {% for message in unread_messages %}
+        ({{ message.conversation.slug }}): {{ message.content|ellipsis:80 }} @ {{ app_url }}/conversations/{{ message.conversation.id }}{{ text|linebreaks }}
+    {% endfor %}
+    {{ text|linebreaks }}
+    {% if n > to_show %}
+        You have {{ n|sub:to_show }} more message{% if n|sub:to_show != 1 %}s{% endif %} to check on the website!{{ text|linebreaks }}
+        {{ text|linebreaks }}
+    {% endif %}
     Please login on {{ app_url }} to view {% if n != 1 %}{% if n > to_show %}all of {% endif %}them{% else %}it{% endif %}.{{ text|linebreaks }}
     {{ text|linebreaks }}
     The Shareish team.{{ text|linebreaks }}

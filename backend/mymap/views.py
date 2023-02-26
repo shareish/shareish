@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
-from mymap.serializers import (
+from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer,
     ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer
 )
@@ -219,9 +219,9 @@ class UserImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         user = User.objects.get(pk=request.POST['userID'])
-        existings = UserImage.objects.filter(user=user)
-        for existing in existings:
-            existing.delete()
+        existing_images = UserImage.objects.filter(user=user)
+        for existing_image in existing_images:
+            existing_image.delete()
         images = [request.FILES.get('image')]
         for image in images:
             new_image = UserImage(image=image, user=user)
@@ -319,35 +319,36 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Conversation.objects.filter(owner=user) | Conversation.objects.filter(buyer=user)
+        return (Conversation.objects.filter(owner=user) | Conversation.objects.filter(buyer=user)).order_by("-lastmessagedate")
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        owner = User.objects.get(pk=data['owner'])
-        buyer = User.objects.get(pk=data['buyer'])
-        item = Item.objects.get(pk=data['item'])
+        data = request.data;
         already_exist = Conversation.objects.filter(
-            owner=owner, buyer=buyer, item=item, name=data['name']
+            owner_id=data['owner_id'],
+            buyer_id=data['buyer_id'],
+            item_id=data['item_id']
         )
         if already_exist:
             serializer = ConversationSerializer(already_exist[0], many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        data['owner'] = None
-        data['buyer'] = None
-        data['item'] = None
-        data['slug'] = None
-        serializer = self.get_serializer(data=data)
+
+        to_serialize = {}
+
+        # Retrieving objects instead of ids
+        owner = User.objects.get(pk=data['owner_id'])
+        buyer = User.objects.get(pk=data['buyer_id'])
+        item = Item.objects.get(pk=data['item_id'])
+
+        # Generating conversation slug
+        to_serialize['name'] = str(data['item_id']) + '-' + str(data['owner_id']) + '-' + str(data['buyer_id'])
+        to_serialize['slug'] = item.name + ' (' + owner.username + ' and ' + buyer.username + ')'
+
+        serializer = self.get_serializer(data=to_serialize)
         if serializer.is_valid():
-            slug = getattr(item, 'name') + ' (' + getattr(owner, 'username') + ' and ' + getattr(
-                buyer, 'username'
-            ) + ')'
-            self.perform_create(serializer, owner, buyer, item, slug)
+            serializer.save(owner=owner, buyer=buyer, item=item)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def perform_create(self, serializer, owner, buyer, item, slug):
-        serializer.save(owner=owner, buyer=buyer, item=item, slug=slug)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -355,7 +356,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
-        return Message.objects.filter(conversation=conversation)
+        return Message.objects.filter(conversation=conversation).order_by("-date")
 
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):

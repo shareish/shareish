@@ -8,23 +8,19 @@
     </figure>
     <div class="media-content">
       <div class="content">
-        <p>
-          <strong>
-            <router-link :to="{name: 'userDetails', params: {id: sender.id}}">
-              {{ sender.first_name }} {{ sender.last_name }}
-            </router-link>
-          </strong>
+        <p class="user">
+          <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="has-text-weight-bold">
+            {{ sender.first_name }} {{ sender.last_name }}
+          </router-link>
           ·
           <small>
-            <router-link :to="{name: 'userDetails', params: {id: sender.id}}">
+            <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="username">
               @{{ sender.username }}
             </router-link>
           </small>
-          <br />
-          {{ message.content }}
-          <br />
-          <small class="has-text-grey">{{ formattedDate }}</small>
         </p>
+        <p class="message_content">{{ message.content }}</p>
+        <p class="has-text-grey"><small>{{ formattedDate }}</small></p>
       </div>
     </div>
   </article>
@@ -50,5 +46,10 @@ export default {
 <style scoped>
 .image {
   width: 64px;
+}
+
+.media-content .content p {
+  margin: 0.25em 0;
+  word-break: break-word;
 }
 </style>

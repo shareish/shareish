@@ -130,8 +130,8 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(pos => {
         this.geoloc = pos;
-      }, err => {
-        console.log(err);
+      }, error => {
+        console.log(error);
       }, {
         maximumAge: 10000,
         timeout: 5000,
@@ -202,7 +202,6 @@ export default {
       }
     },
     resizing() {
-      console.log("test");
       this.windowWidth = window.innerWidth;
     }
   },

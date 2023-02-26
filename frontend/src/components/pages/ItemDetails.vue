@@ -195,13 +195,11 @@ export default {
     async startConversation() {
       try {
         const data = {
-          'name': "" + this.item['id'] + "-" + this.item['user'] + "-" + this.currentUserId,
-          'owner': this.item['user'],
-          'buyer': this.currentUserId,
-          'item': this.item['id'],
-          'messages': [],
+          'owner_id': this.item['user'],
+          'buyer_id': this.currentUserId,
+          'item_id': this.item['id']
         }
-        const response = await axios.post('api/v1/conversations/', data);
+        const response = await axios.post('/api/v1/conversations/', data);
         await this.$router.push(`/conversations/${response.data['id']}`);
       } catch (error) {
         console.log(error);

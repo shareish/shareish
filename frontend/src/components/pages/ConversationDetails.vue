@@ -1,17 +1,15 @@
 <template>
   <div class="page-conversation-details">
     <h1 class="title">{{ conversation.slug }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="loading" :is-full-page="false"/>
     <template v-else>
       <div class="columns">
         <div class="column is-two-thirds">
-          <message v-for="message in messages" :key="message.id" :message="message" :users="users" />
-
           <article class="media">
             <figure class="media-left">
               <p class="image">
-                <img v-if="currentUser.image.length > 0" :src="currentUser.image[0]" />
-                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
+                <img v-if="currentUser.image.length > 0" :src="currentUser.image[0]"/>
+                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"/>
               </p>
             </figure>
             <div class="media-content">
@@ -22,14 +20,18 @@
               </div>
               <div class="field">
                 <p class="control">
-                  <button :disabled="messageToSend===''" class="button" @click="sendMessage">{{ $t('post-message') }}</button>
+                  <button :disabled="messageToSend===''" class="button" @click="sendMessage">{{
+                      $t('post-message')
+                    }}
+                  </button>
                 </p>
               </div>
             </div>
           </article>
+          <message v-for="message in messages" :key="message.id" :message="message" :users="users"/>
         </div>
         <div class="column">
-          <item-card :item="item" :users="users" />
+          <item-card :item="item" :users="users"/>
         </div>
       </div>
     </template>
@@ -54,7 +56,7 @@ export default {
       ws: null,
       loading: true,
       error: false,
-      messageToSend: ''   //this.$t('intro-first-message'),
+      messageToSend: ''
     }
   },
   computed: {
@@ -77,32 +79,25 @@ export default {
   methods: {
     async fetchConversation() {
       try {
-        const id = this.conversationId;
-        this.conversation = (await axios.get(`/api/v1/conversations/${id}/`)).data;
+        this.conversation = (await axios.get(`/api/v1/conversations/${this.conversationId}/`)).data;
       } catch (error) {
         console.log(error);
         this.error = true;
       }
     },
     async autofillMessage() {
-      //console.log(this.conversation)
-      console.log(this.messages.length)
-      if (this.messages.length > 0) {
-        this.messageToSend = '';
-      } else {
-        if (this.item.item_type === "DN") {
-          this.messageToSend = this.$t('intro-donation-first-message');
-        } else if (this.item.item_type === "BR") {
-          this.messageToSend = this.$t('intro-request-first-message');
-        } else if (this.item.item_type === "LN") {
-          this.messageToSend = this.$t('intro-loan-first-message');
+      if (this.messages.length === 0) {
+        let types = {
+          "DN": "donation",
+          "BR": "request",
+          "LN": "loan"
         }
+        this.messageToSend = this.$t('intro-' + types[this.item.item_type] + '-first-message');
       }
     },
     async fetchItem() {
       try {
-        const id = this.conversation.item;
-        this.item = (await axios.get(`/api/v1/items/${id}/`)).data;
+        this.item = (await axios.get(`/api/v1/items/${this.conversation.item}/`)).data;
       } catch (error) {
         console.log(error);
         this.error = true;
@@ -110,8 +105,8 @@ export default {
     },
     async fetchUsers() {
       try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
+        this.users = (await axios.get(`/api/v1/webusers/`)).data;
+        console.log(this.users);
       } catch (error) {
         console.log(error);
         this.error = true;
@@ -119,8 +114,7 @@ export default {
     },
     async fetchExistingMessages() {
       try {
-        const id = this.conversationId;
-        this.messages = (await axios.get(`/api/v1/conversations/${id}/messages/`)).data;
+        this.messages = (await axios.get(`/api/v1/conversations/${this.conversationId}/messages/`)).data;
       } catch (error) {
         console.log(error);
         this.error = true;
@@ -135,7 +129,7 @@ export default {
         this.ws.addEventListener('message', (event) => {
           const data = JSON.parse(event.data);
           if (data.content) {
-            this.messages.push(data);
+            this.messages.unshift(data);
             this.updateNotifications();
           }
           this.ws.addEventListener('close', () => {
@@ -149,14 +143,12 @@ export default {
     },
     sendMessage() {
       try {
-        this.ws.send(
-            JSON.stringify({
-              'content': this.messageToSend,
-              'conversation_id': this.conversationId,
-              'user_id': this.currentUserId,
-              'date': new Date()
-            })
-        )
+        this.ws.send(JSON.stringify({
+          'content': this.messageToSend,
+          'conversation_id': this.conversationId,
+          'user_id': this.currentUserId,
+          'date': new Date()
+        }))
         this.messageToSend = '';
       } catch (error) {
         this.$buefy.snackbar.open({
@@ -172,7 +164,7 @@ export default {
         try {
           const data = {
             'conversation': this.conversationId,
-            'last_message': this.messages.slice(-1)[0]['id']
+            'last_message': this.messages[0]['id']
           }
           this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
         } catch (error) {
