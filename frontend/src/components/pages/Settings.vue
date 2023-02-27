@@ -12,25 +12,25 @@
               {{ $t('profile') }}
             </router-link>
           </li>
-          <li>
-            <router-link to="/settings/privacy" :class="{'is-active': currentView === 'privacy'}">
-              <i class="fas fa-lock"></i>
-              {{ $t('privacy') }}
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
-              <i class="fas fa-cog"></i>
-              {{ $t('account') }}
-            </router-link>
-          </li>
+<!--          <li>-->
+<!--            <router-link to="/settings/privacy" :class="{'is-active': currentView === 'privacy'}">-->
+<!--              <i class="fas fa-lock"></i>-->
+<!--              {{ $t('privacy') }}-->
+<!--            </router-link>-->
+<!--          </li>-->
+<!--          <li>-->
+<!--            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">-->
+<!--              <i class="fas fa-cog"></i>-->
+<!--              {{ $t('account') }}-->
+<!--            </router-link>-->
+<!--          </li>-->
         </ul>
-        <p class="menu-label">{{ $t('notifications') }}</p>
+        <p class="menu-label">{{ $t('email') }} {{ $t('notifications').toLowerCase() }}</p>
         <ul class="menu-list">
           <li>
             <router-link to="/settings/notifications" :class="{'is-active': currentView === 'notifications'}">
               <i class="fas fa-bell"></i>
-              {{ $t('notifications') }}
+              {{ $t('email') }} {{ $t('notifications').toLowerCase() }}
             </router-link>
           </li>
         </ul>
@@ -67,7 +67,11 @@ export default {
 
     document.title = 'Shareish | Settings';
 
-    this.currentView = (this.possibleViews.includes(this.$route.params.page)) ? this.$route.params.page : 'profile';
+    if (this.possibleViews.includes(this.$route.params.page)) {
+      this.currentView = this.$route.params.page;
+    } else {
+      this.$router.push("/settings/profile")
+    }
 
     await this.fetchUser();
 
@@ -97,14 +101,10 @@ export default {
       }
     },
     async fetchAddressGeoLoc() {
-      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoloc !== null) {
         let geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')';
         try {
-          this.user.ref_location = (await axios.post(
-              `/api/v1/address/`,
-              geoLocPoint
-          )).data;
+          this.user.ref_location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
         } catch (error) {
           console.log(JSON.stringify(error));
         }
@@ -113,10 +113,7 @@ export default {
     async fetchAddress() {
       if (this.user !== null && this.user.ref_location !== null) {
         try {
-          this.user.ref_location = (await axios.post(
-              `/api/v1/address/`,
-              this.user.ref_location
-          )).data;
+          this.user.ref_location = (await axios.post(`/api/v1/address/`, this.user.ref_location)).data;
         } catch (error) {
           console.log(JSON.stringify(error));
         }
@@ -128,7 +125,7 @@ export default {
   },
   watch: {
     $route() {
-      this.currentView = (this.possibleViews.includes(this.$route.params.page)) ? this.$route.params.page : 'profile';
+      this.currentView = this.$route.params.page;
     }
   }
 };
@@ -141,7 +138,7 @@ export default {
 
 @media screen and (max-width: 1023px) and (min-width: 767px) {
   #settings-split aside.menu {
-    max-width: calc(15% + 90px);
+    max-width: calc(18% + 100px);
   }
 }
 
