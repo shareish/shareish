@@ -200,8 +200,7 @@ intro-donation-first-message,"Hello, thank you for your donation proposal. I am 
 intro-request-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
 intro-loan-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
 avatar,Avatar,Avatar
-help_avatar,Upload an image that represents you,Transférez une image qui vous représente 
-avatar-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
+help_avatar,Upload an image that represents you,Transférez une image qui vous représente
 notif-success-item-delete,The item has been successfully deleted,L'élément a été correctement supprimé
 notif-error-item-delete,An error prevented the item to be deleted,Une erreur a empêché la suppression de l'élément
 user-items,His/her items,Ses éléments

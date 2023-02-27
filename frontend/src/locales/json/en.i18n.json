@@ -204,7 +204,6 @@
   "intro-loan-first-message": "Hello, thank you for your loan proposal. I am interested for ...",
   "avatar": "Avatar",
   "help_avatar": "Upload an image that represents you",
-  "avatar-info": "Only upload image to replace existing one.",
   "notif-success-item-delete": "The item has been successfully deleted",
   "notif-error-item-delete": "An error prevented the item to be deleted",
   "user-items": "His/her items",

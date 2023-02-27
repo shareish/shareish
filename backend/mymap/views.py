@@ -211,58 +211,11 @@ class ItemImageViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserImageViewSet(viewsets.ViewSet):
-    def list(self, request):
-        images = UserImage.objects.all()
-        serializer = UserImageSerializer(images, many=True)
-        return Response(serializer.data)
-
-    def create(self, request):
-        user = User.objects.get(pk=request.POST['userID'])
-        existing_images = UserImage.objects.filter(user=user)
-        for existing_image in existing_images:
-            existing_image.delete()
-        images = [request.FILES.get('image')]
-        for image in images:
-            new_image = UserImage(image=image, user=user)
-            new_image.save()
-            serialized_image = UserImageSerializer(new_image)
-        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
-
-    def retrieve(self, request, pk=None):
-        try:
-            image = UserImage.objects.get(pk=pk)
-        except UserImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = UserImageSerializer(image)
-        return Response(serializer.data)
-
-    def update(self, request, pk=None):
-        try:
-            image = UserImage.objects.get(pk=pk)
-        except UserImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = UserImageSerializer(image, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        try:
-            image = UserImage.objects.get(pk=pk)
-        except UserImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        image.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
-    ##similar to ItemViewSet create
     def create(self, request, *args, **kwargs):
         data = request.data
         if 'ref_location' in data:
@@ -312,6 +265,19 @@ class UserViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserImageViewSet(viewsets.ViewSet):
+    def create(self, request):
+        user = User.objects.get(pk=request.POST['user_id'])
+        images = [request.FILES.get('image')]
+        url = ""
+        for image in images:
+            new_image = UserImage(image=image, user=user)
+            new_image.save()
+            serialized_image = UserImageSerializer(new_image)
+            url = serialized_image.data['url']
+        return Response(url, status=status.HTTP_201_CREATED)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -476,39 +442,36 @@ def getNotifications(request):
 
 
 @api_view(['GET'])
-def getFirstItemImage(request, id):
+def getFirstItemImage(request, item_id):
     if request.method == 'GET':
-        item = Item.objects.get(pk=id)
-        images = ItemImage.objects.filter(item=item)
+        images = ItemImage.objects.filter(item_id=item_id)
         if len(images) > 0:
             image = images[0]
             serialized_image = ItemImageSerializer(image, many=False)
             return Response(serialized_image.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getUserImage(request, id):
-    if request.method != 'GET':
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    try:
-        image = UserImage.objects.get(pk=id)
-        return FileResponse(open(image.path, 'rb'))
-    except UserImage.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def getUserImage(request, userimage_id):
+    if request.method == 'GET':
+        try:
+            image = UserImage.objects.get(pk=userimage_id)
+            return FileResponse(open(image.path, 'rb'))
+        except UserImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getItemImage(request, id):
-    if request.method != 'GET':
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    try:
-        image = ItemImage.objects.get(pk=id)
-        return FileResponse(open(image.path, 'rb'))
-    except ItemImage.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def getItemImage(request, itemimage_id):
+    if request.method == 'GET':
+        try:
+            image = ItemImage.objects.get(pk=itemimage_id)
+            return FileResponse(open(image.path, 'rb'))
+        except ItemImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

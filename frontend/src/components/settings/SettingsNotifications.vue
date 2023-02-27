@@ -177,7 +177,11 @@ export default {
           this.internalUser.mail_notif_freq_events = this.radioGroups.notif_events;
           this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
 
-          let user = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
+          let tempUser = {...this.internalUser}
+          delete tempUser.images;
+          delete tempUser.items;
+
+          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -186,9 +190,8 @@ export default {
             pauseOnHover: true,
           });
 
-          this.$emit('updateUser', user);
+          this.$emit('updateUser', this.internalUser);
 
-          this.internalUser = user;
           this.fetchAddress();
         } catch (error) {
           console.log(error);

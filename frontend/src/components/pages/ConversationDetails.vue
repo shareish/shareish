@@ -8,7 +8,7 @@
           <article class="media">
             <figure class="media-left">
               <p class="image">
-                <img v-if="currentUser.image.length > 0" :src="currentUser.image[0]"/>
+                <img v-if="currentUser.images.length > 0" :src="currentUser.images[currentUser.images.length - 1]"/>
                 <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"/>
               </p>
             </figure>
@@ -106,7 +106,6 @@ export default {
     async fetchUsers() {
       try {
         this.users = (await axios.get(`/api/v1/webusers/`)).data;
-        console.log(this.users);
       } catch (error) {
         console.log(error);
         this.error = true;
@@ -181,7 +180,7 @@ export default {
       this.fetchExistingMessages(),
       this.createWebSocket()
     ]);
-    await this.fetchItem(); // need conversation fetched to get id
+    await this.fetchItem();
     this.updateNotifications();
     this.autofillMessage();
     this.loading = false;

@@ -18,12 +18,12 @@
 <!--              {{ $t('privacy') }}-->
 <!--            </router-link>-->
 <!--          </li>-->
-<!--          <li>-->
-<!--            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">-->
-<!--              <i class="fas fa-cog"></i>-->
-<!--              {{ $t('account') }}-->
-<!--            </router-link>-->
-<!--          </li>-->
+          <li>
+            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
+              <i class="fas fa-cog"></i>
+              {{ $t('account') }}
+            </router-link>
+          </li>
         </ul>
         <p class="menu-label">{{ $t('email') }} {{ $t('notifications').toLowerCase() }}</p>
         <ul class="menu-list">
@@ -36,6 +36,7 @@
         </ul>
       </aside>
       <settings-profile v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
+      <settings-account v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
       <settings-notifications v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
       <div v-else class="test">Test</div>
     </div>
@@ -46,10 +47,11 @@
 import axios from 'axios';
 import SettingsProfile from "@/components/settings/SettingsProfile.vue";
 import SettingsNotifications from "@/components/settings/SettingsNotifications.vue";
+import SettingsAccount from "@/components/settings/SettingsAccount.vue";
 
 export default {
   name: 'Settings',
-  components: {SettingsNotifications, SettingsProfile},
+  components: {SettingsAccount, SettingsNotifications, SettingsProfile},
   $_veeValidate: {
     validator: 'new'
   },

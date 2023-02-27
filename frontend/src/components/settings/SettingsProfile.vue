@@ -27,6 +27,8 @@
           </b-field>
         </div>
       </div>
+    </div>
+    <div class="tile is-ancestor">
       <div class="tile is-parent">
         <div class="tile is-child box">
           <b-field key="username" :message="errors.first('username')" :type="{'is-danger': errors.has('username')}">
@@ -37,6 +39,26 @@
               </b-tooltip>
             </template>
             <b-input v-model="internalUser['username']" v-validate="'required'" name="username" type="text" />
+          </b-field>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="tile is-child box">
+          <b-field :label="$t('avatar')">
+            <template #label> {{ $t('avatar') }}
+              <b-tooltip :label="$t('help_avatar')" multilined position="is-right">
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-field :class="{'has-name': !!file}" class="file is-primary">
+              <b-upload v-model="file" accept="image/*" class="file-label" validationMessage="Please select a file">
+                <span class="file-cta">
+                  <b-icon class="file-icon" icon="upload"></b-icon>
+                  <span class="file-label">Click to upload</span>
+                </span>
+                <span v-if="file" class="file-name">{{ file.name }}</span>
+              </b-upload>
+            </b-field>
           </b-field>
         </div>
       </div>
@@ -111,9 +133,8 @@ export default {
   },
   data() {
     return {
-      loading: true,
-      geoloc: null,
-      internalUser: null
+      internalUser: null,
+      file: null
     }
   },
   created() {
@@ -125,7 +146,20 @@ export default {
       let result = await this.$validator.validateAll();
       if (result) {
         try {
-          let updatedUser = (await axios.patch('/api/v1/users/me/', this.internalUser)).data;
+          let tempUser = {...this.internalUser}
+          delete tempUser.images;
+          delete tempUser.items;
+
+          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+
+          if (this.file) {
+            let data = new FormData();
+            data.append('user_id', this.internalUser['id']);
+            data.append('image', this.file);
+            const image_url = (await axios.post('/api/v1/user_image/', data)).data;
+            this.internalUser.images.unshift(image_url);
+            this.file = null;
+          }
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -134,9 +168,7 @@ export default {
             pauseOnHover: true,
           });
 
-          this.$emit('updateUser', updatedUser);
-
-          this.internalUser = updatedUser;
+          this.$emit('updateUser', this.internalUser);
         } catch (error) {
           console.log(error);
           this.$buefy.snackbar.open({

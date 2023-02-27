@@ -3,7 +3,7 @@
     <h1 class="title">{{ $t('my-conversations') }}</h1>
     <b-loading :active="loading" :is-full-page="false" />
     <template v-if="conversations.length">
-      <div v-for="conversation in conversations" :key="conversation.slug" class="box">
+      <div v-for="conversation in conversations" :key="conversation.id" class="box">
         <div class="level">
           <div class="level-left">
             {{ conversation.slug }}
@@ -15,7 +15,7 @@
             </span>
           </div>
           <div class="level-right">
-            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id }}">
+            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id}}">
               <button class="button is-primary">{{ $t('open-conversation') }}</button>
             </router-link>
           </div>

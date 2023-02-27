@@ -42,6 +42,19 @@ class ItemImageSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserSerializer(serializers.ModelSerializer):
+    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
+    images = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'first_name', 'last_name', 'email', 'sign_in_date', 'homepage_url', 'facebook_url',
+            'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
+            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images'
+        ]
+
+
 class UserImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()
 
@@ -49,19 +62,6 @@ class UserImageSerializer(serializers.ModelSerializer):
         model = UserImage
         fields = [
             'id', 'image', 'user', 'url'
-        ]
-
-
-class UserSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
-    image = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = User
-        fields = [
-            'id', 'username', 'first_name', 'last_name', 'email', 'sign_in_date', 'homepage_url', 'facebook_url',
-            'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'items', 'description', 'image',
-            'is_active', 'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items'
         ]
 
 
@@ -73,29 +73,11 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    unread_messages = serializers.SerializerMethodField()
-    last_message = serializers.SerializerMethodField()
-
     class Meta:
         model = Conversation
         fields = [
-            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'last_message', 'unread_messages'
+            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'lastmessagedate'
         ]
-
-    def get_unread_messages(self, obj):
-        request = self.context.get("request")
-        if request is None:
-            return 0
-
-        user = request.user
-        return Message.objects.filter(conversation=obj, seen=False).exclude(user=user.id).count()
-
-    def get_last_message(self, obj):
-        try:
-            last_message = Message.objects.filter(conversation=obj).latest('date')
-            return MessageSerializer(last_message).data
-        except ObjectDoesNotExist:
-            return None
 
 
 class MessageSerializer(serializers.ModelSerializer):

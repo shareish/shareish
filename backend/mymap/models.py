@@ -121,7 +121,7 @@ class User(AbstractBaseUser):
 class UserImage(models.Model):
     image = models.ImageField(upload_to='')
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='image', on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, related_name='images', on_delete=models.CASCADE
     )
 
     def save(self, *args, **kwargs):

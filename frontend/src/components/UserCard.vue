@@ -4,7 +4,7 @@
       <figure class="media-left">
         <p class="image">
           <router-link :to="{name: 'userDetails', params: {id: user.id}}">
-            <b-image v-if="user.image.length > 0" :src="user.image[0]" ratio="1by1"></b-image>
+            <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
             <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
           </router-link>
         </p>
