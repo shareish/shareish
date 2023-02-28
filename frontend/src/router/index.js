@@ -35,12 +35,18 @@ const routes = [
     {
         path: '/sign-up',
         name: 'signup',
-        component: SignUp
+        component: SignUp,
+        meta: {
+            loginForbidden: true
+        }
     },
     {
         path: '/log-in',
         name: 'login',
-        component: Login
+        component: Login,
+        meta: {
+            loginForbidden: true
+        }
     },
     {
         path: '/reset-password',
@@ -138,12 +144,14 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
-        i18n.locale = localStorage.getItem('language') || 'en'
         next('/log-in')
-    }
- else {
+    } else if (to.matched.some(record => record.meta.loginForbidden) && store.state.isAuthenticated) {
+        next('/')
+    } else {
         next()
     }
-})
+
+    i18n.locale = localStorage.getItem('language') || 'en'
+});
 
 export default router;
