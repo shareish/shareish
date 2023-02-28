@@ -13,8 +13,7 @@ router.register("items", ItemViewSet, basename="items")
 router.register("images", ItemImageViewSet, basename="images")
 router.register("webusers", UserViewSet, basename="webusers")
 router.register("conversations", ConversationViewSet, basename="conversations")
-router.register(r'conversations/(?P<conversation_id>\d+)/messages', MessageViewSet,
-                basename="messages")
+router.register(r'conversations/(?P<conversation_id>\d+)/messages', MessageViewSet, basename="messages")
 router.register("recurrents", RecurrentItemViewSet, basename="recurrents")
 router.register("actives", ActiveItemViewSet, basename="actives")
 router.register("user_items", UserItemViewSet, basename='user_items')
@@ -28,7 +27,7 @@ urlpatterns = [
     path('requestItems/', views.searchItems, name='search_items'),
     path('predictClass/', views.predictClass, name='predict_class'),
     path('notifications/', views.getNotifications, name='notifications'),
-    path('item/<int:id>/image/first', views.getFirstItemImage, name='get_first_item_image'),
-    path('item_image/<int:id>/image', views.getItemImage, name='get_item_image'),
-    path('user_image/<int:id>/image', views.getUserImage, name='get_user_image'),
+    path('item/<int:item_id>/image/first', views.getFirstItemImage, name='get_first_item_image'),
+    path('item_image/<int:itemimage_id>/image', views.getItemImage, name='get_item_image'),
+    path('user_image/<int:userimage_id>/image', views.getUserImage, name='get_user_image')
 ]

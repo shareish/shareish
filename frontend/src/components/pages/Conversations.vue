@@ -3,19 +3,19 @@
     <h1 class="title">{{ $t('my-conversations') }}</h1>
     <b-loading :active="loading" :is-full-page="false" />
     <template v-if="conversations.length">
-      <div v-for="conversation in conversations" :key="conversation.slug" class="box">
+      <div v-for="conversation in conversations" :key="conversation.id" class="box">
         <div class="level">
           <div class="level-left">
             {{ conversation.slug }}
-            <div v-if="conversation.lastUpdate" class="is-size-7 has-text-grey">{{ $t('last-message') }}
+            <div v-if="conversation.lastUpdate" class="is-size-7 has-text-grey ml-2">{{ $t('last-message') }}
               {{ formattedDate(conversation.lastUpdate) }}
             </div>
-            <span v-if="conversation.unread_messages > 0" class="tag is-danger">
+            <span v-if="conversation.unread_messages > 0" class="tag is-danger ml-2">
               {{ $tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages}) }}
             </span>
           </div>
           <div class="level-right">
-            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id }}">
+            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id}}">
               <button class="button is-primary">{{ $t('open-conversation') }}</button>
             </router-link>
           </div>

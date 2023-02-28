@@ -8,6 +8,7 @@ djangochannelsrestframework==0.3.0
 Django==3.2.10
 django-filter==22.1
 django-cors-headers==3.13.0
+django-mail-templated==2.6.5
 torch==1.12.1
 torchvision==0.13.1
 Pillow==9.0.1

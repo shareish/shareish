@@ -4,7 +4,7 @@
       <figure class="media-left">
         <p class="image">
           <router-link :to="{name: 'userDetails', params: {id: user.id}}">
-            <b-image v-if="user.image.length > 0" :src="user.image[0]" ratio="1by1"></b-image>
+            <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
             <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
           </router-link>
         </p>
@@ -35,8 +35,10 @@
       </div>
       <div v-if="editable && canEdit" class="media-right">
         <div class="buttons">
-          <button class="button is-primary" @click="$emit('edit')">{{ $t('edit') }}</button>
-          <button class="button is-danger" @click="$emit('logout')">{{ $t('log-out') }}</button>
+          <router-link to="/settings">
+            <button class="button is-primary">{{ $t('edit') }}</button>
+          </router-link>
+          <button class="button is-danger" @click="logout()">{{ $t('log-out') }}</button>
         </div>
       </div>
     </div>
@@ -45,6 +47,7 @@
 
 <script>
 import moment from 'moment/moment';
+import axios from "axios";
 
 export default {
   name: 'UserCard',
@@ -62,6 +65,23 @@ export default {
       moment.locale(this.$i18n.locale);
       return (moment(date).format('LL'));
     },
+    async logout() {
+      try {
+        await axios.post('/api/v1/token/logout/');
+        axios.defaults.headers.common["Authorization"] = "";
+        localStorage.removeItem("token");
+        this.$store.commit('removeToken');
+        this.$store.commit('removeUserID');
+        await this.$router.push('/');
+      } catch (error) {
+        if (error.response) {
+          error = error.response.data;
+        } else if (error.message) {
+          error = error.message;
+        }
+        console.log(JSON.stringify(error));
+      }
+    }
   }
 };
 </script>
@@ -89,5 +109,12 @@ export default {
 
 .title a {
   color: #4a4a4a !important;
+}
+
+.media-right button {
+  margin-left: 8px;
+}
+.media-right button:first-child {
+  margin-left: 0;
 }
 </style>

@@ -108,7 +108,6 @@ export default {
     this.pageLoading = true;
     await Promise.all([this.loadItems(), this.fetchUsers()]);
     this.pageLoading = false;
-    //console.log(this.items)  
   },
   created: function () {
     window.addEventListener('scroll', this.scrollHandler);
