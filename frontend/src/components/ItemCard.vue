@@ -2,22 +2,25 @@
   <div class="card">
     <div class="card-image">
       <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
-        <figure v-if="item.images.length > 0" :style="figureStyle" class="image is-5by3">
-        </figure>
-        <figure v-else class="image is-5by3">
-          <img :src="category1['image-placeholder']" alt="Placeholder image">
+        <figure class="image">
+          <b-image v-if="item.images.length > 0" :src="item.images[0]" ratio="5by3"></b-image>
+          <b-image v-else :src="category1['image-placeholder']" ratio="5by3"></b-image>
+          <div class="hitcount tag">
+            {{ item.hitcount }}<i class="far fa-eye"></i>
+          </div>
         </figure>
       </router-link>
     </div>
     <div class="card-content">
       <div class="media">
         <div class="media-content">
-          <p class="title is-4">
+          <p class="title is-5 mb-2">
             <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
               {{ item.name }}
             </router-link>
           </p>
-          <p class="subtitle is-6">
+          <p class="mb-2">{{ truncate(item.description) }}</p>
+          <p class="subtitle is-6 mt-0">
             <item-type-tag :type="item.item_type" />
             <span v-if="user">
               {{ $t('by') }}
@@ -29,13 +32,11 @@
         </div>
       </div>
       <div class="content">
-        {{ truncate(item.description) }}
-        <br />
         <template v-if="!recurrentList">
-          <small>{{ formattedDate(item.startdate) }}</small><br />
-          <small v-if="item.enddate"> {{ $t('ends') }} {{ formattedDate(item.enddate) }}</small><br />
-          <small v-if="item.location && this.location">{{ $t('at') }} &#177; {{ getDistanceFromLatLonInKm() }} km</small><br />
-          <small v-if="item.hitcount > 0">{{ item.hitcount }} {{ $t('views') }}</small><br />
+          <small class="is-block">{{ formattedDate(item.startdate) }}</small>
+          <small class="is-block" v-if="item.enddate"> {{ $t('ends') }} {{ formattedDate(item.enddate) }}</small>
+          <small class="is-block" v-if="item.location && this.location">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromLatLonInKm() }} km</small>
+<!--          <small class="is-block">{{ item.hitcount }} {{ $t('views') }}</small>-->
         </template>
       </div>
       <span v-for="category in categories" :key="category.slug" class="icon-text">
@@ -119,9 +120,6 @@ export default {
       }
       return cat;
     },
-    figureStyle() {
-      return (this.item.images.length === 0) ? {} : {backgroundImage: `url("${(this.item.images[0])}")`, 'border-radius': '0.25rem 0.25rem 0 0'};
-    },
     itemKind() {
       if (this.recurrentList) {
         return 'recurrent';
@@ -149,20 +147,25 @@ export default {
     },
     getDistanceFromLatLonInKm() {
       let latLong = this.item['location'].slice(17, -1).split(' ');
-      var lat2 = latLong[0];
-      var lon2 = latLong[1];
-      var R = 6371; // Radius of the earth in km
-      var dLat = this.deg2rad(lat2 - this.location.coords.latitude);  // deg2rad below
-      var dLon = this.deg2rad(lon2 - this.location.coords.longitude);
-      var a =
+      let lat2 = latLong[0];
+      let lon2 = latLong[1];
+      let R = 6371; // Radius of the earth in km
+      let dLat = this.deg2rad(lat2 - this.location.coords.latitude);  // deg2rad below
+      let dLon = this.deg2rad(lon2 - this.location.coords.longitude);
+      let a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
           Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      var d = R * c; // Distance in km
+      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      let d = R * c; // Distance in km
       return d.toFixed(2);
     },
+    capitalize(s) {
+      const capitalizedFirst = s[0].toUpperCase();
+      const rest = s.slice(1);
 
+      return capitalizedFirst + rest;
+    }
   },
 };
 </script>
@@ -173,7 +176,33 @@ export default {
   background-position: center center;
   background-size: cover;
   position: relative;
-  border-bottom: 1px solid #ddd;
+}
+
+.image .hitcount {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-weight: bold;
+}
+
+.image .hitcount i {
+  margin-left: 4px;
+}
+
+.image .item-type {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+/* Adding ellipsis to second line of item name */
+.media-content .title {
+  height: 2.25em; /* line-height is set to 1.125 by default */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .title a {

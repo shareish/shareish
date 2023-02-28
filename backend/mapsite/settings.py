@@ -31,7 +31,7 @@ DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
 
 PROD_DOMAIN = "shareish.org"
-PROD_URL = "http://" + PROD_DOMAIN
+PROD_URL = "https://" + PROD_DOMAIN
 PROD_API_URL = PROD_URL
 
 APP_DOMAIN = DEV_DOMAIN if DEV else PROD_DOMAIN

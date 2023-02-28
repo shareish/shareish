@@ -1,5 +1,5 @@
 <template>
-  <span :class="color" class="tag is-normal">{{ $t(this.text) }}</span>
+  <span :class="color" class="item-type tag is-normal">{{ $t(this.text) }}</span>
 </template>
 
 <script>

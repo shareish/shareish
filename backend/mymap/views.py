@@ -395,12 +395,13 @@ def searchItems(request):
 @api_view(['POST'])
 def predictClass(request):
     if request.method == "POST" and request.FILES.get('files[]'):
-        class_found, detected_text = findClass(request.FILES.get('files[]'))
-        response = {
-            "suggested_class": class_found,
-            "detected_text": detected_text
-        }
-        return JsonResponse(response, status=status.HTTP_200_OK)
+            class_found, category_found, detected_text = findClass(request.FILES.get('files[]'))
+            response = {
+                "suggested_class": class_found,
+                "suggested_category": category_found,
+                "detected_text": detected_text
+            }
+            return JsonResponse(response, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
