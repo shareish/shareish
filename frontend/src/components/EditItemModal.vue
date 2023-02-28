@@ -148,10 +148,10 @@ export default {
 
         if (this.file) {
           let data = new FormData();
-          data.append('itemID', this.item.id);
+          data.append('item_id', this.item.id);
           data.append('image', this.file);
-          const image = (await axios.post('/api/v1/images/', data)).data;
-          item.images = [image.url];
+          let image_url = (await axios.post('/api/v1/images/', data)).data;
+          item.images.push(image_url);
           this.file = null;
         }
 

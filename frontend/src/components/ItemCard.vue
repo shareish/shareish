@@ -3,11 +3,9 @@
     <div class="card-image">
       <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
         <figure class="image">
-          <b-image v-if="item.images.length > 0" :src="item.images[0]" ratio="5by3"></b-image>
+          <b-image v-if="item.images.length > 0" :src="item.images[item.images.length - 1]" ratio="5by3"></b-image>
           <b-image v-else :src="category1['image-placeholder']" ratio="5by3"></b-image>
-          <div class="hitcount tag">
-            {{ item.hitcount }}<i class="far fa-eye"></i>
-          </div>
+          <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
         </figure>
       </router-link>
     </div>
@@ -35,14 +33,11 @@
         <template v-if="!recurrentList">
           <small class="is-block">{{ formattedDate(item.startdate) }}</small>
           <small class="is-block" v-if="item.enddate"> {{ $t('ends') }} {{ formattedDate(item.enddate) }}</small>
-          <small class="is-block" v-if="item.location && this.location">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromLatLonInKm() }} km</small>
-<!--          <small class="is-block">{{ item.hitcount }} {{ $t('views') }}</small>-->
+          <small class="is-block" v-if="item.location && this.location">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
         </template>
       </div>
       <span v-for="category in categories" :key="category.slug" class="icon-text">
-        <span class="icon">
-          <i :class="category.icon"></i>
-        </span>
+        <span class="icon"><i :class="category.icon"></i></span>
         <span>{{ $t(category.slug) }}</span>
       </span>
     </div>
@@ -68,31 +63,23 @@ export default {
   },
   data() {
     return {
-      location: null,
-      gettingLocation: false,
-      errorStr: null,
+      location: null
     }
   },
   created() {
-    // Do we support geolocation
-    if (!("geolocation" in navigator)) {
-      this.errorStr = 'Geolocation is not available.';
-      return;
+    // Has the user activated geolocation?
+    if ("geolocation" in navigator) {
+      // Get the position
+      navigator.geolocation.getCurrentPosition(positon => {
+        this.geoloc = positon;
+      }, error => {
+        console.log(error);
+      }, {
+        maximumAge: 10000,
+        timeout: 5000,
+        enableHighAccuracy: true
+      });
     }
-
-    this.gettingLocation = true;
-    // Get position
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.gettingLocation = false;
-      this.location = pos;
-    }, err => {
-      this.gettingLocation = false;
-      this.errorStr = err.message;
-    }, {
-      maximumAge: 10000,
-      timeout: 5000,
-      enableHighAccuracy: true
-    });
   },
   computed: {
     user() {
@@ -145,7 +132,7 @@ export default {
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },
-    getDistanceFromLatLonInKm() {
+    getDistanceFromCoords() {
       let latLong = this.item['location'].slice(17, -1).split(' ');
       let lat2 = latLong[0];
       let lon2 = latLong[1];
@@ -157,8 +144,7 @@ export default {
           Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      let d = R * c; // Distance in km
-      return d.toFixed(2);
+      return R * c; // Distance in km
     },
     capitalize(s) {
       const capitalizedFirst = s[0].toUpperCase();

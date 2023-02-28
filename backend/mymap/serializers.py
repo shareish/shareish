@@ -16,6 +16,16 @@ class ItemSerializer(serializers.ModelSerializer):
         ]
 
 
+class ItemImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = ItemImage
+        fields = [
+            'id', 'image', 'item', 'url'
+        ]
+
+
 class MapItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
@@ -29,16 +39,6 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description'
-        ]
-
-
-class ItemImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
-
-    class Meta:
-        model = ItemImage
-        fields = [
-            'id', 'image', 'item', 'url'
         ]
 
 
@@ -74,29 +74,18 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     unread_messages = serializers.SerializerMethodField()
-    last_message = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'lastmessagedate', 'unread_messages', 'last_message'
+            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'lastmessagedate', 'unread_messages'
         ]
 
     def get_unread_messages(self, obj):
         request = self.context.get("request")
-        if request is None:
-            return 0
-
-        user = request.user
-        return Message.objects.filter(conversation=obj, seen=False).exclude(
-            user=user.id).count()
-
-    def get_last_message(self, obj):
-        try:
-            last_message = Message.objects.filter(conversation=obj).latest('date')
-            return MessageSerializer(last_message).data
-        except ObjectDoesNotExist:
-            return None
+        if request is not None:
+            return Message.objects.filter(conversation=obj, seen=False).exclude(user=request.user.id).count()
+        return 0
 
 
 class MessageSerializer(serializers.ModelSerializer):

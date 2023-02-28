@@ -156,8 +156,8 @@ export default {
             let data = new FormData();
             data.append('user_id', this.internalUser['id']);
             data.append('image', this.file);
-            const image_url = (await axios.post('/api/v1/user_image/', data)).data;
-            this.internalUser.images.unshift(image_url);
+            let image_url = (await axios.post('/api/v1/user_image/', data)).data;
+            this.internalUser.images.push(image_url);
             this.file = null;
           }
 

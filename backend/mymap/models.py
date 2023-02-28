@@ -142,7 +142,7 @@ class UserImage(models.Model):
 
     @property
     def url(self):
-        return "{}/api/v1/user_image/{}/image".format(settings.API_URL, self.pk)
+        return "{}/api/v1/users/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
         ordering = ['user']
@@ -195,8 +195,8 @@ class Item(models.Model):
     item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.BARTER)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
-    category2 = models.CharField(max_length=2, choices=Categories.choices, blank=True)
-    category3 = models.CharField(max_length=2, choices=Categories.choices, blank=True)
+    category2 = models.CharField(max_length=2, choices=Categories.choices, null=True, default=None, blank=True)
+    category3 = models.CharField(max_length=2, choices=Categories.choices, null=True, default=None, blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
 
@@ -231,7 +231,7 @@ class ItemImage(models.Model):
 
     @property
     def url(self):
-        return "{}/api/v1/item_image/{}/image".format(settings.API_URL, self.pk)
+        return "{}/api/v1/items/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
         ordering = ['item']
@@ -248,7 +248,7 @@ class Conversation(models.Model):
     lastmessagedate = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['-lastmessagedate']
 
 
 class Message(models.Model):
@@ -259,4 +259,4 @@ class Message(models.Model):
     seen = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['date']
+        ordering = ['-date']

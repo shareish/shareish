@@ -74,8 +74,8 @@
         </div>
         <div v-if="item.images.length > 0" class="tile is-parent is-4">
           <article class="tile is-child box is-vcentered">
-            <figure v-if="item.images[0]" class="image is-256x256 ">
-              <img :src="item.images[0]" />
+            <figure class="image is-256x256">
+              <img :src="item.images[item.images.length - 1]" />
             </figure>
           </article>
         </div>

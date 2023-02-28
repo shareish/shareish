@@ -55,6 +55,15 @@ class ActiveItemFilterBackend(filters.BaseFilterBackend):
         )
 
 
+class UserItemFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user = request.query_params.get('id')
+        if user is not None:
+            return queryset.filter(user_id=int(user))
+        else:
+            return queryset.filter(user=request.user)
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
@@ -88,7 +97,9 @@ class ItemViewSet(viewsets.ModelViewSet):
                     )
                 else:
                     print("Warning: {} given but no location found.".format(address))
-                    data['location'] = None
+                    del data['location']
+            else:
+                del data['location']
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
@@ -99,12 +110,13 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
-        if item.item_type != "EV":
-            from .mail import send_mail_notif_new_single_item_published
-            send_mail_notif_new_single_item_published(item, self.request.user)
-        else:
-            from .mail import send_mail_notif_new_single_event_published
-            send_mail_notif_new_single_event_published(item, self.request.user)
+        if item.location is not None:
+            if item.item_type != "EV":
+                from .mail import send_mail_notif_new_single_item_published
+                send_mail_notif_new_single_item_published(item, self.request.user)
+            else:
+                from .mail import send_mail_notif_new_single_event_published
+                send_mail_notif_new_single_event_published(item, self.request.user)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -120,9 +132,7 @@ class ItemViewSet(viewsets.ModelViewSet):
                         str(geoloc.longitude)
                     )
                 else:
-                    return Response(
-                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
-                    )
+                    return Response({"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -133,8 +143,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 class RecurrentItemViewSet(ItemViewSet):
     filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter,
-        ItemTypeFilterBackend, ItemCategoryFilterBackend,
+        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
     ]  # Do not need ActiveItemFilterBackend
 
     def get_queryset(self):
@@ -146,15 +155,6 @@ class ActiveItemViewSet(ItemViewSet):
 
     def get_queryset(self):
         return Item.objects.filter(in_progress=True)
-
-
-class UserItemFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        user = request.query_params.get('id')
-        if user is not None:
-            return queryset.filter(user_id=int(user))
-        else:
-            return queryset.filter(user=request.user)
 
 
 class UserItemViewSet(ItemViewSet):
@@ -169,19 +169,12 @@ class ItemImageViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        item = Item.objects.get(pk=request.POST['itemID'])
-        existing_images = ItemImage.objects.filter(item=item)
-        for existing_image in existing_images:
-            existing_image.delete()
-        images = request.FILES.getlist('files')
-        if request.FILES.get('image') is not None:
-            images += [request.FILES.get('image')]
-
-        for image in images:
-            new_image = ItemImage(image=image, item=item)
-            new_image.save()
-            serialized_image = ItemImageSerializer(new_image)
-        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
+        item = Item.objects.get(pk=request.POST['item_id'])
+        image = request.FILES.get('image')
+        new_image = ItemImage(image=image, item=item)
+        new_image.save()
+        serialized_image = ItemImageSerializer(new_image)
+        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
@@ -270,14 +263,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserImageViewSet(viewsets.ViewSet):
     def create(self, request):
         user = User.objects.get(pk=request.POST['user_id'])
-        images = [request.FILES.get('image')]
-        url = ""
-        for image in images:
-            new_image = UserImage(image=image, user=user)
-            new_image.save()
-            serialized_image = UserImageSerializer(new_image)
-            url = serialized_image.data['url']
-        return Response(url, status=status.HTTP_201_CREATED)
+        image = request.FILES.get('image')
+        new_image = UserImage(image=image, user=user)
+        new_image.save()
+        serialized_image = UserImageSerializer(new_image)
+        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -285,10 +275,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return (Conversation.objects.filter(owner=user) | Conversation.objects.filter(buyer=user)).order_by("-lastmessagedate")
+        return Conversation.objects.filter(Q(owner=user) | Q(buyer=user))
 
     def create(self, request, *args, **kwargs):
-        data = request.data;
+        data = request.data
         already_exist = Conversation.objects.filter(
             owner_id=data['owner_id'],
             buyer_id=data['buyer_id'],
@@ -322,7 +312,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
-        return Message.objects.filter(conversation=conversation).order_by("-date")
+        return Message.objects.filter(conversation=conversation)
 
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
@@ -394,64 +384,97 @@ def searchItems(request):
 
 @api_view(['POST'])
 def predictClass(request):
-    if request.method == "POST" and request.FILES.get('files[]'):
-            class_found, category_found, detected_text = findClass(request.FILES.get('files[]'))
+    if request.method == "POST":
+        image = request.FILES.get('image')
+        if image:
+            class_found, category_found, detected_text = findClass(image)
             response = {
                 "suggested_class": class_found,
                 "suggested_category": category_found,
                 "detected_text": detected_text
             }
             return JsonResponse(response, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET', 'POST'])
 def getNotifications(request):
     def _get_unread_messages(user):
         return Message.objects.filter(
-            Q(conversation__owner=user) | Q(conversation__buyer=user),
-            Q(seen=False), ~Q(user=user)
+            ~Q(user=user), Q(seen=False),
+            Q(conversation__owner=user) | Q(conversation__buyer=user)
         ).count()
 
     if request.method == 'GET':
-        user = request.user
-        response = {
-            "unread_messages": _get_unread_messages(user)
-        }
-        return Response(response, status=status.HTTP_200_OK)
+        return Response({"unread_messages": _get_unread_messages(request.user)}, status=status.HTTP_200_OK)
     elif request.method == 'POST':
         user = request.user
         data = request.data
-        conversation = Conversation.objects.get(pk=data['conversation'])
+        conversation = Conversation.objects.get(pk=data['conversation_id'])
         if conversation is None or (conversation.buyer != user and conversation.owner != user):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # Set all messages sent by other user as seen by current user for this conversation
         Message.objects.filter(
-            Q(conversation__id=data['conversation']),
-            Q(id__lte=data['last_message']),
+            Q(conversation__id=data['conversation_id']),
+            Q(id__lte=data['last_message_id']),
             ~Q(user=user)
         ).update(seen=True)
 
         # Return unread messages count for all conversations
-        response = {
-            "unread_messages": _get_unread_messages(user)
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
+        return Response({"unread_messages": _get_unread_messages(user)}, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
-def getFirstItemImage(request, item_id):
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def itemHasImage(request, item_id):
     if request.method == 'GET':
-        images = ItemImage.objects.filter(item_id=item_id)
-        if len(images) > 0:
-            image = images[0]
-            serialized_image = ItemImageSerializer(image, many=False)
-            return Response(serialized_image.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            images = ItemImage.objects.filter(item_id=item_id)
+            if len(images) > 0:
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getItemFirstImage(request, item_id):
+    if request.method == 'GET':
+        try:
+            image = ItemImage.objects.filter(item_id=item_id).first()
+            if image is not None:
+                return FileResponse(open(image.path, 'rb'))
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
+def republishItemImagesFromItem(request, new_item_id, parent_item_id):
+    if request.method == 'GET':
+        try:
+            new_item = Item.objects.get(pk=new_item_id)
+            parent_item = Item.objects.get(pk=parent_item_id)
+            if new_item.user == request.user and parent_item.user == request.user:
+                parent_item_images = ItemImage.objects.filter(item=parent_item)
+                if len(parent_item_images) > 0:
+                    for new_item_image in parent_item_images:
+                        new_item_image.pk = None
+                        new_item_image.item_id = new_item_id
+                        new_item_image.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
@@ -460,7 +483,9 @@ def getUserImage(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
-            return FileResponse(open(image.path, 'rb'))
+            if image is not None:
+                return FileResponse(open(image.path, 'rb'))
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -472,7 +497,9 @@ def getItemImage(request, itemimage_id):
     if request.method == 'GET':
         try:
             image = ItemImage.objects.get(pk=itemimage_id)
-            return FileResponse(open(image.path, 'rb'))
+            if image is not None:
+                return FileResponse(open(image.path, 'rb'))
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except ItemImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

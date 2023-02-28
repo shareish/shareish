@@ -7,17 +7,28 @@
       </b-tooltip>
     </h1>
     <b-loading :active="loading" :is-full-page="false" />
-    <template v-if="step === 1">
+    <template v-if="step === 0">
+      <div class="container has-text-centered buttons centered-container">
+        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom">
+          <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
+        </b-tooltip> &nbsp; &nbsp;
+        <b-tooltip :label="$t('help_item_noimage')" multilined position="is-bottom">
+          <button class="button is-primary is-large is-outlined" @click="step = 2">{{ $t('i-do-not-have-image') }}</button>
+        </b-tooltip>
+      </div>
+      <recurrent-items-list @submitAgain="setRecurrentItem" />
+    </template>
+    <template v-else-if="step === 1">
       <h2 class="subtitle">{{ $t('upload-your-item-image') }}</h2>
       <div class="container has-text-centered centered-container">
         <div class="file is-boxed is-large">
           <label class="file-label">
-            <input accept="image/*" class="file-input" type="file" @change="uploadFile">
+            <input accept="image/*" :v-model="file" class="file-input" type="file" @change="uploadFile">
             <span class="file-cta">
               <span class="file-icon"><i class="fas fa-upload"></i></span>
               <span class="file-label">Choose a file…</span>
             </span>
-            <span v-if="file && file.length === 1" class="file-name">{{ file[0].name }}</span>
+            <span v-if="file" class="file-name">{{ file.name }}</span>
           </label>
         </div>
       </div>
@@ -25,22 +36,22 @@
     <template v-else-if="step === 2">
       <div class="columns">
         <section class="column is-four-fifths">
-          <b-field>
+          <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
             <template #label>{{ $t('name') }}
               <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="name" />
+            <b-input v-model="name" name="name" v-validate="'required'" />
           </b-field>
 
-          <b-field>
+          <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
             <template #label>{{ $t('item-type') }}
               <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-select v-model="type" expanded>
+            <b-select v-model="type" expanded name="type" v-validate="'required'">
               <option value="BR">{{ $t('request') }}</option>
               <option value="DN">{{ $t('donation') }}</option>
               <option value="LN">{{ $t('loan') }}</option>
@@ -66,13 +77,13 @@
             </template>
             <b-input v-model="location" />
           </b-field>
-          <b-field>
+          <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
             <template #label> {{ $t('description') }}
               <b-tooltip :label="$t('help_item_description')" multilined position="is-right">
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="description" expanded type="textarea" />
+            <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
           </b-field>
           <b-field grouped>
             <b-field expanded>
@@ -105,22 +116,18 @@
           </div>
         </section>
         <div class="column">
-          <figure v-if="filePreview" class="image is-256x256">
-            <img :src="filePreview" />
-          </figure>
+          <template v-if="!isFromRecurrent">
+            <figure v-if="filePreview" class="image is-256x256">
+              <img :src="filePreview" />
+            </figure>
+          </template>
+          <template v-else>
+            <figure v-if="recurrentImages.length > 0" class="image is-256x256">
+              <img :src="recurrentImages[recurrentImages.length - 1]" />
+            </figure>
+          </template>
         </div>
       </div>
-    </template>
-    <template v-else>
-      <div class="container has-text-centered buttons centered-container">
-        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom">
-          <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
-        </b-tooltip> &nbsp; &nbsp;
-        <b-tooltip :label="$t('help_item_noimage')" multilined position="is-bottom">
-          <button class="button is-primary is-large is-outlined" @click="step = 2">{{ $t('i-do-not-have-image') }}</button>
-        </b-tooltip>
-      </div>
-      <recurrent-items-list @submitAgain="setRecurrentItem" />
     </template>
   </div>
 </template>
@@ -133,6 +140,9 @@ import moment from 'moment/moment';
 
 export default {
   name: 'AddItem',
+  $_veeValidate: {
+    validator: 'new'
+  },
   components: {CategorySelector, RecurrentItemsList},
   data() {
     return {
@@ -144,8 +154,8 @@ export default {
       file: null,
       filePreview: null,
 
-	suggestedName: null,
-	suggestedCategory: null,
+      suggestedName: null,
+      suggestedCategory: null,
       suggestedDescription: null,
 
       name: '',
@@ -155,32 +165,31 @@ export default {
       category2: null,
       category3: null,
       location: '',
-
-      geoloc: null,
-      gettingLocation: false,
-      errorStr: null,
-
       isRecurrent: false,
+      recurrentFrom: null,
+      recurrentImages: [],
       startDate: null,
-      endDate: null
+      endDate: null,
+
+      geoloc: null
     }
   },
   created() {
-    //do we support geolocation
-    if (!("geolocation" in navigator)) {
-      this.errorStr = 'Geolocation is not available.';
-      return;
+    // Has the user activated geolocation?
+    if ("geolocation" in navigator) {
+      // Get the position
+      navigator.geolocation.getCurrentPosition(positon => {
+        this.geoloc = positon;
+      }, error => {
+        console.log(error);
+      }, {
+        maximumAge: 10000,
+        timeout: 5000,
+        enableHighAccuracy: true
+      });
     }
 
-    this.gettingLocation = true;
-    // get position
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.gettingLocation = false;
-      this.geoloc = pos;
-    }, err => {
-      this.gettingLocation = false;
-      this.errorStr = err.message;
-    }, {maximumAge: 10000, timeout: 5000, enableHighAccuracy: true})
+    document.title = `Shareish | ${this.$t('add-new-item')}`;
   },
   computed: {
     error() {
@@ -189,6 +198,9 @@ export default {
         message: this.errorMessage
       }
     },
+    isFromRecurrent() {
+      return this.recurrentFrom !== null;
+    }
   },
   watch: {
     error() {
@@ -197,123 +209,110 @@ export default {
         type: 'is-danger',
         message: `Error ${this.error.code}: ${this.error.message}`,
         pauseOnHover: true,
-      })
+      });
     }
   },
   methods: {
     async copyGeoLocAddress() {
-      //we need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      var geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')'
-      if (this.geoloc === null) {
-        return;
-      }
+      if (this.geoloc !== null) {
+        var geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')'
 
-      try {
-        this.location = (await axios.post(
-            `/api/v1/address/`,
-            geoLocPoint
-        )).data;
-      } catch (error) {
-        console.log(JSON.stringify(error));
+        try {
+          this.location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
+        } catch (error) {
+          console.log(JSON.stringify(error));
+        }
       }
     },
     async uploadFile(event) {
       this.loading = true;
 
-      this.file = event.target.files;
+      this.file = event.target.files[0];
       const reader = new FileReader();
       reader.addEventListener('load', (event) => {
         this.filePreview = event.target.result
       });
-      reader.readAsDataURL(this.file[0]);
+      reader.readAsDataURL(this.file);
       await this.fetchPredictions();
 
-	this.name = this.suggestedName;
-	this.category1 = this.suggestedCategory;
+      this.name = this.suggestedName;
+      this.category1 = this.suggestedCategory;
       this.description = this.suggestedDescription;
       this.step = 2;
       this.loading = false;
     },
     async fetchPredictions() {
       try {
-        const predictions = (await axios.post('/api/v1/predictClass/', this.file)).data;
-          this.suggestedName = predictions['suggested_class'];
-	  this.suggestedCategory = predictions['suggested_category'];
-          this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
+        let data = new FormData();
+        data.append('image', this.file);
+        const predictions = (await axios.post('/api/v1/predictClass/', data)).data;
+        this.suggestedName = predictions['suggested_class'];
+        this.suggestedCategory = predictions['suggested_category'];
+        this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
       } catch (error) {
         console.log(error);
       }
     },
     async submit() {
-      this.errorCode = null;
-      this.errorMessage = null;
+      let result = await this.$validator.validateAll();
+      if (result) {
+        this.errorCode = null;
+        this.errorMessage = null;
 
-      let startDate;
-      if (this.startDate) {
-        startDate = moment(this.startDate).format('YYYY-MM-DD[T]HH:mm:ss');
-      } else {
-        startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
-      }
-
-      let endDate;
-      if (this.endDate) {
-        endDate = moment(this.endDate).format('YYYY-MM-DD[T]HH:mm:ss');
-      }
-
-      try {
-        let uri = '/api/v1/items/';
-        const item = (await axios.post(uri, {
-          name: this.name,
-          item_type: this.type,
-          category1: this.category1,
-          category2: (this.category2) ? this.category2 : '',
-          category3: (this.category3) ? this.category3 : '',
-          description: this.description,
-          location: this.location,
-          is_recurrent: this.isRecurrent,
-          startdate: startDate,
-          enddate: endDate,
-          images: []
-        })).data;
-
-        if (this.file && this.filePreview) {
-          const id = item.id;
-          try {
-            let uri = `/api/v1/images/`;
-            let formData = new FormData();
-            formData.append('itemID', id);
-            let files = [this.file];
-            let previews = [this.filePreview];
-            for (let i = 0; i < Object.keys(files).length; i++) {
-              const file = files[i];
-              const preview = previews[i];
-              const blob = await (await fetch(preview)).blob();
-              const newFile = new File([blob], file.name);
-              formData.append('files', newFile);
-            }
-            await axios.post(uri, formData);
-
-          } catch (error) {
-            console.log(error);
-            const response = error.response;
-            this.errorCode = response.status;
-            if (response.data.message) {
-              this.errorMessage = response.data.message;
-            } else {
-              this.errorMessage = JSON.stringify(response.data);
-            }
-          }
+        let startDate;
+        if (this.startDate) {
+          startDate = moment(this.startDate).format('YYYY-MM-DD[T]HH:mm:ss');
+        } else {
+          startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
         }
 
-        await this.$router.push('/items');
-      } catch (error) {
-        console.log(error);
-        const response = error.response;
-        this.errorCode = response.status;
-        if (response.data.message) {
-          this.errorMessage = response.data.message;
-        } else {
-          this.errorMessage = JSON.stringify(response.data);
+        let endDate;
+        if (this.endDate) {
+          endDate = moment(this.endDate).format('YYYY-MM-DD[T]HH:mm:ss');
+        }
+
+        try {
+          let item = (await axios.post('/api/v1/items/', {
+            name: this.name,
+            item_type: this.type,
+            category1: this.category1,
+            category2: this.category2,
+            category3: this.category3,
+            description: this.description,
+            location: this.location,
+            is_recurrent: this.isRecurrent,
+            startdate: startDate,
+            enddate: endDate,
+            images: []
+          })).data;
+
+          if (!this.isFromRecurrent) {
+            if (this.file && this.filePreview) {
+              try {
+                let data = new FormData();
+                data.append('item_id', item.id);
+
+                let blob = await (await fetch(this.filePreview)).blob();
+                let image = new File([blob], this.file.name);
+                data.append('image', image);
+
+                await axios.post("/api/v1/images/", data);
+              }
+              catch (error) {
+                this.processError(error);
+              }
+            }
+          } else {
+            try {
+              await axios.get(`/api/v1/items/${item.id}/images/republish_from/${this.recurrentFrom}`);
+            } catch (error) {
+              this.processError(error);
+            }
+          }
+
+          this.$router.push(`/items/${item.id}`);
+        } catch (error) {
+          this.processError(error);
         }
       }
     },
@@ -324,22 +323,35 @@ export default {
       this.category1 = item.category1;
       this.category2 = item.category2;
       this.category3 = item.category3;
+      this.recurrentImages = item.images;
 
       if (item.location !== null) {
         try {
           this.location = (await axios.post(`/api/v1/address/`, item.location)).data;
-        } catch (error) {
+        }
+        catch (error) {
           console.log(error);
         }
       }
 
-      //TODO: set image files
+      this.recurrentFrom = item.id;
 
       this.step = 2;
+    },
+    processError(error) {
+      if ('response' in error) {
+        this.errorCode = error.response.status;
+        if (error.response.data.message) {
+          this.errorMessage = error.response.data.message;
+        } else if (error.response.data !== "") {
+          this.errorMessage = JSON.stringify(error.response.data);
+        } else {
+          console.log(error);
+        }
+      } else {
+        console.log(error);
+      }
     }
-  },
-  mounted() {
-    document.title = `Shareish | ${this.$t('add-new-item')}`;
   }
 };
 </script>

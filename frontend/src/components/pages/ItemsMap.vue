@@ -335,7 +335,9 @@ export default {
       }, (error) => {
         this.zoom = 2;
         console.log(error.message);
-      }, {timeout: GEOLOCATION_TIMEOUT});
+      }, {
+        timeout: GEOLOCATION_TIMEOUT
+      });
     },
     async getItemsLocation() {
       try {

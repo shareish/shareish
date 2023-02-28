@@ -80,8 +80,8 @@ export default {
     // Has the user activated geolocation?
     if ("geolocation" in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(pos => {
-        this.geoloc = pos;
+      navigator.geolocation.getCurrentPosition(positon => {
+        this.geoloc = positon;
       }, error => {
         console.log(error);
       }, {

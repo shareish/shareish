@@ -1,15 +1,15 @@
 <template>
   <div class="page-conversation-details">
     <h1 class="title">{{ conversation.slug }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false"/>
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
       <div class="columns">
         <div class="column is-two-thirds">
           <article class="media">
             <figure class="media-left">
               <p class="image">
-                <img v-if="currentUser.images.length > 0" :src="currentUser.images[currentUser.images.length - 1]"/>
-                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"/>
+                <img v-if="currentUser.images.length > 0" :src="currentUser.images[currentUser.images.length - 1]" />
+                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
               </p>
             </figure>
             <div class="media-content">
@@ -20,18 +20,15 @@
               </div>
               <div class="field">
                 <p class="control">
-                  <button :disabled="messageToSend===''" class="button" @click="sendMessage">{{
-                      $t('post-message')
-                    }}
-                  </button>
+                  <button :disabled="!messageToSend" class="button" @click="sendMessage">{{ $t('post-message') }}</button>
                 </p>
               </div>
             </div>
           </article>
-          <message v-for="message in messages" :key="message.id" :message="message" :users="users"/>
+          <message v-for="message in messages" :key="message.id" :message="message" :users="users" />
         </div>
         <div class="column">
-          <item-card :item="item" :users="users"/>
+          <item-card :item="item" :users="users" />
         </div>
       </div>
     </template>
@@ -111,7 +108,7 @@ export default {
         this.error = true;
       }
     },
-    async fetchExistingMessages() {
+    async fetchMessages() {
       try {
         this.messages = (await axios.get(`/api/v1/conversations/${this.conversationId}/messages/`)).data;
       } catch (error) {
@@ -123,7 +120,7 @@ export default {
       try {
         this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversationId}/`);
         this.ws.onopen = () => {
-          console.log("Websocket connected.")
+          console.log("Websocket connected.");
         };
         this.ws.addEventListener('message', (event) => {
           const data = JSON.parse(event.data);
@@ -132,7 +129,7 @@ export default {
             this.updateNotifications();
           }
           this.ws.addEventListener('close', () => {
-            console.log("Websocket has been closed.")
+            console.log("Websocket has been closed.");
           });
         });
       } catch (error) {
@@ -154,16 +151,16 @@ export default {
           duration: 5000,
           type: 'is-danger',
           message: this.$t('notif-error-send-message'),
-          pauseOnHover: true,
-        })
+          pauseOnHover: true
+        });
       }
     },
     async updateNotifications() {
       if (this.messages.length > 0) {
         try {
           const data = {
-            'conversation': this.conversationId,
-            'last_message': this.messages[0]['id']
+            'conversation_id': this.conversationId,
+            'last_message_id': this.messages[0]['id']
           }
           this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
         } catch (error) {
@@ -177,20 +174,19 @@ export default {
     await Promise.all([
       this.fetchConversation(),
       this.fetchUsers(),
-      this.fetchExistingMessages(),
+      this.fetchMessages(),
       this.createWebSocket()
     ]);
     await this.fetchItem();
     this.updateNotifications();
     this.autofillMessage();
-    this.loading = false;
-
     document.title = `Shareish | ${this.conversation.slug}`;
+
+    this.loading = false;
   },
   beforeDestroy() {
-    if (this.ws) {
+    if (this.ws)
       this.ws.close();
-    }
   }
 };
 </script>

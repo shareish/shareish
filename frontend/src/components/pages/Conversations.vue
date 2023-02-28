@@ -7,8 +7,8 @@
         <div class="level">
           <div class="level-left">
             {{ conversation.slug }}
-            <div v-if="conversation.lastUpdate" class="is-size-7 has-text-grey ml-2">{{ $t('last-message') }}
-              {{ formattedDate(conversation.lastUpdate) }}
+            <div v-if="conversation.lastmessagedate" class="is-size-7 has-text-grey ml-2">{{ $t('last-message') }}
+              {{ formattedDate(conversation.lastmessagedate) }}
             </div>
             <span v-if="conversation.unread_messages > 0" class="tag is-danger ml-2">
               {{ $tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages}) }}
@@ -46,17 +46,7 @@ export default {
   methods: {
     async fetchConversations() {
       try {
-        const conv = (await axios.get('/api/v1/conversations/')).data;
-        this.conversations = conv.map(conversation => {
-          let lastUpdate = null;
-          if (conversation.last_message) {
-            lastUpdate = conversation.last_message.date;
-          }
-          return {
-            ...conversation,
-            lastUpdate
-          }
-        })
+        this.conversations = (await axios.get('/api/v1/conversations/')).data;
       } catch (error) {
         console.log(error);
       }
@@ -69,8 +59,8 @@ export default {
   },
   mounted() {
     this.fetchConversations();
-    this.loading = false;
     document.title = `Shareish | ${this.$t('my-conversations')}`;
+    this.loading = false;
   },
   destroyed() {
     clearTimeout(this.timeout);
