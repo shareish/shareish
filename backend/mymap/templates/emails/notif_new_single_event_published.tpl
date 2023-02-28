@@ -1,7 +1,7 @@
 {% extends "mail_templated/base.tpl" %}
 
 {% block subject %}
-    [Shareish] A new event just go published on Shareish mutual aid platform!
+    [Shareish] A new event just got published on Shareish mutual aid platform!
 {% endblock %}
 
 {% block text %}
