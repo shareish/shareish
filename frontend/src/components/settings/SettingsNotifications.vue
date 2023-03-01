@@ -88,9 +88,11 @@
 
 <script>
 import axios from 'axios';
+import SnackbarErrorMixin from "@/components/ErrorHandler";
 
 export default {
   name: 'SettingsNotifications',
+  mixins: [SnackbarErrorMixin],
   $_veeValidate: {
     validator: 'new'
   },
@@ -123,7 +125,7 @@ export default {
     this.radioGroups.notif_events = this.internalUser.mail_notif_freq_events;
     this.radioGroups.notif_items = this.internalUser.mail_notif_freq_items;
 
-    this.fetchAddress();
+    this.fetchAddress(this.internalUser.ref_location);
 
     // Has the user activated geolocation?
     if ("geolocation" in navigator) {
@@ -146,26 +148,16 @@ export default {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoloc !== null) {
         let geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')';
-        console.log(this.internalUser.ref_location);
-        try {
-          this.internalUser.ref_location = (await axios.post(
-              `/api/v1/address/`,
-              geoLocPoint
-          )).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
-        }
+        this.fetchAddress(geoLocPoint);
       }
     },
-    async fetchAddress() {
-      if (this.internalUser !== null && this.internalUser.ref_location !== null) {
+    async fetchAddress(location) {
+      if (location !== null) {
         try {
-          this.internalUser.ref_location = (await axios.post(
-              `/api/v1/address/`,
-              this.internalUser.ref_location
-          )).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
+          this.internalUser.ref_location = (await axios.post('/api/v1/address/', location)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
     },
@@ -181,7 +173,7 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -192,15 +184,10 @@ export default {
 
           this.$emit('updateUser', this.internalUser);
 
-          this.fetchAddress();
-        } catch (error) {
-          console.log(error);
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-danger',
-            message: this.$t('notif-error-user-update'),
-            pauseOnHover: true,
-          })
+          this.fetchAddress(this.internalUser.ref_location);
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
     },

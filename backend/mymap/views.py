@@ -10,7 +10,7 @@ User = get_user_model()
 
 from rest_framework import filters, viewsets
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from .serializers import (
@@ -209,6 +209,16 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
+    def get_instance(self):
+        return self.request.user
+
+    @action(["put", "patch"], detail=False)
+    def me(self, request, *args, **kwargs):
+        if request.method == "PUT":
+            return self.update(request, *args, **kwargs)
+        elif request.method == "PATCH":
+            return self.partial_update(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         data = request.data
         if 'ref_location' in data:
@@ -237,27 +247,32 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
+        instance = self.get_instance()
         if 'ref_location' in request.data:
             address = request.data['ref_location']
-            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    request.data['ref_location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
+            if address is not None:
+                if isinstance(address, str):
+                    address = address.strip()
+                    if address == '':
+                        request.data['ref_location'] = None
+                    elif not address.startswith(LOCATION_PREFIX):
+                        location = locator.geocode(address)
+                        if location is not None:
+                            request.data['ref_location'] = "{} ({} {})".format(
+                                LOCATION_PREFIX,
+                                str(location.latitude),
+                                str(location.longitude)
+                            )
+                        else:
+                            return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response(
-                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
-                    )
+                    return Response("Bad address received.", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"serializer_errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserImageViewSet(viewsets.ViewSet):
@@ -323,14 +338,14 @@ class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def getAddress(request):
     if request.method == "POST":
-        address = request.data['SRID']
-        address = address.split(' ')
-        address[1] = address[1][1:]
-        address[2] = address[2][:-1]
-        geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
-        if geoloc is not None:
-            return Response(geoloc.address, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        coords = request.data['SRID'].split(' ')[1:]
+        latitude = coords[0][1:]
+        longitude = coords[1][:-1]
+        location = locator.reverse((latitude, longitude), exactly_one=True)
+        if location is not None:
+            return Response(location.address, status=status.HTTP_200_OK)
+        return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
@@ -361,8 +376,7 @@ def searchItemFilter(request):
             items = items | items_category1 | items_category2 | items_category3
         serialized_items = ItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
@@ -378,8 +392,7 @@ def searchItems(request):
         items = paginator.paginate_queryset(items, request)
         serialized_items = ItemSerializer(items, many=True)
         return paginator.get_paginated_response(serialized_items.data)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])

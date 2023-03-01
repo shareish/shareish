@@ -49,7 +49,7 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -59,14 +59,9 @@ export default {
           });
 
           this.$emit('updateUser', this.internalUser);
-        } catch (error) {
-          console.log(error);
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-danger',
-            message: this.$t('notif-error-user-update'),
-            pauseOnHover: true,
-          })
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
     }

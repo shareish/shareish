@@ -96,29 +96,9 @@ export default {
   methods: {
     async fetchUser() {
       try {
-        const uri = `/api/v1/users/me/`
-        this.user = (await axios.get(uri)).data;
+        this.user = (await axios.get('/api/v1/users/me/')).data;
       } catch (error) {
         console.log(error);
-      }
-    },
-    async fetchAddressGeoLoc() {
-      if (this.geoloc !== null) {
-        let geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')';
-        try {
-          this.user.ref_location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
-        }
-      }
-    },
-    async fetchAddress() {
-      if (this.user !== null && this.user.ref_location !== null) {
-        try {
-          this.user.ref_location = (await axios.post(`/api/v1/address/`, this.user.ref_location)).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
-        }
       }
     },
     updateUser(user) {

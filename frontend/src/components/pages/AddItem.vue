@@ -133,13 +133,15 @@
 </template>
 
 <script>
-import RecurrentItemsList from '@/components/RecurrentItemsList';
 import axios from 'axios';
+import RecurrentItemsList from '@/components/RecurrentItemsList';
 import CategorySelector from '@/components/CategorySelector';
+import SnackbarErrorMixin from "@/components/ErrorHandler";
 import moment from 'moment/moment';
 
 export default {
   name: 'AddItem',
+  mixins: [SnackbarErrorMixin],
   $_veeValidate: {
     validator: 'new'
   },
@@ -219,7 +221,8 @@ export default {
 
         try {
           this.location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
-        } catch (error) {
+        }
+        catch (error) {
           console.log(JSON.stringify(error));
         }
       }
@@ -299,20 +302,22 @@ export default {
                 await axios.post("/api/v1/images/", data);
               }
               catch (error) {
-                this.processError(error);
+                this.snackbarError(error);
               }
             }
           } else {
             try {
               await axios.get(`/api/v1/items/${item.id}/images/republish_from/${this.recurrentFrom}`);
-            } catch (error) {
-              this.processError(error);
+            }
+            catch (error) {
+              this.snackbarError(error);
             }
           }
 
           this.$router.push(`/items/${item.id}`);
-        } catch (error) {
-          this.processError(error);
+        }
+        catch (error) {
+          this.snackbarError(error);
         }
       }
     },
@@ -323,6 +328,7 @@ export default {
       this.category1 = item.category1;
       this.category2 = item.category2;
       this.category3 = item.category3;
+      this.recurrentFrom = item.id;
       this.recurrentImages = item.images;
 
       if (item.location !== null) {
@@ -334,23 +340,7 @@ export default {
         }
       }
 
-      this.recurrentFrom = item.id;
-
       this.step = 2;
-    },
-    processError(error) {
-      if ('response' in error) {
-        this.errorCode = error.response.status;
-        if (error.response.data.message) {
-          this.errorMessage = error.response.data.message;
-        } else if (error.response.data !== "") {
-          this.errorMessage = JSON.stringify(error.response.data);
-        } else {
-          console.log(error);
-        }
-      } else {
-        console.log(error);
-      }
     }
   }
 };

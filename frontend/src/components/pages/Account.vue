@@ -37,8 +37,7 @@ export default {
   methods: {
     async fetchUser() {
       try {
-        const uri = `/api/v1/users/me/`
-        this.user = (await axios.get(uri)).data;
+        this.user = (await axios.get('/api/v1/users/me/')).data;
       } catch (error) {
         console.log(error);
       }

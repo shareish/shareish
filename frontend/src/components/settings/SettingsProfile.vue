@@ -122,9 +122,11 @@
 
 <script>
 import axios from 'axios';
+import SnackbarErrorMixin from "@/components/ErrorHandler";
 
 export default {
   name: 'SettingsProfile',
+  mixins: [SnackbarErrorMixin],
   $_veeValidate: {
     validator: 'new'
   },
@@ -150,7 +152,7 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
 
           if (this.file) {
             let data = new FormData();
@@ -169,14 +171,9 @@ export default {
           });
 
           this.$emit('updateUser', this.internalUser);
-        } catch (error) {
-          console.log(error);
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-danger',
-            message: this.$t('notif-error-user-update'),
-            pauseOnHover: true,
-          })
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
     }
