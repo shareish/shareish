@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ObjectDoesNotExist
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
@@ -53,6 +55,27 @@ class UserSerializer(serializers.ModelSerializer):
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images'
         ]
+
+    def validate(self, data):
+        errors = {}
+
+        # Facebook url validation
+        if data.get("facebook_url") != "":
+            facebook_regex = r"^((https:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
+            if not re.match(facebook_regex, data.get("facebook_url")):
+                errors['facebook_url'] = "Facebook url is invalid."
+
+        # Instagram url validation
+        if data.get("instagram_url") != "":
+            instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
+            instagram_regex = r"((https:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "/"
+            if not re.match("^" + instagram_regex + "$", data.get("instagram_url")):
+                errors['instagram_url'] = "Instagram url is invalid."
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return data
 
 
 class UserImageSerializer(serializers.ModelSerializer):

@@ -4,7 +4,7 @@ export default {
     message: null
   }),
   methods: {
-    snackbarError(error) {
+    snackbarError(error, replace = true) {
       if (this.isFromAxios()) {
         // Error received from Axios
         this.code = error.response.status;
@@ -52,6 +52,8 @@ export default {
         type: 'is-danger',
         message: message,
         pauseOnHover: true,
+        queue: replace,
+        position: "is-bottom-right"
       });
 
       // Reset the component fields
@@ -60,8 +62,14 @@ export default {
     fullErrorHandling(error) {
       if (this.isSerializationError(error)) {
         // This is a serialization error
-        for (const [key, value] of Object.entries(error.response.data.serializer_errors))
-          this.snackbarError(`(${key}) ${value}`);
+        for (const [key, value] of Object.entries(error.response.data.serializer_errors)) {
+          if (typeof value === "string") {
+            this.snackbarError(`(${key}) ${value}`);
+          } else if (Array.isArray(value)) {
+            for (const message of value)
+              this.snackbarError(`(${key}) ${message}`, false);
+          }
+        }
       } else {
         this.snackbarError(error);
       }
