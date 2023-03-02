@@ -77,12 +77,6 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
     ordering = ['-startdate']
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Item.objects.filter(pk=instance.id).update(hitcount=F('hitcount') + 1)
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
     def create(self, request, *args, **kwargs):
         data = request.data
         if 'location' in data:
@@ -407,7 +401,7 @@ def predictClass(request):
                 "detected_text": detected_text
             }
             return JsonResponse(response, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -424,20 +418,23 @@ def getNotifications(request):
     elif request.method == 'POST':
         user = request.user
         data = request.data
-        conversation = Conversation.objects.get(pk=data['conversation_id'])
-        if conversation is None or (conversation.buyer != user and conversation.owner != user):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            conversation = Conversation.objects.get(pk=data['conversation_id'])
+            if conversation.buyer != user and conversation.owner != user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
-        # Set all messages sent by other user as seen by current user for this conversation
-        Message.objects.filter(
-            Q(conversation__id=data['conversation_id']),
-            Q(id__lte=data['last_message_id']),
-            ~Q(user=user)
-        ).update(seen=True)
+            # Set all messages sent by other user as seen by current user for this conversation
+            Message.objects.filter(
+                Q(conversation__id=data['conversation_id']),
+                Q(id__lte=data['last_message_id']),
+                ~Q(user=user)
+            ).update(seen=True)
 
-        # Return unread messages count for all conversations
-        return Response({"unread_messages": _get_unread_messages(user)}, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+            # Return unread messages count for all conversations
+            return Response({"unread_messages": _get_unread_messages(user)}, status=status.HTTP_200_OK)
+        except Conversation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
@@ -450,7 +447,7 @@ def itemHasImage(request, item_id):
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -464,7 +461,7 @@ def getItemFirstImage(request, item_id):
                 return FileResponse(open(image.path, 'rb'))
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -484,9 +481,9 @@ def republishItemImagesFromItem(request, new_item_id, parent_item_id):
                         new_item_image.save()
                     return Response(status=status.HTTP_201_CREATED)
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -496,9 +493,7 @@ def getUserImage(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
-            if image is not None:
-                return FileResponse(open(image.path, 'rb'))
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return FileResponse(open(image.path, 'rb'))
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -510,9 +505,21 @@ def getItemImage(request, itemimage_id):
     if request.method == 'GET':
         try:
             image = ItemImage.objects.get(pk=itemimage_id)
-            if image is not None:
-                return FileResponse(open(image.path, 'rb'))
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return FileResponse(open(image.path, 'rb'))
         except ItemImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def increaseHitcountItem(request, item_id):
+    if request.method == 'GET':
+        try:
+            item = Item.objects.get(pk=item_id)
+            item.hitcount += 1
+            item.save()
+            return Response(status=status.HTTP_200_OK)
+        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

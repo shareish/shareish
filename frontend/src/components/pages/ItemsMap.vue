@@ -6,7 +6,8 @@
         @update:searchString="searchString = $event"
     />
 
-    <l-map :bounds.sync="bounds" :center.sync="center" :zoom.sync="zoom" style="height: 800px" @update:bounds="fetchMarkers">
+    <l-map :bounds.sync="bounds" :center.sync="center" :zoom.sync="zoom" style="height: 800px"
+           @update:bounds="fetchMarkers">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
       <l-control class="control-geolocation">
         <button class="button" @click="setGeolocalizedPosition">
@@ -22,7 +23,7 @@
         </div>
       </l-control>
 
-      <l-marker v-if="userPosition" :icon="userPositionIcon" :lat-lng="userPosition" />
+      <l-marker v-if="userPosition" :icon="userPositionIcon" :lat-lng="userPosition"/>
 
       <l-layer-group ref="layer">
         <v-marker-cluster :options="markerClusterGroupOptions">
@@ -35,7 +36,7 @@
               @ready="openRoutedItemPopup(item.id)"
           >
             <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-              <item-map-popup :item="item" :users="users" />
+              <item-map-popup :item="item" :users="users"/>
             </l-popup>
           </l-marker>
         </v-marker-cluster>
@@ -302,17 +303,18 @@ export default {
           this.setGeolocalizedPosition();
           this.routedItemError = true;
           console.log('Routed id is null');
-          return;
+        } else {
+          const item = (await axios.get(`/api/v1/items/${this.routedId}/`)).data;
+          await axios.get(`/api/v1/items/${this.routedId}/increase_hitcount`);
+          if (item['location'] === null) {
+            this.setGeolocalizedPosition();
+            this.routedItemError = true;
+            console.log('Routed id location is null');
+          } else {
+            const latLong = item['location'].slice(17, -1).split(' ');
+            this.center = latLng(...latLong);
+          }
         }
-        const item = (await axios.get(`/api/v1/items/${this.routedId}/`)).data;
-        if (item['location'] === null) {
-          this.setGeolocalizedPosition();
-          this.routedItemError = true;
-          console.log('Routed id location is null');
-          return;
-        }
-        const latLong = item['location'].slice(17, -1).split(' ');
-        this.center = latLng(...latLong);
       } catch (error) {
         this.setGeolocalizedPosition();
         this.routedItemError = true;
@@ -355,7 +357,7 @@ export default {
             longitude: latLong[1],
             latLng: latLng(...latLong)
           };
-        })
+        });
       } catch (error) {
         console.log(error);
       }
@@ -365,73 +367,69 @@ export default {
         return;
       }
 
-      this.extraLayers = await Promise.all(this.extraLayers.map(async extraLayer => {
-        try {
-          if (extraLayer.tagKey === 'ff') {
-            const elements = await this.getFallingFruitElements();
-            const markers = elements.filter(element =>
-                (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
-            ).map(element => {
-              return {
-                latitude: element['lat'],
-                longitude: element['lon'] || element['lng'],
-                latLng: latLng(element['lat'], element['lng']),
-                type: 'ffruit', //element['description'], //'ffruit',
-                name: element['type_names'][0],
-                description: element['description'],
-                id: element['id']
-              }
-            })
-            return {...extraLayer, markers};
-          } else {
-            const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
-            const markers = elements.filter(element =>
-                (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
-            ).map(element => {
-              return {
-                latitude: element['lat'],
-                longitude: element['lon'] || element['lng'],
-                latLng: latLng(element['lat'], element['lon']),
-                type: element['tags'][extraLayer.tagKey],
-                name: element['tags']['name'],
-                id: element['id']
-              }
-            })
-            return {...extraLayer, markers};
+      this.extraLayers = await Promise.all(
+        this.extraLayers.map(async extraLayer => {
+          try {
+            if (extraLayer.tagKey === 'ff') {
+              const elements = await this.getFallingFruitElements();
+              const markers = elements.filter(element =>
+                  (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
+              ).map(element => {
+                return {
+                  latitude: element['lat'],
+                  longitude: element['lon'] || element['lng'],
+                  latLng: latLng(element['lat'], element['lng']),
+                  type: 'ffruit', //element['description'], //'ffruit',
+                  name: element['type_names'][0],
+                  description: element['description'],
+                  id: element['id']
+                }
+              });
+              return {...extraLayer, markers};
+            } else {
+              const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
+              const markers = elements.filter(element =>
+                  (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
+              ).map(element => {
+                return {
+                  latitude: element['lat'],
+                  longitude: element['lon'] || element['lng'],
+                  latLng: latLng(element['lat'], element['lon']),
+                  type: element['tags'][extraLayer.tagKey],
+                  name: element['tags']['name'],
+                  id: element['id']
+                }
+              });
+              return {...extraLayer, markers};
+            }
+          } catch (error) {
+            console.log(error)
+            return extraLayer;
           }
-        } catch (error) {
-          console.log(error)
-          return extraLayer;
-        }
-      }));
+        })
+      );
     },
     getExtraMarkerURL(marker) {
       if (marker.type === 'ffruit') {
-        return ('http://fallingfruit.org/locations/' + marker.id + '&locale=' + this.$i18n.locale)
+        return 'http://fallingfruit.org/locations/' + marker.id + '&locale=' + this.$i18n.locale;
       } else {
-        return ('https://openstreetmap.org/node/' + marker.id)
+        return 'https://openstreetmap.org/node/' + marker.id;
       }
     },
     getExtraMarkerSourceTransSlug(marker) {
-      if (marker.type === 'ffruit') {
-        return ('from-ff')
-      } else {
-        return ('from-osm')
-      }
+      return (marker.type === 'ffruit') ? 'from-ff' : 'from-osm';
     },
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=0';
         const ffcoords = '&nelat=' + this.bounds.getNorthEast().lat + '&nelng=' + this.bounds.getNorthEast().lng + '&swlat=' + this.bounds.getSouthWest().lat + '&swlng=' + this.bounds.getSouthWest().lng;
         const ffURL = ffbaseURL + ffcoords
-        return (await axios.get(ffURL,
-            {
-              transformRequest: (data, headers) => {
-                delete headers.common['Authorization'];
-                return data;
-              }
-            })).data;
-
+        return (await axios.get(ffURL, {
+          transformRequest: (data, headers) => {
+            delete headers.common['Authorization'];
+            return data;
+          }
+        })).data;
       } catch (error) {
         console.log(error);
         return []; // may happen if fallingfruit API returns an error
@@ -469,7 +467,7 @@ export default {
         console.log(error);
       }
     }
-  },
+  }
 }
 </script>
 
@@ -478,7 +476,8 @@ export default {
   margin-top: 0.75rem;
 }
 
->>> .item-popup .leaflet-popup-content, >>> .item-popup .leaflet-popup-content p {
+>>> .item-popup .leaflet-popup-content,
+>>> .item-popup .leaflet-popup-content p {
   margin: 0;
 }
 

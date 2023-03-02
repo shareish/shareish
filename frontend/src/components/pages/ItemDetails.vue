@@ -5,7 +5,7 @@
       <h1 class="title">{{ item.name }} <item-type-tag :type="item.item_type" /></h1>
       <div class="block level">
         <div class="level-left">
-          <div v-for="category in categories" :key="category.slug" class="icon-text level-item">
+          <div v-for="category in itemCategories" :key="category.slug" class="icon-text level-item">
             <span class="icon is-large"><i :class="category.icon" class="fa-2x"></i></span>
             <span class="is-size-5">{{ $t(category.slug) }}</span>
           </div>
@@ -91,9 +91,11 @@ import {categories} from '@/categories';
 import ItemTypeTag from '@/components/ItemTypeTag';
 import UserCard from '@/components/UserCard';
 import EditItemModal from "@/components/EditItemModal";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'ItemDetails',
+  mixins: [ErrorHandler],
   components: {UserCard, ItemTypeTag},
   data() {
     return {
@@ -101,8 +103,8 @@ export default {
       users: [],
       address: null,
 
-      loading: true,
-      error: false,
+      redirection: false,
+      loading: true
     }
   },
   computed: {
@@ -118,68 +120,65 @@ export default {
       }
       return 'items';
     },
-    currentUserId() {
-      return this.$store.state.user.id;
-    },
     user() {
       return this.users.find(user => user.id === this.item.user) || {};
     },
     isOwner() {
-      return this.currentUserId === this.user.id;
+      return this.$store.state.user.id === this.user.id;
     },
     category1() {
-      return this.category(this.item.category1);
+      return categories[this.item.category1];
     },
     category2() {
-      return this.category(this.item.category2);
+      return categories[this.item.category2];
     },
     category3() {
-      return this.category(this.item.category3);
+      return categories[this.item.category3];
     },
-    categories() {
-      let cat = [];
-      if (this.category1) {
-        cat.push(this.category1);
-      }
-      if (this.category2) {
-        cat.push(this.category2);
-      }
-      if (this.category3) {
-        cat.push(this.category3);
-      }
-      return cat;
+    itemCategories() {
+      let itemCategories = [];
+      if (this.category1)
+        itemCategories.push(this.category1);
+      if (this.category2)
+        itemCategories.push(this.category2);
+      if (this.category3)
+        itemCategories.push(this.category3);
+      return itemCategories;
     },
   },
   methods: {
     async fetchItem() {
-      try {
-        this.item = (await axios.get(`/api/v1/${this.itemApiUri}/${this.itemId}/`)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
-      }
-    },
-    async fetchUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+      if (!this.redirection) {
+        try {
+          this.item = (await axios.get(`/api/v1/${this.itemApiUri}/${this.itemId}/`)).data;
+          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
+        } catch (error) {
+          this.snackbarError(error);
+          this.redirection = true;
+          await this.$router.push("/items");
+        }
       }
     },
     async fetchAddress() {
-      if (this.item.location === null) {
-        return;
+      if (!this.redirection) {
+        if (this.item.location !== null) {
+          try {
+            this.address = (await axios.post('/api/v1/address/', this.item.location)).data;
+          } catch (error) {
+            this.snackbarError(error);
+          }
+        }
       }
-
-      try {
-        this.address = (await axios.post(
-            `/api/v1/address/`,
-            this.item.location
-        )).data;
-      } catch (error) {
-        console.log(JSON.stringify(error));
+    },
+    async fetchUsers() {
+      if (!this.redirection) {
+        try {
+          this.users = (await axios.get('/api/v1/webusers/')).data;
+        } catch (error) {
+          this.snackbarError(error);
+          this.redirection = true;
+          await this.$router.push("/items");
+        }
       }
     },
     formattedDate(date) {
@@ -189,14 +188,11 @@ export default {
     formattedDateFromNow(date) {
       return moment(date).fromNow();
     },
-    category(category) {
-      return categories[category];
-    },
     async startConversation() {
       try {
         const data = {
           'owner_id': this.item['user'],
-          'buyer_id': this.currentUserId,
+          'buyer_id': this.$store.state.user.id,
           'item_id': this.item['id']
         }
         const response = await axios.post('/api/v1/conversations/', data);
@@ -244,11 +240,9 @@ export default {
   },
   async mounted() {
     this.loading = true;
-    await Promise.all([
-      this.fetchUsers(),
-      this.fetchItem()
-    ])
+    await this.fetchItem();
     await this.fetchAddress();
+    await this.fetchUsers();
     document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }

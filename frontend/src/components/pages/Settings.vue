@@ -38,7 +38,6 @@
       <settings-profile v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
       <settings-account v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
       <settings-notifications v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
-      <div v-else class="test">Test</div>
     </div>
   </div>
 </template>
@@ -61,7 +60,7 @@ export default {
       user: null,
       geoloc: null,
       currentView: null,
-      possibleViews: ['profile', 'privacy', 'account', 'notifications']
+      possibleViews: ['profile', 'account', 'notifications']
     }
   },
   async created() {
