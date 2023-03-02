@@ -2,7 +2,7 @@
   <div class="page-account">
     <h1 class="title">{{ $t('my-account') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
-    <user-card v-else-if="user" :user="user" editable @edit="startEdition" />
+    <user-card v-else-if="user" :user="user" editable />
     <h1 class="title">{{ $t('my-items') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <div v-else-if="items && items.length" class="columns">
@@ -20,7 +20,6 @@
 import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
-import EditAccountModal from '@/components/EditAccountModal';
 
 export default {
   name: 'Account',
@@ -60,16 +59,6 @@ export default {
     },
     updateUser(user) {
       this.user = user;
-    },
-    startEdition() {
-      this.$buefy.modal.open({
-        parent: this,
-        props: {user: this.user},
-        events: {updateUser: this.updateUser},
-        component: EditAccountModal,
-        hasModalCard: true,
-        trapFocus: true,
-      })
     }
   },
   async created() {
