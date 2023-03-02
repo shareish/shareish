@@ -9,9 +9,9 @@
     <b-loading :active="loading" :is-full-page="false" />
     <template v-if="step === 0">
       <div class="container has-text-centered buttons centered-container">
-        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom">
+        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom" class="mr-3">
           <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
-        </b-tooltip> &nbsp; &nbsp;
+        </b-tooltip>
         <b-tooltip :label="$t('help_item_noimage')" multilined position="is-bottom">
           <button class="button is-primary is-large is-outlined" @click="step = 2">{{ $t('i-do-not-have-image') }}</button>
         </b-tooltip>

@@ -47,7 +47,7 @@
 
 <script>
 import moment from 'moment/moment';
-import axios from "axios";
+import { logout } from '@/App.vue';
 
 export default {
   name: 'UserCard',
@@ -66,21 +66,7 @@ export default {
       return (moment(date).format('LL'));
     },
     async logout() {
-      try {
-        await axios.post('/api/v1/token/logout/');
-        axios.defaults.headers.common["Authorization"] = "";
-        localStorage.removeItem("token");
-        this.$store.commit('removeToken');
-        this.$store.commit('removeUserID');
-        await this.$router.push('/');
-      } catch (error) {
-        if (error.response) {
-          error = error.response.data;
-        } else if (error.message) {
-          error = error.message;
-        }
-        console.log(JSON.stringify(error));
-      }
+      logout(this)
     }
   }
 };

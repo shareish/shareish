@@ -21,7 +21,7 @@
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{ $t('conversations') }}
-        &nbsp;<span v-if="unreadMessages > 0" class="tag is-rounded">{{ unreadMessages }}</span>
+        <span v-if="unreadMessages > 0" class="tag is-rounded">{{ unreadMessages }}</span>
       </b-navbar-item>
     </template>
     <template #end>
@@ -61,6 +61,7 @@
 
 <script>
 import axios from 'axios';
+import { logout } from '@/App.vue';
 
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
 
@@ -80,12 +81,15 @@ export default {
     }
   },
   watch: {
-    async isAuthenticated(val) {
+    async isAuthenticated() {
       // Force update conversation notification when authenticated
       await this.fetchConversationUpdates();
     }
   },
   methods: {
+    async logout() {
+      logout(this)
+    },
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
         try {
@@ -102,23 +106,6 @@ export default {
     changeLanguage(lang) {
       localStorage.setItem('language', lang);
       this.$i18n.locale = lang;
-    },
-    async logout() {
-      try {
-        await axios.post('/api/v1/token/logout/');
-        axios.defaults.headers.common["Authorization"] = "";
-        localStorage.removeItem("token");
-        this.$store.commit('removeToken');
-        this.$store.commit('removeUserID');
-        await this.$router.push('/');
-      } catch (error) {
-        if (error.response) {
-          error = error.response.data;
-        } else if (error.message) {
-          error = error.message;
-        }
-        console.log(JSON.stringify(error));
-      }
     }
   },
   mounted() {
