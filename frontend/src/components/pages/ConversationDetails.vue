@@ -86,7 +86,7 @@ export default {
       if (this.messages.length === 0) {
         let types = {
           "DN": "donation",
-          "BR": "request",
+          "RQ": "request",
           "LN": "loan"
         }
         this.messageToSend = this.$t('intro-' + types[this.item.item_type] + '-first-message');

@@ -6,14 +6,14 @@
 const itemTypeIcons = {
   "DN": "is-success",
   "LN": "is-warning",
-  "BR": "is-danger",
+  "RQ": "is-danger",
   "EV": "is-purple"
 }
 
 const itemTypeSlug = {
   "DN": "donation",
   "LN": "loan",
-  "BR": "request",
+  "RQ": "request",
   "EV": "event"
 }
 

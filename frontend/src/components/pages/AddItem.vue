@@ -52,7 +52,7 @@
               </b-tooltip>
             </template>
             <b-select v-model="type" expanded name="type" v-validate="'required'">
-              <option value="BR">{{ $t('request') }}</option>
+              <option value="RQ">{{ $t('request') }}</option>
               <option value="DN">{{ $t('donation') }}</option>
               <option value="LN">{{ $t('loan') }}</option>
               <option value="EV">{{ $t('event') }}</option>

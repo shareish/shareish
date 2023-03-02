@@ -17,7 +17,7 @@
             </b-tooltip>
           </template>
           <b-select v-model="internalItem.item_type" expanded>
-            <option value="BR">{{ $t('request') }}</option>
+            <option value="RQ">{{ $t('request') }}</option>
             <option value="DN">{{ $t('donation') }}</option>
             <option value="LN">{{ $t('loan') }}</option>
             <option value="EV">{{ $t('event') }}</option>
@@ -137,8 +137,8 @@ export default {
           name: this.internalItem.name,
           item_type: this.internalItem.item_type,
           category1: this.internalItem.category1,
-          category2: (this.internalItem.category2) ? this.internalItem.category2 : '',
-          category3: (this.internalItem.category3) ? this.internalItem.category3 : '',
+          category2: this.internalItem.category2,
+          category3: this.internalItem.category3,
           description: this.internalItem.description,
           location: this.internalItem.address,
           is_recurrent: this.internalItem.is_recurrent,

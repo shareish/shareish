@@ -113,7 +113,7 @@ import ItemMapPopup from '@/components/ItemMapPopup';
 const itemTypeIcons = {
   "DN": greenIcon,
   "LN": yellowIcon,
-  "BR": redIcon,
+  "RQ": redIcon,
   "EV": eventIcon
 }
 

@@ -12,7 +12,7 @@
     <b-field :label="$t('item-type')">
       <b-select v-model="selectedType">
         <option :value="null">{{ $t('all') }}</option>
-        <option value="BR">{{ $t('request') }}</option>
+        <option value="RQ">{{ $t('request') }}</option>
         <option value="DN">{{ $t('donation') }}</option>
         <option value="LN">{{ $t('loan') }}</option>
         <option value="EV">{{ $t('event') }}</option>

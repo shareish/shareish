@@ -152,7 +152,7 @@ class Item(models.Model):
     class ItemType(models.TextChoices):
         DONATION = 'DN', _('Donation')
         LOAN = 'LN', _('Loan')
-        BARTER = 'BR', _('Request')
+        REQUEST = 'RQ', _('Request')
         EVENT = 'EV', _('Event')
 
     class Categories(models.TextChoices):
@@ -192,7 +192,7 @@ class Item(models.Model):
     is_recurrent = models.BooleanField(default=False)
     hitcount = models.IntegerField(verbose_name='Hit Count', default=0)
 
-    item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.BARTER)
+    item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
     category2 = models.CharField(max_length=2, choices=Categories.choices, null=True, default=None, blank=True)

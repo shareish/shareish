@@ -29,7 +29,7 @@ to_show = {
 item_types = {
     "DN": "Donation",
     "LN": "Loan",
-    "BR": "Request",
+    "RQ": "Request",
     "EV": "Event"
 }
 
