@@ -5,7 +5,7 @@
     <template v-else>
       <div v-if="items && items.length" class="columns">
         <div v-for="item in items" :key="`${item.id}-item-card-recurrent`" class="column is-one-quarter">
-          <item-card :item="item" :recurrent-list="true" :users="users" @submitAgain="$emit('submitAgain', $event)" />
+          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
         </div>
       </div>
       <div v-else>{{ $t('no-items') }}</div>
@@ -16,38 +16,33 @@
 <script>
 import ItemCard from '@/components/ItemCard';
 import axios from 'axios';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'RecurrentItemsList',
+  mixins: [ErrorHandler],
   components: {ItemCard},
   data() {
     return {
       items: [],
-      users: [],
       loading: true,
     }
   },
   methods: {
     async fetchItems() {
       try {
-        const uri = '/api/v1/recurrents/';
-        this.items = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
+        this.items = (await axios.get('/api/v1/recurrents/')).data;
       }
-    },
-    async fetchUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
+      catch (error) {
+        this.snackbarError(error);
       }
     }
   },
   async mounted() {
     this.loading = true;
-    await Promise.all([this.fetchItems(), this.fetchUsers()]);
+    await Promise.all([
+      this.fetchItems()
+    ]);
     this.loading = false;
   }
 };

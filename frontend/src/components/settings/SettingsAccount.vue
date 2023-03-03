@@ -22,9 +22,11 @@
 
 <script>
 import axios from 'axios';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'SettingsAccount',
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },

@@ -8,9 +8,9 @@
     />
     <b-loading v-if="pageLoading" :active="pageLoading" :is-full-page="false" />
     <div v-else ref="listItems" class="scrollable">
-      <div v-if="items && items.length" class="columns">
+      <div v-if="items && items.length" class="columns is-flex-wrap-wrap">
         <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
-          <item-card :item="item" :users="users" />
+          <item-card :item="item" />
         </div>
         <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
           <button v-if="!loadedAllItems" :class="{'is-loading': loading}" class="button is-primary" @click="loadItems()">
@@ -28,9 +28,11 @@ import _ from 'lodash';
 import ItemsFilters from '@/components/ItemsFilters';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'ItemsList',
+  mixins: [ErrorHandler],
   components: {ItemsFilters, ItemCard},
   data() {
     return {
@@ -44,8 +46,7 @@ export default {
       nbItemsPerPage: 20,
       loadedAllItems: false,
 
-      items: [],
-      users: []
+      items: []
     }
   },
   computed: {
@@ -88,25 +89,20 @@ export default {
         if (data.next === null) {
           this.loadedAllItems = true;
         }
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
 
       this.loading = false;
-    },
-    async fetchUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
-      }
     }
   },
   async mounted() {
     document.title = `Shareish | ${this.$t('items')}`;
     this.pageLoading = true;
-    await Promise.all([this.loadItems(), this.fetchUsers()]);
+    await Promise.all([
+        this.loadItems()
+    ]);
     this.pageLoading = false;
   },
   created: function () {
@@ -119,12 +115,6 @@ export default {
 </script>
 
 <style scoped>
-.columns {
-  flex-wrap: wrap;
-  /*justify-content: space-between;*/
-  align-content: flex-start;
-}
-
 .vertical-center {
   display: flex;
   flex-direction: row;

@@ -36,7 +36,7 @@
               @ready="openRoutedItemPopup(item.id)"
           >
             <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-              <item-map-popup :item="item" :users="users"/>
+              <item-map-popup :item="item" />
             </l-popup>
           </l-marker>
         </v-marker-cluster>
@@ -110,6 +110,7 @@ import {latLng} from "leaflet";
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from 'vue2-leaflet';
 import Vue2LeafletMarkercluster from 'vue2-leaflet-markercluster';
 import ItemMapPopup from '@/components/ItemMapPopup';
+import ErrorHandler from "@/components/ErrorHandler";
 
 const itemTypeIcons = {
   "DN": greenIcon,
@@ -122,6 +123,7 @@ const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
   name: 'ItemsMap',
+  mixins: [ErrorHandler],
   components: {
     ItemMapPopup,
     ItemsFilters,
@@ -249,20 +251,18 @@ export default {
       selectedType: null,
       selectedCategory: null,
       items: [],
-      users: [],
 
       routedItemError: false,
     }
   },
   async mounted() {
     document.title = `Shareish | ${this.$t('map')}`;
-    if (this.routedId) {
+    if (this.itemId) {
       await this.setRoutedItem();
     } else {
       this.setGeolocalizedPosition();
     }
     await Promise.all([
-      this.fetchUsers(),
       this.getItemsLocation(),
       this.fetchExtraLayersMakers()
     ]);
@@ -285,7 +285,7 @@ export default {
         search: this.searchString
       };
     },
-    routedId() {
+    itemId() {
       return Number(this.$route.query.id);
     }
   },
@@ -299,13 +299,13 @@ export default {
   methods: {
     async setRoutedItem() {
       try {
-        if (this.routedId === null) {
+        if (this.itemId === null) {
           this.setGeolocalizedPosition();
           this.routedItemError = true;
           console.log('Routed id is null');
         } else {
-          const item = (await axios.get(`/api/v1/items/${this.routedId}/`)).data;
-          await axios.get(`/api/v1/items/${this.routedId}/increase_hitcount`);
+          const item = (await axios.get(`/api/v1/items/${this.itemId}/`)).data;
+          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
           if (item['location'] === null) {
             this.setGeolocalizedPosition();
             this.routedItemError = true;
@@ -315,16 +315,17 @@ export default {
             this.center = latLng(...latLong);
           }
         }
-      } catch (error) {
+      }
+      catch (error) {
         this.setGeolocalizedPosition();
         this.routedItemError = true;
         console.log(error);
       }
     },
     openRoutedItemPopup(id) {
-      if (this.routedId && this.routedId === id && !this.routedItemError) {
+      if (this.itemId && this.itemId === id && !this.routedItemError) {
         this.$nextTick(() => {
-          this.$refs[`marker-item-${this.routedId}`][0].mapObject.openPopup();
+          this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
           //TODO: popup does not open when clustered. Probably need to to programmatically split the cluster.
         });
       }
@@ -358,7 +359,8 @@ export default {
             latLng: latLng(...latLong)
           };
         });
-      } catch (error) {
+      }
+      catch (error) {
         console.log(error);
       }
     },
@@ -402,7 +404,8 @@ export default {
               });
               return {...extraLayer, markers};
             }
-          } catch (error) {
+          }
+          catch (error) {
             console.log(error)
             return extraLayer;
           }
@@ -430,7 +433,8 @@ export default {
             return data;
           }
         })).data;
-      } catch (error) {
+      }
+      catch (error) {
         console.log(error);
         return []; // may happen if fallingfruit API returns an error
       }
@@ -449,7 +453,8 @@ export default {
       const baseURL = 'https://maps.mail.ru/osm/tools/overpass/api';
       try {
         return (await axios.get('/interpreter', {params: {data}, baseURL})).data['elements'];
-      } catch (error) {
+      }
+      catch (error) {
         return []; // may happen if overpass API returns an error
       }
     },
@@ -458,14 +463,6 @@ export default {
       this.mapLoading = true;
       await this.fetchExtraLayersMakers();
       this.mapLoading = false;
-    },
-    async fetchUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
-      }
     }
   }
 }

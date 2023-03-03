@@ -31,10 +31,12 @@ import moment from 'moment';
 
 export default {
   name: 'Message',
-  props: ['message', 'users'],
+  props: {
+    message: Object
+  },
   computed: {
     sender() {
-      return this.users.find(user => user.id === this.message.user) || {};
+      return this.message.user;
     },
     formattedDate() {
       return moment(this.message.date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();

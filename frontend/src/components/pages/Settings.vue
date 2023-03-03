@@ -47,9 +47,11 @@ import axios from 'axios';
 import SettingsProfile from "@/components/settings/SettingsProfile.vue";
 import SettingsNotifications from "@/components/settings/SettingsNotifications.vue";
 import SettingsAccount from "@/components/settings/SettingsAccount.vue";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'Settings',
+  mixins: [ErrorHandler],
   components: {SettingsAccount, SettingsNotifications, SettingsProfile},
   $_veeValidate: {
     validator: 'new'
@@ -82,7 +84,7 @@ export default {
       navigator.geolocation.getCurrentPosition(positon => {
         this.geoloc = positon;
       }, error => {
-        console.log(error);
+        this.snackbarError(error);
       }, {
         maximumAge: 10000,
         timeout: 5000,
@@ -96,8 +98,9 @@ export default {
     async fetchUser() {
       try {
         this.user = (await axios.get('/api/v1/users/me/')).data;
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     updateUser(user) {

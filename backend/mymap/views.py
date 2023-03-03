@@ -100,7 +100,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"serializer_errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
@@ -152,7 +152,6 @@ class ActiveItemViewSet(ItemViewSet):
 
 
 class UserItemViewSet(ItemViewSet):
-    queryset = Item.objects.all()
     filter_backends = [UserItemFilterBackend]
 
 

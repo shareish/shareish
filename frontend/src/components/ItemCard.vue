@@ -20,10 +20,10 @@
           <p class="mb-2">{{ truncate(item.description) }}</p>
           <p class="subtitle is-6 mt-0">
             <item-type-tag :type="item.item_type" />
-            <span v-if="user">
+            <span v-if="item.user">
               {{ $t('by') }}
-              <router-link :to="{name: 'userDetails', params: {id: user.id}}">
-                @{{ user.username }}
+              <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
+                @{{ item.user.username }}
               </router-link>
             </span>
           </p>
@@ -51,15 +51,15 @@
 import ItemTypeTag from '@/components/ItemTypeTag';
 import moment from 'moment/moment';
 import {categories} from '@/categories';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'ItemCard',
+  mixins: [ErrorHandler],
   components: {ItemTypeTag},
   props: {
     item: Object,
-    recurrentList: {type: Boolean, default: false},
-    userList: {type: Boolean, default: false},
-    users: Array
+    recurrentList: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -73,7 +73,7 @@ export default {
       navigator.geolocation.getCurrentPosition(positon => {
         this.geoloc = positon;
       }, error => {
-        console.log(error);
+        this.snackbarError(error);
       }, {
         maximumAge: 10000,
         timeout: 5000,
@@ -82,9 +82,6 @@ export default {
     }
   },
   computed: {
-    user() {
-      return this.users.find(user => user.id === this.item.user) || {};
-    },
     category1() {
       return this.category(this.item.category1);
     },
@@ -108,12 +105,7 @@ export default {
       return cat;
     },
     itemKind() {
-      if (this.recurrentList) {
-        return 'recurrent';
-      } else if (this.userList) {
-        return 'user';
-      }
-      return null;
+      return (this.recurrentList) ? 'recurrent' : null;
     },
     itemDetailQueryParams() {
       return (this.itemKind) ? {'kind': this.itemKind} : {};

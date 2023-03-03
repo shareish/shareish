@@ -6,44 +6,6 @@ from rest_framework import serializers
 
 from .models import Conversation, Item, ItemImage, Message, User, UserImage
 
-
-class ItemSerializer(serializers.ModelSerializer):
-    images = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = Item
-        fields = [
-            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type',
-            'category1', 'category2', 'category3', 'user', 'images', 'hitcount'
-        ]
-
-
-class ItemImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
-
-    class Meta:
-        model = ItemImage
-        fields = [
-            'id', 'image', 'item', 'url'
-        ]
-
-
-class MapItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Item
-        fields = [
-            'id', 'location'
-        ]
-
-
-class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Item
-        fields = [
-            'id', 'name', 'description'
-        ]
-
-
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
     images = serializers.StringRelatedField(many=True)
@@ -95,6 +57,44 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
         ]
 
 
+class ItemSerializer(serializers.ModelSerializer):
+    images = serializers.StringRelatedField(many=True)
+    user = UserSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = Item
+        fields = [
+            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'startdate', 'enddate', 'item_type',
+            'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
+        ]
+
+
+class ItemImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = ItemImage
+        fields = [
+            'id', 'image', 'item', 'url'
+        ]
+
+
+class MapItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = [
+            'id', 'location'
+        ]
+
+
+class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = [
+            'id', 'name', 'description'
+        ]
+
+
 class ConversationSerializer(serializers.ModelSerializer):
     unread_messages = serializers.SerializerMethodField()
 
@@ -112,8 +112,10 @@ class ConversationSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+
     class Meta:
         model = Message
         fields = [
-            'id', 'conversation', 'content', 'user', 'date', 'seen'
+            'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user'
         ]

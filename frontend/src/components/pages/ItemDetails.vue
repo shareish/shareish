@@ -61,7 +61,7 @@
                   </div>
                 </div>
                 <div v-if="address" class="content">
-                  <router-link :to="`/map?id=${item.id}`">
+                  <router-link :to="{name: 'itemsMap', query: {id: item.id}}">
                     {{ address }}
                   </router-link>
                 </div>
@@ -100,7 +100,7 @@ export default {
   data() {
     return {
       item: {},
-      users: [],
+      user: {},
       address: null,
 
       redirection: false,
@@ -108,20 +108,12 @@ export default {
     }
   },
   computed: {
-    itemId() {
-      return this.$route.params.id;
+    userId() {
+      return Number(this.item.user.id);
     },
-    itemApiUri() {
+    apiURI() {
       let kind = this.$route.query.kind;
-      if (kind === 'user') {
-        return 'user_items';
-      } else if (kind === 'recurrent') {
-        return 'recurrents';
-      }
-      return 'items';
-    },
-    user() {
-      return this.users.find(user => user.id === this.item.user) || {};
+      return (kind === 'recurrent') ? 'recurrents' : 'items';
     },
     isOwner() {
       return this.$store.state.user.id === this.user.id;
@@ -150,9 +142,11 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
-          this.item = (await axios.get(`/api/v1/${this.itemApiUri}/${this.itemId}/`)).data;
-          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
-        } catch (error) {
+          const item_id = this.$route.params.id;
+          this.item = (await axios.get(`/api/v1/${this.apiURI}/${item_id}/`)).data;
+          await axios.get(`/api/v1/items/${item_id}/increase_hitcount`);
+        }
+        catch (error) {
           this.snackbarError(error);
           this.redirection = true;
           await this.$router.push("/items");
@@ -164,17 +158,19 @@ export default {
         if (this.item.location !== null) {
           try {
             this.address = (await axios.post('/api/v1/address/', this.item.location)).data;
-          } catch (error) {
+          }
+          catch (error) {
             this.snackbarError(error);
           }
         }
       }
     },
-    async fetchUsers() {
+    async fetchUser() {
       if (!this.redirection) {
         try {
-          this.users = (await axios.get('/api/v1/webusers/')).data;
-        } catch (error) {
+          this.user = (await axios.get(`/api/v1/webusers/${this.userId}/`)).data;
+        }
+        catch (error) {
           this.snackbarError(error);
           this.redirection = true;
           await this.$router.push("/items");
@@ -197,8 +193,9 @@ export default {
         }
         const response = await axios.post('/api/v1/conversations/', data);
         await this.$router.push(`/conversations/${response.data['id']}`);
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async deleteItem() {
@@ -211,14 +208,9 @@ export default {
           pauseOnHover: true,
         });
         await this.$router.push('/items');
-      } catch (error) {
-        console.log(error);
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: this.$t('notif-error-item-delete'),
-          pauseOnHover: true,
-        })
+      }
+      catch (error) {
+        this.snackbarError(this.$t('notif-error-item-delete'));
       }
     },
     async updateItem(item) {
@@ -242,7 +234,7 @@ export default {
     this.loading = true;
     await this.fetchItem();
     await this.fetchAddress();
-    await this.fetchUsers();
+    await this.fetchUser();
     document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }

@@ -55,7 +55,7 @@ export default {
           message: this.$t('notif-success-email-activation'),
           pauseOnHover: true,
         });
-      } catch (error) {
+      } (error) {
         this.allowResend = true;
         let errorMessage;
         if (error.response) {
@@ -100,7 +100,8 @@ export default {
           message: this.$t('notif-success-resend-activation'),
           pauseOnHover: true,
         });
-      } catch (error) {
+      }
+      catch (error) {
         console.log(error);
         this.$buefy.snackbar.open({
           duration: 5000,

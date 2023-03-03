@@ -1,18 +1,17 @@
 <template>
   <div class="page-account">
-    <h1 class="title">{{ $t('my-account') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
-    <user-card v-else-if="user" :user="user" editable />
-    <h1 class="title">{{ $t('my-items') }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
-    <div v-else-if="items && items.length" class="columns">
-      <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
-        <item-card :item="item" :user-list="true" :users="itemUsers" />
+    <template v-else>
+      <h1 class="title">{{ $t('my-account') }}</h1>
+      <user-card v-if="user" :user="user" editable />
+      <h1 class="title">{{ $t('my-items') }}</h1>
+      <div v-if="items && items.length" class="columns is-flex-wrap-wrap">
+        <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
+          <item-card :item="item" />
+        </div>
       </div>
-    </div>
-    <div v-else>
-      {{ $t('no-items') }}
-    </div>
+      <div v-else>{{ $t('no-items') }}</div>
+    </template>
   </div>
 </template>
 
@@ -20,15 +19,16 @@
 import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'Account',
+  mixins: [ErrorHandler],
   components: {UserCard, ItemCard},
   data() {
     return {
-      user: null,
+      user: {},
       items: [],
-      itemUsers: [],
 
       loading: true
     }
@@ -37,24 +37,17 @@ export default {
     async fetchUser() {
       try {
         this.user = (await axios.get('/api/v1/users/me/')).data;
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async fetchItems() {
       try {
-        const uri = `/api/v1/user_items/`;
-        this.items = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
+        this.items = (await axios.get('/api/v1/user_items/')).data;
       }
-    },
-    async fetchItemUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.itemUsers = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     updateUser(user) {
@@ -65,8 +58,7 @@ export default {
     this.loading = true;
     await Promise.all([
       this.fetchUser(),
-      this.fetchItems(),
-      this.fetchItemUsers()
+      this.fetchItems()
     ]);
     this.loading = false;
   },
@@ -75,10 +67,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.columns {
-  flex-wrap: wrap;
-  align-content: flex-start;
-}
-</style>

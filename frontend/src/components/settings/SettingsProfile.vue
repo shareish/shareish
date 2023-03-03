@@ -122,11 +122,11 @@
 
 <script>
 import axios from 'axios';
-import SnackbarErrorMixin from "@/components/ErrorHandler";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'SettingsProfile',
-  mixins: [SnackbarErrorMixin],
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },

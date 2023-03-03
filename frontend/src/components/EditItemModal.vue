@@ -102,9 +102,11 @@
 import axios from 'axios';
 import moment from 'moment/moment';
 import CategorySelector from '@/components/CategorySelector';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'EditItemModal',
+  mixins: [ErrorHandler],
   components: {CategorySelector},
   props: {
     item: Object,
@@ -163,14 +165,9 @@ export default {
         });
         this.$emit('close');
         this.$emit('updateItem', item);
-      } catch (error) {
-        console.log(error);
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: this.$t('notif-error-item-update'),
-          pauseOnHover: true,
-        })
+      }
+      catch (error) {
+        this.snackbarError(this.$t('notif-error-item-update'));
       }
     },
   },

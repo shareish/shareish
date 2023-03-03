@@ -101,7 +101,8 @@ export default {
           message: this.$t('notif-success-user-sign-up'),
           pauseOnHover: true,
         });
-      } catch (error) {
+      }
+      catch (error) {
         if (error.response) {
           for (const property in error.response.data) {
             if (Array.isArray(error.response.data[property])) {

@@ -62,11 +62,13 @@
 <script>
 import axios from 'axios';
 import { logout } from '@/App.vue';
+import ErrorHandler from "@/components/ErrorHandler";
 
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
 
 export default {
   name: 'ShareishNavbar',
+  mixins: [ErrorHandler],
   data() {
     return {
       timeout: null
@@ -94,8 +96,9 @@ export default {
       if (this.isAuthenticated) {
         try {
           this.$store.state.notifications = (await axios.get('/api/v1/notifications/')).data['unread_messages'];
-        } catch (error) {
-          console.log(error);
+        }
+        catch (error) {
+          thi.snackbarError(error);
         }
       } else {
         this.$store.state.notifications = 0;

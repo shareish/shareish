@@ -88,11 +88,11 @@
 
 <script>
 import axios from 'axios';
-import SnackbarErrorMixin from "@/components/ErrorHandler";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'SettingsNotifications',
-  mixins: [SnackbarErrorMixin],
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },
@@ -133,7 +133,7 @@ export default {
       navigator.geolocation.getCurrentPosition(positon => {
         this.geoloc = positon;
       }, error => {
-        console.log(error);
+        this.snackbarError(error);
       }, {
         maximumAge: 10000,
         timeout: 5000,

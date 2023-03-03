@@ -31,11 +31,13 @@
 <script>
 import axios from 'axios';
 import moment from 'moment';
+import ErrorHandler from "@/components/ErrorHandler";
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 
 export default {
   name: 'Conversations',
+  mixins: [ErrorHandler],
   data() {
     return {
       loading: true,
@@ -47,11 +49,12 @@ export default {
     async fetchConversations() {
       try {
         this.conversations = (await axios.get('/api/v1/conversations/')).data;
-      } catch (error) {
-        console.log(error);
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
       }
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
+      catch (error) {
+        this.snackbarError(error);
+      }
     },
     formattedDate(date) {
       return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();

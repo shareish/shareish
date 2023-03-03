@@ -136,12 +136,12 @@
 import axios from 'axios';
 import RecurrentItemsList from '@/components/RecurrentItemsList';
 import CategorySelector from '@/components/CategorySelector';
-import SnackbarErrorMixin from "@/components/ErrorHandler";
+import ErrorHandler from "@/components/ErrorHandler";
 import moment from 'moment/moment';
 
 export default {
   name: 'AddItem',
-  mixins: [SnackbarErrorMixin],
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },
@@ -183,7 +183,7 @@ export default {
       navigator.geolocation.getCurrentPosition(positon => {
         this.geoloc = positon;
       }, error => {
-        console.log(error);
+        this.snackbarError(error);
       }, {
         maximumAge: 10000,
         timeout: 5000,
@@ -223,7 +223,7 @@ export default {
           this.location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
         }
         catch (error) {
-          console.log(JSON.stringify(error));
+          this.snackbarError(error);
         }
       }
     },
@@ -252,8 +252,9 @@ export default {
         this.suggestedName = predictions['suggested_class'];
         this.suggestedCategory = predictions['suggested_category'];
         this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
-      } catch (error) {
-        console.log(error);
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async submit() {
@@ -317,7 +318,7 @@ export default {
           this.$router.push(`/items/${item.id}`);
         }
         catch (error) {
-          this.snackbarError(error);
+          this.fullErrorHandling(error);
         }
       }
     },
@@ -336,7 +337,7 @@ export default {
           this.location = (await axios.post(`/api/v1/address/`, item.location)).data;
         }
         catch (error) {
-          console.log(error);
+          this.snackbarError(error);
         }
       }
 
