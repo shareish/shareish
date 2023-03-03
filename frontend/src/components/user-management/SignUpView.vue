@@ -75,14 +75,14 @@ export default {
       username: '',
       first_name: '',
       last_name: '',
-      errors: [],
+      errors: []
     }
   },
   mounted() {
     document.title = `Shareish | ${this.$t('sign-up')}`
   },
   methods: {
-    async submitForm(e) {
+    async submitForm() {
       this.errors.splice(0);
 
       const formData = {
@@ -99,17 +99,15 @@ export default {
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-user-sign-up'),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
       }
       catch (error) {
         if (error.response) {
           for (const property in error.response.data) {
             if (Array.isArray(error.response.data[property])) {
-              for (const idx in error.response.data[property]) {
-                const message = error.response.data[property][idx];
-                this.errors.push(`${property}: ${message}`);
-              }
+              for (const idx in error.response.data[property])
+                this.errors.push(`${property}: ${error.response.data[property][idx]}`);
             } else {
               this.errors.push(`${property}: ${error.response.data[property]}`);
             }
@@ -130,10 +128,10 @@ export default {
           duration: 5000,
           type: 'is-danger',
           message: errorMessage,
-          pauseOnHover: true,
+          pauseOnHover: true
         });
       }
     }
-  },
+  }
 }
 </script>

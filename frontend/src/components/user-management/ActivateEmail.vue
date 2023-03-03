@@ -21,9 +21,11 @@
 
 <script>
 import axios from 'axios'
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'ActivateEmail',
+  mixins: [ErrorHandler],
   data() {
     return {
       email: '',
@@ -48,14 +50,15 @@ export default {
 
       try {
         await axios.post("/api/v1/users/activation/", formData);
-        await this.$router.push('/');
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-email-activation'),
           pauseOnHover: true,
         });
-      } (error) {
+        await this.$router.push('/');
+      }
+      catch (error) {
         this.allowResend = true;
         let errorMessage;
         if (error.response) {
@@ -102,13 +105,7 @@ export default {
         });
       }
       catch (error) {
-        console.log(error);
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: this.$t('notif-error-resend-activation'),
-          pauseOnHover: true,
-        });
+        this.snackbarError(this.$t('notif-error-resend-activation'));
       }
     }
   }
