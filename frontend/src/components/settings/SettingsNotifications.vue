@@ -89,10 +89,11 @@
 <script>
 import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
+import WindowSize from "@/components/WindowSize";
 
 export default {
   name: 'SettingsNotifications',
-  mixins: [ErrorHandler],
+  mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'
   },
@@ -108,8 +109,7 @@ export default {
         'notif_conversations': String,
         'notif_events': String,
         'notif_items': String
-      },
-      windowWidth: window.innerWidth
+      }
     }
   },
   async created() {
@@ -190,9 +190,6 @@ export default {
           this.fullErrorHandling(error);
         }
       }
-    },
-    resizing() {
-      this.windowWidth = window.innerWidth;
     }
   },
   computed: {
@@ -253,15 +250,7 @@ export default {
         }
       ];
     }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.resizing);
-    });
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.resizing);
-  },
+  }
 };
 </script>
 

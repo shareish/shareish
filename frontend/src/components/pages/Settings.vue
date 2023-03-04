@@ -1,5 +1,5 @@
 <template>
-  <div class="page-account container">
+  <div id="page-settings" class="max-width-is-max-container">
     <h1 class="title mb-6">{{ $t('settings') }} & {{ $t('notifications') }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <div v-else class="columns is-variable" id="settings-split">
@@ -12,12 +12,6 @@
               {{ $t('profile') }}
             </router-link>
           </li>
-<!--          <li>-->
-<!--            <router-link to="/settings/privacy" :class="{'is-active': currentView === 'privacy'}">-->
-<!--              <i class="fas fa-lock"></i>-->
-<!--              {{ $t('privacy') }}-->
-<!--            </router-link>-->
-<!--          </li>-->
           <li>
             <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
               <i class="fas fa-cog"></i>
@@ -116,8 +110,17 @@ export default {
 </script>
 
 <style scoped>
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+
 #settings-split aside.menu {
   max-width: 250px;
+}
+
+.menu-list i {
+  margin-right: 3px;
 }
 
 @media screen and (max-width: 1023px) and (min-width: 767px) {
@@ -134,9 +137,5 @@ export default {
   #settings-split aside.menu {
     max-width: 100%;
   }
-}
-
-.menu-list i {
-  margin-right: 3px;
 }
 </style>

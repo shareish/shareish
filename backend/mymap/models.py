@@ -184,7 +184,7 @@ class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
     location = models.PointField(blank=True, geography=True, null=True)
-    creationdate = models.DateField(auto_now_add=True)
+    creationdate = models.DateTimeField(default=timezone.now)
     # save and add to serializer (?), to mail.py to filter based on creation rather than start,...
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)

@@ -1,14 +1,14 @@
 <template>
-  <div class="page-add-item">
-    <h1 class="title">
+  <div id="page-add-item">
+    <h1 class="title has-text-centered mb-6">
       {{ $t('add-new-item') }}
       <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
     </h1>
-    <b-loading :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-if="step === 0">
-      <div class="container has-text-centered buttons centered-container">
+      <div class="max-width-is-max-container has-text-centered buttons is-justify-content-center">
         <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom" class="mr-3">
           <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
         </b-tooltip>
@@ -19,8 +19,8 @@
       <recurrent-items-list @submitAgain="setRecurrentItem" />
     </template>
     <template v-else-if="step === 1">
-      <h2 class="subtitle">{{ $t('upload-your-item-image') }}</h2>
-      <div class="container has-text-centered centered-container">
+      <div class="container has-text-centered is-justify-content-center">
+        <h2 class="subtitle">{{ $t('upload-your-item-image') }}</h2>
         <div class="file is-boxed is-large">
           <label class="file-label">
             <input accept="image/*" :v-model="file" class="file-input" type="file" @change="uploadFile">
@@ -34,8 +34,8 @@
       </div>
     </template>
     <template v-else-if="step === 2">
-      <div class="columns">
-        <section class="column is-four-fifths">
+      <div class="columns max-width-is-max-container">
+        <section class="column is-8">
           <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
             <template #label>{{ $t('name') }}
               <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
@@ -115,7 +115,7 @@
             <button class="button is-primary" @click="submit">{{ $t('submit') }}</button>
           </div>
         </section>
-        <div class="column">
+        <div class="column is-4">
           <template v-if="!isFromRecurrent">
             <figure v-if="filePreview" class="image is-256x256">
               <img :src="filePreview" />
@@ -348,7 +348,12 @@ export default {
 </script>
 
 <style scoped>
-.centered-container, .file {
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+
+.file {
   justify-content: center;
 }
 </style>

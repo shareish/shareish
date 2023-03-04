@@ -131,7 +131,7 @@ views,views,vues
 save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
 help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
 submit,Submit,Soumettre
-ends,ends,se termine
+ends,Ends,Se termine
 submit-again,Submit again,Soumettre à nouveau
 profile,Profile,Profil
 my-conversations,My conversations,Mes conversations
@@ -190,12 +190,12 @@ post-message,Send message,Envoyer le message
 notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
-location,Location,Emplacement
+location,Location,Lieu
 no-address,No address provided,Pas d'adresse renseignée
-from,from,du
-since,since,depuis
+item-availability-from,From,À partir du
+item-availability-until,Until,Jusqu'au
 delete,Delete,Supprimer
-start-conversation,Start conversation,Commencer une conversation
+start-conversation,Start conversation,Lancer une conversation
 intro-donation-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
 intro-request-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
 intro-loan-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
@@ -233,3 +233,7 @@ notifications,Notifications,Notifications
 privacy,Privacy,Confidentialité
 account,Account,Compte
 general,General,Général
+joined,joined,a rejoint
+published,Published,Publié
+are-you-interested,Are you interested?,Vous êtes intéressé?
+management,Management,Gestion

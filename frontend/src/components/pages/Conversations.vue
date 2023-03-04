@@ -1,14 +1,14 @@
 <template>
-  <div class="page-add-item">
+  <div id="page-conversations" class="max-width-is-max-container">
     <h1 class="title">{{ $t('my-conversations') }}</h1>
-    <b-loading :active="loading" :is-full-page="false" />
-    <template v-if="conversations.length">
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <template v-else-if="conversations.length">
       <div v-for="conversation in conversations" :key="conversation.id" class="box">
         <div class="level">
           <div class="level-left">
             {{ conversation.slug }}
             <div v-if="conversation.lastmessagedate" class="is-size-7 has-text-grey ml-2">{{ $t('last-message') }}
-              {{ formattedDate(conversation.lastmessagedate) }}
+              {{ formattedDateFromNow(conversation.lastmessagedate) }}
             </div>
             <span v-if="conversation.unread_messages > 0" class="tag is-danger ml-2">
               {{ $tc('unread-messages', conversation.unread_messages, {count: conversation.unread_messages}) }}
@@ -56,12 +56,12 @@ export default {
         this.snackbarError(error);
       }
     },
-    formattedDate(date) {
-      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
-    },
+    formattedDateFromNow(date) {
+      return moment(date).locale(this.$i18n.locale).fromNow();
+    }
   },
-  mounted() {
-    this.fetchConversations();
+  async mounted() {
+    await this.fetchConversations();
     document.title = `Shareish | ${this.$t('my-conversations')}`;
     this.loading = false;
   },
@@ -70,3 +70,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+</style>

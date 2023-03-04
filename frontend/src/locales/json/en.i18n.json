@@ -130,7 +130,7 @@
   "save-as-recurrent-item": "Save as recurrent item",
   "help_item_recurrent": "Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)",
   "submit": "Submit",
-  "ends": "ends",
+  "ends": "Ends",
   "submit-again": "Submit again",
   "profile": "Profile",
   "my-conversations": "My conversations",
@@ -195,8 +195,8 @@
   "shared-by": "Shared by",
   "location": "Location",
   "no-address": "No address provided",
-  "from": "from",
-  "since": "since",
+  "item-availability-from": "From",
+  "item-availability-until": "Until",
   "delete": "Delete",
   "start-conversation": "Start conversation",
   "intro-donation-first-message": "Hello, thank you for your donation proposal. I am interested for ...",
@@ -235,5 +235,9 @@
   "notifications": "Notifications",
   "privacy": "Privacy",
   "account": "Account",
-  "general": "General"
+  "general": "General",
+  "joined": "joined",
+  "published": "Published",
+  "are-you-interested": "Are you interested?",
+  "management": "Management"
 }

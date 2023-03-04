@@ -31,8 +31,8 @@
       </div>
       <div class="content">
         <template v-if="!recurrentList">
-          <small class="is-block">{{ formattedDate(item.startdate) }}</small>
-          <small class="is-block" v-if="item.enddate"> {{ $t('ends') }} {{ formattedDate(item.enddate) }}</small>
+          <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+          <small class="is-block" v-if="item.enddate">{{ $t('ends') }} {{ formattedDateFromNow(item.enddate) }}</small>
           <small class="is-block" v-if="item.location && this.location">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
         </template>
       </div>
@@ -112,8 +112,8 @@ export default {
     }
   },
   methods: {
-    formattedDate(date) {
-      return moment(date, "YYYY-MM-DD[T]HH:mm:ss").locale(this.$i18n.locale).fromNow();
+    formattedDateFromNow(date) {
+      return moment(date).locale(this.$i18n.locale).fromNow();
     },
     truncate(description) {
       return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;

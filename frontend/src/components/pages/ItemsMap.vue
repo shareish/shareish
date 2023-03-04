@@ -1,5 +1,5 @@
 <template>
-  <div class="page-dashboard">
+  <div id="page-items-map">
     <items-filters
         @update:selectedType="selectedType = $event"
         @update:selectedCategory="selectedCategory = $event"

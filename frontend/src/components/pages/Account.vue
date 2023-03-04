@@ -1,12 +1,12 @@
 <template>
-  <div class="page-account">
+  <div id="page-account">
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
       <h1 class="title">{{ $t('my-account') }}</h1>
-      <user-card v-if="user" :user="user" editable />
+      <user-card v-if="user" :user="user" />
       <h1 class="title">{{ $t('my-items') }}</h1>
-      <div v-if="items && items.length" class="columns is-flex-wrap-wrap">
-        <div v-for="item in items" :key="`${item.id}-item-card`" class="column is-one-quarter">
+      <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
+        <div v-for="item in items" :key="`${item.id}-item-card`" class="column" :class="columnsWidthClass">
           <item-card :item="item" />
         </div>
       </div>
@@ -20,15 +20,17 @@ import UserCard from '@/components/UserCard';
 import axios from 'axios';
 import ItemCard from '@/components/ItemCard';
 import ErrorHandler from "@/components/ErrorHandler";
+import WindowSize from "@/components/WindowSize";
 
 export default {
   name: 'Account',
-  mixins: [ErrorHandler],
+  mixins: [ErrorHandler, WindowSize],
   components: {UserCard, ItemCard},
   data() {
     return {
       user: {},
       items: [],
+      columnsWidthClass: null,
 
       loading: true
     }
@@ -52,6 +54,29 @@ export default {
     },
     updateUser(user) {
       this.user = user;
+    },
+    windowWidthChanged() {
+      // Below or equal 520
+      let columnsWidthClass = "is-full";
+      if (this.windowWidth > 550) { // Arbitrary
+        columnsWidthClass = "is-half";
+        if (this.windowWidth > 768) { // Over PAL* (768x576)
+          columnsWidthClass = "is-one-third";
+          if (this.windowWidth > 1152) { // Over XGA+ (1152x864)
+            columnsWidthClass = "is-one-quarter";
+            if (this.windowWidth > 1600) { // Over UXGA (1600x1200)
+              columnsWidthClass = "is-one-fifth";
+              if (this.windowWidth > 2560) { // Over WQHD (2560x1440)
+                columnsWidthClass = "is-2";
+                if (this.windowWidth > 3840) { // Over UHD-1 (3840x2160)
+                  columnsWidthClass = "is-1";
+                }
+              }
+            }
+          }
+        }
+      }
+      this.columnsWidthClass = columnsWidthClass;
     }
   },
   async created() {

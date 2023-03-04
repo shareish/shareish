@@ -90,7 +90,7 @@ export default {
   },
   methods: {
     async logout() {
-      logout(this)
+      logout(this);
     },
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {

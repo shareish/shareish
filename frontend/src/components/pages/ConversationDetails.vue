@@ -1,5 +1,5 @@
 <template>
-  <div class="page-conversation-details">
+  <div id="page-conversation-details" class="max-width-is-max-container">
     <h1 class="title">{{ conversation.slug }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
@@ -187,6 +187,11 @@ export default {
 </script>
 
 <style scoped>
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+
 .image {
   width: 64px;
 }

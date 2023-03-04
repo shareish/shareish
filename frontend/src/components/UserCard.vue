@@ -1,45 +1,35 @@
 <template>
-  <div class="box">
+  <div class="box" ref="UserCard">
     <div class="media">
       <figure class="media-left">
-        <p class="image">
-          <router-link :to="{name: 'userDetails', params: {id: user.id}}">
-            <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
-            <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
-          </router-link>
-        </p>
+        <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
+          <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
+          <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
+        </router-link>
       </figure>
       <div class="media-content">
-        <h2 class="title is-3">
-          <router-link :to="{name: 'userDetails', params: {id: user.id}}">
-            {{ user.first_name }} {{ user.last_name }}
-          </router-link>
-        </h2>
-        <h2 class="subtitle is-4">@{{ user.username }}</h2>
-        ({{ $t('member_since') }} {{ formattedDate(user.sign_in_date) }})<br /><br />
-        {{ user.description }}
-
-        <nav class="level is-mobile">
-          <div class="level-left">
-            <a v-if="user.homepage_url" :href="user.homepage_url" class="level-item">
-              <span class="icon is-small"><i class="fas fa-globe"></i></span>
-            </a>
-            <a v-if="user.facebook_url" :href="user.facebook_url" class="level-item">
-              <span class="icon is-small"><i class="fab fa-facebook"></i></span>
-            </a>
-            <a v-if="user.instagram_url" :href="user.instagram_url" class="level-item">
-              <span class="icon is-small"><i class="fab fa-instagram"></i></span>
-            </a>
-          </div>
-        </nav>
-      </div>
-      <div v-if="editable && canEdit" class="media-right">
-        <div class="buttons">
-          <router-link to="/settings">
-            <button class="button is-primary">{{ $t('edit') }}</button>
-          </router-link>
-          <button class="button is-danger" @click="logout()">{{ $t('log-out') }}</button>
+        <h2 class="title" :class="titleSizeClass">{{ user.first_name }} {{ user.last_name }}</h2>
+        <div class="subtitle mb-3" :class="subtitleSizeClass">
+          <router-link :to="{name: 'userDetails', params: {id: user.id}}">@{{ user.username }}</router-link>
+          <template v-if="hasOneSocial">
+            &middot;
+            <nav class="socials">
+              <small>
+                <a v-if="user.homepage_url" :href="user.homepage_url" class="social" target="_blank">
+                  <span class="icon is-small"><i class="fas fa-globe"></i></span>
+                </a>
+                <a v-if="user.facebook_url" :href="user.facebook_url" class="social" target="_blank">
+                  <span class="icon is-small"><i class="fab fa-facebook"></i></span>
+                </a>
+                <a v-if="user.instagram_url" :href="user.instagram_url" class="social" target="_blank">
+                  <span class="icon is-small"><i class="fab fa-instagram"></i></span>
+                </a>
+              </small>
+            </nav>
+          </template>
+          <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_in_date) }})</p>
         </div>
+        <p class="description">{{ user.description }}</p>
       </div>
     </div>
   </div>
@@ -47,55 +37,78 @@
 
 <script>
 import moment from 'moment/moment';
-import { logout } from '@/App.vue';
+import WindowSize from "@/components/WindowSize";
 
 export default {
   name: 'UserCard',
+  mixins: [WindowSize],
   props: {
-    user: Object,
-    editable: {type: Boolean, default: false}
+    user: Object
+  },
+  data() {
+    return {
+      windowResizeWatchedRefsProperties: {
+        "UserCard": {
+          "clientWidth": 0
+        }
+      },
+      titleSizeClass: null,
+      subtitleSizeClass: null,
+      userImageSize: null
+    }
   },
   computed: {
-    canEdit() {
-      return this.user.id === this.$store.state.user.id;
+    hasOneSocial() {
+      return (this.user.homepage_url || this.user.facebook_url || this.user.instagram_url);
     }
   },
   methods: {
-    formattedDate(date) {
-      moment.locale(this.$i18n.locale);
-      return (moment(date).format('LL'));
+    formattedDateFromNow(date) {
+      return moment(date).locale(this.$i18n.locale).fromNow();
     },
-    async logout() {
-      logout(this)
+    windowWidthChanged() {
+      let userImageSize = 128;
+      let titleSizeClass = "is-3";
+      let subtitleSizeClass = "is-5";
+      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 680) {
+        userImageSize = 96;
+      }
+      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 590) {
+        userImageSize = 72;
+        titleSizeClass = "is-4";
+        subtitleSizeClass = "is-6";
+      }
+      this.titleSizeClass = titleSizeClass;
+      this.subtitleSizeClass = subtitleSizeClass;
+      this.userImageSize = userImageSize + "px";
     }
   }
 };
 </script>
 
 <style scoped>
-.media-left, .media-content {
-  margin-bottom: 1rem;
+.media-left .image {
+  width: v-bind('userImageSize');
 }
 
-.media-content {
-  margin-right: 1rem;
+.joined {
+  font-size: 0.8rem;
 }
 
-.media-right {
-  margin-left: 0 !important;
+nav.socials {
+  display: inline-block;
 }
 
-.media {
-  flex-wrap: wrap;
+nav.socials a.social {
+  margin-right: 5px;
 }
 
-.image {
-  width: 128px;
+nav.socials a.social:last-child {
+  margin-right: 0;
 }
 
-.title a {
-  color: #4a4a4a !important;
-}
+
+
 
 .media-right button {
   margin-left: 8px;

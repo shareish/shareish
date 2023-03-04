@@ -12,7 +12,7 @@
           <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="has-text-weight-bold">
             {{ sender.first_name }} {{ sender.last_name }}
           </router-link>
-          ·
+          &middot;
           <small>
             <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="username">
               @{{ sender.username }}
