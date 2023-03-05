@@ -36,7 +36,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 
 export default {
-  name: 'Conversations',
+  name: 'TheConversationsView',
   mixins: [ErrorHandler],
   data() {
     return {

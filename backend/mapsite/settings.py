@@ -218,7 +218,7 @@ SITE_NAME = 'Shareish'
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'reset-password/confirm/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,  # also send if email has changed
     'SEND_CONFIRMATION_EMAIL': True,  # registration or activation
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,

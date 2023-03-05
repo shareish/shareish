@@ -1,12 +1,11 @@
 <template>
-  <div class="page-signup">
+  <div id="page-sign-up">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('sign-up') }}
         <b-tooltip :label="$t('help_signup')" multilined position="is-right">
           <i class="icon far fa-question-circle"></i>
         </b-tooltip>
       </h1>
-
       <form @submit.prevent="submitForm">
         <div class="field">
           <label>{{ $t('email') }}</label>
@@ -16,7 +15,6 @@
             </b-tooltip>
           </div>
         </div>
-
         <div class="field">
           <label>{{ $t('username') }}</label>
           <div class="control">
@@ -25,7 +23,6 @@
             </b-tooltip>
           </div>
         </div>
-
         <div class="field">
           <label>{{ $t('firstname') }}</label>
           <div class="control">
@@ -34,7 +31,6 @@
             </b-tooltip>
           </div>
         </div>
-
         <div class="field">
           <label>{{ $t('lastname') }}</label>
           <div class="control">
@@ -43,7 +39,6 @@
             </b-tooltip>
           </div>
         </div>
-
         <div class="field">
           <label>{{ $t('password') }}</label>
           <div class="control">
@@ -52,7 +47,6 @@
             </b-tooltip>
           </div>
         </div>
-
         <div class="field">
           <div class="control">
             <button class="button is-success">{{ $t('sign-up') }}</button>
@@ -67,7 +61,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'SignUp',
+  name: 'TheSignUpView',
   data() {
     return {
       email: '',

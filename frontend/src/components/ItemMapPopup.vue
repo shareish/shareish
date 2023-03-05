@@ -53,8 +53,10 @@ export default {
   name: 'ItemMapPopup',
   components: {ItemTypeTag},
   props: {
-    item: Object,
-    user: Object
+    item: {
+      type: Object,
+      required: true
+    }
   },
   computed: {
     category1() {

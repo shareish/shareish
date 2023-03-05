@@ -19,7 +19,15 @@ const itemTypeSlug = {
 
 export default {
   name: 'ItemTypeTag',
-  props: ['type'],
+  props: {
+    type: {
+      type: String,
+      required: true,
+      validator: function (value) {
+        return ["DN", "LN", "RQ", "EV"].indexOf(value) !== -1;
+      }
+    }
+  },
   computed: {
     color() {
       return itemTypeIcons[this.type];

@@ -4,7 +4,7 @@
     <template v-else>
       <h1 class="title">{{ $t('my-recurrent-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
-        <div v-for="item in items" :key="`${item.id}-item-card-recurrent`" class="column" :class="columnsWidthClass">
+        <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
           <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
         </div>
       </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="columns">
+  <div id="page-activate" class="columns">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('activate-your-account') }}</h1>
       <form v-if="allowResend" @submit.prevent="resendActivation">
@@ -24,7 +24,7 @@ import axios from 'axios'
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'ActivateEmail',
+  name: 'TheActivateView',
   mixins: [ErrorHandler],
   data() {
     return {

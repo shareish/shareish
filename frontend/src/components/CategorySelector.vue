@@ -17,8 +17,14 @@ export default {
   props: {
     number: Number,
     value: String,
-    nullable: {type: Boolean, default: true},
-    expanded: {type: Boolean, default: false}
+    nullable: {
+      type: Boolean,
+      default: true
+    },
+    expanded: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     label() {

@@ -58,8 +58,14 @@ export default {
   mixins: [ErrorHandler],
   components: {ItemTypeTag},
   props: {
-    item: Object,
-    recurrentList: {type: Boolean, default: false}
+    item: {
+      type: Object,
+      required: true
+    },
+    recurrentList: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -92,17 +98,17 @@ export default {
       return this.category(this.item.category3);
     },
     categories() {
-      let cat = [];
+      let categories = [];
       if (this.category1) {
-        cat.push(this.category1);
+        categories.push(this.category1);
       }
       if (this.category2) {
-        cat.push(this.category2);
+        categories.push(this.category2);
       }
       if (this.category3) {
-        cat.push(this.category3);
+        categories.push(this.category3);
       }
-      return cat;
+      return categories;
     },
     itemKind() {
       return (this.recurrentList) ? 'recurrent' : null;

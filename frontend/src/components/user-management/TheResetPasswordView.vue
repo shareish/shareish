@@ -1,8 +1,7 @@
 <template>
-  <div class="page-signup">
+  <div id="page-reset-password" class="page-signup">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('reset-password') }}</h1>
-
       <form @submit.prevent="submitForm">
         <div class="field">
           <label>{{ $t('email') }}</label>
@@ -10,7 +9,6 @@
             <input v-model="email" class="input" name="email" required type="email">
           </div>
         </div>
-
         <div class="field">
           <div class="control">
             <button class="button is-success">{{ $t('reset-password') }}</button>
@@ -25,7 +23,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'ResetPassword',
+  name: 'TheResetPasswordView',
   data() {
     return {
       email: '',

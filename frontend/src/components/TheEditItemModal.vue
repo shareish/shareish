@@ -105,12 +105,18 @@ import CategorySelector from '@/components/CategorySelector';
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'EditItemModal',
+  name: 'TheEditItemModal',
   mixins: [ErrorHandler],
   components: {CategorySelector},
   props: {
-    item: Object,
-    address: String,
+    item: {
+      type: Object,
+      required: true
+    },
+    address: {
+      type: String,
+      required: true
+    },
   },
   data() {
     return {
@@ -119,7 +125,6 @@ export default {
       file: null,
     }
   },
-  computed: {},
   methods: {
     async save() {
       try {

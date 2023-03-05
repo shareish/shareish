@@ -30,9 +30,12 @@
 import moment from 'moment';
 
 export default {
-  name: 'Message',
+  name: 'ConversationMessage',
   props: {
-    message: Object
+    message: {
+      type: Object,
+      required: true
+    }
   },
   computed: {
     sender() {

@@ -1,12 +1,12 @@
 <template>
-  <div id="page-user-profile">
+  <div id="page-profile">
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
       <h1 class="title">@{{ user.username }}</h1>
       <user-card v-if="user" :user="user" />
       <h1 class="title">{{ $t('user-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
-        <div v-for="item in items" :key="`${item.id}-item-card`" class="column" :class="columnsWidthClass">
+        <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
           <item-card :item="item" />
         </div>
       </div>
@@ -23,7 +23,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'UserProfile',
+  name: 'TheProfileView',
   mixins: [ErrorHandler, WindowSize],
   components: {UserCard, ItemCard},
   data() {
@@ -38,7 +38,7 @@ export default {
   computed: {
     userId() {
       return Number(this.$route.params.id);
-    },
+    }
   },
   methods: {
     async fetchUser() {

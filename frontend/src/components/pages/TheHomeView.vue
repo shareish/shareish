@@ -97,7 +97,7 @@
 
 <script>
 export default {
-  name: 'HomeView',
+  name: 'TheHomeView',
   components: {},
   mounted() {
     document.title = "Shareish"

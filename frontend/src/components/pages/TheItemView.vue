@@ -1,6 +1,6 @@
 <template>
-  <div id="page-item-details" class="max-width-is-max-container">
-    <b-loading v-if="loading" :active="loading" :is-full-page="false"/>
+  <div id="page-item" class="max-width-is-max-container">
+    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
       <div class="columns">
         <section class="column is-5">
@@ -14,10 +14,10 @@
           </div>
           <article id="item-image">
             <div class="item-image-background">
-              <img :src="item.images[item.images.length - 1]"/>
+              <img :src="item.images[item.images.length - 1]" />
             </div>
             <figure>
-              <img :src="item.images[item.images.length - 1]"/>
+              <img :src="item.images[item.images.length - 1]" />
             </figure>
           </article>
           <div v-if="isOwner" id="item-management" class="level mt-3">
@@ -30,7 +30,7 @@
         </section>
         <section id="item-info" class="column is-7">
           <h1 class="title is-size-2">{{ item.name }}
-            <item-type-tag :type="item.item_type"/>
+            <item-type-tag :type="item.item_type" />
           </h1>
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}
@@ -87,7 +87,7 @@
                 <span>{{ $t('shared-by') }}</span>
               </div>
             </div>
-            <user-card :user="user"/>
+            <user-card :user="user" />
           </article>
           <article>
             <div class="title is-size-4 mb-1">
@@ -112,11 +112,11 @@ import moment from 'moment';
 import {categories} from '@/categories';
 import ItemTypeTag from '@/components/ItemTypeTag';
 import UserCard from '@/components/UserCard';
-import EditItemModal from "@/components/EditItemModal";
+import TheEditItemModal from "@/components/TheEditItemModal.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'ItemDetails',
+  name: 'TheItemView',
   mixins: [ErrorHandler],
   components: {UserCard, ItemTypeTag},
   data() {
@@ -134,8 +134,7 @@ export default {
       return Number(this.item.user.id);
     },
     apiURI() {
-      let kind = this.$route.query.kind;
-      return (kind === 'recurrent') ? 'recurrents' : 'items';
+      return (this.$route.query.kind === 'recurrent') ? 'recurrents' : 'items';
     },
     isOwner() {
       return this.$store.state.user.id === this.user.id;
@@ -232,9 +231,12 @@ export default {
     startEdition() {
       this.$buefy.modal.open({
         parent: this,
-        props: {item: this.item, address: this.address},
+        props: {
+          item: this.item,
+          address: this.address
+        },
         events: {updateItem: this.updateItem},
-        component: EditItemModal,
+        component: TheEditItemModal,
         hasModalCard: true,
         trapFocus: true,
       })

@@ -25,13 +25,16 @@ import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'SettingsAccount',
+  name: 'TheSettingsAccountView',
   mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },
   props: {
-    user: Object
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {

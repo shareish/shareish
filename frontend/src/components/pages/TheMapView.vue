@@ -1,5 +1,5 @@
 <template>
-  <div id="page-items-map">
+  <div id="page-map">
     <items-filters
         @update:selectedType="selectedType = $event"
         @update:selectedCategory="selectedCategory = $event"
@@ -23,7 +23,7 @@
         </div>
       </l-control>
 
-      <l-marker v-if="userPosition" :icon="userPositionIcon" :lat-lng="userPosition"/>
+      <l-marker v-if="userPosition" :icon="userPositionIcon" :lat-lng="userPosition" />
 
       <l-layer-group ref="layer">
         <v-marker-cluster :options="markerClusterGroupOptions">
@@ -122,7 +122,7 @@ const itemTypeIcons = {
 const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
-  name: 'ItemsMap',
+  name: 'TheMapView',
   mixins: [ErrorHandler],
   components: {
     ItemMapPopup,

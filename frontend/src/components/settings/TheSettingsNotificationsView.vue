@@ -44,42 +44,36 @@
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
-          <template v-for="{key, translationKey, color} in conversationsFrequencies">
-            <b-radio-button :key="key" v-model="radioGroups['notif_conversations']" :native-value="key" :type="color">
-              <span>{{ $t(translationKey) }}</span>
-            </b-radio-button>
-          </template>
+          <b-radio-button v-for="{key, translationKey, color} in conversationsFrequencies" :key="key" v-model="radioGroups['notif_conversations']" :native-value="key" :type="color">
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
         </template>
         <template v-else>
           <b-select v-model="radioGroups['notif_conversations']" placeholder="Select a frequency" expanded>
-            <option v-for="{key, translationKey} in frequencies" :value="key" :key="key">{{ $t(translationKey) }}</option>
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{ $t(translationKey) }}</option>
           </b-select>
         </template>
       </b-field>
     </div>
     <div class="box">
-      <template v-for="{field, translationKey, helpTranslationKey} in notificationsFields">
-        <b-field :key="field" horizontal>
-          <template #label>
-            <b-tooltip :label="$t(helpTranslationKey)" multilined position="is-right" class="frequency_label">
-              {{ $t(translationKey) }}
-              <i class="icon far fa-question-circle"></i>
-            </b-tooltip>
-          </template>
-          <template v-if="windowWidth >= 1024">
-            <template v-for="{key, translationKey, color} in frequencies">
-              <b-radio-button :key="key" v-model="radioGroups[field]" :native-value="key" :type="color">
-                <span>{{ $t(translationKey) }}</span>
-              </b-radio-button>
-            </template>
-          </template>
-          <template v-else>
-            <b-select v-model="radioGroups[field]" placeholder="Select a name" expanded>
-              <option v-for="{key, translationKey} in frequencies" :value="key" :key="key">{{ $t(translationKey) }}</option>
-            </b-select>
-          </template>
-        </b-field>
-      </template>
+      <b-field v-for="{field, translationKey, helpTranslationKey} in notificationsFields" :key="field" horizontal>
+        <template #label>
+          <b-tooltip :label="$t(helpTranslationKey)" multilined position="is-right" class="frequency_label">
+            {{ $t(translationKey) }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </template>
+        <template v-if="windowWidth >= 1024">
+          <b-radio-button v-for="{key, translationKey, color} in frequencies" :key="key" v-model="radioGroups[field]" :native-value="key" :type="color">
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
+        </template>
+        <template v-else>
+          <b-select v-model="radioGroups[field]" placeholder="Select a name" expanded>
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{ $t(translationKey) }}</option>
+          </b-select>
+        </template>
+      </b-field>
     </div>
     <b-button :label="$t('save')" type="is-primary" @click="save" />
   </section>
@@ -92,13 +86,16 @@ import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'SettingsNotifications',
+  name: 'TheSettingsNotificationsView',
   mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'
   },
   props: {
-    user: Object
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {

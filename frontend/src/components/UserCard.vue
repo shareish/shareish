@@ -43,7 +43,10 @@ export default {
   name: 'UserCard',
   mixins: [WindowSize],
   props: {
-    user: Object
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {

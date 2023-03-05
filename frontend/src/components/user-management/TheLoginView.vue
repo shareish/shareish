@@ -1,8 +1,7 @@
 <template>
-  <div class="columns">
+  <div id="page-log-in" class="columns">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('log-in') }}</h1>
-
       <form @submit.prevent="submitForm">
         <div class="field">
           <label>{{ $t('email') }}</label>
@@ -10,18 +9,12 @@
             <input v-model="email" class="input" name="email" type="email">
           </div>
         </div>
-
         <div class="field">
           <label>{{ $t('password') }}</label>
           <div class="control">
             <input v-model="password" class="input" name="password" type="password">
           </div>
         </div>
-
-        <div v-if="errors.length" class="notification is-danger">
-          <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-        </div>
-
         <div class="field">
           <div class="control">
             <button class="button is-success">{{ $t('log-in') }}</button>
@@ -38,13 +31,12 @@ import axios from 'axios'
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: "Login",
+  name: "TheLoginView",
   mixins: [ErrorHandler],
   data() {
     return {
       email: '',
-      password: '',
-      errors: []
+      password: ''
     }
   },
   mounted() {

@@ -1,6 +1,6 @@
 <template>
   <div id="wrapper" class="wrapper">
-    <shareish-navbar />
+    <the-navbar />
     <section class="section">
       <router-view />
     </section>
@@ -46,7 +46,7 @@
 
 <script>
 import axios from 'axios'
-import ShareishNavbar from '@/components/ShareishNavbar';
+import TheNavbar from '@/components/TheNavbar.vue';
 import ErrorHandler from "@/components/ErrorHandler";
 
 export async function logout(instance) {
@@ -65,7 +65,7 @@ export async function logout(instance) {
 
 export default {
   name: 'App',
-  components: {ShareishNavbar},
+  components: {TheNavbar},
   beforeCreate() {
     this.$store.commit('initializeStore');
     const token = this.$store.state.token;

@@ -1,5 +1,5 @@
 <template>
-  <div id="page-item-list">
+  <div id="page-items">
     <items-filters
         @update:selectedType="selectedType = $event"
         @update:selectedCategory="selectedCategory = $event"
@@ -8,7 +8,7 @@
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <div v-else ref="listItems" class="scrollable">
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
-        <div v-for="item in items" :key="`${item.id}-item-card`" class="column" :class="columnsWidthClass">
+        <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
           <item-card :item="item" />
         </div>
         <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
@@ -31,7 +31,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'ItemsList',
+  name: 'TheItemsView',
   mixins: [ErrorHandler, WindowSize],
   components: {ItemsFilters, ItemCard},
   data() {
@@ -56,7 +56,7 @@ export default {
         search: this.searchString,
         item_type: this.selectedType,
         category: this.selectedCategory
-      }
+      };
     }
   },
   watch: {

@@ -18,7 +18,7 @@
         <option value="EV">{{ $t('event') }}</option>
       </b-select>
     </b-field>
-    <category-selector v-model="selectedCategory"></category-selector>
+    <category-selector v-model="selectedCategory" />
   </b-field>
 </template>
 
@@ -36,7 +36,6 @@ export default {
       searchString: '',
     }
   },
-  computed: {},
   watch: {
     selectedCategory() {
       this.$emit('update:selectedCategory', this.selectedCategory);

@@ -21,7 +21,7 @@
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{ $t('conversations') }}
-        <span v-if="unreadMessages > 0" class="tag is-rounded">{{ unreadMessages }}</span>
+        <span v-if="unreadMessagesCount > 0" class="tag is-rounded">{{ unreadMessagesCount }}</span>
       </b-navbar-item>
     </template>
     <template #end>
@@ -67,7 +67,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
 
 export default {
-  name: 'ShareishNavbar',
+  name: 'TheNavbar',
   mixins: [ErrorHandler],
   data() {
     return {
@@ -78,8 +78,8 @@ export default {
     isAuthenticated() {
       return this.$store.state.isAuthenticated;
     },
-    unreadMessages() {
-      return this.$store.state.notifications;
+    unreadMessagesCount() {
+      return Number(this.$store.state.notifications);
     }
   },
   watch: {

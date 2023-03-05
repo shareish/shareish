@@ -1,5 +1,5 @@
 <template>
-  <div id="page-conversation-details" class="max-width-is-max-container">
+  <div id="page-conversation" class="max-width-is-max-container">
     <h1 class="title">{{ conversation.slug }}</h1>
     <b-loading v-if="loading" :active="loading" :is-full-page="false" />
     <template v-else>
@@ -25,7 +25,7 @@
               </div>
             </div>
           </article>
-          <message v-for="message in messages" :key="message.id" :message="message" />
+          <conversation-message v-for="message in messages" :key="message.id" :message="message" />
         </div>
         <div class="column">
           <item-card :item="item" />
@@ -37,14 +37,14 @@
 
 <script>
 import ItemCard from '@/components/ItemCard';
-import Message from '@/components/Message';
+import ConversationMessage from '@/components/ConversationMessage.vue';
 import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'ConversationDetails',
+  name: 'TheConversationView',
   mixins: [ErrorHandler],
-  components: {ItemCard, Message},
+  components: {ItemCard, ConversationMessage},
   data() {
     return {
       conversation: {},

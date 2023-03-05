@@ -140,7 +140,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 import moment from 'moment/moment';
 
 export default {
-  name: 'AddItem',
+  name: 'TheAddItemView',
   mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
@@ -198,7 +198,7 @@ export default {
       return {
         code: this.errorCode,
         message: this.errorMessage
-      }
+      };
     },
     isFromRecurrent() {
       return this.recurrentFrom !== null;
