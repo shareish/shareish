@@ -37,14 +37,12 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         )
 
     async def conversation_message(self, event):
-        message = event['message']
-
-        await self.send(text_data=json.dumps(MessageSerializer(message).data))
+        await self.send(text_data=event['message'])
 
     @sync_to_async
     def save_message(self, content, user_id, conversation_id, date):
         notify_with_email = False
-        last_message_from_sender = Message.objects.filter(conversation_id=conversation_id, user_id=user_id).last()
+        last_message_from_sender = Message.objects.filter(conversation_id=conversation_id, user_id=user_id).order_by("date").last()
         if last_message_from_sender is not None:
             from .mail import delay_instant_notif_conversations
 
@@ -67,4 +65,4 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)
         Conversation.objects.filter(pk=conversation_id).update(lastmessagedate=datetime.now(timezone.utc))
 
-        return message
+        return json.dumps(MessageSerializer(message).data)
