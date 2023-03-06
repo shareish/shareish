@@ -224,7 +224,6 @@
   "notif-error-password-reset": "An error prevented to change your password.",
   "edit-item": "Edit an item",
   "notif-success-item-update": "The item has been successfully edited",
-  "notif-error-item-update": "An error prevented the item to be edited",
   "item-image": "Image",
   "item-image-info": "Only upload image to replace existing one.",
   "unread-messages": "- | 1 unread message | {count} unread messages",

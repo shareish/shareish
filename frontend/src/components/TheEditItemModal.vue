@@ -56,8 +56,17 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-datetimepicker v-model="internalItem.startdate" icon="calendar" icon-pack="fas">
-            </b-datetimepicker>
+            <b-datetimepicker
+                v-model="internalItem.startdate"
+                :max-datetime="internalItem.enddate"
+                icon="calendar"
+                :icon-right="internalItem.startdate ? 'close-circle' : ''"
+                icon-right-clickable
+                @icon-right-click="clearStartdate"
+                icon-pack="fas"
+                :locale="$i18n.locale"
+                @change="startdateChanged"
+            />
           </b-field>
           <b-field expanded>
             <template #label> {{ $t('end-date') }}
@@ -65,8 +74,17 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-datetimepicker v-model="internalItem.enddate" :min-date="internalItem.startdate" icon="calendar" icon-pack="fas">
-            </b-datetimepicker>
+            <b-datetimepicker
+                v-model="internalItem.enddate"
+                :min-datetime="internalItem.startdate"
+                icon="calendar"
+                :icon-right="internalItem.enddate ? 'close-circle' : ''"
+                icon-right-clickable
+                @icon-right-click="clearEnddate"
+                icon-pack="fas"
+                :locale="$i18n.locale"
+                @change="enddateChanged"
+            />
           </b-field>
         </b-field>
         <b-field>
@@ -77,7 +95,6 @@
             </b-tooltip>
           </b-checkbox>
         </b-field>
-
         <b-field :label="$t('item-image')" :message="$t('item-image-info')">
           <b-field :class="{'has-name': !!file}" class="file is-primary">
             <b-upload v-model="file" accept="image/*" class="file-label" validationMessage="Please select a file">
@@ -113,17 +130,15 @@ export default {
       type: Object,
       required: true
     },
-    address: {
-      type: String,
-      required: true
-    }
+    address: String
   },
   data() {
     return {
       internalItem: {},
       displayErrors: false,
       file: null,
-      waitingFormResponse: false
+      waitingFormResponse: false,
+      initialStartdate: Date.now()
     }
   },
   methods: {
@@ -132,16 +147,16 @@ export default {
 
       try {
         let startDate;
-        if (this.internalItem.startdate) {
-          startDate = moment(this.internalItem.startdate).format('YYYY-MM-DD[T]HH:mm:ss');
-        } else {
-          startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
-        }
+        if (this.internalItem.startdate)
+          startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+        else
+          startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
         let endDate;
-        if (this.internalItem.enddate) {
-          endDate = moment(this.internalItem.enddate).format('YYYY-MM-DD[T]HH:mm:ss');
-        }
+        if (this.internalItem.enddate)
+          endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+        else
+          endDate = null;
 
         let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
           name: this.internalItem.name,
@@ -160,7 +175,7 @@ export default {
           let data = new FormData();
           data.append('item_id', this.item.id);
           data.append('image', this.file);
-          let image_url = (await axios.post('/api/v1/images/', data)).data;
+          let image_url = (await axios.post("/api/v1/images/", data)).data;
           item.images.push(image_url);
           this.file = null;
         }
@@ -175,10 +190,30 @@ export default {
         this.$emit('updateItem', item);
       }
       catch (error) {
-        this.snackbarError(this.$t('notif-error-item-update'));
+        this.fullErrorHandling(error);
       }
 
       this.waitingFormResponse = false;
+    },
+    clearStartdate() {
+      this.internalItem.startdate = this.initialStartdate;
+      this.startdateChanged();
+    },
+    clearEnddate() {
+      this.internalItem.enddate = null;
+      this.enddateChanged();
+    },
+    startdateChanged() {
+      if (this.internalItem.enddate && this.internalItem.startdate) {
+        if (this.internalItem.startdate > this.internalItem.enddate)
+          this.internalItem.enddate = this.internalItem.startdate;
+      }
+    },
+    enddateChanged() {
+      if (this.internalItem.enddate && this.internalItem.startdate) {
+        if (this.internalItem.enddate < this.internalItem.startdate)
+          this.internalItem.startdate = this.internalItem.enddate;
+      }
     }
   },
   mounted() {
@@ -186,11 +221,13 @@ export default {
     
     if (this.internalItem.startdate)
       this.internalItem.startdate = new Date(this.internalItem.startdate);
+    this.initialStartdate = this.internalItem.startdate;
 
     if (this.internalItem.enddate)
       this.internalItem.enddate = new Date(this.internalItem.enddate);
 
     this.internalItem.address = this.address;
+
     delete this.internalItem.images;
   }
 };

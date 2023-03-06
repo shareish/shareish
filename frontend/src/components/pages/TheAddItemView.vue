@@ -44,7 +44,6 @@
             </template>
             <b-input v-model="name" name="name" v-validate="'required'" />
           </b-field>
-
           <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
             <template #label>{{ $t('item-type') }}
               <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
@@ -58,7 +57,6 @@
               <option value="EV">{{ $t('event') }}</option>
             </b-select>
           </b-field>
-
           <div class="columns">
             <b-tooltip :label="$t('help_item_category')" multilined position="is-right">
               <category-selector v-model="category1" :number="1" class="column" expanded />
@@ -71,7 +69,7 @@
               <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
-              <b-button size="is-small" @click="copyGeoLocAddress">
+              <b-button size="is-small" @click="fetchAddressGeoLoc">
                 <i class="icon fas fa-map-marker-alt"></i>
               </b-button>
             </template>
@@ -92,7 +90,17 @@
                   <i class="icon far fa-question-circle"></i>
                 </b-tooltip>
               </template>
-              <b-datetimepicker v-model="startDate" icon="calendar" icon-pack="fas"></b-datetimepicker>
+              <b-datetimepicker
+                  v-model="startdate"
+                  :max-datetime="enddate"
+                  icon="calendar"
+                  :icon-right="startdate ? 'close-circle' : ''"
+                  icon-right-clickable
+                  @icon-right-click="clearStartdate"
+                  icon-pack="fas"
+                  :locale="$i18n.locale"
+                  @change="startdateChanged"
+              />
             </b-field>
             <b-field expanded>
               <template #label> {{ $t('end-date') }}
@@ -100,7 +108,17 @@
                   <i class="icon far fa-question-circle"></i>
                 </b-tooltip>
               </template>
-              <b-datetimepicker v-model="endDate" :min-date="startDate" icon="calendar" icon-pack="fas"></b-datetimepicker>
+            <b-datetimepicker
+                v-model="enddate"
+                :min-datetime="startdate"
+                icon="calendar"
+                :icon-right="enddate ? 'close-circle' : ''"
+                icon-right-clickable
+                @icon-right-click="clearEnddate"
+                icon-pack="fas"
+                :locale="$i18n.locale"
+                @change="enddateChanged"
+            />
             </b-field>
           </b-field>
           <b-field>
@@ -150,8 +168,6 @@ export default {
     return {
       loading: false,
       step: 0,
-      errorCode: null,
-      errorMessage: null,
 
       file: null,
       filePreview: null,
@@ -160,8 +176,8 @@ export default {
       suggestedCategory: null,
       suggestedDescription: null,
 
-      name: '',
-      description: '',
+      name: "",
+      description: "",
       type: null,
       category1: '',
       category2: '',
@@ -170,8 +186,8 @@ export default {
       isRecurrent: false,
       recurrentFrom: null,
       recurrentImages: [],
-      startDate: null,
-      endDate: null,
+      startdate: null,
+      enddate: null,
 
       geoloc: null,
       waitingFormResponse: false
@@ -179,7 +195,7 @@ export default {
   },
   created() {
     // Has the user activated geolocation?
-    if ("geolocation" in navigator) {
+    if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(positon => {
         this.geoloc = positon;
@@ -195,36 +211,25 @@ export default {
     document.title = `Shareish | ${this.$t('add-new-item')}`;
   },
   computed: {
-    error() {
-      return {
-        code: this.errorCode,
-        message: this.errorMessage
-      };
-    },
     isFromRecurrent() {
       return this.recurrentFrom !== null;
     }
   },
-  watch: {
-    error() {
-      this.$buefy.snackbar.open({
-        duration: 5000,
-        type: 'is-danger',
-        message: `Error ${this.error.code}: ${this.error.message}`,
-        pauseOnHover: true,
-      });
-    }
-  },
   methods: {
-    async copyGeoLocAddress() {
+    async fetchAddressGeoLoc() {
+      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoloc !== null) {
-        var geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')'
-
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
+        this.fetchAddress(geoLocPoint);
+      }
+    },
+    async fetchAddress(location) {
+      if (location !== null) {
         try {
-          this.location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
+          this.location = (await axios.post("/api/v1/address/", location)).data;
         }
         catch (error) {
-          this.snackbarError(error);
+          this.fullErrorHandling(error);
         }
       }
     },
@@ -249,7 +254,7 @@ export default {
       try {
         let data = new FormData();
         data.append('image', this.file);
-        const predictions = (await axios.post('/api/v1/predictClass/', data)).data;
+        const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
         this.suggestedName = predictions['suggested_class'];
         this.suggestedCategory = predictions['suggested_category'];
         this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
@@ -263,23 +268,20 @@ export default {
 
       let result = await this.$validator.validateAll();
       if (result) {
-        this.errorCode = null;
-        this.errorMessage = null;
-
         let startDate;
-        if (this.startDate) {
-          startDate = moment(this.startDate).format('YYYY-MM-DD[T]HH:mm:ss');
-        } else {
-          startDate = moment().format('YYYY-MM-DD[T]HH:mm:ss');
-        }
+        if (this.startdate)
+          startDate = moment(this.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+        else
+          startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
         let endDate;
-        if (this.endDate) {
-          endDate = moment(this.endDate).format('YYYY-MM-DD[T]HH:mm:ss');
-        }
+        if (this.enddate)
+          endDate = moment(this.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+        else
+          endDate = null;
 
         try {
-          let item = (await axios.post('/api/v1/items/', {
+          let item = (await axios.post("/api/v1/items/", {
             name: this.name,
             item_type: this.type,
             category1: this.category1,
@@ -339,7 +341,7 @@ export default {
 
       if (item.location !== null) {
         try {
-          this.location = (await axios.post(`/api/v1/address/`, item.location)).data;
+          this.location = (await axios.post("/api/v1/address/", item.location)).data;
         }
         catch (error) {
           this.snackbarError(error);
@@ -347,6 +349,26 @@ export default {
       }
 
       this.step = 2;
+    },
+    clearStartdate() {
+      this.startdate = null;
+      this.startdateChanged();
+    },
+    clearEnddate() {
+      this.enddate = null;
+      this.enddateChanged();
+    },
+    startdateChanged() {
+      if (this.enddate && this.startdate) {
+        if (this.startdate > this.enddate)
+          this.enddate = this.startdate;
+      }
+    },
+    enddateChanged() {
+      if (this.enddate && this.startdate) {
+        if (this.enddate < this.startdate)
+          this.startdate = this.enddate;
+      }
     }
   }
 };

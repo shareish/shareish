@@ -9,10 +9,6 @@ export default {
         // Error received from Axios
         this.code = error.response.status;
 
-        console.log(typeof data);
-        console.log("detail" in error.response.data);
-        console.log(typeof error.response.data.detail);
-
         if (typeof error.response.data === 'string') {
           this.message = error.response.data;
         } else {
