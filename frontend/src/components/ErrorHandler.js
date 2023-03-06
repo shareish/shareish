@@ -5,52 +5,57 @@ export default {
   }),
   methods: {
     snackbarError(error, replace = true) {
-      if (this.isFromAxios()) {
+      if (this.isFromAxios(error)) {
         // Error received from Axios
         this.code = error.response.status;
 
+        console.log(typeof data);
+        console.log("detail" in error.response.data);
+        console.log(typeof error.response.data.detail);
+
         if (typeof error.response.data === 'string') {
           this.message = error.response.data;
-        } else if (typeof data === "object") {
-          if ("message" in error.response.data && typeof error.response.data.message === 'string') {
-            this.message = error.response.data.message;
-          } else if ("error" in error.response.data && typeof error.response.data.error === 'string') {
-            this.message = error.response.data.error;
-          } else {
-            this.unableToParse();
-          }
         } else {
-          this.unableToParse();
+          const data = error.response.data;
+          if (typeof data === "object") {
+            if (this.keyInDictIsString("message", data)) {
+              this.message = data.message;
+            } else if (this.keyInDictIsString("error", data)) {
+              this.message = data.error;
+            } else if (this.keyInDictIsString("detail", data)) {
+              this.message = data.detail;
+            } else {
+              this.unableToParse(error);
+            }
+          } else {
+            this.unableToParse(error);
+          }
         }
       } else if (typeof error === "object") {
         if ("message" in error && typeof error.message === 'string') {
           // Error is a casual Exception that have been caught
           this.message = error.message;
         } else {
-          this.unableToParse();
+          this.unableToParse(error);
         }
       } else if (typeof error === 'string') {
         // Error is sent from Vue file intendedly
         this.message = error;
       } else {
-        this.unableToParse();
+        this.unableToParse(error);
       }
 
       // Building error message
-      let message = "Error";
+      let snackbarMessage = "";
       if (this.code != null)
-        message += ` ${this.code}`;
-      message += ": ";
-      if (this.message != null)
-        message += `${this.message}`;
-      else
-        message += "No message provided.";
+        snackbarMessage += `Error ${this.code}: `;
+      snackbarMessage += (this.message != null) ? this.message : "No message provided.";
 
       // Displaying the error
       this.$buefy.snackbar.open({
         duration: 5000,
         type: 'is-danger',
-        message: message,
+        message: snackbarMessage,
         pauseOnHover: true,
         queue: replace,
         position: "is-bottom-right"
@@ -78,7 +83,7 @@ export default {
       this.code = null;
       this.message = null;
     },
-    unableToParse() {
+    unableToParse(error) {
       this.message = "Unable to parse error, please check console.";
       console.log(error);
     },
@@ -87,6 +92,9 @@ export default {
     },
     isSerializationError(error) {
       return (this.isFromAxios(error) && typeof error.response.data === "object" && "serializer_errors" in error.response.data);
+    },
+    keyInDictIsString(elem, dict) {
+      return elem in dict && typeof dict[elem] === 'string'
     }
   }
 }
