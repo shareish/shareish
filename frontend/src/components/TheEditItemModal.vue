@@ -92,7 +92,7 @@
       </section>
       <footer class="modal-card-foot">
         <b-button :label="$t('cancel')" @click="$emit('close')" />
-        <b-button :label="$t('save')" type="is-primary" @click="save" />
+        <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
       </footer>
     </div>
   </form>
@@ -116,17 +116,20 @@ export default {
     address: {
       type: String,
       required: true
-    },
+    }
   },
   data() {
     return {
       internalItem: {},
       displayErrors: false,
       file: null,
+      waitingFormResponse: false
     }
   },
   methods: {
     async save() {
+      this.waitingFormResponse = true;
+
       try {
         let startDate;
         if (this.internalItem.startdate) {
@@ -174,16 +177,19 @@ export default {
       catch (error) {
         this.snackbarError(this.$t('notif-error-item-update'));
       }
-    },
+
+      this.waitingFormResponse = false;
+    }
   },
   mounted() {
     this.internalItem = {...this.item};
-    if (this.internalItem.startdate) {
+    
+    if (this.internalItem.startdate)
       this.internalItem.startdate = new Date(this.internalItem.startdate);
-    }
-    if (this.internalItem.enddate) {
+
+    if (this.internalItem.enddate)
       this.internalItem.enddate = new Date(this.internalItem.enddate);
-    }
+
     this.internalItem.address = this.address;
     delete this.internalItem.images;
   }

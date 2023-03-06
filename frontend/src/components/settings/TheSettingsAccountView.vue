@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <b-button :label="$t('save')" type="is-primary" @click="save" />
+    <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
 </template>
 
@@ -38,7 +38,8 @@ export default {
   },
   data() {
     return {
-      internalUser: null
+      internalUser: null,
+      waitingFormResponse: false
     }
   },
   created() {
@@ -47,6 +48,8 @@ export default {
   },
   methods: {
     async save() {
+      this.waitingFormResponse = true;
+
       let result = await this.$validator.validateAll();
       if (result) {
         try {
@@ -69,6 +72,8 @@ export default {
           this.fullErrorHandling(error);
         }
       }
+
+      this.waitingFormResponse = false;
     }
   }
 };

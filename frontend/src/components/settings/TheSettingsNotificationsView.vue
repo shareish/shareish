@@ -75,7 +75,7 @@
         </template>
       </b-field>
     </div>
-    <b-button :label="$t('save')" type="is-primary" @click="save" />
+    <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
 </template>
 
@@ -106,7 +106,8 @@ export default {
         'notif_conversations': String,
         'notif_events': String,
         'notif_items': String
-      }
+      },
+      waitingFormResponse: false
     }
   },
   async created() {
@@ -159,6 +160,8 @@ export default {
       }
     },
     async save() {
+      this.waitingFormResponse = true;
+
       let result = await this.$validator.validateAll();
       if (result) {
         try {
@@ -187,6 +190,8 @@ export default {
           this.fullErrorHandling(error);
         }
       }
+
+      this.waitingFormResponse = false;
     }
   },
   computed: {

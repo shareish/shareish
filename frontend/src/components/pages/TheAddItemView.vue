@@ -112,7 +112,7 @@
             </b-checkbox>
           </b-field>
           <div class="container has-text-centered">
-            <button class="button is-primary" @click="submit">{{ $t('submit') }}</button>
+            <b-button class="button is-primary" :loading="waitingFormResponse" @click="submit">{{ $t('submit') }}</b-button>
           </div>
         </section>
         <div class="column is-4">
@@ -173,7 +173,8 @@ export default {
       startDate: null,
       endDate: null,
 
-      geoloc: null
+      geoloc: null,
+      waitingFormResponse: false
     }
   },
   created() {
@@ -258,6 +259,8 @@ export default {
       }
     },
     async submit() {
+      this.waitingFormResponse = true;
+
       let result = await this.$validator.validateAll();
       if (result) {
         this.errorCode = null;
@@ -321,6 +324,8 @@ export default {
           this.fullErrorHandling(error);
         }
       }
+
+      this.waitingFormResponse = false;
     },
     async setRecurrentItem(item) {
       this.name = item.name;

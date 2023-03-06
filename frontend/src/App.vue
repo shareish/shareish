@@ -56,7 +56,7 @@ export async function logout(instance) {
     localStorage.removeItem("token");
     instance.$store.commit('removeToken');
     instance.$store.commit('removeUserID');
-    await instance.$router.push('/');
+    await instance.$router.push('/log-in');
   }
   catch (error) {
     ErrorHandler.methods.snackbarError(error);
