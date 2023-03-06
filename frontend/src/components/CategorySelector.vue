@@ -1,7 +1,7 @@
 <template>
   <b-field :label="label">
     <b-select :expanded="expanded" :value="value" @input="$emit('input', $event)">
-      <option v-if="number > 1" value=""></option>
+      <option v-if="number > 1 || !number" value=""></option>
       <option v-for="{id, slug} in categories" :key="id" :value="id">
         {{ $t(slug) }}
       </option>
@@ -15,13 +15,7 @@ import {categories} from '@/categories';
 export default {
   name: 'CategorySelector',
   props: {
-    number: {
-      type: Number,
-      required: true,
-      validator: function (value) {
-        return value > 0;
-      }
-    },
+    number: Number,
     value: String,
     expanded: {
       type: Boolean,
@@ -30,7 +24,8 @@ export default {
   },
   computed: {
     label() {
-      return this.$t('category') + " " + this.number;
+      let addon = (this.number) ? " " + this.number : "";
+      return this.$t('category') + addon;
     },
     categories() {
       return Object.values(categories);
