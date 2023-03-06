@@ -51,7 +51,6 @@
   "help_item_type": "Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event",
   "help_item_ihaveimage": "Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)",
   "help_item_noimage": "Choose this option if you don't have an image for your item (images are optional and can be uploaded later)",
-  "item-category": "Category",
   "help_item_category": "Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items",
   "request": "Request",
   "requests": "Requests",

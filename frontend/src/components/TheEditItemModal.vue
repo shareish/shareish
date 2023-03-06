@@ -25,9 +25,9 @@
         </b-field>
         <div class="columns">
           <b-tooltip :label="$t('help_item_category')" multilined position="is-top">
-            <category-selector v-model="internalItem.category1" :nullable="false" :number="1" class="column" expanded />
-            <category-selector v-model="internalItem.category2" :nullable="false" :number="2" class="column" expanded />
-            <category-selector v-model="internalItem.category3" :nullable="false" :number="3" class="column" expanded />
+            <category-selector v-model="internalItem.category1" :number="1" class="column" expanded />
+            <category-selector v-model="internalItem.category2" :number="2" class="column" expanded />
+            <category-selector v-model="internalItem.category3" :number="3" class="column" expanded />
           </b-tooltip>
         </div>
         <b-field>

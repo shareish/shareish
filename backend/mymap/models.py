@@ -195,8 +195,8 @@ class Item(models.Model):
     item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
-    category2 = models.CharField(max_length=2, choices=Categories.choices, null=True, default=None, blank=True)
-    category3 = models.CharField(max_length=2, choices=Categories.choices, null=True, default=None, blank=True)
+    category2 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
+    category3 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
 

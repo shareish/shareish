@@ -71,7 +71,7 @@
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
-        <b-input v-model="internalUser['description']" v-validate="'required'" name="description" type="textarea" />
+        <b-input v-model="internalUser['description']" name="description" type="textarea" />
       </b-field>
     </div>
     <div class="tile is-ancestor">

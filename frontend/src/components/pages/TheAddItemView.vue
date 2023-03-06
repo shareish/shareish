@@ -61,9 +61,9 @@
 
           <div class="columns">
             <b-tooltip :label="$t('help_item_category')" multilined position="is-right">
-              <category-selector v-model="category1" :nullable="false" :number="1" class="column" expanded />
-              <category-selector v-model="category2" :nullable="false" :number="2" class="column" expanded />
-              <category-selector v-model="category3" :nullable="false" :number="3" class="column" expanded />
+              <category-selector v-model="category1" :number="1" class="column" expanded />
+              <category-selector v-model="category2" :number="2" class="column" expanded />
+              <category-selector v-model="category3" :number="3" class="column" expanded />
             </b-tooltip>
           </div>
           <b-field>
@@ -163,9 +163,9 @@ export default {
       name: '',
       description: '',
       type: null,
-      category1: null,
-      category2: null,
-      category3: null,
+      category1: '',
+      category2: '',
+      category3: '',
       location: '',
       isRecurrent: false,
       recurrentFrom: null,
