@@ -58,26 +58,28 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article v-if="item.enddate || !isAlreadyAvailable" class="mb-5-5">
+          <article v-if="notAvailableYet || enddateIsAhead" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
                 <span>{{ $t('availability') }}</span>
               </div>
             </div>
-            <span v-if="isAlreadyAvailable">
-              {{ $t('item-availability-until') }}
-              {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
-            </span>
-            <template v-else-if="item.enddate">
+            <template v-if="notAvailableYet">
               <span>
                 {{ $t('item-availability-from') }}
                 {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
-              </span><br/>
-              <span>{{ $t('item-availability-until') }} {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})</span>
+              </span><br />
+              <span v-if="item.enddate">
+                {{ $t('item-availability-until') }}
+                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
+              </span>
             </template>
             <template v-else>
-              <span>{{ $t('item-availability-from') }} {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})</span>
+              <span>
+                {{ $t('item-availability-until') }}
+                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
+              </span>
             </template>
           </article>
           <article class="mb-5-5">
@@ -149,8 +151,11 @@ export default {
         itemCategories.push(categories[this.item.category3]);
       return itemCategories;
     },
-    isAlreadyAvailable() {
-      return new Date(this.item.startdate) < Date.now();
+    notAvailableYet() {
+      return new Date(this.item.startdate) > Date.now();
+    },
+    enddateIsAhead() {
+      return this.item.enddate && new Date(this.item.enddate) > Date.now();
     }
   },
   methods: {
