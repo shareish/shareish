@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Q, F
+from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
@@ -27,6 +27,30 @@ from geopy.geocoders import Nominatim
 locator = Nominatim(user_agent="shareish")
 
 LOCATION_PREFIX = "SRID=4326;POINT"
+
+
+def verif_location(data):
+    if isinstance(data, str):
+        address = data.strip()
+        if address == "":
+            return {'success': ""}
+    elif data is None:
+        return {'success': ""}
+    else:
+        return {'error': "No suitable address to process."}
+
+    if not address.startswith(LOCATION_PREFIX):
+        location = locator.geocode(address)
+        if location is not None:
+            return {'success': "{} ({} {})".format(
+                LOCATION_PREFIX,
+                str(location.latitude),
+                str(location.longitude)
+            )}
+        else:
+            return {'error': "Couldn't find location."}
+    else:
+        return {'success': address}
 
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
@@ -79,28 +103,19 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        if 'location' in data:
-            address = data['location']
-            if address != '' and address is not None:
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    data['location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    print("Warning: {} given but no location found.".format(address))
-                    del data['location']
-            else:
-                del data['location']
+
+        result = verif_location(request.data['location'])
+        if 'success' in result:
+            request.data['location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response({"serializer_errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
@@ -115,24 +130,19 @@ class ItemViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        if 'location' in request.data:
-            address = request.data['location']
-            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    request.data['location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    return Response({"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = verif_location(request.data['location'])
+        if 'success' in result:
+            request.data['location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecurrentItemViewSet(ItemViewSet):
@@ -213,22 +223,13 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.partial_update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        if 'ref_location' in data:
-            address = data['ref_location']
-            if address != '' and address is not None:
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    data['ref_location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    print("Warning: {} given but no location found.".format(address))
-                    data['ref_location'] = None
+        result = verif_location(request.data['ref_location'])
+        if 'success' in result:
+            request.data['ref_location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -241,31 +242,19 @@ class UserViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_instance()
-        if 'ref_location' in request.data:
-            address = request.data['ref_location']
-            if address is not None:
-                if isinstance(address, str):
-                    address = address.strip()
-                    if address == '':
-                        request.data['ref_location'] = None
-                    elif not address.startswith(LOCATION_PREFIX):
-                        location = locator.geocode(address)
-                        if location is not None:
-                            request.data['ref_location'] = "{} ({} {})".format(
-                                LOCATION_PREFIX,
-                                str(location.latitude),
-                                str(location.longitude)
-                            )
-                        else:
-                            return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response("Bad address received.", status=status.HTTP_400_BAD_REQUEST)
+
+        result = verif_location(request.data['ref_location'])
+        if 'success' in result:
+            request.data['ref_location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
-        return Response({"serializer_errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserImageViewSet(viewsets.ViewSet):
