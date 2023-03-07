@@ -95,10 +95,10 @@ export default {
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
         try {
-          this.$store.state.notifications = (await axios.get('/api/v1/notifications/')).data['unread_messages'];
+          this.$store.state.notifications = (await axios.get("/api/v1/notifications/")).data['unread_messages'];
         }
         catch (error) {
-          thi.snackbarError(error);
+          this.snackbarError(error);
         }
       } else {
         this.$store.state.notifications = 0;
