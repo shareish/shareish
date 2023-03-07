@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'first_name', 'last_name', 'email', 'sign_in_date', 'homepage_url', 'facebook_url',
+            'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images'
         ]
@@ -79,7 +79,7 @@ class ItemSerializer(serializers.ModelSerializer):
                 errors['category2'] = "Each category can only be used once."
             categories.append(data['category2'])
         if 'category3' in data:
-            if data['category3'] in categories:
+            if data['category3'] != "" and data['category3'] in categories:
                 errors['category3'] = "Each category can only be used once."
 
         # Check end date

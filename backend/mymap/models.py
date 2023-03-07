@@ -16,7 +16,7 @@ class MyUserManager(BaseUserManager):
         birth and password.
         """
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError("Users must have an email address")
 
         user = self.model(
             email=self.normalize_email(email),
@@ -46,31 +46,31 @@ class MyUserManager(BaseUserManager):
 
 
 class MailNotificationFrequencies(models.TextChoices):
-    INSTANTLY = 'I', _('Instantly')
-    DAILY = 'D', _('Daily')
-    WEEKLY = 'W', _('Weekly')
-    NEVER = 'N', _('Never')
+    INSTANTLY = 'I', _("Instantly")
+    DAILY = 'D', _("Daily")
+    WEEKLY = 'W', _("Weekly")
+    NEVER = 'N', _("Never")
 
 
 class MailNotificationFrequenciesConversations(models.TextChoices):
-    INSTANTLY = 'I', _('Instantly')
-    DAILY = 'D', _('Daily')
-    NEVER = 'N', _('Never')
+    INSTANTLY = 'I', _("Instantly")
+    DAILY = 'D', _("Daily")
+    NEVER = 'N', _("Never")
 
 
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=20, null=True, blank=True)
     birth_date = models.DateField(default=date.today, blank=True)
-    sign_in_date = models.DateField(auto_now_add=True)
+    sign_up_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
     username = models.CharField(max_length=20, default='')
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    description = models.TextField(blank=True, max_length=300)
-    homepage_url = models.URLField(blank=True, null=True)
-    facebook_url = models.URLField(blank=True, null=True)
-    instagram_url = models.URLField(blank=True, null=True)
+    description = models.TextField(blank=True, default='', max_length=300)
+    homepage_url = models.URLField(blank=True, default='')
+    facebook_url = models.URLField(blank=True, default='')
+    instagram_url = models.URLField(blank=True, default='')
     ref_location = models.PointField(blank=True, geography=True, null=True, default=Point(0.0, 0.0))
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_freq_conversations = models.CharField(
@@ -91,7 +91,7 @@ class User(AbstractBaseUser):
     dwithin_notifications = models.PositiveSmallIntegerField(
         null=True,
         default=10,
-        help_text='Enter maximum distance for new item and event notifications'
+        help_text="Enter maximum distance for new item and event notifications"
     )
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
@@ -115,7 +115,7 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     class Meta:
-        ordering = ['sign_in_date']
+        ordering = ['sign_up_date']
 
 
 class UserImage(models.Model):
@@ -150,47 +150,46 @@ class UserImage(models.Model):
 
 class Item(models.Model):
     class ItemType(models.TextChoices):
-        DONATION = 'DN', _('Donation')
-        LOAN = 'LN', _('Loan')
-        REQUEST = 'RQ', _('Request')
-        EVENT = 'EV', _('Event')
+        DONATION = 'DN', _("Donation")
+        LOAN = 'LN', _("Loan")
+        REQUEST = 'RQ', _("Request")
+        EVENT = 'EV', _("Event")
 
     class Categories(models.TextChoices):
-        FOOD = 'FD', _('Food and Supplies')
-        ANIMALS = 'AN', _('Pets and Animals')
-        ENTERTAINMENT = 'EN', _('Arts, Culture, and Entertainments')
-        COLLECTORS = 'CL', _('Collectibles and Decoratives')
-        HELPING = 'HL', _('Helping hand and Manual Labor')
-        ADMINIT = 'AT', _('Administrative tasks')
-        DIY = 'DY', _('Do-it-Yourself')
-        BEAUTY = 'BT', _('Beauty and Well-being')
-        HEALTH = 'HE', _('Health')  # and hygiene
-        ENERGY = "EY", _('Energy and Heating')
-        CHILDHOOD = 'CH', _('Childhood')
-        CLOTHES = 'CO', _('Clothes and Shoes')
-        IT = 'IT', _('Multimedia Hardware')
-        CS = 'CS', _('Informatics Software')
-        GARDEN = 'GD', _('Gardening and Nature')
-        HOUSE = 'HS', _('Living spaces and Housing')
-        TOOLS = 'EQ', _('Tools and Equipments and Ustensils')
-        HOLIDAYS = 'HD', _('Holidays, Week-end, Leisures')
-        BOOK = 'BK', _('Books and Magazines')
-        MEDIA = 'MD', _('CDs, DVDs, Blu-rays, Discs')
-        SPORT = 'SP', _('Sports')
-        TRANSPORT = 'TS', _('Transportation, Delivery, Pick-up, Moving')
-        VEHICLE = 'VE', _('Vehicles and Means of transport')
-        OTHER = 'OT', _('Other')
+        FOOD = 'FD', _("Food and Supplies")
+        ANIMALS = 'AN', _("Pets and Animals")
+        ENTERTAINMENT = 'EN', _("Arts, Culture, and Entertainments")
+        COLLECTORS = 'CL', _("Collectibles and Decoratives")
+        HELPING = 'HL', _("Helping hand and Manual Labor")
+        ADMINIT = 'AT', _("Administrative tasks")
+        DIY = 'DY', _("Do-it-Yourself")
+        BEAUTY = 'BT', _("Beauty and Well-being")
+        HEALTH = 'HE', _("Health")  # and hygiene
+        ENERGY = "EY", _("Energy and Heating")
+        CHILDHOOD = 'CH', _("Childhood")
+        CLOTHES = 'CO', _("Clothes and Shoes")
+        IT = 'IT', _("Multimedia Hardware")
+        CS = 'CS', _("Informatics Software")
+        GARDEN = 'GD', _("Gardening and Nature")
+        HOUSE = 'HS', _("Living spaces and Housing")
+        TOOLS = 'EQ', _("Tools and Equipments and Ustensils")
+        HOLIDAYS = 'HD', _("Holidays, Week-end, Leisures")
+        BOOK = 'BK', _("Books and Magazines")
+        MEDIA = 'MD', _("CDs, DVDs, Blu-rays, Discs")
+        SPORT = 'SP', _("Sports")
+        TRANSPORT = 'TS', _("Transportation, Delivery, Pick-up, Moving")
+        VEHICLE = 'VE', _("Vehicles and Means of transport")
+        OTHER = 'OT', _("Other")
 
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
     location = models.PointField(blank=True, geography=True, null=True)
-    creationdate = models.DateTimeField(default=timezone.now)
-    # save and add to serializer (?), to mail.py to filter based on creation rather than start,...
+    creationdate = models.DateTimeField(auto_now_add=True)
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
     in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
-    hitcount = models.IntegerField(verbose_name='Hit Count', default=0)
+    hitcount = models.IntegerField(verbose_name="Hit Count", default=0)
 
     item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
@@ -198,13 +197,12 @@ class Item(models.Model):
     category2 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
     category3 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="items", on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE, null=True)
 
     def __str__(self) -> str:
-        return self.name + ' : ' + self.description + ' (' + self.category1 + ')'
+        return self.name + " : " + self.description + " (" + self.category1 + ")"
 
     class Meta:
-        # ordering = ['name']
         ordering = ['startdate']
 
 
@@ -240,12 +238,12 @@ class ItemImage(models.Model):
 class Conversation(models.Model):
     name = models.CharField(max_length=100)
     slug = models.CharField(max_length=100, null=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_owner", on_delete=models.CASCADE,
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_as_owner', on_delete=models.CASCADE,
                               null=True)
-    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="conversations_as_buyer", on_delete=models.CASCADE,
+    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_as_buyer', on_delete=models.CASCADE,
                               null=True)
-    item = models.ForeignKey(Item, related_name="conversations", on_delete=models.CASCADE, null=True)
-    lastmessagedate = models.DateTimeField(default=timezone.now)
+    item = models.ForeignKey(Item, related_name='conversations', on_delete=models.CASCADE, null=True)
+    lastmessagedate = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-lastmessagedate']
@@ -253,8 +251,8 @@ class Conversation(models.Model):
 
 class Message(models.Model):
     content = models.TextField(null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="messages", on_delete=models.CASCADE, null=True)
-    conversation = models.ForeignKey(Conversation, related_name="messages", on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE, null=True)
+    conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE, null=True)
     date = models.DateTimeField(auto_now=True)
     seen = models.BooleanField(default=False)
 

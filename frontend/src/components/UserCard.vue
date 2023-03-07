@@ -27,7 +27,7 @@
               </small>
             </nav>
           </template>
-          <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_in_date) }})</p>
+          <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_up_date) }})</p>
         </div>
         <p class="description">{{ user.description }}</p>
       </div>
