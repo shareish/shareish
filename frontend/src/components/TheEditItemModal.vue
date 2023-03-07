@@ -6,17 +6,22 @@
         <button class="delete" type="button" @click="$emit('close')" />
       </header>
       <section class="modal-card-body">
-        <b-field :label="$t('name')">
-          <b-input v-model="internalItem.name" />
+        <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
+          <template #label>{{ $t('name') }}
+            <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
+              <i class="icon far fa-question-circle"></i>
+            </b-tooltip>
+          </template>
+          <b-input v-model="internalItem.name" name="name" v-validate="'required'" />
         </b-field>
-        <b-field>
+        <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
           <template #label>
             {{ $t('item-type') }}
             <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
               <i class="icon far fa-question-circle"></i>
             </b-tooltip>
           </template>
-          <b-select v-model="internalItem.item_type" expanded>
+          <b-select v-model="internalItem.item_type" name="type" v-validate="'required'" expanded>
             <option value="RQ">{{ $t('request') }}</option>
             <option value="DN">{{ $t('donation') }}</option>
             <option value="LN">{{ $t('loan') }}</option>
@@ -39,17 +44,17 @@
           </template>
           <b-input v-model="internalItem.address" />
         </b-field>
-        <b-field>
+        <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
           <template #label>
             {{ $t('description') }}
             <b-tooltip :label="$t('help_item_description')" multilined position="is-right">
               <i class="icon far fa-question-circle"></i>
             </b-tooltip>
           </template>
-          <b-input v-model="internalItem.description" expanded type="textarea" />
+          <b-input v-model="internalItem.description" expanded type="textarea" name="description" v-validate="'required'" />
         </b-field>
         <b-field grouped>
-          <b-field expanded>
+          <b-field key="startdate" :message="errors.first('startdate')" :type="{'is-danger': errors.has('startdate')}" expanded>
             <template #label>
               {{ $t('start-date') }}
               <b-tooltip :label="$t('help_item_start_date')" multilined position="is-top">
@@ -66,6 +71,8 @@
                 icon-pack="fas"
                 :locale="$i18n.locale"
                 @change="startdateChanged"
+                name="startdate"
+                v-validate="'required'"
             />
           </b-field>
           <b-field expanded>
@@ -124,6 +131,9 @@ import ErrorHandler from "@/components/ErrorHandler";
 export default {
   name: 'TheEditItemModal',
   mixins: [ErrorHandler],
+  $_veeValidate: {
+    validator: 'new'
+  },
   components: {CategorySelector},
   props: {
     item: {
@@ -145,52 +155,55 @@ export default {
     async save() {
       this.waitingFormResponse = true;
 
-      try {
-        let startDate;
-        if (this.internalItem.startdate)
-          startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
-        else
-          startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
+      let result = await this.$validator.validateAll();
+      if (result) {
+        try {
+          let startDate;
+          if (this.internalItem.startdate)
+            startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+          else
+            startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
-        let endDate;
-        if (this.internalItem.enddate)
-          endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
-        else
-          endDate = null;
+          let endDate;
+          if (this.internalItem.enddate)
+            endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+          else
+            endDate = null;
 
-        let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
-          name: this.internalItem.name,
-          item_type: this.internalItem.item_type,
-          category1: this.internalItem.category1,
-          category2: this.internalItem.category2,
-          category3: this.internalItem.category3,
-          description: this.internalItem.description,
-          location: this.internalItem.address,
-          is_recurrent: this.internalItem.is_recurrent,
-          startdate: startDate,
-          enddate: endDate,
-        })).data;
+          let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
+            name: this.internalItem.name,
+            item_type: this.internalItem.item_type,
+            category1: this.internalItem.category1,
+            category2: this.internalItem.category2,
+            category3: this.internalItem.category3,
+            description: this.internalItem.description,
+            location: this.internalItem.address,
+            is_recurrent: this.internalItem.is_recurrent,
+            startdate: startDate,
+            enddate: endDate,
+          })).data;
 
-        if (this.file) {
-          let data = new FormData();
-          data.append('item_id', this.item.id);
-          data.append('image', this.file);
-          let image_url = (await axios.post("/api/v1/images/", data)).data;
-          item.images.push(image_url);
-          this.file = null;
+          if (this.file) {
+            let data = new FormData();
+            data.append('item_id', this.item.id);
+            data.append('image', this.file);
+            let image_url = (await axios.post("/api/v1/images/", data)).data;
+            item.images.push(image_url);
+            this.file = null;
+          }
+
+          this.$buefy.snackbar.open({
+            duration: 5000,
+            type: 'is-success',
+            message: this.$t('notif-success-item-update'),
+            pauseOnHover: true,
+          });
+          this.$emit('close');
+          this.$emit('updateItem', item);
         }
-
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-success',
-          message: this.$t('notif-success-item-update'),
-          pauseOnHover: true,
-        });
-        this.$emit('close');
-        this.$emit('updateItem', item);
-      }
-      catch (error) {
-        this.fullErrorHandling(error);
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
       }
 
       this.waitingFormResponse = false;
