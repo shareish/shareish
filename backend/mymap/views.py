@@ -24,7 +24,7 @@ from .ai import findClass
 
 from geopy.geocoders import Nominatim
 
-locator = Nominatim(user_agent="shareish")
+locator = Nominatim(user_agent='shareish')
 
 LOCATION_PREFIX = "SRID=4326;POINT"
 
@@ -102,15 +102,13 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ['-startdate']
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-
         result = verif_location(request.data['location'])
         if 'success' in result:
             request.data['location'] = result['success']
         else:
             return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -215,11 +213,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_instance(self):
         return self.request.user
 
-    @action(["put", "patch"], detail=False)
+    @action(['put', 'patch'], detail=False)
     def me(self, request, *args, **kwargs):
-        if request.method == "PUT":
+        if request.method == 'PUT':
             return self.update(request, *args, **kwargs)
-        elif request.method == "PATCH":
+        elif request.method == 'PATCH':
             return self.partial_update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -293,8 +291,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
         item = Item.objects.get(pk=data['item_id'])
 
         # Generating conversation slug
-        to_serialize['name'] = str(data['item_id']) + '-' + str(data['owner_id']) + '-' + str(data['buyer_id'])
-        to_serialize['slug'] = item.name + ' (' + owner.username + ' and ' + buyer.username + ')'
+        to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])
+        to_serialize['slug'] = item.name + " (" + owner.username + " and " + buyer.username + ")"
 
         serializer = self.get_serializer(data=to_serialize)
         if serializer.is_valid():
@@ -319,7 +317,7 @@ class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 def getAddress(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         coords = request.data['SRID'].split(' ')[1:]
         latitude = coords[0][1:]
         longitude = coords[1][:-1]
@@ -332,7 +330,7 @@ def getAddress(request):
 
 @api_view(['POST'])
 def searchItemFilter(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         searched = request.data
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
@@ -363,7 +361,7 @@ def searchItemFilter(request):
 
 @api_view(['POST'])
 def searchItems(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         paginator = ActivePaginationClass()
         search = request.data['search']
         items = Item.objects.none()
@@ -379,14 +377,14 @@ def searchItems(request):
 
 @api_view(['POST'])
 def predictClass(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         image = request.FILES.get('image')
         if image:
             class_found, category_found, detected_text = findClass(image)
             response = {
-                "suggested_class": class_found,
-                "suggested_category": category_found,
-                "detected_text": detected_text
+                'suggested_class': class_found,
+                'suggested_category': category_found,
+                'detected_text': detected_text
             }
             return JsonResponse(response, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -394,6 +392,7 @@ def predictClass(request):
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
 def getNotifications(request):
     def _get_unread_messages(user):
         return Message.objects.filter(
@@ -401,25 +400,25 @@ def getNotifications(request):
             Q(conversation__owner=user) | Q(conversation__buyer=user)
         ).count()
 
+    user = request.user
+
     if request.method == 'GET':
-        return Response({"unread_messages": _get_unread_messages(request.user)}, status=status.HTTP_200_OK)
+        return Response({'unread_messages': _get_unread_messages(user)}, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        user = request.user
-        data = request.data
         try:
-            conversation = Conversation.objects.get(pk=data['conversation_id'])
+            conversation = Conversation.objects.get(pk=request.data['conversation_id'])
             if conversation.buyer != user and conversation.owner != user:
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
             # Set all messages sent by other user as seen by current user for this conversation
             Message.objects.filter(
-                Q(conversation__id=data['conversation_id']),
-                Q(id__lte=data['last_message_id']),
+                Q(conversation__id=request.data['conversation_id']),
+                Q(id__lte=request.data['last_message_id']),
                 ~Q(user=user)
             ).update(seen=True)
 
             # Return unread messages count for all conversations
-            return Response({"unread_messages": _get_unread_messages(user)}, status=status.HTTP_200_OK)
+            return Response({'unread_messages': _get_unread_messages(user)}, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -1,6 +1,5 @@
 import re
 
-from django.core.exceptions import ObjectDoesNotExist
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
@@ -21,17 +20,17 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         errors = {}
 
-        # Facebook url validation
-        if data.get("facebook_url") != "":
+        # Check Facebook url
+        if data.get('facebook_url') != "":
             facebook_regex = r"^((https:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
-            if not re.match(facebook_regex, data.get("facebook_url")):
+            if not re.match(facebook_regex, data.get('facebook_url')):
                 errors['facebook_url'] = "Facebook url is invalid."
 
-        # Instagram url validation
-        if data.get("instagram_url") != "":
+        # Check Instagram url
+        if data.get('instagram_url') != "":
             instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
             instagram_regex = r"((https:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "/"
-            if not re.match("^" + instagram_regex + "$", data.get("instagram_url")):
+            if not re.match("^" + instagram_regex + "$", data.get('instagram_url')):
                 errors['instagram_url'] = "Instagram url is invalid."
 
         if len(errors) > 0:
@@ -67,6 +66,31 @@ class ItemSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'creationdate', 'startdate',
             'enddate', 'item_type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
         ]
+
+    def validate(self, data):
+        errors = {}
+
+        # Check categories uniqueness
+        categories = []
+        if 'category1' in data:
+            categories.append(data['category1'])
+        if 'category2' in data:
+            if data['category2'] in categories:
+                errors['category2'] = "Each category can only be used once."
+            categories.append(data['category2'])
+        if 'category3' in data:
+            if data['category3'] in categories:
+                errors['category3'] = "Each category can only be used once."
+
+        # Check end date
+        if data.get('startdate') != None and data.get('enddate') != None:
+            if data.get('enddate') <= data.get('startdate'):
+                errors['enddate'] = "The end date can't be earlier or equal to the start date."
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return data
 
 
 class ItemImageSerializer(serializers.ModelSerializer):
@@ -105,7 +129,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         ]
 
     def get_unread_messages(self, obj):
-        request = self.context.get("request")
+        request = self.context.get('request')
         if request is not None:
             return Message.objects.filter(conversation=obj, seen=False).exclude(user=request.user.id).count()
         return 0
