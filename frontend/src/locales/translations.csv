@@ -238,3 +238,5 @@ management,Management,Gestion
 conversations-reloaded-successfully,Conversations got reloaded successfully after last error!,Les conversations ont pu être rechargées correctement depuis la dernière erreur!
 notifications-reloaded-successfully,Notifications got reloaded successfully after last error!,Les notifications ont pu être rechargées correctement depuis la dernière erreur!
 connection-error,Connection error. Try again later.,Erreur de connexion. Veuillez réeesayer plus tard.
+item-not-available-anymore-warning,"This item is not available anymore. This page is still accessible for information purpose. Please, do not start a conversation with item owner if not required.","Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif. S'il vous plaît, ne lancez pas une conversation avec le propriétaire si ce n'est pas nécessaire."
+warning,Warning,Attention

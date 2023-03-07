@@ -2,11 +2,19 @@
   <div id="page-item" class="max-width-is-max-container">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
+      <article v-if="itemHasEnded" class="message is-warning">
+        <div class="message-header">{{ $t('warning') }}</div>
+        <div class="message-body">
+          {{ $t('item-not-available-anymore-warning') }}
+        </div>
+      </article>
       <div class="columns">
         <section class="column is-5">
           <div v-if="!isOwner" id="start-conversation" class="level mb-3">
             <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold">{{ $t("are-you-interested") }}</p>
+              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
+                {{ $t("are-you-interested") }}
+              </p>
               <button class="level-item button is-primary" @click="startConversation">
                 {{ $t('start-conversation') }}
               </button>
@@ -20,9 +28,11 @@
               <img :src="item.images[item.images.length - 1]" />
             </figure>
           </article>
-          <div v-if="isOwner" id="item-management" class="level mt-3">
+          <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
             <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold">{{ $t('management') }}</p>
+              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
+                {{ $t('management') }}
+              </p>
               <button class="level-item button is-primary" @click="startEdition">{{ $t('edit') }}</button>
               <button class="level-item button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
             </div>
@@ -58,24 +68,20 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article v-if="notAvailableYet || enddateIsAhead" class="mb-5-5">
+          <article v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
                 <span>{{ $t('availability') }}</span>
               </div>
             </div>
-            <template v-if="notAvailableYet">
+            <template v-if="isOwner || itemHasEnded || notAvailableYet">
               <span>
                 {{ $t('item-availability-from') }}
                 {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
               </span><br />
-              <span v-if="item.enddate">
-                {{ $t('item-availability-until') }}
-                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
-              </span>
             </template>
-            <template v-else>
+            <template v-if="item.enddate">
               <span>
                 {{ $t('item-availability-until') }}
                 {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
@@ -154,8 +160,11 @@ export default {
     notAvailableYet() {
       return new Date(this.item.startdate) > Date.now();
     },
-    enddateIsAhead() {
+    itemHasNotEndedYet() {
       return this.item.enddate && new Date(this.item.enddate) > Date.now();
+    },
+    itemHasEnded() {
+      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     }
   },
   methods: {
@@ -352,6 +361,10 @@ div.icon-text {
 
 @media screen and (max-width: 1215px) {
   #page-item-details .columns:first-child .column:first-child .level-left .level-item:first-child {
+    display: none;
+  }
+
+  .level-left-description {
     display: none;
   }
 }

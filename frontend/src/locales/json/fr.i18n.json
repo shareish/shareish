@@ -240,5 +240,7 @@
   "management": "Gestion",
   "conversations-reloaded-successfully": "Les conversations ont pu être rechargées correctement depuis la dernière erreur!",
   "notifications-reloaded-successfully": "Les notifications ont pu être rechargées correctement depuis la dernière erreur!",
-  "connection-error": "Erreur de connexion. Veuillez réeesayer plus tard."
+  "connection-error": "Erreur de connexion. Veuillez réeesayer plus tard.",
+  "item-not-available-anymore-warning": "Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif. S'il vous plaît, ne lancez pas une conversation avec le propriétaire si ce n'est pas nécessaire.",
+  "warning": "Attention"
 }

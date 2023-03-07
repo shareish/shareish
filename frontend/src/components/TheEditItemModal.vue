@@ -83,7 +83,7 @@
             </template>
             <b-datetimepicker
                 v-model="internalItem.enddate"
-                :min-datetime="internalItem.startdate"
+                :min-datetime="minEnddate"
                 icon="calendar"
                 :icon-right="internalItem.enddate ? 'close-circle' : ''"
                 icon-right-clickable
@@ -151,6 +151,16 @@ export default {
       initialStartdate: Date.now()
     }
   },
+  computed: {
+    minEnddate() {
+      const now = new Date();
+      if (this.internalItem.startdate) {
+        const startdate = new Date(this.internalItem.startdate);
+        return (startdate > now) ? startdate : now;
+      }
+      return now;
+    }
+  },
   methods: {
     async save() {
       this.waitingFormResponse = true;
@@ -158,17 +168,17 @@ export default {
       let result = await this.$validator.validateAll();
       if (result) {
         try {
-          let startDate;
+          let startdate;
           if (this.internalItem.startdate)
-            startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+            startdate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
           else
-            startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
+            startdate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
-          let endDate;
+          let enddate;
           if (this.internalItem.enddate)
-            endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+            enddate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
           else
-            endDate = null;
+            enddate = null;
 
           let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
             name: this.internalItem.name,
@@ -179,8 +189,8 @@ export default {
             description: this.internalItem.description,
             location: this.internalItem.address,
             is_recurrent: this.internalItem.is_recurrent,
-            startdate: startDate,
-            enddate: endDate,
+            startdate: startdate,
+            enddate: enddate,
           })).data;
 
           if (this.file) {

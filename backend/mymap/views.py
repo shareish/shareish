@@ -101,6 +101,17 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
     ordering = ['-startdate']
 
+    def retrieve(self, request, *args, **kwargs):
+        # Solution to view ended item, maybe temporary
+        # Previously, used ?kind=user but only owner could see the item, not cool
+        pk = int(kwargs['pk'])
+        try:
+            instance = Item.objects.get(pk=pk)
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        except Item.DoesNotExist:
+            return Response("Item doesn't exist.", status=status.HTTP_404_NOT_FOUND)
+
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['location'])
         if 'success' in result:

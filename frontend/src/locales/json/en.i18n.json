@@ -240,5 +240,7 @@
   "management": "Management",
   "conversations-reloaded-successfully": "Conversations got reloaded successfully after last error!",
   "notifications-reloaded-successfully": "Notifications got reloaded successfully after last error!",
-  "connection-error": "Connection error. Try again later."
+  "connection-error": "Connection error. Try again later.",
+  "item-not-available-anymore-warning": "This item is not available anymore. This page is still accessible for information purpose. Please, do not start a conversation with item owner if not required.",
+  "warning": "Warning"
 }
