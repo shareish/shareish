@@ -5,17 +5,19 @@
         <div class="tile is-child box">
           <div class="field is-horizontal">
             <div class="field-body">
-              <b-field key="ref_location" :message="errors.first('ref_location')" :type="{'is-danger': errors.has('ref_location')}">
+              <b-field key="ref_location" :message="errors.first('ref_location')"
+                       :type="{'is-danger': errors.has('ref_location')}">
                 <template #label>
                   <b-tooltip key="ref_location" :label="$t('help_ref_location')" multilined position="is-right">
                     {{ $t('reflocation') }}
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-button @click="fetchAddressGeoLoc" type="is-primary">
+                <b-button type="is-primary" @click="fetchAddressGeoLoc">
                   <i class="icon fas fa-map-marker-alt"></i>
                 </b-button>
-                <b-input v-model="internalUser['ref_location']" name="ref_location" type="text" class="is-expanded ml-2" />
+                <b-input v-model="internalUser['ref_location']" class="is-expanded ml-2" name="ref_location"
+                         type="text"/>
               </b-field>
             </div>
           </div>
@@ -23,14 +25,16 @@
       </div>
       <div class="tile is-parent">
         <div class="tile is-child box">
-          <b-field key="dwithin_notifications" :message="errors.first('dwithin_notifications')" :type="{'is-danger': errors.has('dwithin_notifications')}">
+          <b-field key="dwithin_notifications" :message="errors.first('dwithin_notifications')"
+                   :type="{'is-danger': errors.has('dwithin_notifications')}">
             <template #label>
               <b-tooltip key="dwithin_notifications" :label="$t('help_dwithin')" multilined position="is-right">
                 {{ $t('dwithin_notif') }}
                 <i class="icon far fa-question-circle"></i>
-	            </b-tooltip>
+              </b-tooltip>
             </template>
-            <b-slider v-model="internalUser['dwithin_notifications']" indicator :tooltip="false" :max="99" format="raw" class="mt-5 pl-3 pr-3" />
+            <b-slider v-model="internalUser['dwithin_notifications']" :max="99" :tooltip="false" class="mt-5 pl-3 pr-3" format="raw"
+                      indicator/>
           </b-field>
         </div>
       </div>
@@ -38,19 +42,23 @@
     <div class="box">
       <b-field key="notif_conversations" horizontal>
         <template #label>
-          <b-tooltip :label="$t('help_notif_conversations')" multilined position="is-right" class="frequency_label">
+          <b-tooltip :label="$t('help_notif_conversations')" class="frequency_label" multilined position="is-right">
             {{ $t('conversations') }}
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
-          <b-radio-button v-for="{key, translationKey, color} in conversationsFrequencies" :key="key" v-model="radioGroups['notif_conversations']" :native-value="key" :type="color">
+          <b-radio-button v-for="{key, translationKey, color} in conversationsFrequencies" :key="key"
+                          v-model="radioGroups['notif_conversations']" :native-value="key" :type="color">
             <span>{{ $t(translationKey) }}</span>
           </b-radio-button>
         </template>
         <template v-else>
-          <b-select v-model="radioGroups['notif_conversations']" placeholder="Select a frequency" expanded>
-            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{ $t(translationKey) }}</option>
+          <b-select v-model="radioGroups['notif_conversations']" expanded placeholder="Select a frequency">
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{
+                $t(translationKey)
+              }}
+            </option>
           </b-select>
         </template>
       </b-field>
@@ -58,30 +66,34 @@
     <div class="box">
       <b-field v-for="{field, translationKey, helpTranslationKey} in notificationsFields" :key="field" horizontal>
         <template #label>
-          <b-tooltip :label="$t(helpTranslationKey)" multilined position="is-right" class="frequency_label">
+          <b-tooltip :label="$t(helpTranslationKey)" class="frequency_label" multilined position="is-right">
             {{ $t(translationKey) }}
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
-          <b-radio-button v-for="{key, translationKey, color} in frequencies" :key="key" v-model="radioGroups[field]" :native-value="key" :type="color">
+          <b-radio-button v-for="{key, translationKey, color} in frequencies" :key="key" v-model="radioGroups[field]"
+                          :native-value="key" :type="color">
             <span>{{ $t(translationKey) }}</span>
           </b-radio-button>
         </template>
         <template v-else>
-          <b-select v-model="radioGroups[field]" placeholder="Select a name" expanded>
-            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{ $t(translationKey) }}</option>
+          <b-select v-model="radioGroups[field]" expanded placeholder="Select a name">
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{
+                $t(translationKey)
+              }}
+            </option>
           </b-select>
         </template>
       </b-field>
     </div>
-    <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
+    <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save"/>
   </section>
 </template>
 
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
@@ -126,17 +138,19 @@ export default {
     this.fetchAddress(this.internalUser.ref_location);
 
     // Has the user activated geolocation?
-    if ("geolocation" in navigator) {
+    if ('geolocation' in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(positon => {
-        this.geoloc = positon;
-      }, error => {
-        this.snackbarError(error);
-      }, {
-        maximumAge: 10000,
-        timeout: 5000,
-        enableHighAccuracy: true
-      });
+      navigator.geolocation.getCurrentPosition(
+        positon => {
+          this.geoloc = positon;
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
     }
 
     this.loading = false;
@@ -145,16 +159,15 @@ export default {
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoloc !== null) {
-        let geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')';
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       }
     },
     async fetchAddress(location) {
       if (location !== null) {
         try {
-          this.internalUser.ref_location = (await axios.post('/api/v1/address/', location)).data;
-        }
-        catch (error) {
+          this.internalUser.ref_location = (await axios.post("/api/v1/address/", location)).data;
+        } catch (error) {
           this.fullErrorHandling(error);
         }
       }
@@ -173,7 +186,7 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
+          this.internalUser = (await axios.patch("/api/v1/webusers/me/", tempUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -185,8 +198,7 @@ export default {
           this.$emit('updateUser', this.internalUser);
 
           this.fetchAddress(this.internalUser.ref_location);
-        }
-        catch (error) {
+        } catch (error) {
           this.fullErrorHandling(error);
         }
       }

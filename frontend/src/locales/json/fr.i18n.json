@@ -237,5 +237,8 @@
   "joined": "a rejoint",
   "published": "Publié",
   "are-you-interested": "Vous êtes intéressé?",
-  "management": "Gestion"
+  "management": "Gestion",
+  "conversations-reloaded-successfully": "Les conversations ont pu être rechargées correctement depuis la dernière erreur!",
+  "notifications-reloaded-successfully": "Les notifications ont pu être rechargées correctement depuis la dernière erreur!",
+  "connection-error": "Erreur de connexion. Veuillez réeesayer plus tard."
 }

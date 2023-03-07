@@ -89,10 +89,10 @@
 
 <script>
 import * as L from 'leaflet'; // do not remove for markercluster
-import 'leaflet.markercluster';
-import 'leaflet-easybutton';
-import axios from 'axios'
-import ItemsFilters from '@/components/ItemsFilters';
+import "leaflet.markercluster";
+import "leaflet-easybutton";
+import axios from "axios"
+import ItemsFilters from "@/components/ItemsFilters";
 
 import {
   greenIcon,
@@ -104,19 +104,19 @@ import {
   aedIcon,
   giveBoxIcon,
   drinkingWaterIcon, freeShopIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
-} from '@/map-icons';
+} from "@/map-icons";
 
 import {latLng} from "leaflet";
-import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from 'vue2-leaflet';
-import Vue2LeafletMarkercluster from 'vue2-leaflet-markercluster';
-import ItemMapPopup from '@/components/ItemMapPopup';
+import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
+import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
+import ItemMapPopup from "@/components/ItemMapPopup";
 import ErrorHandler from "@/components/ErrorHandler";
 
 const itemTypeIcons = {
-  "DN": greenIcon,
-  "LN": yellowIcon,
-  "RQ": redIcon,
-  "EV": eventIcon
+  'DN': greenIcon,
+  'LN': yellowIcon,
+  'RQ': redIcon,
+  'EV': eventIcon
 }
 
 const GEOLOCATION_TIMEOUT = 10000;
@@ -142,7 +142,7 @@ export default {
       zoom: 14,
       center: latLng(0, 0),
       bounds: null,
-      url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
       tileLayerOptions: {
         zoom: 14,
@@ -302,14 +302,14 @@ export default {
         if (this.itemId === null) {
           this.setGeolocalizedPosition();
           this.routedItemError = true;
-          console.log('Routed id is null');
+          console.log("Routed id is null");
         } else {
           const item = (await axios.get(`/api/v1/items/${this.itemId}/`)).data;
           await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
           if (item['location'] === null) {
             this.setGeolocalizedPosition();
             this.routedItemError = true;
-            console.log('Routed id location is null');
+            console.log("Routed id location is null");
           } else {
             const latLong = item['location'].slice(17, -1).split(' ');
             this.center = latLng(...latLong);
@@ -337,14 +337,13 @@ export default {
         this.userPosition = this.center;
       }, (error) => {
         this.zoom = 2;
-        console.log(error.message);
       }, {
         timeout: GEOLOCATION_TIMEOUT
       });
     },
     async getItemsLocation() {
       try {
-        let items = (await axios.get('/api/v1/items/', {params: this.filterParams})).data;
+        let items = (await axios.get("/api/v1/items/", {params: this.filterParams})).data;
 
         this.items = items.filter(item =>
             // should not happen, but happens :)
@@ -414,9 +413,9 @@ export default {
     },
     getExtraMarkerURL(marker) {
       if (marker.type === 'ffruit') {
-        return 'http://fallingfruit.org/locations/' + marker.id + '&locale=' + this.$i18n.locale;
+        return "http://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
       } else {
-        return 'https://openstreetmap.org/node/' + marker.id;
+        return "https://openstreetmap.org/node/" + marker.id;
       }
     },
     getExtraMarkerSourceTransSlug(marker) {
@@ -424,8 +423,8 @@ export default {
     },
     async getFallingFruitElements() {
       try {
-        const ffbaseURL = 'https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=0';
-        const ffcoords = '&nelat=' + this.bounds.getNorthEast().lat + '&nelng=' + this.bounds.getNorthEast().lng + '&swlat=' + this.bounds.getSouthWest().lat + '&swlng=' + this.bounds.getSouthWest().lng;
+        const ffbaseURL = "https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale=" + this.$i18n.locale + "&muni=0";
+        const ffcoords = "&nelat=" + this.bounds.getNorthEast().lat + "&nelng=" + this.bounds.getNorthEast().lng + "&swlat=" + this.bounds.getSouthWest().lat + "&swlng=" + this.bounds.getSouthWest().lng;
         const ffURL = ffbaseURL + ffcoords
         return (await axios.get(ffURL, {
           transformRequest: (data, headers) => {
@@ -450,9 +449,9 @@ export default {
 
       //const baseURL = 'http://overpass-api.de/api';
       //const baseURL = 'https://overpass.kumi.systems/api';
-      const baseURL = 'https://maps.mail.ru/osm/tools/overpass/api';
+      const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
       try {
-        return (await axios.get('/interpreter', {params: {data}, baseURL})).data['elements'];
+        return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       }
       catch (error) {
         return []; // may happen if overpass API returns an error

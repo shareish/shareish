@@ -21,7 +21,7 @@
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{ $t('conversations') }}
-        <span v-if="unreadMessagesCount > 0" class="tag is-rounded">{{ unreadMessagesCount }}</span>
+        <span v-if="unreadMessagesCount > 0" class="tag is-rounded ml-2">{{ unreadMessagesCount }}</span>
       </b-navbar-item>
     </template>
     <template #end>
@@ -60,8 +60,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { logout } from '@/App.vue';
+import axios from "axios";
+import { logout } from "@/App.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
@@ -71,7 +71,8 @@ export default {
   mixins: [ErrorHandler],
   data() {
     return {
-      timeout: null
+      timeout: null,
+      unableToGetNotifications: false
     }
   },
   computed: {
@@ -95,10 +96,23 @@ export default {
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {
         try {
-          this.$store.state.notifications = (await axios.get("/api/v1/notifications/")).data['unread_messages'];
+          this.$store.state.notifications = (await axios.get("/api/v1/notifications/")).data;
+          if (this.unableToGetNotifications) {
+            this.$buefy.snackbar.open({
+              duration: 5000,
+              type: 'is-success',
+              message: this.$t('notifications-reloaded-successfully'),
+              pauseOnHover: true,
+              queue: false
+            });
+            this.unableToGetNotifications = false;
+          }
         }
         catch (error) {
-          this.snackbarError(error);
+          if (!this.unableToGetNotifications) {
+            this.unableToGetNotifications = true;
+            this.snackbarError(error);
+          }
         }
       } else {
         this.$store.state.notifications = 0;

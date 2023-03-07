@@ -235,3 +235,6 @@ joined,joined,a rejoint
 published,Published,Publié
 are-you-interested,Are you interested?,Vous êtes intéressé?
 management,Management,Gestion
+conversations-reloaded-successfully,Conversations got reloaded successfully after last error!,Les conversations ont pu être rechargées correctement depuis la dernière erreur!
+notifications-reloaded-successfully,Notifications got reloaded successfully after last error!,Les notifications ont pu être rechargées correctement depuis la dernière erreur!
+connection-error,Connection error. Try again later.,Erreur de connexion. Veuillez réeesayer plus tard.

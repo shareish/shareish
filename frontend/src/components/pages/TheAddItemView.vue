@@ -6,7 +6,7 @@
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
     </h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-if="step === 0">
       <div class="max-width-is-max-container has-text-centered buttons is-justify-content-center">
         <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom" class="mr-3">
@@ -151,11 +151,11 @@
 </template>
 
 <script>
-import axios from 'axios';
-import RecurrentItemsList from '@/components/RecurrentItemsList';
-import CategorySelector from '@/components/CategorySelector';
+import axios from "axios";
+import RecurrentItemsList from "@/components/RecurrentItemsList";
+import CategorySelector from "@/components/CategorySelector";
 import ErrorHandler from "@/components/ErrorHandler";
-import moment from 'moment/moment';
+import moment from "moment/moment";
 
 export default {
   name: 'TheAddItemView',
@@ -197,15 +197,17 @@ export default {
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(positon => {
-        this.geoloc = positon;
-      }, error => {
-        this.snackbarError(error);
-      }, {
-        maximumAge: 10000,
-        timeout: 5000,
-        enableHighAccuracy: true
-      });
+      navigator.geolocation.getCurrentPosition(
+        positon => {
+          this.geoloc = positon;
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
     }
 
     document.title = `Shareish | ${this.$t('add-new-item')}`;

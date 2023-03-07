@@ -1,6 +1,6 @@
 <template>
   <div id="page-item" class="max-width-is-max-container">
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
       <div class="columns">
         <section class="column is-5">
@@ -109,11 +109,11 @@
 </template>
 
 <script>
-import axios from 'axios';
-import moment from 'moment';
-import {categories} from '@/categories';
-import ItemTypeTag from '@/components/ItemTypeTag';
-import UserCard from '@/components/UserCard';
+import axios from "axios";
+import moment from "moment";
+import {categories} from "@/categories";
+import ItemTypeTag from "@/components/ItemTypeTag";
+import UserCard from "@/components/UserCard";
 import TheEditItemModal from "@/components/TheEditItemModal.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 

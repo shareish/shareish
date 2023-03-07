@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import ItemTypeTag from '@/components/ItemTypeTag';
-import moment from 'moment/moment';
+import ItemTypeTag from "@/components/ItemTypeTag";
+import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/components/ErrorHandler";
 
@@ -74,17 +74,19 @@ export default {
   },
   created() {
     // Has the user activated geolocation?
-    if ("geolocation" in navigator) {
+    if ('geolocation' in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(positon => {
-        this.geoloc = positon;
-      }, error => {
-        this.snackbarError(error);
-      }, {
-        maximumAge: 10000,
-        timeout: 5000,
-        enableHighAccuracy: true
-      });
+      navigator.geolocation.getCurrentPosition(
+        positon => {
+          this.geoloc = positon;
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
     }
   },
   computed: {

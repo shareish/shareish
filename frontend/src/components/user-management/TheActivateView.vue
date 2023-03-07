@@ -1,5 +1,6 @@
 <template>
-  <div id="page-activate" class="columns">
+  <b-loading v-if="loading" :active="true" :is-full-page="false" />
+  <div v-else id="page-activate" class="columns">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('activate-your-account') }}</h1>
       <div class="field">
@@ -28,15 +29,18 @@ export default {
     return {
       email: "",
       errors: [],
-      waitingFormResponse: false
+      waitingFormResponse: false,
+      loading: false
     }
   },
-  mounted() {
+  created() {
     document.title = `Shareish | ${this.$t('activate-your-account')}`;
     const uid = this.$route.params.uid;
     const token = this.$route.params.token;
-    if (uid && token)
+    if (uid && token) {
+      this.loading = true;
       this.submitActivation(uid, token);
+    }
   },
   methods: {
     async submitActivation(uid, token) {
@@ -58,6 +62,7 @@ export default {
         await this.$router.push("/");
       }
       catch (error) {
+        this.loading = false;
         let errorMessage;
         if (error.response) {
           for (const property in error.response.data) {

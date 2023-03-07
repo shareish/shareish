@@ -237,5 +237,8 @@
   "joined": "joined",
   "published": "Published",
   "are-you-interested": "Are you interested?",
-  "management": "Management"
+  "management": "Management",
+  "conversations-reloaded-successfully": "Conversations got reloaded successfully after last error!",
+  "notifications-reloaded-successfully": "Notifications got reloaded successfully after last error!",
+  "connection-error": "Connection error. Try again later."
 }

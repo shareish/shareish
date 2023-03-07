@@ -1,7 +1,7 @@
 <template>
   <div id="page-conversations" class="max-width-is-max-container">
     <h1 class="title">{{ $t('my-conversations') }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else-if="conversations.length">
       <div v-for="conversation in conversations" :key="conversation.id" class="box">
         <div class="level">
@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import moment from 'moment';
+import axios from "axios";
+import moment from "moment";
 import ErrorHandler from "@/components/ErrorHandler";
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
@@ -42,19 +42,33 @@ export default {
     return {
       loading: true,
       conversations: [],
-      timeout: null
+      timeout: null,
+      unableToFetchConversations: false
     }
   },
   methods: {
     async fetchConversations() {
       try {
-        this.conversations = (await axios.get('/api/v1/conversations/')).data;
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
+        this.conversations = (await axios.get("/api/v1/conversations/")).data;
+        if (this.unableToFetchConversations) {
+          this.$buefy.snackbar.open({
+            duration: 5000,
+            type: 'is-success',
+            message: this.$t('conversations-reloaded-successfully'),
+            pauseOnHover: true,
+            queue: false
+          });
+          this.unableToFetchConversations = false;
+        }
       }
       catch (error) {
-        this.snackbarError(error);
+        if (!this.unableToFetchConversations) {
+          this.unableToFetchConversations = true;
+          this.snackbarError(error);
+        }
       }
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
     },
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();

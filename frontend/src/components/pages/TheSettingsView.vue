@@ -1,7 +1,7 @@
 <template>
   <div id="page-settings" class="max-width-is-max-container">
     <h1 class="title mb-6">{{ $t('settings') }} & {{ $t('notifications') }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <div v-else class="columns is-variable" id="settings-split">
       <aside class="menu column">
         <p class="menu-label">{{ $t('general') }}</p>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 import TheSettingsProfileView from "@/components/settings/TheSettingsProfileView.vue";
 import TheSettingsNotificationsView from "@/components/settings/TheSettingsNotificationsView.vue";
 import TheSettingsAccountView from "@/components/settings/TheSettingsAccountView.vue";
@@ -73,17 +73,19 @@ export default {
     await this.fetchUser();
 
     // Has the user activated geolocation?
-    if ("geolocation" in navigator) {
+    if ('geolocation' in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(positon => {
-        this.geoloc = positon;
-      }, error => {
-        this.snackbarError(error);
-      }, {
-        maximumAge: 10000,
-        timeout: 5000,
-        enableHighAccuracy: true
-      });
+      navigator.geolocation.getCurrentPosition(
+        positon => {
+          this.geoloc = positon;
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
     }
 
     this.loading = false;
@@ -91,7 +93,7 @@ export default {
   methods: {
     async fetchUser() {
       try {
-        this.user = (await axios.get('/api/v1/users/me/')).data;
+        this.user = (await axios.get("/api/v1/users/me/")).data;
       }
       catch (error) {
         this.snackbarError(error);

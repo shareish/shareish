@@ -406,7 +406,7 @@ def getNotifications(request):
     user = request.user
 
     if request.method == 'GET':
-        return Response({'unread_messages': _get_unread_messages(user)}, status=status.HTTP_200_OK)
+        return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
     elif request.method == 'POST':
         try:
             conversation = Conversation.objects.get(pk=request.data['conversation_id'])
@@ -421,7 +421,7 @@ def getNotifications(request):
             ).update(seen=True)
 
             # Return unread messages count for all conversations
-            return Response({'unread_messages': _get_unread_messages(user)}, status=status.HTTP_200_OK)
+            return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -1,7 +1,7 @@
 <template>
   <div id="page-conversation" class="max-width-is-max-container">
     <h1 class="title">{{ conversation.slug }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
       <div class="columns">
         <div class="column is-two-thirds">
@@ -36,9 +36,9 @@
 </template>
 
 <script>
-import ItemCard from '@/components/ItemCard';
-import ConversationMessage from '@/components/ConversationMessage.vue';
-import axios from 'axios';
+import axios from "axios";
+import ItemCard from "@/components/ItemCard";
+import ConversationMessage from "@/components/ConversationMessage.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
@@ -54,7 +54,7 @@ export default {
 
       ws: null,
       loading: true,
-      messageToSend: ''
+      messageToSend: ""
     }
   },
   computed: {
@@ -66,8 +66,8 @@ export default {
     },
     webSocketHost() {
       let host = axios.defaults.baseURL;
-      host = host.replace('http://', 'ws://');
-      host = host.replace('https://', 'wss://');
+      host = host.replace("http://", "ws://");
+      host = host.replace("https://", "wss://");
       return host;
     }
   },
@@ -83,9 +83,9 @@ export default {
     async autofillMessage() {
       if (this.messages.length === 0) {
         let types = {
-          "DN": "donation",
-          "RQ": "request",
-          "LN": "loan"
+          'DN': 'donation',
+          'RQ': 'request',
+          'LN': 'loan'
         }
         this.messageToSend = this.$t('intro-' + types[this.item.item_type] + '-first-message');
       }
@@ -156,7 +156,7 @@ export default {
             'conversation_id': this.conversationId,
             'last_message_id': this.messages[0]['id']
           }
-          this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
+          this.$store.state.notifications = (await axios.post("/api/v1/notifications/", data)).data;
         }
         catch (error) {
           this.snackbarError(error);
