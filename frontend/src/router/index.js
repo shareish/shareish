@@ -58,8 +58,16 @@ const routes = [
     },
     {
         path: '/activate/:uid/:token',
-        name: 'activateEmail',
+        name: 'activateEmailToken',
         component: TheActivateView
+    },
+    {
+        path: '/activate',
+        name: 'activateEmail',
+        component: TheActivateView,
+        meta: {
+            loginForbidden: true
+        }
     },
     {
         path: '/map',

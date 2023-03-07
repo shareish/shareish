@@ -2,25 +2,23 @@
   <div id="page-activate" class="columns">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('activate-your-account') }}</h1>
-      <form v-if="allowResend" @submit.prevent="resendActivation">
-        <div class="field">
-          <label>{{ $t('email') }}</label>
-          <div class="control">
-            <input v-model="email" class="input" name="email" required type="email">
-          </div>
+      <div class="field">
+        <label>{{ $t('email') }}</label>
+        <div class="control">
+          <input v-model="email" class="input" name="email" required type="email">
         </div>
-        <div class="field">
-          <div class="control">
-            <button class="button is-success">{{ $t('resend-activation') }}</button>
-          </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <b-button class="button is-success" :loading="waitingFormResponse" @click="resendActivation">{{ $t('resend-activation') }}</b-button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios"
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
@@ -28,24 +26,25 @@ export default {
   mixins: [ErrorHandler],
   data() {
     return {
-      email: '',
+      email: "",
       errors: [],
-      allowResend: false
+      waitingFormResponse: false
     }
   },
   mounted() {
     document.title = `Shareish | ${this.$t('activate-your-account')}`;
-    this.uid = this.$route.params.uid;
-    this.token = this.$route.params.token;
-    this.submitActivation();
+    const uid = this.$route.params.uid;
+    const token = this.$route.params.token;
+    if (uid && token)
+      this.submitActivation(uid, token);
   },
   methods: {
-    async submitActivation() {
-      this.errors.splice(0);
+    async submitActivation(uid, token) {
+      this.errors = [];
 
       const formData = {
-        uid: this.uid,
-        token: this.token
+        uid: uid,
+        token: token
       };
 
       try {
@@ -54,12 +53,11 @@ export default {
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-email-activation'),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
-        await this.$router.push('/');
+        await this.$router.push("/");
       }
       catch (error) {
-        this.allowResend = true;
         let errorMessage;
         if (error.response) {
           for (const property in error.response.data) {
@@ -73,7 +71,7 @@ export default {
             }
           }
           console.log(JSON.stringify(error.response.data));
-          errorMessage = this.errors.join('<br />');
+          errorMessage = this.errors.join("<br />");
         } else if (error.message) {
           console.log(JSON.stringify(error.message));
           errorMessage = error.message;
@@ -82,18 +80,15 @@ export default {
           errorMessage = this.$t('notif-error-email-activation');
         }
 
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: errorMessage,
-          pauseOnHover: true,
-        });
+        this.snackbarError(errorMessage);
       }
     },
     async resendActivation() {
+      this.waitingFormResponse = true;
+
       const formData = {
         email: this.email
-      }
+      };
 
       try {
         await axios.post("/api/v1/users/resend_activation/", formData);
@@ -101,13 +96,15 @@ export default {
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-resend-activation'),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
       }
       catch (error) {
         this.snackbarError(this.$t('notif-error-resend-activation'));
       }
+
+      this.waitingFormResponse = false;
     }
   }
-}
+};
 </script>
