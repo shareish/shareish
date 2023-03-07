@@ -274,32 +274,35 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        already_exist = Conversation.objects.filter(
-            owner_id=data['owner_id'],
-            buyer_id=data['buyer_id'],
-            item_id=data['item_id']
-        )
-        if already_exist:
-            serializer = ConversationSerializer(already_exist[0], many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            already_exist = Conversation.objects.filter(
+                owner_id=data['owner_id'],
+                buyer_id=data['buyer_id'],
+                item_id=data['item_id']
+            )
+            if already_exist:
+                serializer = ConversationSerializer(already_exist[0], many=False)
+                return Response(serializer.data['id'], status=status.HTTP_200_OK)
 
-        to_serialize = {}
+            to_serialize = {}
 
-        # Retrieving objects instead of ids
-        owner = User.objects.get(pk=data['owner_id'])
-        buyer = User.objects.get(pk=data['buyer_id'])
-        item = Item.objects.get(pk=data['item_id'])
+            # Retrieving objects instead of ids
+            owner = User.objects.get(pk=data['owner_id'])
+            buyer = User.objects.get(pk=data['buyer_id'])
+            item = Item.objects.get(pk=data['item_id'])
 
-        # Generating conversation slug
-        to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])
-        to_serialize['slug'] = item.name + " (" + owner.username + " and " + buyer.username + ")"
+            # Generating conversation slug
+            to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])
+            to_serialize['slug'] = item.name + " (" + owner.username + " and " + buyer.username + ")"
 
-        serializer = self.get_serializer(data=to_serialize)
-        if serializer.is_valid():
-            serializer.save(owner=owner, buyer=buyer, item=item)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=to_serialize)
+            if serializer.is_valid():
+                serializer.save(owner=owner, buyer=buyer, item=item)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data['id'], status=status.HTTP_201_CREATED, headers=headers)
+            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response("Couldn't create the new conversation.", status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageViewSet(viewsets.ModelViewSet):

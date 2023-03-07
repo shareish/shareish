@@ -176,7 +176,7 @@ export default {
       if (!this.redirection) {
         if (this.item.location !== null) {
           try {
-            this.address = (await axios.post('/api/v1/address/', this.item.location)).data;
+            this.address = (await axios.post("/api/v1/address/", this.item.location)).data;
           } catch (error) {
             this.snackbarError(error);
           }
@@ -195,7 +195,7 @@ export default {
       }
     },
     formattedDate(date) {
-      return (moment(date).locale(this.$i18n.locale).format('LLLL'));
+      return (moment(date).locale(this.$i18n.locale).format("LLLL"));
     },
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
@@ -203,12 +203,12 @@ export default {
     async startConversation() {
       try {
         const data = {
-          'owner_id': this.item['user'],
+          'owner_id': this.item['user_id'],
           'buyer_id': this.$store.state.user.id,
           'item_id': this.item['id']
         }
-        const response = await axios.post('/api/v1/conversations/', data);
-        await this.$router.push(`/conversations/${response.data['id']}`);
+        const id = (await axios.post("/api/v1/conversations/", data)).data;
+        await this.$router.push(`/conversations/${id}`);
       } catch (error) {
         this.snackbarError(error);
       }
@@ -222,7 +222,7 @@ export default {
           message: this.$t('notif-success-item-delete'),
           pauseOnHover: true,
         });
-        await this.$router.push('/items');
+        await this.$router.push("/items");
       } catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
