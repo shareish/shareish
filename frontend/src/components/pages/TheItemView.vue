@@ -5,7 +5,12 @@
       <article v-if="itemHasEnded" class="message is-warning">
         <div class="message-header">{{ $t('warning') }}</div>
         <div class="message-body">
-          {{ $t('item-not-available-anymore-warning') }}
+          <template v-if="isOwner">
+            {{ $t('item-not-available-anymore-warning-owner') }}
+          </template>
+          <template v-else>
+            {{ $t('item-not-available-anymore-warning') }}
+          </template>
         </div>
       </article>
       <div class="columns">

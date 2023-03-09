@@ -32,7 +32,15 @@
       <div class="content">
         <template v-if="!recurrentList">
           <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
-          <small class="is-block" v-if="item.enddate">{{ $t('ends') }} {{ formattedDateFromNow(item.enddate) }}</small>
+          <small class="is-block" v-if="item.enddate">
+            <template v-if="!itemHasEnded">
+              {{ $t('ends') }}
+            </template>
+            <template v-else>
+              {{ $t('ended') }}
+            </template>
+            {{ formattedDateFromNow(item.enddate) }}
+          </small>
           <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
         </template>
       </div>
@@ -117,6 +125,9 @@ export default {
     },
     itemDetailQueryParams() {
       return (this.itemKind) ? {'kind': this.itemKind} : {};
+    },
+    itemHasEnded() {
+      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     }
   },
   methods: {
