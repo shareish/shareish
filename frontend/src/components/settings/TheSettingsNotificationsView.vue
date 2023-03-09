@@ -112,7 +112,7 @@ export default {
   data() {
     return {
       loading: true,
-      geoloc: null,
+      geoLocation: null,
       internalUser: null,
       radioGroups: {
         'notif_conversations': String,
@@ -142,7 +142,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         positon => {
-          this.geoloc = positon;
+          this.geoLocation = positon;
         },
         null,
         {
@@ -158,8 +158,8 @@ export default {
   methods: {
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoloc !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
+      if (this.geoLocation !== null) {
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       }
     },

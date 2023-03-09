@@ -19,7 +19,7 @@
             </router-link>
           </small>
         </p>
-        <p class="message_content">{{ message.content }}</p>
+        <p class="message_content" style="white-space: pre-wrap;">{{ message.content }}</p>
         <p class="has-text-grey"><small>{{ formattedDate }}</small></p>
       </div>
     </div>

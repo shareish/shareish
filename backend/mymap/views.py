@@ -1,4 +1,5 @@
-from datetime import datetime
+import re
+from datetime import datetime, timezone
 
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse
@@ -258,6 +259,10 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
+        instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
+        if re.match("^" + instagram_username_regex + "$", request.data['instagram_url']):
+            request.data['instagram_url'] = "https://www.instagram.com/" + request.data['instagram_url'] + "/"
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -298,9 +303,11 @@ class ConversationViewSet(viewsets.ModelViewSet):
             to_serialize = {}
 
             # Retrieving objects instead of ids
+            item = Item.objects.get(pk=data['item_id'])
+            if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
+                return Response("You can't start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
             owner = User.objects.get(pk=data['owner_id'])
             buyer = User.objects.get(pk=data['buyer_id'])
-            item = Item.objects.get(pk=data['item_id'])
 
             # Generating conversation slug
             to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])

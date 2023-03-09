@@ -110,7 +110,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['instagram_url']" v-validate="'url'" name="instagram_url" type="text" />
+            <b-input v-model="internalUser['instagram_url']" v-validate="'required'" name="instagram_url" type="text" />
           </b-field>
         </div>
       </div>

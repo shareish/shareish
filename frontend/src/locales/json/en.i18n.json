@@ -130,6 +130,7 @@
   "help_item_recurrent": "Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)",
   "submit": "Submit",
   "ends": "Ends",
+  "ended": "Ended",
   "submit-again": "Submit again",
   "profile": "Profile",
   "my-conversations": "My conversations",
@@ -241,6 +242,7 @@
   "conversations-reloaded-successfully": "Conversations got reloaded successfully after last error!",
   "notifications-reloaded-successfully": "Notifications got reloaded successfully after last error!",
   "connection-error": "Connection error. Try again later.",
-  "item-not-available-anymore-warning": "This item is not available anymore. This page is still accessible for information purpose. Please, do not start a conversation with item owner if not required.",
+  "item-not-available-anymore-warning": "This item is not available anymore. This page is still accessible for information purpose.",
+  "item-not-available-anymore-warning-owner": "Your item is not available anymore. This page is still accessible for information purpose.",
   "warning": "Warning"
 }

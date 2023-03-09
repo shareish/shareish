@@ -5,12 +5,17 @@
       <article v-if="itemHasEnded" class="message is-warning">
         <div class="message-header">{{ $t('warning') }}</div>
         <div class="message-body">
-          {{ $t('item-not-available-anymore-warning') }}
+          <template v-if="isOwner">
+            {{ $t('item-not-available-anymore-warning-owner') }}
+          </template>
+          <template v-else>
+            {{ $t('item-not-available-anymore-warning') }}
+          </template>
         </div>
       </article>
       <div class="columns">
         <section class="column is-5">
-          <div v-if="!isOwner" id="start-conversation" class="level mb-3">
+          <div v-if="!isOwner && itemHasNotEndedYet" id="start-conversation" class="level mb-3">
             <div class="level-left">
               <p class="level-item is-size-5 has-text-weight-bold level-left-description">
                 {{ $t("are-you-interested") }}

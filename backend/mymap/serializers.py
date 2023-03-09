@@ -22,16 +22,17 @@ class UserSerializer(serializers.ModelSerializer):
 
         # Check Facebook url
         if data.get('facebook_url') != "":
-            facebook_regex = r"^((https:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
+            facebook_regex = r"^((http[s]?:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
             if not re.match(facebook_regex, data.get('facebook_url')):
-                errors['facebook_url'] = "Facebook url is invalid."
+                errors['facebook_url'] = "Facebook profile/url is invalid."
 
         # Check Instagram url
         if data.get('instagram_url') != "":
             instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
-            instagram_regex = r"((https:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "/"
-            if not re.match("^" + instagram_regex + "$", data.get('instagram_url')):
-                errors['instagram_url'] = "Instagram url is invalid."
+            if not re.match("^" + instagram_username_regex + "$", data.get('instagram_url')):
+                instagram_regex = r"((http[s]?:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "(\/|(\?=.+))?"
+                if not re.match("^" + instagram_regex + "$", data.get('instagram_url')):
+                    errors['instagram_url'] = "Instagram profile/url is invalid."
 
         if len(errors) > 0:
             raise serializers.ValidationError(errors)

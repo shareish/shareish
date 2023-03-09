@@ -131,6 +131,7 @@ save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
 help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
 submit,Submit,Soumettre
 ends,Ends,Se termine
+ended,Ended,S'est terminé
 submit-again,Submit again,Soumettre à nouveau
 profile,Profile,Profil
 my-conversations,My conversations,Mes conversations
@@ -238,5 +239,6 @@ management,Management,Gestion
 conversations-reloaded-successfully,Conversations got reloaded successfully after last error!,Les conversations ont pu être rechargées correctement depuis la dernière erreur!
 notifications-reloaded-successfully,Notifications got reloaded successfully after last error!,Les notifications ont pu être rechargées correctement depuis la dernière erreur!
 connection-error,Connection error. Try again later.,Erreur de connexion. Veuillez réeesayer plus tard.
-item-not-available-anymore-warning,"This item is not available anymore. This page is still accessible for information purpose. Please, do not start a conversation with item owner if not required.","Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif. S'il vous plaît, ne lancez pas une conversation avec le propriétaire si ce n'est pas nécessaire."
+item-not-available-anymore-warning,"This item is not available anymore. This page is still accessible for information purpose.","Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
+item-not-available-anymore-warning-owner,"Your item is not available anymore. This page is still accessible for information purpose.","Votre élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
 warning,Warning,Attention
