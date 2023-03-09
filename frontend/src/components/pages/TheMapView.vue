@@ -1,12 +1,13 @@
 <template>
-  <div class="page-dashboard">
+  <div id="page-map">
     <items-filters
         @update:selectedType="selectedType = $event"
         @update:selectedCategory="selectedCategory = $event"
         @update:searchString="searchString = $event"
     />
 
-    <l-map :bounds.sync="bounds" :center.sync="center" :zoom.sync="zoom" style="height: 800px" @update:bounds="fetchMarkers">
+    <l-map :bounds.sync="bounds" :center.sync="center" :zoom.sync="zoom" style="height: 800px"
+           @update:bounds="fetchMarkers">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
       <l-control class="control-geolocation">
         <button class="button" @click="setGeolocalizedPosition">
@@ -35,7 +36,7 @@
               @ready="openRoutedItemPopup(item.id)"
           >
             <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-              <item-map-popup :item="item" :users="users" />
+              <item-map-popup :item="item" />
             </l-popup>
           </l-marker>
         </v-marker-cluster>
@@ -88,10 +89,10 @@
 
 <script>
 import * as L from 'leaflet'; // do not remove for markercluster
-import 'leaflet.markercluster';
-import 'leaflet-easybutton';
-import axios from 'axios'
-import ItemsFilters from '@/components/ItemsFilters';
+import "leaflet.markercluster";
+import "leaflet-easybutton";
+import axios from "axios"
+import ItemsFilters from "@/components/ItemsFilters";
 
 import {
   greenIcon,
@@ -103,24 +104,26 @@ import {
   aedIcon,
   giveBoxIcon,
   drinkingWaterIcon, freeShopIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
-} from '@/map-icons';
+} from "@/map-icons";
 
 import {latLng} from "leaflet";
-import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from 'vue2-leaflet';
-import Vue2LeafletMarkercluster from 'vue2-leaflet-markercluster';
-import ItemMapPopup from '@/components/ItemMapPopup';
+import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
+import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
+import ItemMapPopup from "@/components/ItemMapPopup";
+import ErrorHandler from "@/components/ErrorHandler";
 
 const itemTypeIcons = {
-  "DN": greenIcon,
-  "LN": yellowIcon,
-  "BR": redIcon,
-  "EV": eventIcon
+  'DN': greenIcon,
+  'LN': yellowIcon,
+  'RQ': redIcon,
+  'EV': eventIcon
 }
 
 const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
-  name: 'ItemsMap',
+  name: 'TheMapView',
+  mixins: [ErrorHandler],
   components: {
     ItemMapPopup,
     ItemsFilters,
@@ -139,7 +142,7 @@ export default {
       zoom: 14,
       center: latLng(0, 0),
       bounds: null,
-      url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
       tileLayerOptions: {
         zoom: 14,
@@ -248,20 +251,18 @@ export default {
       selectedType: null,
       selectedCategory: null,
       items: [],
-      users: [],
 
       routedItemError: false,
     }
   },
   async mounted() {
     document.title = `Shareish | ${this.$t('map')}`;
-    if (this.routedId) {
+    if (this.itemId) {
       await this.setRoutedItem();
     } else {
       this.setGeolocalizedPosition();
     }
     await Promise.all([
-      this.fetchUsers(),
       this.getItemsLocation(),
       this.fetchExtraLayersMakers()
     ]);
@@ -284,7 +285,7 @@ export default {
         search: this.searchString
       };
     },
-    routedId() {
+    itemId() {
       return Number(this.$route.query.id);
     }
   },
@@ -298,31 +299,33 @@ export default {
   methods: {
     async setRoutedItem() {
       try {
-        if (this.routedId === null) {
+        if (this.itemId === null) {
           this.setGeolocalizedPosition();
           this.routedItemError = true;
-          console.log('Routed id is null');
-          return;
+          console.log("Routed id is null");
+        } else {
+          const item = (await axios.get(`/api/v1/items/${this.itemId}/`)).data;
+          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
+          if (item['location'] === null) {
+            this.setGeolocalizedPosition();
+            this.routedItemError = true;
+            console.log("Routed id location is null");
+          } else {
+            const latLong = item['location'].slice(17, -1).split(' ');
+            this.center = latLng(...latLong);
+          }
         }
-        const item = (await axios.get(`/api/v1/items/${this.routedId}/`)).data;
-        if (item['location'] === null) {
-          this.setGeolocalizedPosition();
-          this.routedItemError = true;
-          console.log('Routed id location is null');
-          return;
-        }
-        const latLong = item['location'].slice(17, -1).split(' ');
-        this.center = latLng(...latLong);
-      } catch (error) {
+      }
+      catch (error) {
         this.setGeolocalizedPosition();
         this.routedItemError = true;
         console.log(error);
       }
     },
     openRoutedItemPopup(id) {
-      if (this.routedId && this.routedId === id && !this.routedItemError) {
+      if (this.itemId && this.itemId === id && !this.routedItemError) {
         this.$nextTick(() => {
-          this.$refs[`marker-item-${this.routedId}`][0].mapObject.openPopup();
+          this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
           //TODO: popup does not open when clustered. Probably need to to programmatically split the cluster.
         });
       }
@@ -334,12 +337,13 @@ export default {
         this.userPosition = this.center;
       }, (error) => {
         this.zoom = 2;
-        console.log(error.message);
-      }, {timeout: GEOLOCATION_TIMEOUT});
+      }, {
+        timeout: GEOLOCATION_TIMEOUT
+      });
     },
     async getItemsLocation() {
       try {
-        let items = (await axios.get('/api/v1/items/', {params: this.filterParams})).data;
+        let items = (await axios.get("/api/v1/items/", {params: this.filterParams})).data;
 
         this.items = items.filter(item =>
             // should not happen, but happens :)
@@ -353,8 +357,9 @@ export default {
             longitude: latLong[1],
             latLng: latLng(...latLong)
           };
-        })
-      } catch (error) {
+        });
+      }
+      catch (error) {
         console.log(error);
       }
     },
@@ -363,59 +368,58 @@ export default {
         return;
       }
 
-      this.extraLayers = await Promise.all(this.extraLayers.map(async extraLayer => {
-        try {
-          if (extraLayer.tagKey === 'ff') {
-            const elements = await this.getFallingFruitElements();
-            const markers = elements.filter(element =>
-                (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
-            ).map(element => {
-              return {
-                latitude: element['lat'],
-                longitude: element['lon'] || element['lng'],
-                latLng: latLng(element['lat'], element['lng']),
-                type: 'ffruit', //element['description'], //'ffruit',
-                name: element['type_names'][0],
-                description: element['description'],
-                id: element['id']
-              }
-            })
-            return {...extraLayer, markers};
-          } else {
-            const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
-            const markers = elements.filter(element =>
-                (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
-            ).map(element => {
-              return {
-                latitude: element['lat'],
-                longitude: element['lon'] || element['lng'],
-                latLng: latLng(element['lat'], element['lon']),
-                type: element['tags'][extraLayer.tagKey],
-                name: element['tags']['name'],
-                id: element['id']
-              }
-            })
-            return {...extraLayer, markers};
+      this.extraLayers = await Promise.all(
+        this.extraLayers.map(async extraLayer => {
+          try {
+            if (extraLayer.tagKey === 'ff') {
+              const elements = await this.getFallingFruitElements();
+              const markers = elements.filter(element =>
+                  (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
+              ).map(element => {
+                return {
+                  latitude: element['lat'],
+                  longitude: element['lon'] || element['lng'],
+                  latLng: latLng(element['lat'], element['lng']),
+                  type: 'ffruit', //element['description'], //'ffruit',
+                  name: element['type_names'][0],
+                  description: element['description'],
+                  id: element['id']
+                }
+              });
+              return {...extraLayer, markers};
+            } else {
+              const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
+              const markers = elements.filter(element =>
+                  (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
+              ).map(element => {
+                return {
+                  latitude: element['lat'],
+                  longitude: element['lon'] || element['lng'],
+                  latLng: latLng(element['lat'], element['lon']),
+                  type: element['tags'][extraLayer.tagKey],
+                  name: element['tags']['name'],
+                  id: element['id']
+                }
+              });
+              return {...extraLayer, markers};
+            }
           }
-        } catch (error) {
-          console.log(error)
-          return extraLayer;
-        }
-      }));
+          catch (error) {
+            console.log(error)
+            return extraLayer;
+          }
+        })
+      );
     },
     getExtraMarkerURL(marker) {
       if (marker.type === 'ffruit') {
-        return ('http://fallingfruit.org/locations/' + marker.id + '&locale=' + this.$i18n.locale)
+        return "http://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
       } else {
-        return ('https://openstreetmap.org/node/' + marker.id)
+        return "https://openstreetmap.org/node/" + marker.id;
       }
     },
     getExtraMarkerSourceTransSlug(marker) {
-      if (marker.type === 'ffruit') {
-        return ('from-ff')
-      } else {
-        return ('from-osm')
-      }
+      return (marker.type === 'ffruit') ? 'from-ff' : 'from-osm';
     },
     async getFallingFruitElements() {
       try {
@@ -446,10 +450,11 @@ export default {
 
       //const baseURL = 'http://overpass-api.de/api';
       //const baseURL = 'https://overpass.kumi.systems/api';
-      const baseURL = 'https://maps.mail.ru/osm/tools/overpass/api';
+      const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
       try {
-        return (await axios.get('/interpreter', {params: {data}, baseURL})).data['elements'];
-      } catch (error) {
+        return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
+      }
+      catch (error) {
         return []; // may happen if overpass API returns an error
       }
     },
@@ -458,16 +463,8 @@ export default {
       this.mapLoading = true;
       await this.fetchExtraLayersMakers();
       this.mapLoading = false;
-    },
-    async fetchUsers() {
-      try {
-        let uri = `/api/v1/webusers/`;
-        this.users = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
-      }
     }
-  },
+  }
 }
 </script>
 
@@ -476,7 +473,8 @@ export default {
   margin-top: 0.75rem;
 }
 
->>> .item-popup .leaflet-popup-content, >>> .item-popup .leaflet-popup-content p {
+>>> .item-popup .leaflet-popup-content,
+>>> .item-popup .leaflet-popup-content p {
   margin: 0;
 }
 

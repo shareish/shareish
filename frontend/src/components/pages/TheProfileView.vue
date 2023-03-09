@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <div id="page-profile">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
-      <h1 class="title">{{ $t('my-recurrent-items') }}</h1>
+      <h1 class="title">@{{ user.username }}</h1>
+      <user-card v-if="user" :user="user" />
+      <h1 class="title">{{ $t('user-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
         <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
-          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
+          <item-card :item="item" />
         </div>
       </div>
       <div v-else>{{ $t('no-items') }}</div>
@@ -14,26 +16,43 @@
 </template>
 
 <script>
+import UserCard from "@/components/UserCard";
 import axios from "axios";
 import ItemCard from "@/components/ItemCard";
 import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'RecurrentItemsList',
+  name: 'TheProfileView',
   mixins: [ErrorHandler, WindowSize],
-  components: {ItemCard},
+  components: {UserCard, ItemCard},
   data() {
     return {
+      user: {},
       items: [],
-      loading: true,
       columnsWidthClass: null,
+
+      loading: true
+    }
+  },
+  computed: {
+    userId() {
+      return Number(this.$route.params.id);
     }
   },
   methods: {
+    async fetchUser() {
+      try {
+        this.user = (await axios.get(`/api/v1/webusers/${this.userId}`)).data;
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+    },
     async fetchItems() {
       try {
-        this.items = (await axios.get("/api/v1/recurrents/")).data;
+        const params = {id: this.userId}
+        this.items = (await axios.get("/api/v1/user_items/", {params: params})).data;
       }
       catch (error) {
         this.snackbarError(error);
@@ -63,11 +82,19 @@ export default {
       this.columnsWidthClass = columnsWidthClass;
     }
   },
-  async mounted() {
+  async created() {
     this.loading = true;
-    await Promise.all([
-      this.fetchItems()
-    ]);
+
+    if (this.$store.state.user.id !== this.userId) {
+      await Promise.all([
+        this.fetchUser(),
+        this.fetchItems()
+      ]);
+      document.title = `Shareish | ${this.user.username}`;
+    } else {
+      await this.$router.push("/profile");
+    }
+
     this.loading = false;
   }
 };

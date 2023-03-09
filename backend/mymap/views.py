@@ -1,6 +1,7 @@
-from datetime import datetime
+import re
+from datetime import datetime, timezone
 
-from django.db.models import Q, F
+from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
@@ -10,7 +11,7 @@ User = get_user_model()
 
 from rest_framework import filters, viewsets
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from .serializers import (
@@ -24,9 +25,33 @@ from .ai import findClass
 
 from geopy.geocoders import Nominatim
 
-locator = Nominatim(user_agent="shareish")
+locator = Nominatim(user_agent='shareish')
 
 LOCATION_PREFIX = "SRID=4326;POINT"
+
+
+def verif_location(data):
+    if isinstance(data, str):
+        address = data.strip()
+        if address == "":
+            return {'success': ""}
+    elif data is None:
+        return {'success': ""}
+    else:
+        return {'error': "No suitable address to process."}
+
+    if not address.startswith(LOCATION_PREFIX):
+        location = locator.geocode(address)
+        if location is not None:
+            return {'success': "{} ({} {})".format(
+                LOCATION_PREFIX,
+                str(location.latitude),
+                str(location.longitude)
+            )}
+        else:
+            return {'error': "Couldn't find location."}
+    else:
+        return {'success': address}
 
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
@@ -55,6 +80,15 @@ class ActiveItemFilterBackend(filters.BaseFilterBackend):
         )
 
 
+class UserItemFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user = request.query_params.get('id')
+        if user is not None:
+            return queryset.filter(user_id=int(user))
+        else:
+            return queryset.filter(user=request.user)
+
+
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
@@ -69,72 +103,61 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering = ['-startdate']
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Item.objects.filter(pk=instance.id).update(hitcount=F('hitcount') + 1)
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        # Solution to view ended item, maybe temporary
+        # Previously, used ?kind=user but only owner could see the item, not cool
+        pk = int(kwargs['pk'])
+        try:
+            instance = Item.objects.get(pk=pk)
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        except Item.DoesNotExist:
+            return Response("Item doesn't exist.", status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        if 'location' in data:
-            address = data['location']
-            if address != '' and address is not None:
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    data['location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    print("Warning: {} given but no location found.".format(address))
-                    data['location'] = None
+        result = verif_location(request.data['location'])
+        if 'success' in result:
+            request.data['location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
-        if item.item_type != "EV":
-            from .mail import send_mail_notif_new_single_item_published
-            send_mail_notif_new_single_item_published(item, self.request.user)
-        else:
-            from .mail import send_mail_notif_new_single_event_published
-            send_mail_notif_new_single_event_published(item, self.request.user)
+        if item.location is not None:
+            if item.item_type != "EV":
+                from .mail import send_mail_notif_new_single_item_published
+                send_mail_notif_new_single_item_published(item, self.request.user)
+            else:
+                from .mail import send_mail_notif_new_single_event_published
+                send_mail_notif_new_single_event_published(item, self.request.user)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        if 'location' in request.data:
-            address = request.data['location']
-            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    request.data['location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    return Response(
-                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
-                    )
+
+        result = verif_location(request.data['location'])
+        if 'success' in result:
+            request.data['location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecurrentItemViewSet(ItemViewSet):
     filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter,
-        ItemTypeFilterBackend, ItemCategoryFilterBackend,
+        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
     ]  # Do not need ActiveItemFilterBackend
 
     def get_queryset(self):
@@ -148,17 +171,7 @@ class ActiveItemViewSet(ItemViewSet):
         return Item.objects.filter(in_progress=True)
 
 
-class UserItemFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        user = request.query_params.get('id')
-        if user is not None:
-            return queryset.filter(user_id=int(user))
-        else:
-            return queryset.filter(user=request.user)
-
-
 class UserItemViewSet(ItemViewSet):
-    queryset = Item.objects.all()
     filter_backends = [UserItemFilterBackend]
 
 
@@ -169,19 +182,12 @@ class ItemImageViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        item = Item.objects.get(pk=request.POST['itemID'])
-        existing_images = ItemImage.objects.filter(item=item)
-        for existing_image in existing_images:
-            existing_image.delete()
-        images = request.FILES.getlist('files')
-        if request.FILES.get('image') is not None:
-            images += [request.FILES.get('image')]
-
-        for image in images:
-            new_image = ItemImage(image=image, item=item)
-            new_image.save()
-            serialized_image = ItemImageSerializer(new_image)
-        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
+        item = Item.objects.get(pk=request.POST['item_id'])
+        image = request.FILES.get('image')
+        new_image = ItemImage(image=image, item=item)
+        new_image.save()
+        serialized_image = ItemImageSerializer(new_image)
+        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
@@ -216,23 +222,24 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        if 'ref_location' in data:
-            address = data['ref_location']
-            if address != '' and address is not None:
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    data['ref_location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    print("Warning: {} given but no location found.".format(address))
-                    data['ref_location'] = None
+    def get_instance(self):
+        return self.request.user
 
-        serializer = self.get_serializer(data=data)
+    @action(['put', 'patch'], detail=False)
+    def me(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return self.update(request, *args, **kwargs)
+        elif request.method == 'PATCH':
+            return self.partial_update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        result = verif_location(request.data['ref_location'])
+        if 'success' in result:
+            request.data['ref_location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -244,40 +251,34 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        if 'ref_location' in request.data:
-            address = request.data['ref_location']
-            if address != '' and address is not None and not address.startswith(LOCATION_PREFIX):
-                geoloc = locator.geocode(address)
-                if geoloc is not None:
-                    request.data['ref_location'] = "{} ({} {})".format(
-                        LOCATION_PREFIX,
-                        str(geoloc.latitude),
-                        str(geoloc.longitude)
-                    )
-                else:
-                    return Response(
-                        {"message": "Bad location."}, status=status.HTTP_400_BAD_REQUEST
-                    )
+        instance = self.get_instance()
+
+        result = verif_location(request.data['ref_location'])
+        if 'success' in result:
+            request.data['ref_location'] = result['success']
+        else:
+            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
+        instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
+        if re.match("^" + instagram_username_regex + "$", request.data['instagram_url']):
+            request.data['instagram_url'] = "https://www.instagram.com/" + request.data['instagram_url'] + "/"
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserImageViewSet(viewsets.ViewSet):
     def create(self, request):
         user = User.objects.get(pk=request.POST['user_id'])
-        images = [request.FILES.get('image')]
-        url = ""
-        for image in images:
-            new_image = UserImage(image=image, user=user)
-            new_image.save()
-            serialized_image = UserImageSerializer(new_image)
-            url = serialized_image.data['url']
-        return Response(url, status=status.HTTP_201_CREATED)
+        image = request.FILES.get('image')
+        new_image = UserImage(image=image, user=user)
+        new_image.save()
+        serialized_image = UserImageSerializer(new_image)
+        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -285,36 +286,41 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return (Conversation.objects.filter(owner=user) | Conversation.objects.filter(buyer=user)).order_by("-lastmessagedate")
+        return Conversation.objects.filter(Q(owner=user) | Q(buyer=user))
 
     def create(self, request, *args, **kwargs):
-        data = request.data;
-        already_exist = Conversation.objects.filter(
-            owner_id=data['owner_id'],
-            buyer_id=data['buyer_id'],
-            item_id=data['item_id']
-        )
-        if already_exist:
-            serializer = ConversationSerializer(already_exist[0], many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        data = request.data
+        try:
+            already_exist = Conversation.objects.filter(
+                owner_id=data['owner_id'],
+                buyer_id=data['buyer_id'],
+                item_id=data['item_id']
+            )
+            if already_exist:
+                serializer = ConversationSerializer(already_exist[0], many=False)
+                return Response(serializer.data['id'], status=status.HTTP_200_OK)
 
-        to_serialize = {}
+            to_serialize = {}
 
-        # Retrieving objects instead of ids
-        owner = User.objects.get(pk=data['owner_id'])
-        buyer = User.objects.get(pk=data['buyer_id'])
-        item = Item.objects.get(pk=data['item_id'])
+            # Retrieving objects instead of ids
+            item = Item.objects.get(pk=data['item_id'])
+            if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
+                return Response("You can't start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
+            owner = User.objects.get(pk=data['owner_id'])
+            buyer = User.objects.get(pk=data['buyer_id'])
 
-        # Generating conversation slug
-        to_serialize['name'] = str(data['item_id']) + '-' + str(data['owner_id']) + '-' + str(data['buyer_id'])
-        to_serialize['slug'] = item.name + ' (' + owner.username + ' and ' + buyer.username + ')'
+            # Generating conversation slug
+            to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])
+            to_serialize['slug'] = item.name + " (" + owner.username + " and " + buyer.username + ")"
 
-        serializer = self.get_serializer(data=to_serialize)
-        if serializer.is_valid():
-            serializer.save(owner=owner, buyer=buyer, item=item)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=to_serialize)
+            if serializer.is_valid():
+                serializer.save(owner=owner, buyer=buyer, item=item)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data['id'], status=status.HTTP_201_CREATED, headers=headers)
+            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response("Couldn't create the new conversation.", status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -322,7 +328,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
-        return Message.objects.filter(conversation=conversation).order_by("-date")
+        return Message.objects.filter(conversation=conversation)
 
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
@@ -332,20 +338,20 @@ class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 def getAddress(request):
-    if request.method == "POST":
-        address = request.data['SRID']
-        address = address.split(' ')
-        address[1] = address[1][1:]
-        address[2] = address[2][:-1]
-        geoloc = locator.reverse((address[1], address[2]), exactly_one=True)
-        if geoloc is not None:
-            return Response(geoloc.address, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        coords = request.data['SRID'].split(' ')[1:]
+        latitude = coords[0][1:]
+        longitude = coords[1][:-1]
+        location = locator.reverse((latitude, longitude), exactly_one=True)
+        if location is not None:
+            return Response(location.address, status=status.HTTP_200_OK)
+        return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
 def searchItemFilter(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         searched = request.data
         items = Item.objects.none()
         queryset = Item.objects.filter(in_progress=True)
@@ -371,13 +377,12 @@ def searchItemFilter(request):
             items = items | items_category1 | items_category2 | items_category3
         serialized_items = ItemSerializer(items, many=True)
         return Response(serialized_items.data, status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
 def searchItems(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         paginator = ActivePaginationClass()
         search = request.data['search']
         items = Item.objects.none()
@@ -388,70 +393,106 @@ def searchItems(request):
         items = paginator.paginate_queryset(items, request)
         serialized_items = ItemSerializer(items, many=True)
         return paginator.get_paginated_response(serialized_items.data)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
 def predictClass(request):
-    if request.method == "POST" and request.FILES.get('files[]'):
-            class_found, category_found, detected_text = findClass(request.FILES.get('files[]'))
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        if image:
+            class_found, category_found, detected_text = findClass(image)
             response = {
-                "suggested_class": class_found,
-                "suggested_category": category_found,
-                "detected_text": detected_text
+                'suggested_class': class_found,
+                'suggested_category': category_found,
+                'detected_text': detected_text
             }
             return JsonResponse(response, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
 def getNotifications(request):
     def _get_unread_messages(user):
         return Message.objects.filter(
-            Q(conversation__owner=user) | Q(conversation__buyer=user),
-            Q(seen=False), ~Q(user=user)
+            ~Q(user=user), Q(seen=False),
+            Q(conversation__owner=user) | Q(conversation__buyer=user)
         ).count()
 
+    user = request.user
+
     if request.method == 'GET':
-        user = request.user
-        response = {
-            "unread_messages": _get_unread_messages(user)
-        }
-        return Response(response, status=status.HTTP_200_OK)
+        return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        user = request.user
-        data = request.data
-        conversation = Conversation.objects.get(pk=data['conversation'])
-        if conversation is None or (conversation.buyer != user and conversation.owner != user):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            conversation = Conversation.objects.get(pk=request.data['conversation_id'])
+            if conversation.buyer != user and conversation.owner != user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
-        # Set all messages sent by other user as seen by current user for this conversation
-        Message.objects.filter(
-            Q(conversation__id=data['conversation']),
-            Q(id__lte=data['last_message']),
-            ~Q(user=user)
-        ).update(seen=True)
+            # Set all messages sent by other user as seen by current user for this conversation
+            Message.objects.filter(
+                Q(conversation__id=request.data['conversation_id']),
+                Q(id__lte=request.data['last_message_id']),
+                ~Q(user=user)
+            ).update(seen=True)
 
-        # Return unread messages count for all conversations
-        response = {
-            "unread_messages": _get_unread_messages(user)
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+            # Return unread messages count for all conversations
+            return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
+        except Conversation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
-def getFirstItemImage(request, item_id):
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def itemHasImage(request, item_id):
     if request.method == 'GET':
-        images = ItemImage.objects.filter(item_id=item_id)
-        if len(images) > 0:
-            image = images[0]
-            serialized_image = ItemImageSerializer(image, many=False)
-            return Response(serialized_image.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            images = ItemImage.objects.filter(item_id=item_id)
+            if len(images) > 0:
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getItemFirstImage(request, item_id):
+    if request.method == 'GET':
+        try:
+            image = ItemImage.objects.filter(item_id=item_id).first()
+            if image is not None:
+                return FileResponse(open(image.path, 'rb'))
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
+def republishItemImagesFromItem(request, new_item_id, parent_item_id):
+    if request.method == 'GET':
+        try:
+            new_item = Item.objects.get(pk=new_item_id)
+            parent_item = Item.objects.get(pk=parent_item_id)
+            if new_item.user == request.user and parent_item.user == request.user:
+                parent_item_images = ItemImage.objects.filter(item=parent_item)
+                if len(parent_item_images) > 0:
+                    for new_item_image in parent_item_images:
+                        new_item_image.pk = None
+                        new_item_image.item_id = new_item_id
+                        new_item_image.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
@@ -474,5 +515,19 @@ def getItemImage(request, itemimage_id):
             image = ItemImage.objects.get(pk=itemimage_id)
             return FileResponse(open(image.path, 'rb'))
         except ItemImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def increaseHitcountItem(request, item_id):
+    if request.method == 'GET':
+        try:
+            item = Item.objects.get(pk=item_id)
+            item.hitcount += 1
+            item.save()
+            return Response(status=status.HTTP_200_OK)
+        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

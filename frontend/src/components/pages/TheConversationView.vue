@@ -1,15 +1,15 @@
 <template>
-  <div class="page-conversation-details">
+  <div id="page-conversation" class="max-width-is-max-container">
     <h1 class="title">{{ conversation.slug }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false"/>
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
       <div class="columns">
         <div class="column is-two-thirds">
           <article class="media">
             <figure class="media-left">
               <p class="image">
-                <img v-if="currentUser.images.length > 0" :src="currentUser.images[currentUser.images.length - 1]"/>
-                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"/>
+                <img v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" />
+                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
               </p>
             </figure>
             <div class="media-content">
@@ -20,18 +20,15 @@
               </div>
               <div class="field">
                 <p class="control">
-                  <button :disabled="messageToSend===''" class="button" @click="sendMessage">{{
-                      $t('post-message')
-                    }}
-                  </button>
+                  <button :disabled="!messageToSend" class="button" @click="sendMessage">{{ $t('post-message') }}</button>
                 </p>
               </div>
             </div>
           </article>
-          <message v-for="message in messages" :key="message.id" :message="message" :users="users"/>
+          <conversation-message v-for="message in messages" :key="message.id" :message="message" />
         </div>
         <div class="column">
-          <item-card :item="item" :users="users"/>
+          <item-card :item="item" />
         </div>
       </div>
     </template>
@@ -39,40 +36,38 @@
 </template>
 
 <script>
-import ItemCard from '@/components/ItemCard';
-import Message from '@/components/Message';
-import axios from 'axios';
+import axios from "axios";
+import ItemCard from "@/components/ItemCard";
+import ConversationMessage from "@/components/ConversationMessage.vue";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'ConversationDetails',
-  components: {ItemCard, Message},
+  name: 'TheConversationView',
+  mixins: [ErrorHandler],
+  components: {ItemCard, ConversationMessage},
   data() {
     return {
       conversation: {},
-      users: [],
       item: {},
       messages: [],
+      user: {},
 
       ws: null,
       loading: true,
-      error: false,
-      messageToSend: ''
+      messageToSend: ""
     }
   },
   computed: {
-    currentUserId() {
-      return this.$store.state.user.id;
-    },
-    currentUser() {
-      return this.users.find(user => user.id === this.currentUserId) || {};
+    userId() {
+      return Number(this.$store.state.user.id);
     },
     conversationId() {
       return Number(this.$route.params.id);
     },
     webSocketHost() {
       let host = axios.defaults.baseURL;
-      host = host.replace('http://', 'ws://');
-      host = host.replace('https://', 'wss://');
+      host = host.replace("http://", "ws://");
+      host = host.replace("https://", "wss://");
       return host;
     }
   },
@@ -80,17 +75,17 @@ export default {
     async fetchConversation() {
       try {
         this.conversation = (await axios.get(`/api/v1/conversations/${this.conversationId}/`)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async autofillMessage() {
       if (this.messages.length === 0) {
         let types = {
-          "DN": "donation",
-          "BR": "request",
-          "LN": "loan"
+          'DN': 'donation',
+          'RQ': 'request',
+          'LN': 'loan'
         }
         this.messageToSend = this.$t('intro-' + types[this.item.item_type] + '-first-message');
       }
@@ -98,32 +93,32 @@ export default {
     async fetchItem() {
       try {
         this.item = (await axios.get(`/api/v1/items/${this.conversation.item}/`)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
-    async fetchUsers() {
+    async fetchUser() {
       try {
-        this.users = (await axios.get(`/api/v1/webusers/`)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+        this.user = (await axios.get(`/api/v1/webusers/${this.userId}`)).data;
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
-    async fetchExistingMessages() {
+    async fetchMessages() {
       try {
         this.messages = (await axios.get(`/api/v1/conversations/${this.conversationId}/messages/`)).data;
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async createWebSocket() {
       try {
         this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversationId}/`);
         this.ws.onopen = () => {
-          console.log("Websocket connected.")
+          console.log("Websocket connected.");
         };
         this.ws.addEventListener('message', (event) => {
           const data = JSON.parse(event.data);
@@ -132,12 +127,12 @@ export default {
             this.updateNotifications();
           }
           this.ws.addEventListener('close', () => {
-            console.log("Websocket has been closed.")
+            console.log("Websocket has been closed.");
           });
         });
-      } catch (error) {
-        console.log(error);
-        this.error = true;
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     sendMessage() {
@@ -145,29 +140,26 @@ export default {
         this.ws.send(JSON.stringify({
           'content': this.messageToSend,
           'conversation_id': this.conversationId,
-          'user_id': this.currentUserId,
+          'user_id': this.$store.state.user.id,
           'date': new Date()
         }))
         this.messageToSend = '';
-      } catch (error) {
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: this.$t('notif-error-send-message'),
-          pauseOnHover: true,
-        })
+      }
+      catch (error) {
+        this.snackbarError(this.$t('notif-error-send-message'));
       }
     },
     async updateNotifications() {
       if (this.messages.length > 0) {
         try {
           const data = {
-            'conversation': this.conversationId,
-            'last_message': this.messages[0]['id']
+            'conversation_id': this.conversationId,
+            'last_message_id': this.messages[0]['id']
           }
-          this.$store.state.notifications = (await axios.post(`/api/v1/notifications/`, data)).data['unread_messages'];
-        } catch (error) {
-          console.log(error);
+          this.$store.state.notifications = (await axios.post("/api/v1/notifications/", data)).data;
+        }
+        catch (error) {
+          this.snackbarError(error);
         }
       }
     }
@@ -176,26 +168,30 @@ export default {
     this.loading = true;
     await Promise.all([
       this.fetchConversation(),
-      this.fetchUsers(),
-      this.fetchExistingMessages(),
+      this.fetchUser(),
+      this.fetchMessages(),
       this.createWebSocket()
     ]);
     await this.fetchItem();
     this.updateNotifications();
     this.autofillMessage();
-    this.loading = false;
-
     document.title = `Shareish | ${this.conversation.slug}`;
+
+    this.loading = false;
   },
   beforeDestroy() {
-    if (this.ws) {
+    if (this.ws)
       this.ws.close();
-    }
   }
 };
 </script>
 
 <style scoped>
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+
 .image {
   width: 64px;
 }

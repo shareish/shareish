@@ -1,78 +1,77 @@
 <template>
-  <div class="wrapper" id="wrapper">
-    <shareish-navbar />
+  <div id="wrapper" class="wrapper">
+    <the-navbar />
     <section class="section">
       <router-view />
     </section>
-
     <footer class="footer">
       <div class="container">
         <div class="columns">
           <div class="column">
             <h6 class="title is-4 mb-4">Shareish</h6>
-            <!-- <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
-            <address>
-              XXX Anonymous
-              <br />XXX Anonymous
-              <br />XXX Anonymous
-              <br />XXX Anonymous (for Review)
+<!--            <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
+            <address class="custom-flex-column">
+              <span>XXX Anonymous</span>
+              <span>XXX Anonymous</span>
+              <span>XXX Anonymous</span>
+              <span>XXX Anonymous (for Review)</span>
             </address>
           </div>
           <div class="column">
             <h6 class="title is-4 mb-4">
               {{ $t('useful-links') }}
             </h6>
-            <p>
-              <a @click="goto('/')" class="text-reset">{{ $t('about-us') }}</a><br />
-              <a @click="goto('/profile')" class="text-reset">{{ $t('profile') }}</a><br />
-              <a @click="goto('/map')" class="text-reset">{{ $t('map') }}</a><br />
+            <div class="custom-flex-column">
+              <router-link to="/">{{ $t('about-us') }}</router-link>
+              <router-link to="/profile">{{ $t('profile') }}</router-link>
+              <router-link to="/map">{{ $t('map') }}</router-link>
               <a href="https://github.com/anonymous">
-                <img src="./assets/GitHub-Mark-32px.png" alt="https://github.com/anonymous">
+                <img alt="https://github.com/anonymous" src="./assets/GitHub-Mark-32px.png">
               </a>
-            </p>
+            </div>
           </div>
           <div class="column">
             <h6 class="title is-4 mb-4">
               {{ $t('contact') }}
             </h6>
-            <p>
-              <a href="mailto: info@shareish.org">info@shareish.org</a>
-            </p>
+            <div class="custom-flex-column">
+              <a href="mailto:info@shareish.org">info@shareish.org</a>
+            </div>
           </div>
         </div>
       </div>
-
     </footer>
-
-
   </div>
 </template>
 
 <script>
-  import axios from 'axios'
-  import ShareishNavbar from '@/components/ShareishNavbar';
+import axios from 'axios'
+import TheNavbar from '@/components/TheNavbar.vue';
+import ErrorHandler from "@/components/ErrorHandler";
 
-  export default {
-    name: 'App',
-    components: {ShareishNavbar},
-    beforeCreate() {
-      this.$store.commit('initializeStore');
-      const token = this.$store.state.token;
-
-      if (token) {
-        axios.defaults.headers.common['Authorization'] = "Token " + token;
-      }
-      else {
-        axios.defaults.headers.common['Authorization'] = "";
-      }
-    },
-
-    methods: {
-      goto(url) {
-        this.$router.push(url)
-      },
-    },
+export async function logout(instance) {
+  try {
+    await axios.post('/api/v1/token/logout/');
+    axios.defaults.headers.common["Authorization"] = "";
+    localStorage.removeItem("token");
+    instance.$store.commit('removeToken');
+    instance.$store.commit('removeUserID');
+    await instance.$router.push('/log-in');
   }
+  catch (error) {
+    ErrorHandler.methods.snackbarError(error);
+  }
+}
+
+export default {
+  name: 'App',
+  components: {TheNavbar},
+  beforeCreate() {
+    this.$store.commit('initializeStore');
+    const token = this.$store.state.token;
+    axios.defaults.headers.common['Authorization'] = (token) ? "Token " + token : "";
+  }
+}
 </script>
 
 <style lang="scss">
@@ -84,24 +83,13 @@
   width: 100%;
   flex-direction: column;
   background: white;
+  margin-right: auto;
+  margin-left: auto;
 }
 
-.section-content {
-  flex: 1;
-  overflow-y: auto;
-  /* position: relative; */
+.custom-flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
-
-
-  //@import '../node_modules/bulma';
-  .is-vcentered {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center; /* used this for multiple child */
-    align-items: center; /* if an only child */
-  }
-  .wrapper {
-    margin-right: auto; /* 1 */
-    margin-left: auto; /* 1 */
-  }
 </style>

@@ -9,7 +9,7 @@
     {{ text|linebreaks }}
     There is new content within your neighbourhood on Shareish mutual aid platform.{{ text|linebreaks }}
     {{ text|linebreaks }}
-    Last {% if n > to_show %}{{ to_show }}{% endif %} event{% if n != 1 %}s{% endif %} publised:{{ text|linebreaks }}
+    Last {% if n > to_show %}{{ to_show }}{% endif %} event{% if n != 1 %}s{% endif %} published:{{ text|linebreaks }}
     {% for event in new_events %}
         - {{ event.name }}, in {{ event.delay }} days, at {{ event.distance.km|floatformat:2 }}km ({{ app_url }}/items/{{ event.id }}){{ text|linebreaks }}
     {% endfor %}
@@ -45,7 +45,7 @@
     </style>
     <p>Dear {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),</p>
     <p>There is new content within your neighbourhood on Shareish mutual aid platform.</p>
-    <p>Last {% if n > to_show %}{{ to_show }}{% endif %} event{% if n != 1 %}s{% endif %} publised:</p>
+    <p>Last {% if n > to_show %}{{ to_show }}{% endif %} event{% if n != 1 %}s{% endif %} published:</p>
     <ul>
         {% for event in new_events %}
             <li><a href='{{ app_url }}/items/{{ event.id }}'>{{ event.name }}</a>, in {{ event.delay }} days, at {{ event.distance.km|floatformat:2 }}km</li>

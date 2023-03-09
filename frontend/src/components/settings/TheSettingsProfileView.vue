@@ -71,7 +71,7 @@
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
-        <b-input v-model="internalUser['description']" v-validate="'required'" name="description" type="textarea" />
+        <b-input v-model="internalUser['description']" name="description" type="textarea" />
       </b-field>
     </div>
     <div class="tile is-ancestor">
@@ -84,7 +84,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['homepage_url']" name="homepage_url" type="text" />
+            <b-input v-model="internalUser['homepage_url']" v-validate="'url'" name="homepage_url" type="text" />
           </b-field>
         </div>
       </div>
@@ -97,7 +97,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['facebook_url']" name="facebook_url" type="text" />
+            <b-input v-model="internalUser['facebook_url']" v-validate="'url'" name="facebook_url" type="text" />
           </b-field>
         </div>
       </div>
@@ -110,31 +110,37 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['instagram_url']" name="instagram_url" type="text" />
+            <b-input v-model="internalUser['instagram_url']" v-validate="'required'" name="instagram_url" type="text" />
           </b-field>
         </div>
       </div>
     </div>
-    <b-button :label="$t('save')" type="is-primary" @click="save" />
+    <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
 </template>
 
 
 <script>
 import axios from 'axios';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'SettingsProfile',
+  name: 'TheSettingsProfileView',
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },
   props: {
-    user: Object
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {
       internalUser: null,
-      file: null
+      file: null,
+      waitingFormResponse: false
     }
   },
   created() {
@@ -143,6 +149,8 @@ export default {
   },
   methods: {
     async save() {
+      this.waitingFormResponse = true;
+
       let result = await this.$validator.validateAll();
       if (result) {
         try {
@@ -150,14 +158,14 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
 
           if (this.file) {
             let data = new FormData();
             data.append('user_id', this.internalUser['id']);
             data.append('image', this.file);
-            const image_url = (await axios.post('/api/v1/user_image/', data)).data;
-            this.internalUser.images.unshift(image_url);
+            let image_url = (await axios.post('/api/v1/user_image/', data)).data;
+            this.internalUser.images.push(image_url);
             this.file = null;
           }
 
@@ -169,16 +177,13 @@ export default {
           });
 
           this.$emit('updateUser', this.internalUser);
-        } catch (error) {
-          console.log(error);
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-danger',
-            message: this.$t('notif-error-user-update'),
-            pauseOnHover: true,
-          })
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
+
+      this.waitingFormResponse = false;
     }
   }
 };

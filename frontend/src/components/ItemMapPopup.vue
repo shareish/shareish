@@ -2,18 +2,20 @@
   <div class="box">
     <article class="media">
       <div class="media-left">
-        <figure class="image">
-          <img v-if="item.images.length > 0" :src="item.images[0]" alt="Image">
-          <img v-else :src="category1['image-placeholder']" alt="Image">
-        </figure>
+        <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+          <figure class="image">
+            <img v-if="item.images.length > 0" :src="item.images[0]" alt="Image">
+            <img v-else :src="category1['image-placeholder']" alt="Image">
+          </figure>
+        </router-link>
       </div>
       <div class="media-content">
         <div class="content">
           <p>
             <strong class="is-size-4">{{ item.name }}</strong>
             <br />
-            <item-type-tag :type="item.item_type" />
-            <small v-if="user">{{ $t('by') }} @{{ user.username }}</small>
+            <item-type-tag :type="item.item_type" class="mr-1" />
+            <small v-if="item.user">{{ $t('by') }} <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">@{{ item.user.username }}</router-link></small>
             <br />
             <small>{{ formattedDate(item.startdate) }} </small>
             <template v-if="item.enddate"> {{ $t('to') }} {{ formattedDate(item.enddate) }}</template>
@@ -50,11 +52,13 @@ import {categories} from '@/categories';
 export default {
   name: 'ItemMapPopup',
   components: {ItemTypeTag},
-  props: ['item', 'users'],
+  props: {
+    item: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
-    user() {
-      return this.users.find(user => user.id === this.item.user) || {};
-    },
     category1() {
       return this.category(this.item.category1);
     },

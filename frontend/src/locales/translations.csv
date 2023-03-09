@@ -52,7 +52,6 @@ help_add_item,"An element can be of several types (request for good or service, 
 help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Évènement pour un évènement gratuit et solidaire"
 help_item_ihaveimage,"Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)","Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)"
 help_item_noimage,"Choose this option if you don't have an image for your item (images are optional and can be uploaded later)","Choisissez cette option si vous n'avez pas d'images pour votre élément (les images sont optionnelles et peuvent être uploadées ultérieurement)"
-item-category,Category,Catégorie
 help_item_category,"Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items","Choisissez de 1 à 3 catégories pour décrire votre élément ce qui permet aux autres utilisateurs de plus rapidement chercher les éléments qui les intéressent"
 request,Request,Demande
 requests,Requests,Demandes
@@ -131,7 +130,8 @@ views,views,vues
 save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
 help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
 submit,Submit,Soumettre
-ends,ends,se termine
+ends,Ends,Se termine
+ended,Ended,S'est terminé
 submit-again,Submit again,Soumettre à nouveau
 profile,Profile,Profil
 my-conversations,My conversations,Mes conversations
@@ -190,12 +190,12 @@ post-message,Send message,Envoyer le message
 notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
-location,Location,Emplacement
+location,Location,Lieu
 no-address,No address provided,Pas d'adresse renseignée
-from,from,du
-since,since,depuis
+item-availability-from,From,À partir du
+item-availability-until,Until,Jusqu'au
 delete,Delete,Supprimer
-start-conversation,Start conversation,Commencer une conversation
+start-conversation,Start conversation,Lancer une conversation
 intro-donation-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
 intro-request-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
 intro-loan-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
@@ -222,7 +222,6 @@ notif-success-password-reset,Your password has been changed.,Votre mot de passe 
 notif-error-password-reset,An error prevented to change your password.,Une erreur a empêché la mise à jour de votre mot de passe.
 edit-item,Edit an item,Editer un élément
 notif-success-item-update,The item has been successfully edited,L'élément a été correctement édité
-notif-error-item-update,An error prevented the item to be edited,Une erreur a empêché l'édition de l'élément
 item-image,Image,Image
 item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
 unread-messages,- | 1 unread message | {count} unread messages,- | 1 message non lu | {count} messages non lus
@@ -233,3 +232,13 @@ notifications,Notifications,Notifications
 privacy,Privacy,Confidentialité
 account,Account,Compte
 general,General,Général
+joined,joined,a rejoint
+published,Published,Publié
+are-you-interested,Are you interested?,Vous êtes intéressé?
+management,Management,Gestion
+conversations-reloaded-successfully,Conversations got reloaded successfully after last error!,Les conversations ont pu être rechargées correctement depuis la dernière erreur!
+notifications-reloaded-successfully,Notifications got reloaded successfully after last error!,Les notifications ont pu être rechargées correctement depuis la dernière erreur!
+connection-error,Connection error. Try again later.,Erreur de connexion. Veuillez réeesayer plus tard.
+item-not-available-anymore-warning,"This item is not available anymore. This page is still accessible for information purpose.","Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
+item-not-available-anymore-warning-owner,"Your item is not available anymore. This page is still accessible for information purpose.","Votre élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
+warning,Warning,Attention

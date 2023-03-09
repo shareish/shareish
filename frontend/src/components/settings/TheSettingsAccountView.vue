@@ -15,25 +15,31 @@
         </div>
       </div>
     </div>
-    <b-button :label="$t('save')" type="is-primary" @click="save" />
+    <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
 </template>
 
 
 <script>
 import axios from 'axios';
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'SettingsAccount',
+  name: 'TheSettingsAccountView',
+  mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
   },
   props: {
-    user: Object
+    user: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {
-      internalUser: null
+      internalUser: null,
+      waitingFormResponse: false
     }
   },
   created() {
@@ -42,6 +48,8 @@ export default {
   },
   methods: {
     async save() {
+      this.waitingFormResponse = true;
+
       let result = await this.$validator.validateAll();
       if (result) {
         try {
@@ -49,7 +57,7 @@ export default {
           delete tempUser.images;
           delete tempUser.items;
 
-          this.internalUser = (await axios.patch('/api/v1/users/me/', tempUser)).data;
+          this.internalUser = (await axios.patch('/api/v1/webusers/me/', tempUser)).data;
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -59,16 +67,13 @@ export default {
           });
 
           this.$emit('updateUser', this.internalUser);
-        } catch (error) {
-          console.log(error);
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-danger',
-            message: this.$t('notif-error-user-update'),
-            pauseOnHover: true,
-          })
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
         }
       }
+
+      this.waitingFormResponse = false;
     }
   }
 };

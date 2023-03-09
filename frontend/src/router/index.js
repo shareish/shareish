@@ -2,41 +2,38 @@ import VueRouter from 'vue-router';
 import store from '../store'
 import i18n from '@/i18n'
 
-import HomeView from '@/components/HomeView.vue'
-import ItemsMap from '@/components/pages/ItemsMap';
-import SignUp from '@/components/user-management/SignUpView.vue'
-import Login from '@/components/user-management/LoginView.vue'
-import ItemDetails from '@/components/pages/ItemDetails'
-import AddItem from '@/components/pages/AddItem'
-import Conversations from '@/components/pages/Conversations'
-import ConversationDetail from '@/components/pages/ConversationDetails'
-import ResetPassword from '@/components/user-management/ResetPassword.vue'
-import ResetPasswordConfirm from '@/components/user-management/ResetPasswordConfirm.vue'
-import ActivateEmail from '@/components/user-management/ActivateEmail.vue'
-import ItemsList from '@/components/pages/ItemsList';
-import Account from '@/components/pages/Account';
-import UserProfile from '@/components/pages/UserProfile';
-import Settings from "@/components/pages/Settings.vue";
+import TheHomeView from '@/components/pages/TheHomeView.vue'
+import TheSignUpView from '@/components/user-management/TheSignUpView.vue'
+import TheLoginView from '@/components/user-management/TheLoginView.vue'
+import TheResetPasswordView from '@/components/user-management/TheResetPasswordView.vue'
+import TheResetPasswordConfirmView from '@/components/user-management/TheResetPasswordConfirmView.vue'
+import TheActivateView from '@/components/user-management/TheActivateView.vue'
+import TheAccountView from '@/components/pages/TheAccountView.vue';
+import TheProfileView from '@/components/pages/TheProfileView.vue';
+import TheSettingsView from "@/components/pages/TheSettingsView.vue";
+import TheItemsView from '@/components/pages/TheItemsView.vue';
+import TheItemView from '@/components/pages/TheItemView.vue'
+import TheMapView from '@/components/pages/TheMapView.vue';
+import TheAddItemView from '@/components/pages/TheAddItemView.vue'
+import TheConversationsView from '@/components/pages/TheConversationsView.vue'
+import TheConversationView from '@/components/pages/TheConversationView.vue'
+import TheAboutView from "@/components/pages/TheAboutView.vue";
 
 const routes = [
     {
         path: '/',
         name: 'home',
-        component: HomeView
+        component: TheHomeView
     },
     {
         path: '/about',
         name: 'about',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () =>
-            import ( /* webpackChunkName: "about" */ '@/components/AboutView.vue')
+        component: TheAboutView
     },
     {
         path: '/sign-up',
         name: 'signup',
-        component: SignUp,
+        component: TheSignUpView,
         meta: {
             loginForbidden: true
         }
@@ -44,7 +41,7 @@ const routes = [
     {
         path: '/log-in',
         name: 'login',
-        component: Login,
+        component: TheLoginView,
         meta: {
             loginForbidden: true
         }
@@ -52,22 +49,30 @@ const routes = [
     {
         path: '/reset-password',
         name: 'resetPassword',
-        component: ResetPassword
+        component: TheResetPasswordView
     },
     {
-        path: '/password/reset/confirm/:uid/:token',
+        path: '/reset-password/confirm/:uid/:token',
         name: 'resetPasswordConfirm',
-        component: ResetPasswordConfirm
+        component: TheResetPasswordConfirmView
     },
     {
         path: '/activate/:uid/:token',
+        name: 'activateEmailToken',
+        component: TheActivateView
+    },
+    {
+        path: '/activate',
         name: 'activateEmail',
-        component: ActivateEmail
+        component: TheActivateView,
+        meta: {
+            loginForbidden: true
+        }
     },
     {
         path: '/map',
         name: 'itemsMap',
-        component: ItemsMap,
+        component: TheMapView,
         meta: {
             requireLogin: true
         }
@@ -75,7 +80,7 @@ const routes = [
     {
         path: '/profile',
         name: 'myaccount',
-        component: Account,
+        component: TheAccountView,
         meta: {
             requireLogin: true
         }
@@ -83,7 +88,7 @@ const routes = [
     {
         path: '/profile/:id',
         name: 'userDetails',
-        component: UserProfile,
+        component: TheProfileView,
         meta: {
             requireLogin: true
         }
@@ -91,7 +96,7 @@ const routes = [
     {
         path: '/items',
         name: 'items',
-        component: ItemsList,
+        component: TheItemsView,
         meta: {
             requireLogin: true
         }
@@ -99,7 +104,7 @@ const routes = [
     {
         path: '/items/:id',
         name: 'itemDetail',
-        component: ItemDetails,
+        component: TheItemView,
         meta: {
             requireLogin: true
         }
@@ -107,7 +112,7 @@ const routes = [
     {
         path: '/add-item',
         name: 'addItem',
-        component: AddItem,
+        component: TheAddItemView,
         meta: {
             requireLogin: true
         }
@@ -115,7 +120,7 @@ const routes = [
     {
         path: '/conversations',
         name: 'conversations',
-        component: Conversations,
+        component: TheConversationsView,
         meta: {
             requireLogin: true
         }
@@ -123,7 +128,7 @@ const routes = [
     {
         path: '/conversations/:id',
         name: 'conversationDetail',
-        component: ConversationDetail,
+        component: TheConversationView,
         meta: {
             requireLogin: true
         }
@@ -131,7 +136,7 @@ const routes = [
     {
         path: '/settings',
         name: 'settings',
-        component: Settings,
+        component: TheSettingsView,
         meta: {
             requireLogin: true
         }
@@ -139,7 +144,7 @@ const routes = [
     {
         path: '/settings/:page',
         name: 'settingsPage',
-        component: Settings,
+        component: TheSettingsView,
         meta: {
             requireLogin: true
         }

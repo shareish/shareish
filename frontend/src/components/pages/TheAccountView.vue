@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <div id="page-account">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
-      <h1 class="title">{{ $t('my-recurrent-items') }}</h1>
+      <h1 class="title">{{ $t('my-account') }}</h1>
+      <user-card v-if="user" :user="user" />
+      <h1 class="title">{{ $t('my-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
         <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
-          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
+          <item-card :item="item" />
         </div>
       </div>
       <div v-else>{{ $t('no-items') }}</div>
@@ -14,30 +16,44 @@
 </template>
 
 <script>
+import UserCard from "@/components/UserCard";
 import axios from "axios";
 import ItemCard from "@/components/ItemCard";
 import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'RecurrentItemsList',
+  name: 'TheAccountView',
   mixins: [ErrorHandler, WindowSize],
-  components: {ItemCard},
+  components: {UserCard, ItemCard},
   data() {
     return {
+      user: {},
       items: [],
-      loading: true,
       columnsWidthClass: null,
+
+      loading: true
     }
   },
   methods: {
-    async fetchItems() {
+    async fetchUser() {
       try {
-        this.items = (await axios.get("/api/v1/recurrents/")).data;
+        this.user = (await axios.get("/api/v1/users/me/")).data;
       }
       catch (error) {
         this.snackbarError(error);
       }
+    },
+    async fetchItems() {
+      try {
+        this.items = (await axios.get("/api/v1/user_items/")).data;
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+    },
+    updateUser(user) {
+      this.user = user;
     },
     windowWidthChanged() {
       // Below or equal 520
@@ -63,12 +79,16 @@ export default {
       this.columnsWidthClass = columnsWidthClass;
     }
   },
-  async mounted() {
+  async created() {
     this.loading = true;
     await Promise.all([
+      this.fetchUser(),
       this.fetchItems()
     ]);
     this.loading = false;
+  },
+  mounted() {
+    document.title = `Shareish | ${this.$t('my-account')}`;
   }
 };
 </script>

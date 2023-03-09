@@ -29,7 +29,7 @@ to_show = {
 item_types = {
     "DN": "Donation",
     "LN": "Loan",
-    "BR": "Request",
+    "RQ": "Request",
     "EV": "Event"
 }
 
@@ -54,7 +54,7 @@ def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
 
     # Items sorted by distance
     queryset = Item.objects.filter(
-        Q(creationdate__lte=end, creationdate__gte=start),
+        Q(creationdate__gte=start),
         Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
         ~Q(item_type='EV'),
         ~Q(user=user)
@@ -75,7 +75,7 @@ def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies)
     # Events sorted by delay before event starting
     queryset = Item.objects.filter(
         Q(item_type='EV'),
-        Q(creationdate__lte=end, creationdate__gte=start),
+        Q(creationdate__gte=start),
         Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
         ~Q(user=user)
     ).annotate(

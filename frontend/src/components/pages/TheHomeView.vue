@@ -3,19 +3,13 @@
     <h1 class="title">{{ $t('welcome') }} {{ $t('on') }} SHAREISH ({{ $t('shareish_title') }})</h1>
     <h2 class="subtitle">{{ $t('about-us') }}</h2>
 
-    <p>{{ $t('shareish_description') }}.<br /><br />
-      <a class="text-reset" @click="goto('/sign-up')">{{ $t('after_registration') }}</a> {{ $t('andet') }}
-      <a class="text-reset" @click="goto('/log-in')">{{ $t('logged_in') }}</a>, Shareish {{ $t('offers') }}
-      <a class="text-reset" @click="goto('/map')">{{ $t('interactive_map') }}</a> {{ $t('shareish_description2') }}.
+    <p>
+      {{ $t('shareish_description') }}.<br /><br />
+      <router-link to="/sign-up">{{ $t('after_registration') }}</router-link> {{ $t('andet') }}
+      <router-link to="/log-in">{{ $t('logged_in') }}</router-link>, Shareish {{ $t('offers') }}
+      <router-link to="/map">{{ $t('interactive_map') }}</router-link> {{ $t('shareish_description2') }}.
     </p>
     <br />
-
-    <!--<b-image :src="require('@/assets/shareish-screenshot.png')" :rounded="rounded"></b-image>//-->
-    <!--
-    <p>Existing Shareish instances:</p>
-    <ul><li><a href="https://shareish.org/">Shareish demonstration server</a></li>
-    </ul>
-    //-->
 
     <br />
     <h2 class="subtitle"><b>{{ $t('faq') }}</b></h2>
@@ -103,15 +97,10 @@
 
 <script>
 export default {
-  name: 'HomeView',
+  name: 'TheHomeView',
   components: {},
   mounted() {
     document.title = "Shareish"
-  },
-  methods: {
-    goto(url) {
-      this.$router.push(url)
-    },
   }
 }
 </script>

@@ -12,14 +12,14 @@
           <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="has-text-weight-bold">
             {{ sender.first_name }} {{ sender.last_name }}
           </router-link>
-          ·
+          &middot;
           <small>
             <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="username">
               @{{ sender.username }}
             </router-link>
           </small>
         </p>
-        <p class="message_content">{{ message.content }}</p>
+        <p class="message_content" style="white-space: pre-wrap;">{{ message.content }}</p>
         <p class="has-text-grey"><small>{{ formattedDate }}</small></p>
       </div>
     </div>
@@ -30,11 +30,16 @@
 import moment from 'moment';
 
 export default {
-  name: 'Message',
-  props: ['message', 'users'],
+  name: 'ConversationMessage',
+  props: {
+    message: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
     sender() {
-      return this.users.find(user => user.id === this.message.user) || {};
+      return this.message.user;
     },
     formattedDate() {
       return moment(this.message.date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();

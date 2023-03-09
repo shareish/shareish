@@ -1,9 +1,9 @@
 <template>
   <b-field :label="label">
     <b-select :expanded="expanded" :value="value" @input="$emit('input', $event)">
-      <option v-if="nullable" :value="null">{{ $t('all') }}</option>
-      <option v-for="category in categories" :key="category.id" :value="category.id">
-        {{ $t(category.slug) }}
+      <option v-if="number > 1 || !number" value=""></option>
+      <option v-for="{id, slug} in categories" :key="id" :value="id">
+        {{ $t(slug) }}
       </option>
     </b-select>
   </b-field>
@@ -17,15 +17,15 @@ export default {
   props: {
     number: Number,
     value: String,
-    nullable: {type: Boolean, default: true},
-    expanded: {type: Boolean, default: false}
+    expanded: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     label() {
-      let label = this.$t('item-category');
-      if (this.number)
-        label += ` ${this.number}`;
-      return label;
+      let addon = (this.number) ? " " + this.number : "";
+      return this.$t('category') + addon;
     },
     categories() {
       return Object.values(categories);

@@ -6,20 +6,28 @@
 const itemTypeIcons = {
   "DN": "is-success",
   "LN": "is-warning",
-  "BR": "is-danger",
+  "RQ": "is-danger",
   "EV": "is-purple"
 }
 
 const itemTypeSlug = {
   "DN": "donation",
   "LN": "loan",
-  "BR": "request",
+  "RQ": "request",
   "EV": "event"
 }
 
 export default {
   name: 'ItemTypeTag',
-  props: ['type'],
+  props: {
+    type: {
+      type: String,
+      required: true,
+      validator: function (value) {
+        return ["DN", "LN", "RQ", "EV"].indexOf(value) !== -1;
+      }
+    }
+  },
   computed: {
     color() {
       return itemTypeIcons[this.type];

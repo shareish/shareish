@@ -1,7 +1,7 @@
 <template>
-  <div class="page-account container">
+  <div id="page-settings" class="max-width-is-max-container">
     <h1 class="title mb-6">{{ $t('settings') }} & {{ $t('notifications') }}</h1>
-    <b-loading v-if="loading" :active="loading" :is-full-page="false" />
+    <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <div v-else class="columns is-variable" id="settings-split">
       <aside class="menu column">
         <p class="menu-label">{{ $t('general') }}</p>
@@ -12,12 +12,6 @@
               {{ $t('profile') }}
             </router-link>
           </li>
-<!--          <li>-->
-<!--            <router-link to="/settings/privacy" :class="{'is-active': currentView === 'privacy'}">-->
-<!--              <i class="fas fa-lock"></i>-->
-<!--              {{ $t('privacy') }}-->
-<!--            </router-link>-->
-<!--          </li>-->
           <li>
             <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
               <i class="fas fa-cog"></i>
@@ -35,23 +29,24 @@
           </li>
         </ul>
       </aside>
-      <settings-profile v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
-      <settings-account v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
-      <settings-notifications v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
-      <div v-else class="test">Test</div>
+      <the-settings-profile-view v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
+      <the-settings-account-view v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
+      <the-settings-notifications-view v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import SettingsProfile from "@/components/settings/SettingsProfile.vue";
-import SettingsNotifications from "@/components/settings/SettingsNotifications.vue";
-import SettingsAccount from "@/components/settings/SettingsAccount.vue";
+import axios from "axios";
+import TheSettingsProfileView from "@/components/settings/TheSettingsProfileView.vue";
+import TheSettingsNotificationsView from "@/components/settings/TheSettingsNotificationsView.vue";
+import TheSettingsAccountView from "@/components/settings/TheSettingsAccountView.vue";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'Settings',
-  components: {SettingsAccount, SettingsNotifications, SettingsProfile},
+  name: 'TheSettingsView',
+  mixins: [ErrorHandler],
+  components: {TheSettingsAccountView, TheSettingsNotificationsView, TheSettingsProfileView},
   $_veeValidate: {
     validator: 'new'
   },
@@ -59,9 +54,9 @@ export default {
     return {
       loading: true,
       user: null,
-      geoloc: null,
+      geoLocation: null,
       currentView: null,
-      possibleViews: ['profile', 'privacy', 'account', 'notifications']
+      possibleViews: ['profile', 'account', 'notifications']
     }
   },
   async created() {
@@ -78,17 +73,19 @@ export default {
     await this.fetchUser();
 
     // Has the user activated geolocation?
-    if ("geolocation" in navigator) {
+    if ('geolocation' in navigator) {
       // Get the position
-      navigator.geolocation.getCurrentPosition(pos => {
-        this.geoloc = pos;
-      }, error => {
-        console.log(error);
-      }, {
-        maximumAge: 10000,
-        timeout: 5000,
-        enableHighAccuracy: true
-      });
+      navigator.geolocation.getCurrentPosition(
+        positon => {
+          this.geoLocation = positon;
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
     }
 
     this.loading = false;
@@ -96,29 +93,10 @@ export default {
   methods: {
     async fetchUser() {
       try {
-        const uri = `/api/v1/users/me/`
-        this.user = (await axios.get(uri)).data;
-      } catch (error) {
-        console.log(error);
+        this.user = (await axios.get("/api/v1/users/me/")).data;
       }
-    },
-    async fetchAddressGeoLoc() {
-      if (this.geoloc !== null) {
-        let geoLocPoint = 'SRID=4326;POINT (' + this.geoloc.coords.latitude + ' ' + this.geoloc.coords.longitude + ')';
-        try {
-          this.user.ref_location = (await axios.post(`/api/v1/address/`, geoLocPoint)).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
-        }
-      }
-    },
-    async fetchAddress() {
-      if (this.user !== null && this.user.ref_location !== null) {
-        try {
-          this.user.ref_location = (await axios.post(`/api/v1/address/`, this.user.ref_location)).data;
-        } catch (error) {
-          console.log(JSON.stringify(error));
-        }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     updateUser(user) {
@@ -134,8 +112,17 @@ export default {
 </script>
 
 <style scoped>
+.max-width-is-max-container {
+  margin: 0 auto;
+  max-width: 1344px;
+}
+
 #settings-split aside.menu {
   max-width: 250px;
+}
+
+.menu-list i {
+  margin-right: 3px;
 }
 
 @media screen and (max-width: 1023px) and (min-width: 767px) {
@@ -152,9 +139,5 @@ export default {
   #settings-split aside.menu {
     max-width: 100%;
   }
-}
-
-.menu-list i {
-  margin-right: 3px;
 }
 </style>
