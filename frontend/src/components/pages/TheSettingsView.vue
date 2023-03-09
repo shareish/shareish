@@ -54,7 +54,7 @@ export default {
     return {
       loading: true,
       user: null,
-      geoloc: null,
+      geoLocation: null,
       currentView: null,
       possibleViews: ['profile', 'account', 'notifications']
     }
@@ -77,7 +77,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         positon => {
-          this.geoloc = positon;
+          this.geoLocation = positon;
         },
         null,
         {

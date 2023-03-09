@@ -33,7 +33,7 @@
         <template v-if="!recurrentList">
           <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
           <small class="is-block" v-if="item.enddate">{{ $t('ends') }} {{ formattedDateFromNow(item.enddate) }}</small>
-          <small class="is-block" v-if="item.location && this.location">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
+          <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
         </template>
       </div>
       <span v-for="category in categories" :key="category.slug" class="icon-text">
@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      location: null
+      geoLocation: null
     }
   },
   created() {
@@ -78,7 +78,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         positon => {
-          this.geoloc = positon;
+          this.geoLocation = positon;
         },
         null,
         {
@@ -137,11 +137,11 @@ export default {
       let lat2 = latLong[0];
       let lon2 = latLong[1];
       let R = 6371; // Radius of the earth in km
-      let dLat = this.deg2rad(lat2 - this.location.coords.latitude);  // deg2rad below
-      let dLon = this.deg2rad(lon2 - this.location.coords.longitude);
+      let dLat = this.deg2rad(lat2 - this.geoLocation.coords.latitude);  // deg2rad below
+      let dLon = this.deg2rad(lon2 - this.geoLocation.coords.longitude);
       let a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(this.deg2rad(this.location.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
+          Math.cos(this.deg2rad(this.geoLocation.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c; // Distance in km
