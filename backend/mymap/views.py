@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from django.db.models import Q
@@ -257,6 +258,10 @@ class UserViewSet(viewsets.ModelViewSet):
             request.data['ref_location'] = result['success']
         else:
             return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
+        instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
+        if re.match("^" + instagram_username_regex + "$", request.data['instagram_url']):
+            request.data['instagram_url'] = "https://www.instagram.com/" + request.data['instagram_url'] + "/"
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
