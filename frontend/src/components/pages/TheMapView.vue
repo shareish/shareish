@@ -423,17 +423,18 @@ export default {
     },
     async getFallingFruitElements() {
       try {
-        const ffbaseURL = "https://fallingfruit.org/api/0.2/locations.json?api_key=EEQRBBUB&locale=" + this.$i18n.locale + "&muni=0";
-        const ffcoords = "&nelat=" + this.bounds.getNorthEast().lat + "&nelng=" + this.bounds.getNorthEast().lng + "&swlat=" + this.bounds.getSouthWest().lat + "&swlng=" + this.bounds.getSouthWest().lng;
-        const ffURL = ffbaseURL + ffcoords
-        return (await axios.get(ffURL, {
-          transformRequest: (data, headers) => {
-            delete headers.common['Authorization'];
-            return data;
-          }
-        })).data;
-      }
-      catch (error) {
+          const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
+	  const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+          const ffURL = ffbaseURL + ffcoords
+        return (await axios.get(ffURL,
+            {
+              transformRequest: (data, headers) => {
+                delete headers.common['Authorization'];
+                return data;
+              }
+            })).data;
+
+      } catch (error) {
         console.log(error);
         return []; // may happen if fallingfruit API returns an error
       }
