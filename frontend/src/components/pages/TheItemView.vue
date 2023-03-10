@@ -112,7 +112,7 @@
               </div>
             </div>
             <div class="box has-background-white-ter">
-              <p class="content" style="white-space: pre-wrap;">{{ item.description }}</p>
+              <p class="description wbbw wspw">{{ item.description }}</p>
             </div>
           </article>
         </section>
@@ -165,7 +165,7 @@ export default {
       return itemCategories;
     },
     notAvailableYet() {
-      return new Date(this.item.startdate) > Date.now();
+      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
     itemHasNotEndedYet() {
       return this.item.enddate && new Date(this.item.enddate) > Date.now();

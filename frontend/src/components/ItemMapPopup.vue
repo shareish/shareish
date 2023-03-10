@@ -11,15 +11,30 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <p>
-            <strong class="is-size-4">{{ item.name }}</strong>
-            <br />
-            <item-type-tag :type="item.item_type" class="mr-1" />
-            <small v-if="item.user">{{ $t('by') }} <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">@{{ item.user.username }}</router-link></small>
-            <br />
-            <small>{{ formattedDate(item.startdate) }} </small>
-            <template v-if="item.enddate"> {{ $t('to') }} {{ formattedDate(item.enddate) }}</template>
-          </p>
+          <p class="is-size-4 mb-1 wbbw has-text-weight-bold">{{ item.name }}</p>
+          <div class="mb-1">
+            <item-type-tag :type="item.item_type" />
+            <span v-if="item.user">
+              {{ $t('by') }}
+              <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
+                @{{ item.user.username }}
+              </router-link>
+            </span>
+          </div>
+          <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+          <small v-if="notAvailableYet">
+            {{ $t('available') }}
+            {{ formattedDateFromNow(item.startdate) }}
+          </small>
+          <small class="is-block" v-if="item.enddate">
+            <template v-if="!itemHasEnded">
+              {{ $t('ends') }}
+            </template>
+            <template v-else>
+              {{ $t('ended') }}
+            </template>
+            {{ formattedDateFromNow(item.enddate) }}
+          </small>
           <div class="level is-mobile categories-icons">
             <div class="level-left">
               <i v-if="category1" :class="category1.icon" :title="$t(category1.slug)" class="level-item fa-2x" />
@@ -27,7 +42,7 @@
               <i v-if="category3" :class="category3.icon" :title="$t(category3.slug)" class="level-item fa-2x" />
             </div>
           </div>
-          <p>{{ truncate(item.description) }}</p>
+          <p class="description wbbw wspw">{{ truncate(item.description) }}</p>
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
@@ -68,9 +83,15 @@ export default {
     category3() {
       return this.category(this.item.category3);
     },
+    itemHasEnded() {
+      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
+    },
+    notAvailableYet() {
+      return this.item.startdate && new Date(this.item.startdate) > Date.now();
+    }
   },
   methods: {
-    formattedDate(date) {
+    formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
     },
     truncate(description) {
@@ -79,7 +100,7 @@ export default {
     category(category) {
       return categories[category];
     }
-  },
+  }
 };
 </script>
 
@@ -99,5 +120,12 @@ button i {
 
 .image {
   width: 128px;
+}
+
+.media-content .description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 </style>

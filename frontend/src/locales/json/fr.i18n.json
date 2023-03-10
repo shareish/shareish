@@ -245,5 +245,6 @@
   "item-not-available-anymore-warning": "Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif.",
   "item-not-available-anymore-warning-owner": "Votre élément n'est plus disponible. Cette page est toujours accessible à titre informatif.",
   "warning": "Attention",
-  "enable-geolocation-to-use-feature": "Vous devez activer la géolocalisation pour utiliser cette fonctionnalité."
+  "enable-geolocation-to-use-feature": "Vous devez activer la géolocalisation pour utiliser cette fonctionnalité.",
+  "available": "Disponible"
 }
