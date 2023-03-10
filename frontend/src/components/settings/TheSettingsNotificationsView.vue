@@ -127,8 +127,6 @@ export default {
 
     document.title = 'Shareish | Settings: Notifications';
 
-    window.removeEventListener('resize', this.resizing);
-
     this.internalUser = {...this.user};
 
     this.radioGroups.notif_conversations = this.internalUser.mail_notif_freq_conversations;
@@ -161,6 +159,8 @@ export default {
       if (this.geoLocation !== null) {
         let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
+      } else {
+        this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
       }
     },
     async fetchAddress(location) {
