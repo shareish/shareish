@@ -127,8 +127,6 @@ export default {
 
     document.title = 'Shareish | Settings: Notifications';
 
-    window.removeEventListener('resize', this.resizing);
-
     this.internalUser = {...this.user};
 
     this.radioGroups.notif_conversations = this.internalUser.mail_notif_freq_conversations;
