@@ -223,6 +223,8 @@ export default {
       if (this.geoLocation !== null) {
         let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
+      } else {
+        this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
       }
     },
     async fetchAddress(location) {

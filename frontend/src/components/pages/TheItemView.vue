@@ -50,6 +50,8 @@
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}
             {{ formattedDateFromNow(item.creationdate) }}
+            &middot;
+            <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
           <article id="categories" class="mb-5-5">
             <p v-for="category in itemCategories" :key="category.slug" class="category">
@@ -327,6 +329,10 @@ div.icon-text {
 #item-info .subtitle {
   font-style: italic;
   opacity: 0.9;
+}
+
+#item-info .subtitle i {
+  margin: 0 0.2em 0 0.1em;
 }
 
 #item-info #categories .category {
