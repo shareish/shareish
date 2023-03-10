@@ -42,7 +42,7 @@
               <i v-if="category3" :class="category3.icon" :title="$t(category3.slug)" class="level-item fa-2x" />
             </div>
           </div>
-          <p class="description wbbw wspw">{{ truncate(item.description) }}</p>
+          <p class="description wbbw wspw">{{ item.description }}</p>
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
@@ -93,9 +93,6 @@ export default {
   methods: {
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
-    },
-    truncate(description) {
-      return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
     },
     category(category) {
       return categories[category];
