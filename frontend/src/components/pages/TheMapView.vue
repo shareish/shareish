@@ -103,7 +103,7 @@ import {
   publicBookcaseIcon,
   aedIcon,
   giveBoxIcon,
-  drinkingWaterIcon, freeShopIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
+  drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
 } from "@/map-icons";
 
 import {latLng} from "leaflet";
@@ -197,6 +197,15 @@ export default {
           tagValue: 'food_bank',
           color: 'is-dark'
         },
+	{
+          id: 'food-sharings',
+          slugMarker: 'food-sharing',
+          markers: [],
+          visible: true,
+          tagKey: 'amenity',
+          tagValue: 'food_sharing',
+          color: 'is-dark'
+        },
         {
           id: 'soup-kitchens',
           slugMarker: 'soup-kitchen',
@@ -240,6 +249,7 @@ export default {
         'give-boxes': giveBoxIcon,
         'drinking-water-spots': drinkingWaterIcon,
         'free-shops': freeShopIcon,
+	'food-sharings': foodSharingIcon,  
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon

@@ -88,8 +88,8 @@ transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Liv
 vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
 other,Other,Autres
 search-dot,Search...,Recherche...
-bookcases,Public bookcases,Micro-bibliothèques
-bookcase,Public bookcase,Micro-bibliothèque
+bookcases,Public bookcases,Boîtes à livres
+bookcase,Public bookcase,Boîte à livre
 defibrillators,Defibrillators,Défibrillateurs
 defibrillator,Defibrillator,Défibrillateur
 give-boxes,Give boxes,Boîtes à dons
@@ -98,6 +98,8 @@ drinking-water-spots,Drinking water spots,Points d'eau potable
 drinking-water-spot,Drinking water spot,Point d'eau potable
 free-shops,Free shops,Magasins gratuits
 free-shop,Free shop,Magasin gratuit
+food-sharings,Food Sharing,Frigos solidaires
+food-sharing,Food Sharing,Frigo solidaire
 food-banks,Food Banks,Banques alimentaires
 food-bank,Food Bank,Banque alimentaire
 soup-kitchens,Soup Kitchens, Soupes populaires
