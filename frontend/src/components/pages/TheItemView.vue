@@ -59,6 +59,17 @@
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
           </article>
+          <article id="description" class="mb-5-5">
+            <div class="title is-size-4 mb-1">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
+                <span>{{ $t('description') }}</span>
+              </div>
+            </div>
+            <div class="box has-background-white-ter">
+              <p class="description wbbw wspw">{{ item.description }}</p>
+            </div>
+          </article>
           <article id="location" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
@@ -75,7 +86,7 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
+          <article id="availability" v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
@@ -95,7 +106,7 @@
               </span>
             </template>
           </article>
-          <article class="mb-5-5">
+          <article id="user">
             <div class="title is-size-4 mb-1">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
@@ -103,17 +114,6 @@
               </div>
             </div>
             <user-card :user="user" />
-          </article>
-          <article>
-            <div class="title is-size-4 mb-1">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
-                <span>{{ $t('description') }}</span>
-              </div>
-            </div>
-            <div class="box has-background-white-ter">
-              <p class="description wbbw wspw">{{ item.description }}</p>
-            </div>
           </article>
         </section>
       </div>
