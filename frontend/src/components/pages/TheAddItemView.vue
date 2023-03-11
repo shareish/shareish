@@ -1,205 +1,255 @@
 <template>
-  <div id="page-add-item">
+  <b-loading v-if="loading" :active="true" :is-full-page="false" />
+  <div v-else id="page-add-item" class="max-width-is-max-container" ref="page-container">
     <h1 class="title has-text-centered mb-6">
       {{ $t('add-new-item') }}
       <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
     </h1>
-    <b-loading v-if="loading" :active="true" :is-full-page="false" />
-    <template v-if="step === 0">
-      <div class="max-width-is-max-container has-text-centered buttons is-justify-content-center">
-        <b-tooltip :label="$t('help_item_ihaveimage')" multilined position="is-bottom" class="mr-3">
-          <button class="button is-primary is-large" @click="step = 1">{{ $t('i-have-image') }}</button>
-        </b-tooltip>
-        <b-tooltip :label="$t('help_item_noimage')" multilined position="is-bottom">
-          <button class="button is-primary is-large is-outlined" @click="step = 2">{{ $t('i-do-not-have-image') }}</button>
-        </b-tooltip>
-      </div>
-      <recurrent-items-list @submitAgain="setRecurrentItem" />
-    </template>
-    <template v-else-if="step === 1">
-      <div class="container has-text-centered is-justify-content-center">
-        <h2 class="subtitle">{{ $t('upload-your-item-image') }}</h2>
-        <div class="file is-boxed is-large">
-          <label class="file-label">
-            <input accept="image/*" :v-model="file" class="file-input" type="file" @change="uploadFile">
-            <span class="file-cta">
-              <span class="file-icon"><i class="fas fa-upload"></i></span>
-              <span class="file-label">Choose a file…</span>
-            </span>
-            <span v-if="file" class="file-name">{{ file.name }}</span>
-          </label>
-        </div>
-      </div>
-    </template>
-    <template v-else-if="step === 2">
-      <div class="columns max-width-is-max-container">
-        <section class="column is-8">
-          <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
-            <template #label>{{ $t('name') }}
-              <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
-                <i class="icon far fa-question-circle"></i>
-              </b-tooltip>
-            </template>
-            <b-input v-model="name" name="name" v-validate="'required'" />
-          </b-field>
-          <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
-            <template #label>{{ $t('item-type') }}
-              <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
-                <i class="icon far fa-question-circle"></i>
-              </b-tooltip>
-            </template>
-            <b-select v-model="type" expanded name="type" v-validate="'required'">
-              <option value="RQ">{{ $t('request') }}</option>
-              <option value="DN">{{ $t('donation') }}</option>
-              <option value="LN">{{ $t('loan') }}</option>
-              <option value="EV">{{ $t('event') }}</option>
-            </b-select>
-          </b-field>
-          <div class="columns">
-            <b-tooltip :label="$t('help_item_category')" multilined position="is-right">
-              <category-selector v-model="category1" :number="1" class="column" expanded />
-              <category-selector v-model="category2" :number="2" class="column" expanded />
-              <category-selector v-model="category3" :number="3" class="column" expanded />
-            </b-tooltip>
-          </div>
-          <b-field>
-            <template #label>{{ $t('address') }}
-              <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
-                <i class="icon far fa-question-circle"></i>
-              </b-tooltip>
-              <b-button size="is-small" @click="fetchAddressGeoLoc">
-                <i class="icon fas fa-map-marker-alt"></i>
-              </b-button>
-            </template>
-            <b-input v-model="location" />
-          </b-field>
-          <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
-            <template #label> {{ $t('description') }}
-              <b-tooltip :label="$t('help_item_description')" multilined position="is-right">
-                <i class="icon far fa-question-circle"></i>
-              </b-tooltip>
-            </template>
-            <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
-          </b-field>
-          <b-field grouped>
-            <b-field expanded>
-              <template #label> {{ $t('start-date') }}
-                <b-tooltip :label="$t('help_item_start_date')" multilined position="is-top">
-                  <i class="icon far fa-question-circle"></i>
-                </b-tooltip>
-              </template>
-              <b-datetimepicker
-                  v-model="startdate"
-                  :max-datetime="enddate"
-                  icon="calendar"
-                  :icon-right="startdate ? 'close-circle' : ''"
-                  icon-right-clickable
-                  @icon-right-click="clearStartdate"
-                  icon-pack="fas"
-                  :locale="$i18n.locale"
-                  @change="startdateChanged"
-              />
-            </b-field>
-            <b-field expanded>
-              <template #label> {{ $t('end-date') }}
-                <b-tooltip :label="$t('help_item_end_date')" multilined position="is-top">
-                  <i class="icon far fa-question-circle"></i>
-                </b-tooltip>
-              </template>
-            <b-datetimepicker
-                v-model="enddate"
-                :min-datetime="startdate"
-                icon="calendar"
-                :icon-right="enddate ? 'close-circle' : ''"
-                icon-right-clickable
-                @icon-right-click="clearEnddate"
-                icon-pack="fas"
-                :locale="$i18n.locale"
-                @change="enddateChanged"
-            />
-            </b-field>
-          </b-field>
-          <b-field>
-            <b-checkbox v-model="isRecurrent">
-              <strong>{{ $t('save-as-recurrent-item') }}</strong>
-              <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
-                <i class="icon far fa-question-circle"></i>
-              </b-tooltip>
-            </b-checkbox>
-          </b-field>
-          <div class="container has-text-centered">
-            <b-button class="button is-primary" :loading="waitingFormResponse" @click="submit">{{ $t('submit') }}</b-button>
-          </div>
-        </section>
-        <div class="column is-4">
-          <template v-if="!isFromRecurrent">
-            <figure v-if="filePreview" class="image is-256x256">
-              <img :src="filePreview" />
-            </figure>
+    <div class="columns">
+      <section id="images-side" class="column is-4 pl-5">
+        <h2 class="is-size-4 has-text-centered mb-3">{{ $t('add-images-to-item') }}</h2>
+        <b-field>
+          <b-upload v-model="filesSelected" :disabled="!canStillUploadImages" accept="image/*" expanded multiple drag-drop>
+            <section class="section">
+              <div class="content has-text-centered">
+                <p>
+                  <i class="fas fa-upload fa-2x"></i>
+                </p>
+                <p>{{ $t('drop-or-click-to-upload') }}</p>
+              </div>
+            </section>
+          </b-upload>
+        </b-field>
+        <div id="previews" v-if="images['previews']" class="mt-4">
+          <h2 class="is-size-5 has-text-weight-bold mb-3">
+            {{ $t('uploaded-images') }}
+            <span class="tag vertical-align-middle ml-1" :class="imagesSlotsLeftColorClass">{{ images['previews'].length }} / {{ imagesSlots }}</span>
+          </h2>
+          <template v-if="images['previews'].length === 0">
+            <p>{{ $t('no-uploaded-images') }}</p>
           </template>
           <template v-else>
-            <figure v-if="recurrentImages.length > 0" class="image is-256x256">
-              <img :src="recurrentImages[recurrentImages.length - 1]" />
-            </figure>
+            <div class="columns is-mobile is-flex-wrap-wrap">
+              <div v-for="(preview, index) in images['previews']" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
+                <div class="square">
+                  <div class="square-fill">
+                    <div class="img-fill">
+                      <div class="remove" @click="removeImage(index)">
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z" />
+                        </svg>
+                      </div>
+                      <img :src="preview" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </template>
         </div>
-      </div>
-    </template>
+      </section>
+      <section id="form-side" class="column is-8">
+        <div class="box mb-6" :class="{'is-hidden': hideRecurrentsItemsInfoBox}" style="border: 2px solid #3eaf7c;">
+          <template v-if="!isRecurrentItemUsed">
+            {{ $t('ask-fill-form-using-recurrents') }}
+          </template>
+          <template v-else>
+            {{ $tc('want-an-other-recurrent', recurrentItemId) }}
+          </template>
+          <router-link to="/add-item/from-recurrents" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
+          <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
+        </div>
+        <div id="form">
+          <div class="columns">
+            <div class="column">
+              <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
+                <template #label>{{ $t('name') }}
+                  <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-input v-model="name" name="name" v-validate="'required'" />
+              </b-field>
+            </div>
+            <div class="column">
+              <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
+                <template #label>{{ $t('item-type') }}
+                  <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-select v-model="type" expanded name="type" v-validate="'required'">
+                  <option value="RQ">{{ $t('request') }}</option>
+                  <option value="DN">{{ $t('donation') }}</option>
+                  <option value="LN">{{ $t('loan') }}</option>
+                  <option value="EV">{{ $t('event') }}</option>
+                </b-select>
+              </b-field>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded />
+            </div>
+            <div class="column">
+              <category-selector v-model="category2" :number="2" expanded />
+            </div>
+            <div class="column">
+              <category-selector v-model="category3" :number="3" expanded />
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
+                <template #label> {{ $t('description') }}
+                  <b-tooltip :label="$t('help_item_description')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+              </b-field>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <b-field>
+                <template #label>
+                  <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
+                    {{ $t('address') }}
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-button type="is-primary" @click="fetchAddressGeoLoc">
+                  <i class="icon fas fa-map-marker-alt"></i>
+                </b-button>
+                <b-input v-model="location" class="is-expanded ml-2" name="ref_location" type="text" />
+              </b-field>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <b-field>
+                <template #label> {{ $t('start-date') }}
+                  <b-tooltip :label="$t('help_item_start_date')" multilined position="is-top">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-datetimepicker
+                    v-model="startdate"
+                    :max-datetime="enddate"
+                    icon="calendar"
+                    :icon-right="startdate ? 'close-circle' : ''"
+                    icon-right-clickable
+                    @icon-right-click="clearStartdate"
+                    icon-pack="fas"
+                    :locale="$i18n.locale"
+                    @change="startdateChanged"
+                />
+              </b-field>
+            </div>
+            <div class="column">
+              <b-field>
+                <template #label> {{ $t('end-date') }}
+                  <b-tooltip :label="$t('help_item_end_date')" multilined position="is-top">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <b-datetimepicker
+                    v-model="enddate"
+                    :min-datetime="startdate"
+                    icon="calendar"
+                    :icon-right="enddate ? 'close-circle' : ''"
+                    icon-right-clickable
+                    @icon-right-click="clearEnddate"
+                    icon-pack="fas"
+                    :locale="$i18n.locale"
+                    @change="enddateChanged"
+                />
+              </b-field>
+            </div>
+          </div>
+          <div class="columns">
+          <div class="column">
+          <b-checkbox v-model="isRecurrent">
+            <strong>{{ $t('save-as-recurrent-item') }}</strong>
+            <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
+              <i class="icon far fa-question-circle"></i>
+            </b-tooltip>
+          </b-checkbox>
+          </div>
+          </div>
+        </div>
+        <div class="container has-text-centered mt-5">
+          <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
+          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('publish-item') }}</b-button>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import RecurrentItemsList from "@/components/RecurrentItemsList";
 import CategorySelector from "@/components/CategorySelector";
 import ErrorHandler from "@/components/ErrorHandler";
 import moment from "moment/moment";
+import WindowSize from "@/components/WindowSize";
 
 export default {
   name: 'TheAddItemView',
-  mixins: [ErrorHandler],
+  mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'
   },
-  components: {CategorySelector, RecurrentItemsList},
+  components: {CategorySelector},
   data() {
     return {
       loading: false,
       step: 0,
 
-      file: null,
-      filePreview: null,
+      filesSelected: [],
+      images: {
+        'files': [],
+        'previews': []
+      },
+      imagesSlots: 12,
+      imagesPreviewColumnSizeClass: 'is-one-third',
+      formBottomButtonsSize: 'is-large',
 
-      suggestedName: null,
-      suggestedCategory: null,
-      suggestedDescription: null,
+      hideRecurrentsItemsInfoBox: false,
+
+      // suggestedName: null,
+      // suggestedCategory: null,
+      // suggestedDescription: null,
+
+      recurrentItem: null,
 
       name: "",
       description: "",
-      type: null,
+      type: '',
       category1: '',
       category2: '',
       category3: '',
-      location: '',
-      isRecurrent: false,
-      recurrentFrom: null,
-      recurrentImages: [],
+      location: "",
       startdate: null,
       enddate: null,
+      isRecurrent: false,
 
-      geoLocation: null,
+      geoloc: null,
       waitingFormResponse: false
     }
   },
   created() {
+    this.fetchRecurrentItem();
+
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         positon => {
-          this.geoLocation = positon;
+          this.geoloc = positon;
         },
         null,
         {
@@ -213,16 +263,86 @@ export default {
     document.title = `Shareish | ${this.$t('add-new-item')}`;
   },
   computed: {
-    isFromRecurrent() {
-      return this.recurrentFrom !== null;
+    canStillUploadImages() {
+      return this.imagesSlots > this.images['previews'].length;
+    },
+    imagesSlotsLeft() {
+      return this.imagesSlots - this.images['previews'].length;
+    },
+    imagesSlotsLeftColorClass () {
+      if (this.imagesSlotsLeft >= 6)
+        return 'is-primary';
+      else if (this.imagesSlotsLeft >= 3)
+        return 'is-warning';
+      else
+        return 'is-danger';
+    },
+    recurrentItemId() {
+      return Number(this.$route.params.id);
+    },
+    isRecurrentItemUsed() {
+      return this.recurrentItemId > 0;
+    }
+  },
+  watch: {
+    filesSelected() {
+      if (this.filesSelected.length > 0) {
+        if (this.imagesSlotsLeft) {
+          if (this.filesSelected.length <= this.imagesSlotsLeft) {
+            for (const i in this.filesSelected)
+              this.processImage(this.filesSelected[i]);
+          } else {
+            this.snackbarError(this.$tc('too-many-images-selected-to-upload', this.imagesSlotsLeft));
+          }
+        } else {
+          this.snackbarError(this.$t('max-images-uploaded-reached'));
+        }
+        this.filesSelected = [];
+      }
     }
   },
   methods: {
+    async fetchRecurrentItem() {
+      if (this.isRecurrentItemUsed) {
+        try {
+          this.recurrentItem = (await axios.get(`/api/v1/recurrents/${this.recurrentItemId}`)).data;
+          this.setFieldFromRecurrentItem();
+        } catch (error) {
+          this.snackbarError(error);
+          await this.$router.push("/add-item");
+        }
+      }
+    },
+    async setFieldFromRecurrentItem() {
+      if (this.recurrentItem !== null) {
+        this.name = this.recurrentItem.name;
+        this.description = this.recurrentItem.description;
+        this.type = this.recurrentItem.item_type;
+        this.category1 = this.recurrentItem.category1;
+        this.category2 = this.recurrentItem.category2;
+        this.category3 = this.recurrentItem.category3;
+        this.isRecurrent = false;
+
+        try {
+          const images = JSON.parse((await axios.get(`/api/v1/items/${this.recurrentItemId}/images/base64`)).data);
+          for (const i in images) {
+            this.images['files'].push(images[i].name);
+            this.images['previews'].push(images[i].base64_url);
+          }
+        } catch (error) {
+          this.snackbarError(error);
+        }
+
+        this.fetchAddress(this.recurrentItem.location);
+      }
+    },
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoLocation !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
+      if (this.geoloc !== null) {
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
+      } else {
+        this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
       }
     },
     async fetchAddress(location) {
@@ -235,36 +355,40 @@ export default {
         }
       }
     },
-    async uploadFile(event) {
+    async processImage(file) {
       this.loading = true;
 
-      this.file = event.target.files[0];
+      this.images['files'].unshift(file.name);
       const reader = new FileReader();
-      reader.addEventListener('load', (event) => {
-        this.filePreview = event.target.result
+      reader.addEventListener('load', () => {
+        this.images['previews'].unshift(reader.result)
       });
-      reader.readAsDataURL(this.file);
-      await this.fetchPredictions();
+      reader.readAsDataURL(file);
 
-      this.name = this.suggestedName;
-      this.category1 = this.suggestedCategory;
-      this.description = this.suggestedDescription;
-      this.step = 2;
+      // await this.fetchPredictions(file);
+      // this.name = this.suggestedName;
+      // this.category1 = this.suggestedCategory;
+      // this.description = this.suggestedDescription;
+
       this.loading = false;
     },
-    async fetchPredictions() {
-      try {
-        let data = new FormData();
-        data.append('image', this.file);
-        const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
-        this.suggestedName = predictions['suggested_class'];
-        this.suggestedCategory = predictions['suggested_category'];
-        this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
-      }
-      catch (error) {
-        this.snackbarError(error);
-      }
+    removeImage(index) {
+      this.images['files'].splice(index, 1);
+      this.images['previews'].splice(index, 1);
     },
+    // async fetchPredictions(file) {
+    //   try {
+    //     let data = new FormData();
+    //     data.append('image', file);
+    //     const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
+    //     this.suggestedName = predictions['suggested_class'];
+    //     this.suggestedCategory = predictions['suggested_category'];
+    //     this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
+    //   }
+    //   catch (error) {
+    //     this.snackbarError(error);
+    //   }
+    // },
     async submit() {
       this.waitingFormResponse = true;
 
@@ -293,29 +417,21 @@ export default {
             location: this.location,
             is_recurrent: this.isRecurrent,
             startdate: startDate,
-            enddate: endDate,
-            images: []
+            enddate: endDate
           })).data;
 
-          if (!this.isFromRecurrent) {
-            if (this.file && this.filePreview) {
-              try {
-                let data = new FormData();
-                data.append('item_id', item.id);
-
-                let blob = await (await fetch(this.filePreview)).blob();
-                let image = new File([blob], this.file.name);
-                data.append('image', image);
-
-                await axios.post("/api/v1/images/", data);
-              }
-              catch (error) {
-                this.snackbarError(error);
-              }
-            }
-          } else {
+          if (this.images['files'].length > 0) {
             try {
-              await axios.get(`/api/v1/items/${item.id}/images/republish_from/${this.recurrentFrom}`);
+              let data = new FormData();
+              data.append('item_id', item.id);
+
+              for (let i in this.images['files']) {
+                const blob = await (await fetch(this.images['previews'][i])).blob();
+                const image = new File([blob], this.images['files'][i]);
+                data.append('images', image);
+              }
+
+              await axios.post("/api/v1/images/", data);
             }
             catch (error) {
               this.snackbarError(error);
@@ -331,26 +447,20 @@ export default {
 
       this.waitingFormResponse = false;
     },
-    async setRecurrentItem(item) {
-      this.name = item.name;
-      this.description = item.description;
-      this.type = item.item_type;
-      this.category1 = item.category1;
-      this.category2 = item.category2;
-      this.category3 = item.category3;
-      this.recurrentFrom = item.id;
-      this.recurrentImages = item.images;
+    reset() {
+      this.name = "";
+      this.description = "";
+      this.type = '';
+      this.category1 = '';
+      this.category2 = '';
+      this.category3 = '';
+      this.startdate = null;
+      this.enddate = null;
+      this.isRecurrent = false;
+      this.recurrentItem = null;
 
-      if (item.location !== null) {
-        try {
-          this.location = (await axios.post("/api/v1/address/", item.location)).data;
-        }
-        catch (error) {
-          this.snackbarError(error);
-        }
-      }
-
-      this.step = 2;
+      this.images['files'] = [];
+      this.images['previews'] = [];
     },
     clearStartdate() {
       this.startdate = null;
@@ -371,18 +481,117 @@ export default {
         if (this.enddate < this.startdate)
           this.startdate = this.enddate;
       }
+    },
+    windowWidthChanged() {
+      let imagesPreviewColumnSizeClass = "is-one-third";
+      let formBottomButtonsSize = "is-large";
+      if (this.windowWidth <= 1500) {
+        imagesPreviewColumnSizeClass = "is-2";
+        if (this.windowWidth < 1100) {
+          imagesPreviewColumnSizeClass = "is-one-quarter";
+          if (this.windowWidth < 768) {
+            imagesPreviewColumnSizeClass = "is-one-third";
+            formBottomButtonsSize = "is-normal";
+            if (this.windowWidth < 550) {
+              imagesPreviewColumnSizeClass = "is-half";
+              if (this.windowWidth < 380) {
+                imagesPreviewColumnSizeClass = "is-full";
+              }
+            }
+          }
+        }
+      }
+      this.formBottomButtonsSize = formBottomButtonsSize;
+      this.imagesPreviewColumnSizeClass = imagesPreviewColumnSizeClass;
     }
   }
 };
 </script>
 
 <style scoped>
+
+@media screen and (max-width: 1500px) {
+  #page-add-item > .columns {
+    display: block;
+  }
+
+  #page-add-item > .columns > .column {
+    width: 100%;
+  }
+
+  #form-side > .box {
+    margin-top: 1.5rem !important;
+  }
+}
+
 .max-width-is-max-container {
   margin: 0 auto;
   max-width: 1344px;
 }
 
-.file {
+#previews .column {
+  height: 33%;
+}
+
+.vertical-align-middle {
+  margin-top: -1px;
+  vertical-align: middle;
+}
+
+.square {
+  position: relative;
+  overflow: hidden;
+}
+
+.square:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.square-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.img-fill {
+  position: relative;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  height: 100%;
+}
+
+.img-fill .remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 20%;
+  width: 20%;
+  padding: 5px;
+  border-radius: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.img-fill .remove svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 60%;
+  width: 60%;
+  transform: translate(-50%, -50%);
+  fill: white;
+}
+
+.img-fill img {
+  flex-shrink: 0;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: inherit;
 }
 </style>

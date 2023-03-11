@@ -29,16 +29,16 @@ export default {
 
       let windowSizeChanged = false;
       if (this.windowHeight !== window.innerHeight) {
-        this.windowHeightChanged();
         this.windowHeight = window.innerHeight;
         this.windowSize[0] = window.innerHeight;
         windowSizeChanged = true;
+        this.windowHeightChanged();
       }
       if (this.windowWidth !== window.innerWidth) {
-        this.windowWidthChanged();
         this.windowWidth = window.innerWidth;
         this.windowSize[1] = window.innerHeight;
         windowSizeChanged = true;
+        this.windowWidthChanged();
       }
       if (windowSizeChanged)
         this.windowSizeChanged();
@@ -46,8 +46,12 @@ export default {
     retrieveRefWatchedPropertiesValue() {
       // Retrieve referenced elements' new properties' value
       for (let [key, properties] of Object.entries(this.windowResizeWatchedRefsProperties)) {
-        for (let property in properties)
-          this.windowResizeWatchedRefsProperties[key][property] = this.$refs[key][property];
+        if (key in this.$refs) {
+          for (let property in properties) {
+            if (property in this.$refs[key])
+              this.windowResizeWatchedRefsProperties[key][property] = this.$refs[key][property];
+          }
+        }
       }
     },
     windowWidthChanged() {},

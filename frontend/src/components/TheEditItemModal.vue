@@ -102,17 +102,6 @@
             </b-tooltip>
           </b-checkbox>
         </b-field>
-        <b-field :label="$t('item-image')" :message="$t('item-image-info')">
-          <b-field :class="{'has-name': !!file}" class="file is-primary">
-            <b-upload v-model="file" accept="image/*" class="file-label" validationMessage="Please select a file">
-              <span class="file-cta">
-                <b-icon class="file-icon" icon="upload"></b-icon>
-                <span class="file-label">Click to upload</span>
-              </span>
-              <span v-if="file" class="file-name">{{ file.name }}</span>
-            </b-upload>
-          </b-field>
-        </b-field>
       </section>
       <footer class="modal-card-foot">
         <b-button :label="$t('cancel')" @click="$emit('close')" />
@@ -123,9 +112,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import moment from 'moment/moment';
-import CategorySelector from '@/components/CategorySelector';
+import axios from "axios";
+import moment from "moment/moment";
+import CategorySelector from "@/components/CategorySelector";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
@@ -146,7 +135,6 @@ export default {
     return {
       internalItem: {},
       displayErrors: false,
-      file: null,
       waitingFormResponse: false,
       initialStartdate: Date.now()
     }
@@ -192,15 +180,6 @@ export default {
             startdate: startdate,
             enddate: enddate,
           })).data;
-
-          if (this.file) {
-            let data = new FormData();
-            data.append('item_id', this.item.id);
-            data.append('image', this.file);
-            let image_url = (await axios.post("/api/v1/images/", data)).data;
-            item.images.push(image_url);
-            this.file = null;
-          }
 
           this.$buefy.snackbar.open({
             duration: 5000,

@@ -8,7 +8,7 @@
           <article class="media">
             <figure class="media-left">
               <p class="image">
-                <img v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" />
+                <img v-if="user.images.length > 0" :src="user.images[0]" />
                 <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
               </p>
             </figure>

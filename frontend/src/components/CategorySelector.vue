@@ -1,5 +1,10 @@
 <template>
-  <b-field :label="label">
+  <b-field>
+    <template #label>{{ label }}
+      <b-tooltip v-if="usesTooltip" :label="$t('help_item_category')" multilined position="is-right">
+        <i class="icon far fa-question-circle"></i>
+      </b-tooltip>
+    </template>
     <b-select :expanded="expanded" :value="value" @input="$emit('input', $event)">
       <option v-if="number > 1 || !number" value=""></option>
       <option v-for="{id, slug} in categories" :key="id" :value="id">
@@ -10,7 +15,7 @@
 </template>
 
 <script>
-import {categories} from '@/categories';
+import {categories} from "@/categories";
 
 export default {
   name: 'CategorySelector',
@@ -20,12 +25,16 @@ export default {
     expanded: {
       type: Boolean,
       default: false
+    },
+    usesTooltip: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     label() {
-      let addon = (this.number) ? " " + this.number : "";
-      return this.$t('category') + addon;
+      let category_number = (this.number) ? " " + this.number : "";
+      return this.$t('category') + category_number;
     },
     categories() {
       return Object.values(categories);

@@ -1,3 +1,5 @@
+import base64
+import json
 import re
 from datetime import datetime, timezone
 
@@ -156,23 +158,22 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class RecurrentItemViewSet(ItemViewSet):
-    filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
-    ]  # Do not need ActiveItemFilterBackend
+    filter_backends = [filters.OrderingFilter]
+    ordering = ['-startdate']
 
     def get_queryset(self):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
 
 class ActiveItemViewSet(ItemViewSet):
+    filter_backends = [filters.OrderingFilter, ActiveItemFilterBackend]
     pagination_class = ActivePaginationClass
-
-    def get_queryset(self):
-        return Item.objects.filter(in_progress=True)
+    ordering = ['-startdate']
 
 
 class UserItemViewSet(ItemViewSet):
-    filter_backends = [UserItemFilterBackend]
+    filter_backends = [filters.OrderingFilter, UserItemFilterBackend]
+    ordering = ['-startdate']
 
 
 class ItemImageViewSet(viewsets.ViewSet):
@@ -183,11 +184,11 @@ class ItemImageViewSet(viewsets.ViewSet):
 
     def create(self, request):
         item = Item.objects.get(pk=request.POST['item_id'])
-        image = request.FILES.get('image')
-        new_image = ItemImage(image=image, item=item)
-        new_image.save()
-        serialized_image = ItemImageSerializer(new_image)
-        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
+        images = request.FILES.getlist('images')
+        for i in range(0, len(images)):
+            new_image = ItemImage(image=images[i], position=i, item=item)
+            new_image.save()
+        return Response(status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
@@ -528,6 +529,24 @@ def increaseHitcountItem(request, item_id):
             item.hitcount += 1
             item.save()
             return Response(status=status.HTTP_200_OK)
+        except Item.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getItemImagesBase64(request, item_id):
+    if request.method == 'GET':
+        try:
+            item_images = ItemImage.objects.filter(item_id=item_id)
+            images = []
+            for item_image in item_images:
+                images.append({
+                   "name": str(item_image.image.name),
+                   "base64_url": "data:image/png;base64," + str(base64.b64encode(item_image.image.file.read()).decode("utf-8"))
+                })
+            return Response(json.dumps(images), status=status.HTTP_200_OK)
         except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -3,7 +3,7 @@
     <div class="media">
       <figure class="media-left">
         <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
-          <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
+          <b-image v-if="user.images.length > 0" :src="user.images[0]" ratio="1by1"></b-image>
           <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
         </router-link>
       </figure>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import moment from 'moment/moment';
+import moment from "moment/moment";
 import WindowSize from "@/components/WindowSize";
 
 export default {
@@ -51,8 +51,8 @@ export default {
   data() {
     return {
       windowResizeWatchedRefsProperties: {
-        "UserCard": {
-          "clientWidth": 0
+        'UserCard': {
+          'clientWidth': 0
         }
       },
       titleSizeClass: null,
@@ -73,10 +73,10 @@ export default {
       let userImageSize = 128;
       let titleSizeClass = "is-3";
       let subtitleSizeClass = "is-5";
-      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 680) {
+      if (this.windowResizeWatchedRefsProperties['UserCard']['clientWidth'] < 680) {
         userImageSize = 96;
       }
-      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 590) {
+      if (this.windowResizeWatchedRefsProperties['UserCard']['clientWidth'] < 590) {
         userImageSize = 72;
         titleSizeClass = "is-4";
         subtitleSizeClass = "is-6";

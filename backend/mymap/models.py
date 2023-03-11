@@ -207,10 +207,12 @@ class Item(models.Model):
 
 
 class ItemImage(models.Model):
-    image = models.ImageField(upload_to='')
+    image = models.ImageField(upload_to='items_images')
+    position = models.IntegerField()
     item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        self.image.name = str(self.item.id) + "_" + str(self.position)
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
@@ -232,7 +234,7 @@ class ItemImage(models.Model):
         return "{}/api/v1/items/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
-        ordering = ['item']
+        ordering = ['item', 'position']
 
 
 class Conversation(models.Model):

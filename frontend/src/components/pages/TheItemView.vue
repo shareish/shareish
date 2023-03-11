@@ -25,14 +25,18 @@
               </button>
             </div>
           </div>
-          <article id="item-image">
-            <div class="item-image-background">
-              <img :src="item.images[item.images.length - 1]" />
-            </div>
-            <figure>
-              <img :src="item.images[item.images.length - 1]" />
-            </figure>
-          </article>
+          <b-carousel :autoplay="false" :arrow-hover="false">
+            <b-carousel-item v-for="image in item.images" :key="image.position">
+              <article id="item-image">
+                <div class="item-image-background">
+                  <img :src="image" />
+                </div>
+                <figure>
+                  <img :src="image" />
+                </figure>
+              </article>
+            </b-carousel-item>
+          </b-carousel>
           <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
             <div class="level-left">
               <p class="level-item is-size-5 has-text-weight-bold level-left-description">

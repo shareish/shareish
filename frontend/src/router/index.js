@@ -1,37 +1,38 @@
-import VueRouter from 'vue-router';
-import store from '../store'
-import i18n from '@/i18n'
+import VueRouter from "vue-router";
+import store from "../store"
+import i18n from "@/i18n"
 
-import TheHomeView from '@/components/pages/TheHomeView.vue'
-import TheSignUpView from '@/components/user-management/TheSignUpView.vue'
-import TheLoginView from '@/components/user-management/TheLoginView.vue'
-import TheResetPasswordView from '@/components/user-management/TheResetPasswordView.vue'
-import TheResetPasswordConfirmView from '@/components/user-management/TheResetPasswordConfirmView.vue'
-import TheActivateView from '@/components/user-management/TheActivateView.vue'
-import TheAccountView from '@/components/pages/TheAccountView.vue';
-import TheProfileView from '@/components/pages/TheProfileView.vue';
+import TheHomeView from "@/components/pages/TheHomeView.vue"
+import TheSignUpView from "@/components/user-management/TheSignUpView.vue"
+import TheLoginView from "@/components/user-management/TheLoginView.vue"
+import TheResetPasswordView from "@/components/user-management/TheResetPasswordView.vue"
+import TheResetPasswordConfirmView from "@/components/user-management/TheResetPasswordConfirmView.vue"
+import TheActivateView from "@/components/user-management/TheActivateView.vue"
+import TheAccountView from "@/components/pages/TheAccountView.vue";
+import TheProfileView from "@/components/pages/TheProfileView.vue";
 import TheSettingsView from "@/components/pages/TheSettingsView.vue";
-import TheItemsView from '@/components/pages/TheItemsView.vue';
-import TheItemView from '@/components/pages/TheItemView.vue'
-import TheMapView from '@/components/pages/TheMapView.vue';
-import TheAddItemView from '@/components/pages/TheAddItemView.vue'
-import TheConversationsView from '@/components/pages/TheConversationsView.vue'
-import TheConversationView from '@/components/pages/TheConversationView.vue'
+import TheItemsView from "@/components/pages/TheItemsView.vue";
+import TheItemView from "@/components/pages/TheItemView.vue"
+import TheMapView from "@/components/pages/TheMapView.vue";
+import TheAddItemView from "@/components/pages/TheAddItemView.vue"
+import TheConversationsView from "@/components/pages/TheConversationsView.vue"
+import TheConversationView from "@/components/pages/TheConversationView.vue"
 import TheAboutView from "@/components/pages/TheAboutView.vue";
+import TheAddItemFromRecurrentsView from "@/components/pages/TheAddItemFromRecurrentsView.vue";
 
 const routes = [
     {
-        path: '/',
+        path: "/",
         name: 'home',
         component: TheHomeView
     },
     {
-        path: '/about',
+        path: "/about",
         name: 'about',
         component: TheAboutView
     },
     {
-        path: '/sign-up',
+        path: "/sign-up",
         name: 'signup',
         component: TheSignUpView,
         meta: {
@@ -39,7 +40,7 @@ const routes = [
         }
     },
     {
-        path: '/log-in',
+        path: "/log-in",
         name: 'login',
         component: TheLoginView,
         meta: {
@@ -47,22 +48,22 @@ const routes = [
         }
     },
     {
-        path: '/reset-password',
+        path: "/reset-password",
         name: 'resetPassword',
         component: TheResetPasswordView
     },
     {
-        path: '/reset-password/confirm/:uid/:token',
+        path: "/reset-password/confirm/:uid/:token",
         name: 'resetPasswordConfirm',
         component: TheResetPasswordConfirmView
     },
     {
-        path: '/activate/:uid/:token',
+        path: "/activate/:uid/:token",
         name: 'activateEmailToken',
         component: TheActivateView
     },
     {
-        path: '/activate',
+        path: "/activate",
         name: 'activateEmail',
         component: TheActivateView,
         meta: {
@@ -70,7 +71,7 @@ const routes = [
         }
     },
     {
-        path: '/map',
+        path: "/map",
         name: 'itemsMap',
         component: TheMapView,
         meta: {
@@ -78,7 +79,7 @@ const routes = [
         }
     },
     {
-        path: '/profile',
+        path: "/profile",
         name: 'myaccount',
         component: TheAccountView,
         meta: {
@@ -86,7 +87,7 @@ const routes = [
         }
     },
     {
-        path: '/profile/:id',
+        path: "/profile/:id",
         name: 'userDetails',
         component: TheProfileView,
         meta: {
@@ -94,7 +95,7 @@ const routes = [
         }
     },
     {
-        path: '/items',
+        path: "/items",
         name: 'items',
         component: TheItemsView,
         meta: {
@@ -102,7 +103,7 @@ const routes = [
         }
     },
     {
-        path: '/items/:id',
+        path: "/items/:id",
         name: 'itemDetail',
         component: TheItemView,
         meta: {
@@ -110,7 +111,7 @@ const routes = [
         }
     },
     {
-        path: '/add-item',
+        path: "/add-item",
         name: 'addItem',
         component: TheAddItemView,
         meta: {
@@ -118,7 +119,23 @@ const routes = [
         }
     },
     {
-        path: '/conversations',
+        path: "/add-item/from/:id",
+        name: 'addItemFrom',
+        component: TheAddItemView,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: "/add-item/from-recurrents",
+        name: 'addItemFromRecurrents',
+        component: TheAddItemFromRecurrentsView,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: "/conversations",
         name: 'conversations',
         component: TheConversationsView,
         meta: {
@@ -126,7 +143,7 @@ const routes = [
         }
     },
     {
-        path: '/conversations/:id',
+        path: "/conversations/:id",
         name: 'conversationDetail',
         component: TheConversationView,
         meta: {
@@ -134,7 +151,7 @@ const routes = [
         }
     },
     {
-        path: '/settings',
+        path: "/settings",
         name: 'settings',
         component: TheSettingsView,
         meta: {
@@ -142,7 +159,7 @@ const routes = [
         }
     },
     {
-        path: '/settings/:page',
+        path: "/settings/:page",
         name: 'settingsPage',
         component: TheSettingsView,
         meta: {
@@ -151,10 +168,10 @@ const routes = [
     },
 
     // Redirects for old urls
-    {path: '/dashboard', redirect: '/map'},
-    {path: '/dashboard/items', redirect: '/items'},
-    {path: '/dashboard/items/:id', redirect: '/items/:id'},
-    {path: '/dashboard/items/add', redirect: '/add-item'}
+    {path: "/dashboard", redirect: "/map"},
+    {path: "/dashboard/items", redirect: "/items"},
+    {path: "/dashboard/items/:id", redirect: "/items/:id"},
+    {path: "/dashboard/items/add", redirect: "/add-item"}
 ]
 
 // Create router instance
@@ -166,9 +183,9 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
-        next('/log-in')
+        next("/log-in")
     } else if (to.matched.some(record => record.meta.loginForbidden) && store.state.isAuthenticated) {
-        next('/')
+        next("/")
     } else {
         next()
     }

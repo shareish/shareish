@@ -1,9 +1,9 @@
 <template>
   <div class="card">
     <div class="card-image">
-      <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
+      <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
         <figure class="image">
-          <b-image v-if="item.images.length > 0" :src="item.images[item.images.length - 1]" ratio="5by3"></b-image>
+          <b-image v-if="item.images.length > 0" :src="item.images[0]" ratio="5by3"></b-image>
           <b-image v-else :src="category1['image-placeholder']" ratio="5by3"></b-image>
           <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
         </figure>
@@ -13,7 +13,7 @@
       <div class="media">
         <div class="media-content">
           <p class="title is-5 mb-2">
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
+            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
               {{ item.name }}
             </router-link>
           </p>
@@ -50,7 +50,7 @@
       </span>
     </div>
     <div v-if="recurrentList" class="card-footer">
-      <a class="card-footer-item" @click="$emit('submitAgain', item)">{{ $t('submit-again') }}</a>
+      <router-link :to="{name: 'addItemFrom', params: {id: item.id}}" class="card-footer-item">{{ $t('submit-again') }}</router-link>
     </div>
   </div>
 </template>
