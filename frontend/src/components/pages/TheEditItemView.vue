@@ -2,7 +2,7 @@
   <b-loading v-if="loading" :active="true" :is-full-page="false" />
   <div v-else id="page-add-item" class="max-width-is-max-container" ref="page-container">
     <h1 class="title has-text-centered mb-6">
-      {{ $t('add-new-item') }}
+      {{ $t('edit-item') }}
       <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
@@ -51,16 +51,6 @@
         </div>
       </section>
       <section id="form-side" class="column is-8">
-        <div class="box mb-6" :class="{'is-hidden': hideRecurrentsItemsInfoBox}" style="border: 2px solid #3eaf7c;">
-          <template v-if="!isRecurrentItemUsed">
-            {{ $t('ask-fill-form-using-recurrents') }}
-          </template>
-          <template v-else>
-            {{ $tc('want-an-other-recurrent', recurrentItemId) }}
-          </template>
-          <router-link to="/add-item/from-recurrents" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
-          <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
-        </div>
         <div id="form">
           <div class="columns">
             <div class="column">
@@ -70,7 +60,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="name" name="name" v-validate="'required'" />
+                <b-input v-model="internalItem.name" name="name" v-validate="'required'" />
               </b-field>
             </div>
             <div class="column">
@@ -80,7 +70,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="type" expanded name="type" v-validate="'required'">
+                <b-select v-model="internalItem.item_type" expanded name="type" v-validate="'required'">
                   <option value="RQ">{{ $t('request') }}</option>
                   <option value="DN">{{ $t('donation') }}</option>
                   <option value="LN">{{ $t('loan') }}</option>
@@ -91,13 +81,13 @@
           </div>
           <div class="columns">
             <div class="column">
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded />
+              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded />
             </div>
             <div class="column">
-              <category-selector v-model="category2" :number="2" expanded />
+              <category-selector v-model="internalItem.category2" :number="2" expanded />
             </div>
             <div class="column">
-              <category-selector v-model="category3" :number="3" expanded />
+              <category-selector v-model="internalItem.category3" :number="3" expanded />
             </div>
           </div>
           <div class="columns">
@@ -108,7 +98,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input v-model="internalItem.description" expanded type="textarea" name="description" v-validate="'required'" />
               </b-field>
             </div>
           </div>
@@ -137,10 +127,10 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
-                    v-model="startdate"
-                    :max-datetime="enddate"
+                    v-model="internalItem.startdate"
+                    :max-datetime="internalItem.enddate"
                     icon="calendar"
-                    :icon-right="startdate ? 'close-circle' : ''"
+                    :icon-right="internalItem.startdate ? 'close-circle' : ''"
                     icon-right-clickable
                     @icon-right-click="clearStartdate"
                     icon-pack="fas"
@@ -157,10 +147,10 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
-                    v-model="enddate"
-                    :min-datetime="startdate"
+                    v-model="internalItem.enddate"
+                    :min-datetime="minEnddate"
                     icon="calendar"
-                    :icon-right="enddate ? 'close-circle' : ''"
+                    :icon-right="internalItem.enddate ? 'close-circle' : ''"
                     icon-right-clickable
                     @icon-right-click="clearEnddate"
                     icon-pack="fas"
@@ -172,7 +162,7 @@
           </div>
           <div class="columns">
           <div class="column">
-          <b-checkbox v-model="isRecurrent">
+          <b-checkbox v-model="internalItem.is_recurrent">
             <strong>{{ $t('save-as-recurrent-item') }}</strong>
             <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
               <i class="icon far fa-question-circle"></i>
@@ -183,7 +173,7 @@
         </div>
         <div class="container has-text-centered mt-5">
           <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
-          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('publish-item') }}</b-button>
+          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('edit') }}</b-button>
         </div>
       </section>
     </div>
@@ -198,7 +188,7 @@ import moment from "moment/moment";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'TheAddItemView',
+  name: 'TheEditItemView',
   mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'
@@ -218,31 +208,21 @@ export default {
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
 
-      hideRecurrentsItemsInfoBox: false,
-
       // suggestedName: null,
       // suggestedCategory: null,
       // suggestedDescription: null,
 
-      recurrentItem: null,
-
-      name: "",
-      description: "",
-      type: '',
-      category1: '',
-      category2: '',
-      category3: '',
+      item: {},
+      internalItem: {},
       location: "",
-      startdate: null,
-      enddate: null,
-      isRecurrent: false,
+      initialStartdate: Date.now(),
 
       geoloc: null,
       waitingFormResponse: false
     }
   },
   created() {
-    this.fetchRecurrentItem();
+    this.fetchItem();
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -277,11 +257,16 @@ export default {
       else
         return 'is-danger';
     },
-    recurrentItemId() {
+    itemId() {
       return Number(this.$route.params.id);
     },
-    isRecurrentItemUsed() {
-      return this.recurrentItemId > 0;
+    minEnddate() {
+      const now = new Date();
+      if (this.internalItem.startdate) {
+        const startdate = new Date(this.internalItem.startdate);
+        return (startdate > now) ? startdate : now;
+      }
+      return now;
     }
   },
   watch: {
@@ -302,29 +287,33 @@ export default {
     }
   },
   methods: {
-    async fetchRecurrentItem() {
-      if (this.isRecurrentItemUsed) {
-        try {
-          this.recurrentItem = (await axios.get(`/api/v1/recurrents/${this.recurrentItemId}`)).data;
-          this.setFieldFromRecurrentItem();
-        } catch (error) {
-          this.snackbarError(error);
-          await this.$router.push("/add-item");
-        }
+    async fetchItem() {
+      try {
+        this.item = (await axios.get(`/api/v1/user_items/${this.itemId}`)).data;
+        this.setFieldFromItem();
+      } catch (error) {
+        this.snackbarError(error);
+        await this.$router.push("/items");
       }
     },
-    async setFieldFromRecurrentItem() {
-      if (this.recurrentItem !== null) {
-        this.name = this.recurrentItem.name;
-        this.description = this.recurrentItem.description;
-        this.type = this.recurrentItem.item_type;
-        this.category1 = this.recurrentItem.category1;
-        this.category2 = this.recurrentItem.category2;
-        this.category3 = this.recurrentItem.category3;
-        this.isRecurrent = false;
+    async setFieldFromItem() {
+      if (this.item !== null) {
+
+        this.internalItem = {...this.item};
+
+        if (this.internalItem.startdate) {
+          this.internalItem.startdate = new Date(this.internalItem.startdate);
+          this.initialStartdate = this.internalItem.startdate;
+        }
+
+        if (this.internalItem.enddate)
+          this.internalItem.enddate = new Date(this.internalItem.enddate);
 
         try {
-          const images = JSON.parse((await axios.get(`/api/v1/items/${this.recurrentItemId}/images/base64`)).data);
+          this.images['files'] = [];
+          this.images['previews'] = [];
+
+          const images = JSON.parse((await axios.get(`/api/v1/items/${this.itemId}/images/base64`)).data);
           for (const i in images) {
             this.images['files'].push(images[i].name);
             this.images['previews'].push(images[i].base64_url);
@@ -333,7 +322,7 @@ export default {
           this.snackbarError(error);
         }
 
-        this.fetchAddress(this.recurrentItem.location);
+        this.fetchAddress(this.internalItem.location);
       }
     },
     async fetchAddressGeoLoc() {
@@ -395,30 +384,29 @@ export default {
       let result = await this.$validator.validateAll();
       if (result) {
         let startDate;
-        if (this.startdate)
-          startDate = moment(this.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+        if (this.internalItem.startdate)
+          startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
         else
           startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
         let endDate;
-        if (this.enddate)
-          endDate = moment(this.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+        if (this.internalItem.enddate)
+          endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
         else
           endDate = null;
 
         try {
-          let item = (await axios.post("/api/v1/items/", {
-            name: this.name,
-            item_type: this.type,
-            category1: this.category1,
-            category2: this.category2,
-            category3: this.category3,
-            description: this.description,
+          let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
+            name: this.internalItem.name,
+            item_type: this.internalItem.item_type,
+            category1: this.internalItem.category1,
+            category2: this.internalItem.category2,
+            category3: this.internalItem.category3,
+            description: this.internalItem.description,
             location: this.location,
-            is_recurrent: this.isRecurrent,
+            is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
-            enddate: endDate,
-            images: []
+            enddate: endDate
           })).data;
 
           if (this.images['files'].length > 0) {
@@ -449,38 +437,26 @@ export default {
       this.waitingFormResponse = false;
     },
     reset() {
-      this.name = "";
-      this.description = "";
-      this.type = '';
-      this.category1 = '';
-      this.category2 = '';
-      this.category3 = '';
-      this.startdate = null;
-      this.enddate = null;
-      this.isRecurrent = false;
-      this.recurrentItem = null;
-
-      this.images['files'] = [];
-      this.images['previews'] = [];
+      this.setFieldFromItem();
     },
     clearStartdate() {
-      this.startdate = null;
+      this.internalItem.startdate = this.initialStartdate;
       this.startdateChanged();
     },
     clearEnddate() {
-      this.enddate = null;
+      this.internalItem.enddate = null;
       this.enddateChanged();
     },
     startdateChanged() {
-      if (this.enddate && this.startdate) {
-        if (this.startdate > this.enddate)
-          this.enddate = this.startdate;
+      if (this.internalItem.enddate && this.internalItem.startdate) {
+        if (this.internalItem.startdate > this.internalItem.enddate)
+          this.internalItem.enddate = this.internalItem.startdate;
       }
     },
     enddateChanged() {
-      if (this.enddate && this.startdate) {
-        if (this.enddate < this.startdate)
-          this.startdate = this.enddate;
+      if (this.internalItem.enddate && this.internalItem.startdate) {
+        if (this.internalItem.enddate < this.internalItem.startdate)
+          this.internalItem.startdate = this.internalItem.enddate;
       }
     },
     windowWidthChanged() {

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='itemimage',
             name='position',
-            field=models.IntegerField(default=1),
+            field=models.IntegerField(default=0),
             preserve_default=False,
         ),
         migrations.AlterField(

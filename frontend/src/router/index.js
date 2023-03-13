@@ -19,6 +19,7 @@ import TheConversationsView from "@/components/pages/TheConversationsView.vue"
 import TheConversationView from "@/components/pages/TheConversationView.vue"
 import TheAboutView from "@/components/pages/TheAboutView.vue";
 import TheAddItemFromRecurrentsView from "@/components/pages/TheAddItemFromRecurrentsView.vue";
+import TheEditItemView from "@/components/pages/TheEditItemView.vue";
 
 const routes = [
     {
@@ -130,6 +131,14 @@ const routes = [
         path: "/add-item/from-recurrents",
         name: 'addItemFromRecurrents',
         component: TheAddItemFromRecurrentsView,
+        meta: {
+            requireLogin: true
+        }
+    },
+    {
+        path: "/edit-item/:id",
+        name: 'editItem',
+        component: TheEditItemView,
         meta: {
             requireLogin: true
         }

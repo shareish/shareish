@@ -42,7 +42,7 @@
               <p class="level-item is-size-5 has-text-weight-bold level-left-description">
                 {{ $t('management') }}
               </p>
-              <button class="level-item button is-primary" @click="startEdition">{{ $t('edit') }}</button>
+              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="level-item button is-primary">{{ $t('edit') }}</router-link>
               <button class="level-item button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
             </div>
           </div>
@@ -129,7 +129,6 @@ import moment from "moment";
 import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag";
 import UserCard from "@/components/UserCard";
-import TheEditItemModal from "@/components/TheEditItemModal.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
@@ -250,19 +249,6 @@ export default {
       this.item = item;
       await this.fetchAddress();
       this.loading = false;
-    },
-    startEdition() {
-      this.$buefy.modal.open({
-        parent: this,
-        props: {
-          item: this.item,
-          address: this.address
-        },
-        events: {updateItem: this.updateItem},
-        component: TheEditItemModal,
-        hasModalCard: true,
-        trapFocus: true,
-      })
     }
   },
   async mounted() {

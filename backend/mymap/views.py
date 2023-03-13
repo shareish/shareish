@@ -177,12 +177,12 @@ class UserItemViewSet(ItemViewSet):
 
 
 class ItemImageViewSet(viewsets.ViewSet):
-    def list(self, request):
-        images = ItemImage.objects.all()
-        serializer = ItemImageSerializer(images, many=True)
-        return Response(serializer.data)
 
     def create(self, request):
+        # Remove all previous images if any (edition case)
+        ItemImage.objects.filter(item_id=request.POST['item_id']).delete()
+
+        # Add all news images received (add/edition cases)
         item = Item.objects.get(pk=request.POST['item_id'])
         images = request.FILES.getlist('images')
         for i in range(0, len(images)):
@@ -197,25 +197,6 @@ class ItemImageViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = ItemImageSerializer(image)
         return Response(serializer.data)
-
-    def update(self, request, pk=None):
-        try:
-            image = ItemImage.objects.get(pk=pk)
-        except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ItemImageSerializer(image, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        try:
-            image = ItemImage.objects.get(pk=pk)
-        except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        image.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserViewSet(viewsets.ModelViewSet):
