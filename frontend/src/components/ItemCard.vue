@@ -1,8 +1,8 @@
 <template>
   <div class="card">
     <div class="card-image">
-      <template v-if="item.images.length > 0">
-        <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+      <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+        <template v-if="item.images.length > 0">
           <b-carousel-item v-for="image in item.images" :key="image.position">
             <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
               <figure class="image">
@@ -11,20 +11,18 @@
               </figure>
             </router-link>
           </b-carousel-item>
-        </b-carousel>
-      </template>
-      <template v-else>
-        <b-carousel :autoplay="false" :arrow-hover="false" :arrow="false" :indicator="false">
+        </template>
+        <template v-else>
           <b-carousel-item>
             <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
               <figure class="image">
-                <b-image :src="category1['image-placeholder']" ratio="5by3"></b-image>
+                <b-image :src="itemCategories[0]['image-placeholder']" ratio="5by3"></b-image>
                 <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
               </figure>
             </router-link>
           </b-carousel-item>
-        </b-carousel>
-      </template>
+        </template>
+      </b-carousel>
     </div>
     <div class="card-content">
       <div class="media">
@@ -61,7 +59,7 @@
           <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
         </template>
       </div>
-      <span v-for="category in categories" :key="category.slug" class="icon-text">
+      <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
         <span>{{ $t(category.slug) }}</span>
       </span>
@@ -115,33 +113,15 @@ export default {
     }
   },
   computed: {
-    category1() {
-      return this.category(this.item.category1);
-    },
-    category2() {
-      return this.category(this.item.category2);
-    },
-    category3() {
-      return this.category(this.item.category3);
-    },
-    categories() {
-      let categories = [];
-      if (this.category1) {
-        categories.push(this.category1);
-      }
-      if (this.category2) {
-        categories.push(this.category2);
-      }
-      if (this.category3) {
-        categories.push(this.category3);
-      }
-      return categories;
-    },
-    itemKind() {
-      return (this.recurrentList) ? 'recurrent' : null;
-    },
-    itemDetailQueryParams() {
-      return (this.itemKind) ? {'kind': this.itemKind} : {};
+    itemCategories() {
+      let itemCategories = [];
+      if (categories[this.item.category1])
+        itemCategories.push(categories[this.item.category1]);
+      if (categories[this.item.category2])
+        itemCategories.push(categories[this.item.category2]);
+      if (categories[this.item.category3])
+        itemCategories.push(categories[this.item.category3]);
+      return itemCategories;
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
@@ -153,9 +133,6 @@ export default {
     },
     truncate(description) {
       return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
-    },
-    category(category) {
-      return categories[category];
     },
     deg2rad(deg) {
       return deg * (Math.PI / 180)

@@ -26,16 +26,34 @@
             </div>
           </div>
           <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
-            <b-carousel-item v-for="image in item.images" :key="image.position">
-              <article id="item-image">
-                <div class="item-image-background">
-                  <img :src="image" />
-                </div>
-                <figure>
-                  <img :src="image" />
-                </figure>
-              </article>
-            </b-carousel-item>
+            <template v-if="item.images.length > 0">
+              <b-carousel-item v-for="image in item.images" :key="image.position">
+                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                  <figure id="item-image">
+                    <div class="item-image-background">
+                      <img :src="image" />
+                    </div>
+                    <figure>
+                      <img :src="image" />
+                    </figure>
+                  </figure>
+                </router-link>
+              </b-carousel-item>
+            </template>
+            <template v-else>
+              <b-carousel-item>
+                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                  <figure id="item-image">
+                    <div class="item-image-background">
+                      <img :src="itemCategories[0]['image-placeholder']" />
+                    </div>
+                    <figure>
+                      <img :src="itemCategories[0]['image-placeholder']" />
+                    </figure>
+                  </figure>
+                </router-link>
+              </b-carousel-item>
+            </template>
           </b-carousel>
           <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
             <div class="level-left">
@@ -157,11 +175,11 @@ export default {
     },
     itemCategories() {
       let itemCategories = [];
-      if (this.item.category1 in categories)
+      if (categories[this.item.category1])
         itemCategories.push(categories[this.item.category1]);
-      if (this.item.category2 in categories)
+      if (categories[this.item.category2])
         itemCategories.push(categories[this.item.category2]);
-      if (this.item.category3 in categories)
+      if (categories[this.item.category3])
         itemCategories.push(categories[this.item.category3]);
       return itemCategories;
     },
