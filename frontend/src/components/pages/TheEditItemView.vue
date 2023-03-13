@@ -173,7 +173,7 @@
         </div>
         <div class="container has-text-centered mt-5">
           <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
-          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('edit') }}</b-button>
+          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('save') }}</b-button>
         </div>
       </section>
     </div>
