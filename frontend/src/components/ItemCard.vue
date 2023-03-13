@@ -4,31 +4,30 @@
       <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
         <template v-if="item.images.length > 0">
           <b-carousel-item v-for="image in item.images" :key="image.position">
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+            <router-link :to="linkOnClick">
               <figure class="image">
-                <b-image :src="image" ratio="5by3"></b-image>
-                <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+                <b-image :src="image" ratio="5by3" />
               </figure>
             </router-link>
           </b-carousel-item>
         </template>
         <template v-else>
           <b-carousel-item>
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+            <router-link :to="linkOnClick">
               <figure class="image">
-                <b-image :src="itemCategories[0]['image-placeholder']" ratio="5by3"></b-image>
-                <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+                <b-image :src="itemCategories[0]['image-placeholder']" ratio="5by3" />
               </figure>
             </router-link>
           </b-carousel-item>
         </template>
       </b-carousel>
+      <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
     </div>
     <div class="card-content">
       <div class="media">
         <div class="media-content">
           <p class="title is-5 mb-2">
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+            <router-link :to="linkOnClick">
               {{ item.name }}
             </router-link>
           </p>
@@ -92,7 +91,8 @@ export default {
   },
   data() {
     return {
-      geoLocation: null
+      geoLocation: null,
+      linkOnClick: ""
     }
   },
   created() {
@@ -111,6 +111,9 @@ export default {
         }
       );
     }
+    const addItemFromLink = {name: 'addItemFrom', params: {id: this.item.id}};
+    const itemDetailLink = {name: 'itemDetail', params: {id: this.item.id}};
+    this.linkOnClick = !this.recurrentList ? itemDetailLink : addItemFromLink;
   },
   computed: {
     itemCategories() {
@@ -162,28 +165,19 @@ export default {
 </script>
 
 <style scoped>
-.image {
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+.card-image {
   position: relative;
 }
 
-.image .hitcount {
+.card-image .hitcount {
   position: absolute;
   right: 10px;
   bottom: 10px;
   font-weight: bold;
 }
 
-.image .hitcount i {
+.card-image .hitcount i {
   margin-left: 4px;
-}
-
-.image .item-type {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
 }
 
 /* Adding ellipsis to second line of item name */

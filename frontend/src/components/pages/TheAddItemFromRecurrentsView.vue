@@ -6,7 +6,7 @@
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
     </h1>
-    <recurrent-items-list></recurrent-items-list>
+    <recurrent-items-list />
   </div>
 </template>
 
