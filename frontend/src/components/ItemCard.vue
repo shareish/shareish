@@ -1,13 +1,30 @@
 <template>
   <div class="card">
     <div class="card-image">
-      <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
-        <figure class="image">
-          <b-image v-if="item.images.length > 0" :src="item.images[0]" ratio="5by3"></b-image>
-          <b-image v-else :src="category1['image-placeholder']" ratio="5by3"></b-image>
-          <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
-        </figure>
-      </router-link>
+      <template v-if="item.images.length > 0">
+        <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+          <b-carousel-item v-for="image in item.images" :key="image.position">
+            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+              <figure class="image">
+                <b-image :src="image" ratio="5by3"></b-image>
+                <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+              </figure>
+            </router-link>
+          </b-carousel-item>
+        </b-carousel>
+      </template>
+      <template v-else>
+        <b-carousel :autoplay="false" :arrow-hover="false" :arrow="false" :indicator="false">
+          <b-carousel-item>
+            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+              <figure class="image">
+                <b-image :src="category1['image-placeholder']" ratio="5by3"></b-image>
+                <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+              </figure>
+            </router-link>
+          </b-carousel-item>
+        </b-carousel>
+      </template>
     </div>
     <div class="card-content">
       <div class="media">
