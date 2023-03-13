@@ -25,7 +25,7 @@
               </button>
             </div>
           </div>
-          <b-carousel :autoplay="false" :arrow-hover="false">
+          <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
             <b-carousel-item v-for="image in item.images" :key="image.position">
               <article id="item-image">
                 <div class="item-image-background">
