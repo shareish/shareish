@@ -34,15 +34,13 @@
             <div class="columns is-mobile is-flex-wrap-wrap">
               <div v-for="(preview, index) in images['previews']" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
                 <div class="square">
-                  <div class="square-fill">
-                    <div class="img-fill">
-                      <div class="remove" @click="removeImage(index)">
-                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z" />
-                        </svg>
-                      </div>
-                      <img :src="preview" />
-                    </div>
+                  <figure class="image">
+                    <b-image :src="preview" ratio="1by1" />
+                  </figure>
+                  <div class="remove" @click="removeImage(index)">
+                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z" />
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -539,35 +537,11 @@ export default {
   vertical-align: middle;
 }
 
-.square {
+#previews .square {
   position: relative;
-  overflow: hidden;
 }
 
-.square:before {
-  content: "";
-  display: block;
-  padding-top: 100%;
-}
-
-.square-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-}
-
-.img-fill {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  height: 100%;
-}
-
-.img-fill .remove {
+#previews .square .remove {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -579,7 +553,7 @@ export default {
   cursor: pointer;
 }
 
-.img-fill .remove svg {
+#previews .square .remove svg {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -587,12 +561,5 @@ export default {
   width: 60%;
   transform: translate(-50%, -50%);
   fill: white;
-}
-
-.img-fill img {
-  flex-shrink: 0;
-  min-width: 100%;
-  min-height: 100%;
-  max-width: inherit;
 }
 </style>
