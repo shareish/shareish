@@ -383,13 +383,7 @@ def predictClass(request):
     if request.method == 'POST':
         image = request.FILES.get('image')
         if image:
-            class_found, category_found, detected_text = findClass(image)
-            response = {
-                'suggested_class': class_found,
-                'suggested_category': category_found,
-                'detected_text': detected_text
-            }
-            return JsonResponse(response, status=status.HTTP_200_OK)
+            return JsonResponse(findClass(image), status=status.HTTP_200_OK, safe=False)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

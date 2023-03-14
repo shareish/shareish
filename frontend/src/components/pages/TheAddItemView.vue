@@ -62,13 +62,21 @@
         <div id="form">
           <div class="columns">
             <div class="column">
-              <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
+              <b-field key="name" expanded :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
                 <template #label>{{ $t('name') }}
                   <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="name" name="name" v-validate="'required'" />
+                <b-autocomplete
+                    v-model="name"
+                    :open-on-focus="true"
+                    :data="suggestedNames"
+                    field="name"
+                    @select="option => assignCategory(option)"
+                    :clearable="true"
+                >
+                </b-autocomplete>
               </b-field>
             </div>
             <div class="column">
@@ -218,9 +226,8 @@ export default {
 
       hideRecurrentsItemsInfoBox: false,
 
-      // suggestedName: null,
-      // suggestedCategory: null,
-      // suggestedDescription: null,
+      predictions: [],
+      suggestedNames: [],
 
       recurrentItem: null,
 
@@ -363,30 +370,57 @@ export default {
       });
       reader.readAsDataURL(file);
 
-      // await this.fetchPredictions(file);
-      // this.name = this.suggestedName;
-      // this.category1 = this.suggestedCategory;
-      // this.description = this.suggestedDescription;
+      await this.fetchPredictions(file);
 
       this.loading = false;
+    },
+    async fetchPredictions(file) {
+      try {
+        let data = new FormData();
+        data.append('image', file);
+        const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
+
+        for (let i in predictions) {
+          let found = false;
+          for (let j in this.predictions) {
+            if (this.predictions[j]['class'] === predictions[i]['class']) {
+              this.predictions[j]['probability'] += predictions[i]['probability'];
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+              this.predictions.push(predictions[i]);
+        }
+
+        this.predictions.sort(function(first, second) {
+          return second['probability'] - first['probability'];
+        });
+
+        if (this.predictions[0])
+          this.category1 = this.predictions[0]['category'];
+
+        this.suggestedNames = [];
+        const maxLen = (this.predictions.length < 5) ? this.predictions.length : 5;
+        for (let i = 0; i < maxLen; i++)
+          this.suggestedNames.push(this.predictions[i]['class']);
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+    },
+    assignCategory(option) {
+      for (let i in this.predictions) {
+        if (this.predictions[i]['class'] === option) {
+          this.category1 = this.predictions[i]['category'];
+          break;
+        }
+      }
     },
     removeImage(index) {
       this.images['files'].splice(index, 1);
       this.images['previews'].splice(index, 1);
     },
-    // async fetchPredictions(file) {
-    //   try {
-    //     let data = new FormData();
-    //     data.append('image', file);
-    //     const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
-    //     this.suggestedName = predictions['suggested_class'];
-    //     this.suggestedCategory = predictions['suggested_category'];
-    //     this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
-    //   }
-    //   catch (error) {
-    //     this.snackbarError(error);
-    //   }
-    // },
     async submit() {
       this.waitingFormResponse = true;
 
