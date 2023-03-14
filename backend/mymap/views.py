@@ -23,6 +23,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .ai import findClass
 
+from .CRAFT.CRAFT_shareish import CRAFT_txt
+
 from geopy.geocoders import Nominatim
 
 locator = Nominatim(user_agent='shareish')
@@ -407,6 +409,19 @@ def predictClass(request):
                 'suggested_category': category_found,
                 'detected_text': detected_text
             }
+            return JsonResponse(response, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def craft(request):
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        if image:
+            response, confidence_scores = CRAFT_txt(image)
+            print(response)
             return JsonResponse(response, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

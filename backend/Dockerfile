@@ -16,7 +16,8 @@ RUN apt-get update && \
     locale-gen $LC_ALL
 
 RUN apt-get update && \
-    apt-get install -y python3-pip libgdal-dev tesseract-ocr libtesseract-dev
+    apt-get install -y python3-pip libgdal-dev tesseract-ocr libtesseract-dev && \
+    apt-get install ffmpeg libsm6 libxext6 -y
 
 RUN cd /usr/bin && \
     ln -s python3 python

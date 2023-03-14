@@ -18,6 +18,7 @@ import TheAddItemView from '@/components/pages/TheAddItemView.vue'
 import TheConversationsView from '@/components/pages/TheConversationsView.vue'
 import TheConversationView from '@/components/pages/TheConversationView.vue'
 import TheAboutView from "@/components/pages/TheAboutView.vue";
+import Craft from "@/components/pages/Craft.vue";
 
 const routes = [
     {
@@ -148,6 +149,11 @@ const routes = [
         meta: {
             requireLogin: true
         }
+    },
+    {
+        path: '/craft',
+        name: 'craft',
+        component: Craft
     },
 
     // Redirects for old urls
