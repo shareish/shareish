@@ -114,7 +114,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" @input="descriptionNotUpdated = false" />
               </b-field>
             </div>
           </div>
@@ -223,8 +223,9 @@ export default {
 
       hideRecurrentsItemsInfoBox: false,
 
-      predictions: [],
+      probabilities: [],
       suggestedNames: [],
+      descriptionNotUpdated: true,
 
       recurrentItem: null,
 
@@ -373,27 +374,31 @@ export default {
       try {
         let data = new FormData();
         data.append('image', file);
-        const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
-        this.images[position]['predictions'] = predictions;
+        const response = (await axios.post("/api/v1/predictClass/", data)).data;
+        const probabilities = response['probabilities'];
+        this.images[position]['predictions'] = probabilities;
 
-        for (let i in predictions) {
+        for (let i in probabilities) {
           let found = false;
-          for (let j in this.predictions) {
-            if (this.predictions[j]['class'] === predictions[i]['class']) {
-              this.predictions[j]['probability'] += predictions[i]['probability'];
+          for (let j in this.probabilities) {
+            if (this.probabilities[j]['class'] === probabilities[i]['class']) {
+              this.probabilities[j]['probability'] += probabilities[i]['probability'];
               found = true;
               break;
             }
           }
           if (!found)
-              this.predictions.push({...predictions[i]});
+              this.probabilities.push({...probabilities[i]});
         }
 
         this.sortPredictions();
         this.refreshSuggestedNames();
 
-        if (this.predictions[0])
-          this.category1 = this.predictions[0]['category'];
+        if (this.descriptionNotUpdated)
+          this.description += response['detected_text']
+
+        if (this.probabilities[0])
+          this.category1 = this.probabilities[0]['category'];
       }
       catch (error) {
         this.snackbarError(error);
@@ -402,18 +407,18 @@ export default {
     removeImage(index) {
       const imagePredictionsToRemove = this.images[index]['predictions'];
       for (let i in imagePredictionsToRemove) {
-        for (let j in this.predictions) {
-          if (this.predictions[j]['class'] === imagePredictionsToRemove[i]['class']) {
-            this.predictions[j]['probability'] -= imagePredictionsToRemove[i]['probability'];
+        for (let j in this.probabilities) {
+          if (this.probabilities[j]['class'] === imagePredictionsToRemove[i]['class']) {
+            this.probabilities[j]['probability'] -= imagePredictionsToRemove[i]['probability'];
             break;
           }
         }
       }
 
       let j = 0;
-      while (j < this.predictions.length) {
-        if (this.predictions[j]['probability'] <= 0)
-          this.predictions.splice(j, 1);
+      while (j < this.probabilities.length) {
+        if (this.probabilities[j]['probability'] <= 0)
+          this.probabilities.splice(j, 1);
         else
           j++;
       }
@@ -424,20 +429,20 @@ export default {
       this.images.splice(index, 1);
     },
     sortPredictions() {
-      this.predictions.sort(function(first, second) {
+      this.probabilities.sort(function(first, second) {
         return second['probability'] - first['probability'];
       });
     },
     refreshSuggestedNames() {
       this.suggestedNames = [];
-      const predictionsLength = (this.predictions.length < 5) ? this.predictions.length : 5;
+      const predictionsLength = (this.probabilities.length < 5) ? this.probabilities.length : 5;
       for (let i = 0; i < predictionsLength; i++)
-        this.suggestedNames.push(this.predictions[i]['class']);
+        this.suggestedNames.push(this.probabilities[i]['class']);
     },
     assignCategory(option) {
-      for (let i in this.predictions) {
-        if (this.predictions[i]['class'] === option) {
-          this.category1 = this.predictions[i]['category'];
+      for (let i in this.probabilities) {
+        if (this.probabilities[i]['class'] === option) {
+          this.category1 = this.probabilities[i]['category'];
           break;
         }
       }
