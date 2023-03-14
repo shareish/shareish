@@ -22,20 +22,20 @@
             </section>
           </b-upload>
         </b-field>
-        <div id="previews" v-if="images['previews']" class="mt-4">
+        <div id="previews" v-if="images" class="mt-4">
           <h2 class="is-size-5 has-text-weight-bold mb-3">
             {{ $t('uploaded-images') }}
-            <span class="tag vertical-align-middle ml-1" :class="imagesSlotsLeftColorClass">{{ images['previews'].length }} / {{ imagesSlots }}</span>
+            <span class="tag vertical-align-middle ml-1" :class="imagesSlotsLeftColorClass">{{ images.length }} / {{ imagesSlots }}</span>
           </h2>
-          <template v-if="images['previews'].length === 0">
+          <template v-if="images.length === 0">
             <p>{{ $t('no-uploaded-images') }}</p>
           </template>
           <template v-else>
             <div class="columns is-mobile is-flex-wrap-wrap">
-              <div v-for="(preview, index) in images['previews']" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
+              <div v-for="(image, index) in images" class="column" :class="imagesPreviewColumnSizeClass">
                 <div class="square">
                   <figure class="image">
-                    <b-image :src="preview" ratio="1by1" />
+                    <b-image :src="image['preview']" ratio="1by1" />
                   </figure>
                   <div class="remove" @click="removeImage(index)">
                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -177,14 +177,14 @@
             </div>
           </div>
           <div class="columns">
-          <div class="column">
-          <b-checkbox v-model="isRecurrent">
-            <strong>{{ $t('save-as-recurrent-item') }}</strong>
-            <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
-              <i class="icon far fa-question-circle"></i>
-            </b-tooltip>
-          </b-checkbox>
-          </div>
+            <div class="column">
+              <b-checkbox v-model="isRecurrent">
+                <strong>{{ $t('save-as-recurrent-item') }}</strong>
+                <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
+                  <i class="icon far fa-question-circle"></i>
+                </b-tooltip>
+              </b-checkbox>
+            </div>
           </div>
         </div>
         <div class="container has-text-centered mt-5">
@@ -216,10 +216,7 @@ export default {
       step: 0,
 
       filesSelected: [],
-      images: {
-        'files': [],
-        'previews': []
-      },
+      images: [],
       imagesSlots: 12,
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
@@ -269,10 +266,10 @@ export default {
   },
   computed: {
     canStillUploadImages() {
-      return this.imagesSlots > this.images['previews'].length;
+      return this.imagesSlots > this.images.length;
     },
     imagesSlotsLeft() {
-      return this.imagesSlots - this.images['previews'].length;
+      return this.imagesSlots - this.images.length;
     },
     imagesSlotsLeftColorClass () {
       if (this.imagesSlotsLeft >= 6)
@@ -363,22 +360,21 @@ export default {
     async processImage(file) {
       this.loading = true;
 
-      this.images['files'].unshift(file.name);
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        this.images['previews'].unshift(reader.result)
+        this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
+        this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
 
-      await this.fetchPredictions(file);
-
       this.loading = false;
     },
-    async fetchPredictions(file) {
+    async fetchPredictions(file, position) {
       try {
         let data = new FormData();
         data.append('image', file);
         const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
+        this.images[position]['predictions'] = predictions;
 
         for (let i in predictions) {
           let found = false;
@@ -390,24 +386,53 @@ export default {
             }
           }
           if (!found)
-              this.predictions.push(predictions[i]);
+              this.predictions.push({...predictions[i]});
         }
 
-        this.predictions.sort(function(first, second) {
-          return second['probability'] - first['probability'];
-        });
+        this.sortPredictions();
+        this.refreshSuggestedNames();
 
         if (this.predictions[0])
           this.category1 = this.predictions[0]['category'];
-
-        this.suggestedNames = [];
-        const maxLen = (this.predictions.length < 5) ? this.predictions.length : 5;
-        for (let i = 0; i < maxLen; i++)
-          this.suggestedNames.push(this.predictions[i]['class']);
       }
       catch (error) {
         this.snackbarError(error);
       }
+    },
+    removeImage(index) {
+      const imagePredictionsToRemove = this.images[index]['predictions'];
+      for (let i in imagePredictionsToRemove) {
+        for (let j in this.predictions) {
+          if (this.predictions[j]['class'] === imagePredictionsToRemove[i]['class']) {
+            this.predictions[j]['probability'] -= imagePredictionsToRemove[i]['probability'];
+            break;
+          }
+        }
+      }
+
+      let j = 0;
+      while (j < this.predictions.length) {
+        if (this.predictions[j]['probability'] <= 0)
+          this.predictions.splice(j, 1);
+        else
+          j++;
+      }
+
+      this.sortPredictions();
+      this.refreshSuggestedNames();
+
+      this.images.splice(index, 1);
+    },
+    sortPredictions() {
+      this.predictions.sort(function(first, second) {
+        return second['probability'] - first['probability'];
+      });
+    },
+    refreshSuggestedNames() {
+      this.suggestedNames = [];
+      const predictionsLength = (this.predictions.length < 5) ? this.predictions.length : 5;
+      for (let i = 0; i < predictionsLength; i++)
+        this.suggestedNames.push(this.predictions[i]['class']);
     },
     assignCategory(option) {
       for (let i in this.predictions) {
@@ -416,10 +441,6 @@ export default {
           break;
         }
       }
-    },
-    removeImage(index) {
-      this.images['files'].splice(index, 1);
-      this.images['previews'].splice(index, 1);
     },
     async submit() {
       this.waitingFormResponse = true;
