@@ -32,7 +32,7 @@
           </template>
           <template v-else>
             <div class="columns is-mobile is-flex-wrap-wrap">
-              <div v-for="(image, index) in images" class="column" :class="imagesPreviewColumnSizeClass">
+              <div v-for="(image, index) in images" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
                 <div class="square">
                   <figure class="image">
                     <b-image :src="image['preview']" ratio="1by1" />
