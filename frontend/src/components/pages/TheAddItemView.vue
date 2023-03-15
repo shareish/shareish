@@ -114,7 +114,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" @input="descriptionNotUpdated = false" />
+                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
               </b-field>
             </div>
           </div>
@@ -225,7 +225,6 @@ export default {
 
       probabilities: [],
       suggestedNames: [],
-      descriptionNotUpdated: true,
 
       recurrentItem: null,
 
@@ -393,8 +392,7 @@ export default {
         this.sortPredictions();
         this.refreshSuggestedNames();
 
-        if (this.descriptionNotUpdated)
-          this.description += response['detected_text']
+        this.description += response['detected_text']
 
         if (this.probabilities[0])
           this.category1 = this.probabilities[0]['category'];
