@@ -329,8 +329,7 @@ export default {
         try {
           const images = JSON.parse((await axios.get(`/api/v1/items/${this.recurrentItemId}/images/base64`)).data);
           for (const i in images) {
-            this.images['files'].push(images[i].name);
-            this.images['previews'].push(images[i].base64_url);
+            this.images.push({"filename": images[i].name, 'predictions': [], 'preview': images[i].base64_url, 'probability': 0});
           }
         } catch (error) {
           this.snackbarError(error);
@@ -479,14 +478,14 @@ export default {
             images: []
           })).data;
 
-          if (this.images['files'].length > 0) {
+          if (this.images.length > 0) {
             try {
               let data = new FormData();
               data.append('item_id', item.id);
 
-              for (let i in this.images['files']) {
-                const blob = await (await fetch(this.images['previews'][i])).blob();
-                const image = new File([blob], this.images['files'][i]);
+              for (let i in this.images) {
+                const blob = await (await fetch(this.images[i]['preview'])).blob();
+                const image = new File([blob], this.images[i]['filename']);
                 data.append('images', image);
               }
 
