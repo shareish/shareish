@@ -3,6 +3,34 @@
     <div class="tile is-ancestor">
       <div class="tile is-parent">
         <div class="tile is-child box">
+          <b-field key="first_name" :message="errors.first('first_name')" :type="{'is-danger': errors.has('first_name')}">
+            <template #label>
+              <b-tooltip key="first_name" :label="$t('help_firstname')" multilined position="is-right">
+                {{ $t('firstname') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="internalUser['first_name']" v-validate="'required'" name="first_name" type="text" />
+          </b-field>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="tile is-child box">
+          <b-field key="last_name" :message="errors.first('last_name')" :type="{'is-danger': errors.has('last_name')}">
+            <template #label>
+              <b-tooltip key="last_name" :label="$t('help_lastname')" multilined position="is-right">
+                {{ $t('lastname') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="internalUser['last_name']" v-validate="'required'" name="last_name" type="text" />
+          </b-field>
+        </div>
+      </div>
+    </div>
+    <div class="tile is-ancestor">
+      <div class="tile is-parent">
+        <div class="tile is-child box">
           <b-field key="email" :message="errors.first('email')" :type="{'is-danger': errors.has('email')}">
             <template #label>
               <b-tooltip key="email" :label="$t('help_email')" multilined position="is-right">
@@ -11,6 +39,19 @@
               </b-tooltip>
             </template>
             <b-input v-model="internalUser['email']" v-validate="'required|email'" name="email" type="text" />
+          </b-field>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="tile is-child box">
+          <b-field key="username" :message="errors.first('username')" :type="{'is-danger': errors.has('username')}">
+            <template #label>
+              <b-tooltip key="username" :label="$t('help_username')" multilined position="is-right">
+                {{ $t('username') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="internalUser['username']" v-validate="'required'" name="username" type="text" />
           </b-field>
         </div>
       </div>

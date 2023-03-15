@@ -76,8 +76,8 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        positon => {
-          this.geoLocation = positon;
+        position => {
+          this.geoLocation = position;
         },
         null,
         {
@@ -125,13 +125,13 @@ export default {
   margin-right: 3px;
 }
 
-@media screen and (max-width: 1023px) and (min-width: 767px) {
+@media screen and (max-width: 1023px) and (min-width: 768px) {
   #settings-split aside.menu {
     max-width: calc(18% + 100px);
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
   #settings-split {
     display: block;
   }

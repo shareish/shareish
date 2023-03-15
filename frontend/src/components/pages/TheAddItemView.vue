@@ -240,7 +240,7 @@ export default {
       enddate: null,
       isRecurrent: false,
 
-      geoloc: null,
+      geoLocation: null,
       waitingFormResponse: false
     }
   },
@@ -251,8 +251,8 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        positon => {
-          this.geoloc = positon;
+        position => {
+          this.geoLocation = position;
         },
         null,
         {
@@ -341,8 +341,8 @@ export default {
     },
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoloc !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
+      if (this.geoLocation !== null) {
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));

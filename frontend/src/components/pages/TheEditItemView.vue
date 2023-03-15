@@ -206,16 +206,12 @@ export default {
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
 
-      // suggestedName: null,
-      // suggestedCategory: null,
-      // suggestedDescription: null,
-
       item: {},
       internalItem: {},
       location: "",
       initialStartdate: Date.now(),
 
-      geoloc: null,
+      geoLocation: null,
       waitingFormResponse: false
     }
   },
@@ -226,8 +222,8 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        positon => {
-          this.geoloc = positon;
+        position => {
+          this.geoLocation = position;
         },
         null,
         {
@@ -325,8 +321,8 @@ export default {
     },
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoloc !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoloc.coords.latitude + " " + this.geoloc.coords.longitude + ")";
+      if (this.geoLocation !== null) {
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
@@ -352,30 +348,12 @@ export default {
       });
       reader.readAsDataURL(file);
 
-      // await this.fetchPredictions(file);
-      // this.name = this.suggestedName;
-      // this.category1 = this.suggestedCategory;
-      // this.description = this.suggestedDescription;
-
       this.loading = false;
     },
     removeImage(index) {
       this.images['files'].splice(index, 1);
       this.images['previews'].splice(index, 1);
     },
-    // async fetchPredictions(file) {
-    //   try {
-    //     let data = new FormData();
-    //     data.append('image', file);
-    //     const predictions = (await axios.post("/api/v1/predictClass/", data)).data;
-    //     this.suggestedName = predictions['suggested_class'];
-    //     this.suggestedCategory = predictions['suggested_category'];
-    //     this.suggestedDescription = predictions['suggested_class'] + ": " + predictions['detected_text'];
-    //   }
-    //   catch (error) {
-    //     this.snackbarError(error);
-    //   }
-    // },
     async submit() {
       this.waitingFormResponse = true;
 

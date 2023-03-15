@@ -254,3 +254,16 @@ yes-please,"Yes, please!","Oui, je veux!"
 no-thanks,"No, thanks.",Non merci.
 want-an-other-recurrent,"You are using item <strong>#{n}</strong>. Want to use an other one?","Vous utilisez l'élément #{n}. Voulez-vous en utiliser un autre?"
 reset,Reset,Réinitialiser
+profile-picture,Profile picture,Photo de profil
+remove,Remove,Retirer
+removing-picture,Removing picture,Retirer l'image
+removing-picture-confirmation,"Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.","Êtes-vous sûr de vouloir <b>retirer</b> cette image de votre profil? Cette action ne peut pas être annulée."
+upload-a-new-one,Upload a new one,Transférer pour changer
+current-profile-picture,Current profile picture,Photo de profil actuelle
+current-profile-pictures,Current profile pictures,Photos de profil actuelles
+info-already-uploaded-profile-pictures,"If you have already uploaded profile pictures in the past, you can look through them and <b>select one as your current profile picture</b>. Just click on it!","Si vous avez déjà transféré des photos de profil dans le passé, vous pouvez y jeter un oeil et en <b>sélectionner une comme nouvelle photo de profil</b>. Il suffit de cliquer dessus!"
+info-no-profile-picture-uploaded-yet,You haven't uploaded any profile pictures yet.,Vous n'avez encore jamais transféré de photo de profil.
+no-images,No images,Pas d'images
+info-profile-picture-recommendation,"Using a profile picture is <strong>recommended</strong> as it helps other users to identify who they are interacting with and thus <strong>improve trust</strong> on the website. You can even upload several pictures!","Utiliser une photo de profil est <b>recommandé</b> car cela aide les autres utilisateurs à identifier avec qui ils intéragissent et donc <b>améliorer la confiance</b> en chacun sur le site. Vous pouvez même transférer plusieurs photos!"
+update-profile-picture,Update profile picture,Changer de photo de profil
+and-n-more,And {n} more,Et {n} de plus

@@ -115,7 +115,7 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     class Meta:
-        ordering = ['sign_up_date']
+        ordering = ['sign_up_date', 'id']
 
 
 class UserImage(models.Model):
@@ -145,7 +145,7 @@ class UserImage(models.Model):
         return "{}/api/v1/users/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
-        ordering = ['user']
+        ordering = ['user_id', '-id']
 
 
 class Item(models.Model):
@@ -234,7 +234,7 @@ class ItemImage(models.Model):
         return "{}/api/v1/items/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
-        ordering = ['item', 'position']
+        ordering = ['item_id', 'position']
 
 
 class Conversation(models.Model):
