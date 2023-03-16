@@ -14,7 +14,7 @@
           <p>
             <strong class="is-size-4">{{ item.name }}</strong>
             <br />
-            <item-type-tag :type="item.item_type" class="mr-1" />
+            <item-type-tag :type="item.type" class="mr-1" />
             <small v-if="item.user">{{ $t('by') }} <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">@{{ item.user.username }}</router-link></small>
             <br />
             <small>{{ formattedDate(item.startdate) }} </small>

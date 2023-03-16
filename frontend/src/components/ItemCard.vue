@@ -33,7 +33,7 @@
           </p>
           <p class="mb-2">{{ truncate(item.description) }}</p>
           <p class="subtitle is-6 mt-0">
-            <item-type-tag :type="item.item_type" />
+            <item-type-tag :type="item.type" />
             <span v-if="item.user">
               {{ $t('by') }}
               <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">

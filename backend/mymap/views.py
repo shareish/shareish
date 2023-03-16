@@ -58,9 +58,9 @@ def verif_location(data):
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        item_type = request.query_params.get('item_type')
-        if item_type is not None:
-            return queryset.filter(item_type=item_type)
+        type = request.query_params.get('type')
+        if type is not None:
+            return queryset.filter(type=type)
         return queryset
 
 
@@ -132,7 +132,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
         if item.location is not None:
-            if item.item_type != "EV":
+            if item.type != "EV":
                 from .mail import send_mail_notif_new_single_item_published
                 send_mail_notif_new_single_item_published(item, self.request.user)
             else:
@@ -341,7 +341,7 @@ def searchItemFilter(request):
         if searched['name'] == "":
             searched['name'] = None
 
-        if searched['name'] is None and searched['item_type'] is None and searched['category'] is None:
+        if searched['name'] is None and searched['type'] is None and searched['category'] is None:
             serialized_items = ItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
 
@@ -349,9 +349,9 @@ def searchItemFilter(request):
             items_name = queryset.filter(name__icontains=searched['name'])
             items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
-        if searched['item_type'] is not None:
-            items_item_type = queryset.filter(item_type__exact=searched['item_type'])
-            items = items | items_item_type
+        if searched['type'] is not None:
+            items_type = queryset.filter(type__exact=searched['type'])
+            items = items | items_type
         if searched['category'] is not None:
             items_category1 = queryset.filter(category1__exact=searched['category'])
             items_category2 = queryset.filter(category2__exact=searched['category'])

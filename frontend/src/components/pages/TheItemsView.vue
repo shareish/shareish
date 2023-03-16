@@ -54,7 +54,7 @@ export default {
     params() {
       return {
         search: this.searchString,
-        item_type: this.selectedType,
+        type: this.selectedType,
         category: this.selectedCategory
       };
     }

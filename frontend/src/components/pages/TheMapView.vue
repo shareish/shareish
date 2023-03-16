@@ -280,7 +280,7 @@ export default {
   computed: {
     filterParams() {
       return {
-        item_type: this.selectedType,
+        type: this.selectedType,
         category: this.selectedCategory,
         search: this.searchString
       };
@@ -352,7 +352,7 @@ export default {
           let latLong = item['location'].slice(17, -1).split(' ');
           return {
             ...item,
-            icon: itemTypeIcons[item['item_type']] || greyIcon,
+            icon: itemTypeIcons[item['type']] || greyIcon,
             latitude: latLong[0],
             longitude: latLong[1],
             latLng: latLng(...latLong)

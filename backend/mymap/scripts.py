@@ -14,11 +14,11 @@ def testAddItems(nb_items, user):
         name = 'Test Serializer ' + str(i)
         latitude = random.uniform(50.668157, 50.155765)
         longitude = random.uniform(5.077769, 6.132183)
-        item_type = random.choice(['RQ', 'LN', 'DN'])
+        type = random.choice(['RQ', 'LN', 'DN'])
         location = 'SRID=4326;POINT (' + str(latitude) + ' ' + str(longitude) + ')'
         item = Item(
             name=name, description='Test description', location=location, user=user,
-            item_type=item_type
+            type=type
         )
         item.save()
 

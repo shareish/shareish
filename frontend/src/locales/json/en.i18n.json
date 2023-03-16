@@ -263,7 +263,7 @@
   "removing-picture-confirmation": "Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.",
   "upload-a-new-one": "Upload a new one",
   "current-profile-picture": "Current profile picture",
-  "other-profile-pictures": "Current profile pictures",
+  "other-profile-pictures": "Other profile pictures",
   "info-already-uploaded-profile-pictures": "If you have already uploaded profile pictures in the past, you can look through them and <b>select one as your current profile picture</b>. Just click on it!",
   "info-no-profile-picture-uploaded-yet": "You haven't uploaded any profile pictures yet.",
   "no-images": "No images",
@@ -271,5 +271,6 @@
   "update-profile-picture": "Update profile picture",
   "and-n-more": "And {n} more",
   "picture-removed": "Picture removed!",
-  "aware-changes-not-saved": "Aware! Your new profile picture needs to be saved!"
+  "aware-changes-not-saved": "Aware! Your new profile picture needs to be saved!",
+  "image-already-profile-picture": "This image is already your profile picture!"
 }

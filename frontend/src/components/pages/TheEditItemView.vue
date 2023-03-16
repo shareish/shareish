@@ -68,7 +68,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="internalItem.item_type" expanded name="type" v-validate="'required'">
+                <b-select v-model="internalItem.type" expanded name="type" v-validate="'required'">
                   <option value="RQ">{{ $t('request') }}</option>
                   <option value="DN">{{ $t('donation') }}</option>
                   <option value="LN">{{ $t('loan') }}</option>
@@ -373,7 +373,7 @@ export default {
         try {
           const item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
             name: this.internalItem.name,
-            item_type: this.internalItem.item_type,
+            type: this.internalItem.type,
             category1: this.internalItem.category1,
             category2: this.internalItem.category2,
             category3: this.internalItem.category3,

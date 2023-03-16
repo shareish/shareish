@@ -62,7 +62,7 @@ geoadmin.site.unregister(Group)
 
 
 class ItemAdmin(geoadmin.OSMGeoAdmin):
-    list_display = ("name", "location", "description", "item_type", "user")
+    list_display = ("name", "location", "description", "type", "user")
 
 
 geoadmin.site.register(Item)

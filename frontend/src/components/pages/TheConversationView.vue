@@ -87,7 +87,7 @@ export default {
           'RQ': 'request',
           'LN': 'loan'
         }
-        this.messageToSend = this.$t('intro-' + types[this.item.item_type] + '-first-message');
+        this.messageToSend = this.$t('intro-' + types[this.item.type] + '-first-message');
       }
     },
     async fetchItem() {

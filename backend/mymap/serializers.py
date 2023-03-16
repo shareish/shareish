@@ -65,7 +65,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'creationdate', 'startdate',
-            'enddate', 'item_type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
+            'enddate', 'type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
         ]
 
     def validate(self, data):

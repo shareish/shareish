@@ -201,7 +201,7 @@ class Item(models.Model):
     is_recurrent = models.BooleanField(default=False)
     hitcount = models.IntegerField(verbose_name="Hit Count", default=0)
 
-    item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
+    type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
     category2 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)

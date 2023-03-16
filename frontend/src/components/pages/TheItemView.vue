@@ -67,7 +67,7 @@
         </section>
         <section id="item-info" class="column is-7">
           <h1 class="title is-size-2">{{ item.name }}
-            <item-type-tag :type="item.item_type" />
+            <item-type-tag :type="item.type" />
           </h1>
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}

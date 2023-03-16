@@ -319,7 +319,7 @@ export default {
       if (this.recurrentItem !== null) {
         this.name = this.recurrentItem.name;
         this.description = this.recurrentItem.description;
-        this.type = this.recurrentItem.item_type;
+        this.type = this.recurrentItem.type;
         this.category1 = this.recurrentItem.category1;
         this.category2 = this.recurrentItem.category2;
         this.category3 = this.recurrentItem.category3;
@@ -464,7 +464,7 @@ export default {
         try {
           let item = (await axios.post("/api/v1/items/", {
             name: this.name,
-            item_type: this.type,
+            type: this.type,
             category1: this.category1,
             category2: this.category2,
             category3: this.category3,
