@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import date
 
 from PIL import Image
@@ -7,6 +9,14 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.geos import Point
+
+
+def get_random_string(length):
+    options = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    return ''.join(random.choice(options) for _ in range(length))
+
+def get_random_file_name():
+    return str(int(timezone.now().timestamp())) + "_" + get_random_string(5)
 
 
 class MyUserManager(BaseUserManager):
@@ -115,21 +125,21 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     class Meta:
-        ordering = ['sign_up_date', 'id']
+        ordering = ['sign_up_date']
 
 
 class UserImage(models.Model):
-    image = models.ImageField(upload_to='')
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='images', on_delete=models.CASCADE
-    )
+    image = models.ImageField(upload_to='users_images')
+    user = models.ForeignKey(User, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        self.image.name = get_random_file_name()
         super().save(*args, **kwargs)
-
         img = Image.open(self.image.path)
-        if img.height > 256 or img.width > 256:
-            output_size = (256, 256)
+
+        MAX_SIZE = 256
+        if img.height > MAX_SIZE or img.width > MAX_SIZE:
+            output_size = (MAX_SIZE, MAX_SIZE)
             img.thumbnail(output_size)
             img.save(self.image.path, format=img.format)
 
@@ -212,7 +222,7 @@ class ItemImage(models.Model):
     item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
-        self.image.name = str(self.item.id) + "_" + str(self.position)
+        self.image.name = get_random_file_name()
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 

@@ -260,7 +260,7 @@ class UserImageViewSet(viewsets.ViewSet):
         new_image = UserImage(image=image, user=user)
         new_image.save()
         serialized_image = UserImageSerializer(new_image)
-        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
+        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -471,13 +471,19 @@ def republishItemImagesFromItem(request, new_item_id, parent_item_id):
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getUserImage(request, userimage_id):
+def userImage(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
             return FileResponse(open(image.path, 'rb'))
+        except UserImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    elif request.method == 'DELETE':
+        try:
+            UserImage.objects.get(pk=userimage_id).delete()
+            return Response(status=status.HTTP_200_OK)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -522,6 +528,22 @@ def getItemImagesBase64(request, item_id):
                    "base64_url": "data:image/png;base64," + str(base64.b64encode(item_image.image.file.read()).decode("utf-8"))
                 })
             return Response(json.dumps(images), status=status.HTTP_200_OK)
-        except Item.DoesNotExist:
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getUserImageBase64(request, userimage_id):
+    if request.method == 'GET':
+        try:
+            userimage = UserImage.objects.get(pk=userimage_id)
+            response = {
+               "name": str(userimage.image.name),
+               "base64_url": "data:image/png;base64," + str(base64.b64encode(userimage.image.file.read()).decode("utf-8"))
+            }
+            return Response(json.dumps(response), status=status.HTTP_200_OK)
+        except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

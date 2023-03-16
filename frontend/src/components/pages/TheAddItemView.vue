@@ -483,8 +483,8 @@ export default {
 
               for (let i in this.images) {
                 const blob = await (await fetch(this.images[i]['preview'])).blob();
-                const image = new File([blob], this.images[i]['filename']);
-                data.append('images', image);
+                const tempFile = new File([blob], this.images[i]['filename']);
+                data.append('images', tempFile);
               }
 
               await axios.post("/api/v1/images/", data);

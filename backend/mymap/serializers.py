@@ -5,9 +5,19 @@ from rest_framework import serializers
 
 from .models import Conversation, Item, ItemImage, Message, User, UserImage
 
+class UserImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = UserImage
+        fields = [
+            'id', 'image', 'user', 'url'
+        ]
+
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
-    images = serializers.StringRelatedField(many=True)
+    images = UserImageSerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = User
@@ -38,16 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return data
-
-
-class UserImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
-
-    class Meta:
-        model = UserImage
-        fields = [
-            'id', 'image', 'user', 'url'
-        ]
 
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):

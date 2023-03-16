@@ -6,10 +6,11 @@
       <button class="delete" type="button" @click="$emit('close')" />
     </header>
     <section class="modal-card-body">
+      <b-message v-if="changesNotSaved" type="is-warning" has-icon>{{ $t('aware-changes-not-saved') }}</b-message>
       <div class="media mb-3">
         <div class="media-left">
           <b-image class="image" v-if="preview !== null" :src="preview" ratio="1by1" />
-          <b-image class="image" v-else-if="user.images.length > 0" :src="user.images[0]" ratio="1by1" />
+          <b-image class="image" v-else-if="user.images.length > 0" :src="user.images[0].url" ratio="1by1" />
           <b-image class="image" v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
         </div>
         <div class="media-content">
@@ -26,13 +27,13 @@
       </div>
       <div id="profile-images">
         <hr />
-        <h2 class="title is-size-5 mb-3">{{ $t('current-profile-pictures') }}</h2>
+        <h2 class="title is-size-5 mb-3">{{ $t('other-profile-pictures') }}</h2>
         <p class="mb-5" v-html="$t('info-already-uploaded-profile-pictures')"></p>
         <div v-if="user.images.length > 0" class="columns is-mobile is-flex-wrap-wrap">
           <div v-for="(image, index) in user.images" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
             <div class="square">
               <figure class="image" @click="reuseImage(index)">
-                <b-image :src="image" ratio="1by1" />
+                <b-image :src="image.url" ratio="1by1" />
               </figure>
               <div class="remove" @click="clickRemoveImage(index)">
                 <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +74,8 @@ export default {
       loading: false,
       fileSelected: null,
       filename: null,
-      preview: null
+      preview: null,
+      changesNotSaved: false
     }
   },
   watch: {
@@ -95,6 +97,8 @@ export default {
       });
       reader.readAsDataURL(file);
 
+      this.changesNotSaved = true;
+
       this.loading = false;
     },
     clickRemoveImage(index) {
@@ -109,33 +113,51 @@ export default {
       });
     },
     async reuseImage(index) {
-      this.$buefy.toast.open("Re-use process not done yet!");
-      // Re-use image process
+      if (index > 0) {
+        const image_id = this.user.images[index].id;
+        try {
+          const image = JSON.parse((await axios.get(`/api/v1/users/images/${image_id}/base64`)).data);
+          this.filename = image.name;
+          this.preview = image.base64_url;
+          this.changesNotSaved = true;
+        } catch (error) {
+          this.snackbarError(error);
+        }
+      } else {
+        this.$buefy.toast.open(this.$t('image-already-profile-picture'));
+      }
     },
     async removeImage(index) {
-      this.$buefy.toast.open("Remove process not done yet!");
-      // Remove image process
+      const image_id = this.user.images[index].id;
+      try {
+        await axios.delete(`/api/v1/users/images/${image_id}`);
+        this.$buefy.snackbar.open({
+          duration: 5000,
+          type: 'is-success',
+          message: this.$t('picture-removed'),
+          pauseOnHover: true,
+          position: 'is-bottom-right'
+        });
 
-      // try {
-      //   await axios.delete("/api/v1/user_image/", data);
-      //   this.$buefy.toast.open('Picture removed!');
-      // } catch (error) {
-      //   this.snackbarError(error);
-      // }
+        this.user.images.splice(index, 1);
+      } catch (error) {
+        this.snackbarError(error);
+      }
     },
     async save() {
       this.waitingFormResponse =  true;
 
       if (this.filename !== null) {
-        let data = new FormData();
+        const data = new FormData();
         data.append('user_id', this.user['id']);
 
         const blob = await (await fetch(this.preview)).blob();
-        const image = new File([blob], this.filename);
-        data.append('image', image);
+        const tempFile = new File([blob], this.filename);
+        data.append('image', tempFile);
 
-        let image_url = (await axios.post("/api/v1/user_image/", data)).data;
-        this.user.images.unshift(image_url);
+        const image = (await axios.post("/api/v1/user_image/", data)).data;
+        this.user.images.unshift(image);
+        this.changesNotSaved = false;
         this.$emit('close');
       } else {
         this.$emit('close');

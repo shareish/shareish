@@ -4,9 +4,9 @@
       <div class="media-left">
         <b-carousel class="carousel" :autoplay="false" :arrow-hover="true" :arrow="user.images.length > 1" :indicator="user.images.length > 1">
           <template v-if="user.images.length > 0">
-            <b-carousel-item v-for="image in user.images" :key="image.position">
+            <b-carousel-item v-for="(image, index) in user.images" :key="index">
               <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
-                <b-image :src="image" ratio="1by1"></b-image>
+                <b-image :src="image.url" ratio="1by1"></b-image>
               </router-link>
             </b-carousel-item>
           </template>

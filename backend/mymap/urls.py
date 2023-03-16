@@ -31,6 +31,7 @@ urlpatterns = [
     path("items/<int:item_id>/images/first", views.getItemFirstImage, name='get_item_first_image'),
     path("items/<int:item_id>/increase_hitcount", views.increaseHitcountItem, name='increase_item_hitcount'),
     path("items/images/<int:itemimage_id>", views.getItemImage, name='get_item_image'),
-    path("users/images/<int:userimage_id>", views.getUserImage, name='get_user_image'),
-    path("items/<int:item_id>/images/base64", views.getItemImagesBase64, name='get_item_images_base24'),
+    path("users/images/<int:userimage_id>", views.userImage, name='user_image'),
+    path("users/images/<int:userimage_id>/base64", views.getUserImageBase64, name='get_user_image_base64'),
+    path("items/<int:item_id>/images/base64", views.getItemImagesBase64, name='get_item_images_base64'),
 ]

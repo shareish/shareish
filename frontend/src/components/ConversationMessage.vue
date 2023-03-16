@@ -2,7 +2,7 @@
   <article class="media">
     <div class="media-left">
       <figure class="image">
-        <b-image v-if="sender.images.length > 0" :src="sender.images[0]" ratio="1by1" />
+        <b-image v-if="sender.images.length > 0" :src="sender.images[0].url" ratio="1by1" />
         <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
       </figure>
     </div>

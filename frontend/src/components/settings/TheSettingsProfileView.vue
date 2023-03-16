@@ -2,7 +2,7 @@
   <section class="settings column">
     <div class="media mb-5">
       <div class="media-left box">
-        <b-image v-if="user.images.length > 0" :src="user.images[0]" ratio="1by1" />
+        <b-image v-if="user.images.length > 0" :src="user.images[0].url" ratio="1by1" />
         <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
       </div>
       <div class="media-content box">
@@ -13,13 +13,13 @@
             <b-button type="is-primary" @click="updateProfilePicture()" class="mt-3">{{ $t('update-profile-picture') }}</b-button>
           </div>
           <div class="column">
-            <h4 class="title is-size-5 mb-3">{{ $t('current-profile-pictures') }}</h4>
+            <h4 class="title is-size-5 mb-3">{{ $t('other-profile-pictures') }}</h4>
             <div id="profile-images" class="columns is-mobile is-flex-wrap-wrap">
               <template v-if="user.images.length > 0">
                 <template v-for="(image, index) in user.images">
                   <div :key="index" v-if="index < maxImagesToShow[imagesPreviewColumnSizeClass]" class="column" :class="imagesPreviewColumnSizeClass">
                     <figure class="image">
-                      <b-image :src="image" ratio="1by1" />
+                      <b-image :src="image.url" ratio="1by1" />
                     </figure>
                   </div>
                 </template>

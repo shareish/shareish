@@ -322,7 +322,7 @@ export default {
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoLocation !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
+        const geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
@@ -357,8 +357,7 @@ export default {
     async submit() {
       this.waitingFormResponse = true;
 
-      let result = await this.$validator.validateAll();
-      if (result) {
+      if (await this.$validator.validateAll()) {
         let startDate;
         if (this.internalItem.startdate)
           startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
@@ -372,7 +371,7 @@ export default {
           endDate = null;
 
         try {
-          let item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
+          const item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
             name: this.internalItem.name,
             item_type: this.internalItem.item_type,
             category1: this.internalItem.category1,
@@ -387,13 +386,13 @@ export default {
 
           if (this.images['files'].length > 0) {
             try {
-              let data = new FormData();
+              const data = new FormData();
               data.append('item_id', item.id);
 
               for (let i in this.images['files']) {
                 const blob = await (await fetch(this.images['previews'][i])).blob();
-                const image = new File([blob], this.images['files'][i]);
-                data.append('images', image);
+                const tempFile = new File([blob], this.images['files'][i]);
+                data.append('images', tempFile);
               }
 
               await axios.post("/api/v1/images/", data);

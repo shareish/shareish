@@ -263,11 +263,14 @@
   "removing-picture-confirmation": "Êtes-vous sûr de vouloir <b>retirer</b> cette image de votre profil? Cette action ne peut pas être annulée.",
   "upload-a-new-one": "Transférer pour changer",
   "current-profile-picture": "Photo de profil actuelle",
-  "current-profile-pictures": "Photos de profil actuelles",
+  "other-profile-pictures": "Autres photos de profil",
   "info-already-uploaded-profile-pictures": "Si vous avez déjà transféré des photos de profil dans le passé, vous pouvez y jeter un oeil et en <b>sélectionner une comme nouvelle photo de profil</b>. Il suffit de cliquer dessus!",
   "info-no-profile-picture-uploaded-yet": "Vous n'avez encore jamais transféré de photo de profil.",
   "no-images": "Pas d'images",
   "info-profile-picture-recommendation": "Utiliser une photo de profil est <b>recommandé</b> car cela aide les autres utilisateurs à identifier avec qui ils intéragissent et donc <b>améliorer la confiance</b> en chacun sur le site. Vous pouvez même transférer plusieurs photos!",
   "update-profile-picture": "Changer de photo de profil",
-  "and-n-more": "Et {n} de plus"
+  "and-n-more": "Et {n} de plus",
+  "picture-removed": "Image retirée!",
+  "aware-changes-not-saved": "Attention! Votre nouvelle photo de profil doit être sauvegardée!",
+  "image-already-profile-picture": "Cette image est déjà votre photo de profil!"
 }
