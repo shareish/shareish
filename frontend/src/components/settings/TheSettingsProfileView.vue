@@ -2,8 +2,8 @@
   <section class="settings column">
     <div class="media mb-5">
       <div class="media-left box">
-        <b-image class="to-resize" v-if="user.images.length > 0" :src="user.images[0]" ratio="1by1" />
-        <b-image class="to-resize" v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
+        <b-image v-if="user.images.length > 0" :src="user.images[0]" ratio="1by1" />
+        <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
       </div>
       <div class="media-content box">
         <div class="columns">

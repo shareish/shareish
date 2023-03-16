@@ -6,12 +6,12 @@
       <div class="columns">
         <div class="column is-two-thirds">
           <article class="media">
-            <figure class="media-left">
-              <p class="image">
-                <img v-if="user.images.length > 0" :src="user.images[0]" />
-                <img v-else src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
-              </p>
-            </figure>
+            <div class="media-left">
+              <figure class="image">
+                <b-image v-if="user.images.length > 0" :src="user.images[0]" ratio="1by1" />
+                <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
+              </figure>
+            </div>
             <div class="media-content">
               <div class="field">
                 <p class="control">
