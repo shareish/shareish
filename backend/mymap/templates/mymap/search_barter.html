@@ -1,8 +1,0 @@
-{% extends 'mymap/base.html' %} {% load static %} {% block content %}
-<main>
-    {% if searched %}
-    <br/> {% for barter in barters %} {{ barter }}<br/> {% endfor %} {% else %}
-    <h1>You forgot to search.</h1>
-    {% endif %}
-</main>
-{% endblock %}

@@ -9,7 +9,6 @@
         <div class="columns">
           <div class="column">
             <h6 class="title is-4 mb-4">Shareish</h6>
-<!--            <img src="./assets/anonymous_institute.svg" alt="the anonymous Institute">//-->
             <address class="custom-flex-column">
               <span>XXX Anonymous</span>
               <span>XXX Anonymous</span>
@@ -45,18 +44,18 @@
 </template>
 
 <script>
-import axios from 'axios'
-import TheNavbar from '@/components/TheNavbar.vue';
+import axios from "axios"
+import TheNavbar from "@/components/TheNavbar.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export async function logout(instance) {
   try {
-    await axios.post('/api/v1/token/logout/');
+    await axios.post("/api/v1/token/logout/");
     axios.defaults.headers.common["Authorization"] = "";
     localStorage.removeItem("token");
     instance.$store.commit('removeToken');
     instance.$store.commit('removeUserID');
-    await instance.$router.push('/log-in');
+    await instance.$router.push("/log-in");
   }
   catch (error) {
     ErrorHandler.methods.snackbarError(error);
@@ -75,7 +74,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/main.scss';
+@import "@/assets/styles/main.scss";
 
 .wrapper {
   display: flex;
