@@ -1,4 +1,5 @@
 {% extends "mail_templated/base.tpl" %}
+{% load my_filters %}
 
 {% block subject %}
     [Shareish] {{ digest }} for Shareish mutual aid platform ({{ n }} new item{% if n != 1 %}s{% endif %})
@@ -11,7 +12,7 @@
     {{ text|linebreaks }}
     Last {% if n > to_show %}{{ to_show }}{% endif %} item{% if n != 1 %}s{% endif %} published:{{ text|linebreaks }}
     {% for item in new_items %}
-        - {{ item_types|get_item:item.item_type }}: {{ item.name }}, at {{ item.distance.km|floatformat:2 }}km ({{ app_url }}/items/{{ item.id }}){{ text|linebreaks }}
+        - {{ item_types|get_key:item.item_type }}: {{ item.name }}, at {{ item.distance.km|floatformat:2 }}km ({{ app_url }}/items/{{ item.id }}){{ text|linebreaks }}
     {% endfor %}
     {% if n > to_show %}
         {{ text|linebreaks }}

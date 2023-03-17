@@ -1,4 +1,5 @@
 {% extends "mail_templated/base.tpl" %}
+{% load my_filters %}
 
 {% block subject %}
     [Shareish] {{ digest }} for Shareish mutual aid platform ({{ n }} new event{% if n != 1 %}s{% endif %})

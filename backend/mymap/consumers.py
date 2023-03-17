@@ -25,16 +25,18 @@ class ConversationConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
+        data['content'] = data['content'].strip()
 
-        message = await self.save_message(data['content'], data['user_id'], data['conversation_id'], data['date'])
+        if len(data['content']) > 0:
+            message = await self.save_message(data['content'].strip(), data['user_id'], data['conversation_id'], data['date'])
 
-        await self.channel_layer.group_send(
-            self.conversation_group_name,
-            {
-                'type': 'conversation.message',
-                'message': message,
-            }
-        )
+            await self.channel_layer.group_send(
+                self.conversation_group_name,
+                {
+                    'type': 'conversation.message',
+                    'message': message,
+                }
+            )
 
     async def conversation_message(self, event):
         await self.send(text_data=event['message'])

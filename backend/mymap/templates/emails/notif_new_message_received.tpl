@@ -1,4 +1,5 @@
 {% extends "mail_templated/base.tpl" %}
+{% load my_filters %}
 
 {% block subject %}
     [Shareish] New message received on Shareish mutual aid platform!
