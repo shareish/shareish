@@ -86,7 +86,7 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article id="availability" v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
+          <article id="availability" v-if="isOwner || notAvailableYet || item.enddate" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
@@ -168,7 +168,7 @@ export default {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
     itemHasNotEndedYet() {
-      return this.item.enddate && new Date(this.item.enddate) > Date.now();
+      return !this.item.enddate || new Date(this.item.enddate) > Date.now();
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
