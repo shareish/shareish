@@ -175,7 +175,6 @@ export default {
   margin-left: 4px;
 }
 
-/* Adding ellipsis to second line of item name */
 .media-content .title {
   overflow: hidden;
   display: -webkit-box;

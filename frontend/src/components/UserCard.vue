@@ -41,7 +41,7 @@
           </template>
           <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_up_date) }})</p>
         </div>
-        <p class="description">{{ user.description }}</p>
+        <p class="description wbbw wspw">{{ user.description }}</p>
       </div>
     </div>
   </div>
@@ -110,6 +110,13 @@ export default {
 
 .joined {
   font-size: 0.8rem;
+}
+
+.description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
 }
 
 nav.socials {
