@@ -9,12 +9,12 @@
     <div class="media-content">
       <div class="content">
         <p class="user">
-          <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="has-text-weight-bold">
+          <router-link :to="{name: 'profile', params: {id: sender.id}}" class="has-text-weight-bold">
             {{ sender.first_name }} {{ sender.last_name }}
           </router-link>
           &middot;
           <small>
-            <router-link :to="{name: 'userDetails', params: {id: sender.id}}" class="username">
+            <router-link :to="{name: 'profile', params: {id: sender.id}}" class="username">
               @{{ sender.username }}
             </router-link>
           </small>

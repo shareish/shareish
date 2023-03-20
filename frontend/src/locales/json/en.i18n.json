@@ -274,5 +274,6 @@
   "and-n-more": "And {n} more",
   "picture-removed": "Picture removed!",
   "aware-changes-not-saved": "Aware! Your new profile picture needs to be saved!",
-  "image-already-profile-picture": "This image is already your profile picture!"
+  "image-already-profile-picture": "This image is already your profile picture!",
+  "view-real-profile": "View real profile"
 }

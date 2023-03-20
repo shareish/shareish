@@ -2,7 +2,7 @@
   <div class="box">
     <article class="media">
       <div class="media-left">
-        <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+        <router-link :to="{name: 'item', params: {id: item.id}}">
           <figure class="image">
             <img v-if="item.images.length > 0" :src="item.images[0]" alt="Image">
             <img v-else :src="itemCategories[0]['image-placeholder']" alt="Image">
@@ -16,7 +16,7 @@
             <item-type-tag :type="item.type" />
             <span v-if="item.user">
               {{ $t('by') }}
-              <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
+              <router-link :to="{name: 'profile', params: {id: item.user.id}}">
                 @{{ item.user.username }}
               </router-link>
             </span>
@@ -44,7 +44,7 @@
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+            <router-link :to="{name: 'item', params: {id: item.id}}">
               <button class="button is-small is-primary level-item">
                 <i class="fas fa-info-circle"></i>
                 {{ $t('i-am-interested') }}

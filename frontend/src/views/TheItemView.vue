@@ -28,7 +28,7 @@
           <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
             <template v-if="item.images.length > 0">
               <b-carousel-item v-for="image in item.images" :key="image.position">
-                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                <router-link :to="{name: 'item', params: {id: item.id}}">
                   <figure id="item-image">
                     <div class="item-image-background">
                       <img :src="image" />
@@ -42,7 +42,7 @@
             </template>
             <template v-else>
               <b-carousel-item>
-                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                <router-link :to="{name: 'item', params: {id: item.id}}">
                   <figure id="item-image">
                     <div class="item-image-background">
                       <img :src="itemCategories[0]['image-placeholder']" />
@@ -100,7 +100,7 @@
               </div>
             </div>
             <div v-if="address">
-              <router-link :to="{name: 'itemsMap', query: {id: item.id}}">
+              <router-link :to="{name: 'map', query: {id: item.id}}">
                 {{ address }}
               </router-link>
             </div>

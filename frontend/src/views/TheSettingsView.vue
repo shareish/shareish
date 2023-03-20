@@ -64,8 +64,8 @@ export default {
 
     document.title = 'Shareish | Settings';
 
-    if (this.possibleViews.includes(this.$route.params.page)) {
-      this.currentView = this.$route.params.page;
+    if (this.possibleViews.includes(this.$route.params.tab)) {
+      this.currentView = this.$route.params.tab;
     } else {
       this.$router.push("/settings/profile")
     }
@@ -105,7 +105,7 @@ export default {
   },
   watch: {
     $route() {
-      this.currentView = this.$route.params.page;
+      this.currentView = this.$route.params.tab;
     }
   }
 };

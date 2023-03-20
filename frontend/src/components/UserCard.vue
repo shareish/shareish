@@ -5,14 +5,14 @@
         <b-carousel class="carousel" :autoplay="false" :arrow-hover="true" :arrow="user.images.length > 1" :indicator="user.images.length > 1">
           <template v-if="user.images.length > 0">
             <b-carousel-item v-for="(image, index) in user.images" :key="index">
-              <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
+              <router-link :to="{name: 'profile', params: {id: user.id}}" class="image">
                 <b-image :src="image.url" ratio="1by1"></b-image>
               </router-link>
             </b-carousel-item>
           </template>
           <template v-else>
             <b-carousel-item>
-              <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
+              <router-link :to="{name: 'profile', params: {id: user.id}}" class="image">
                 <b-image ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
               </router-link>
             </b-carousel-item>
@@ -22,7 +22,7 @@
       <div class="media-content">
         <h2 class="title" :class="titleSizeClass">{{ user.first_name }} {{ user.last_name }}</h2>
         <div class="subtitle mb-3" :class="subtitleSizeClass">
-          <router-link :to="{name: 'userDetails', params: {id: user.id}}">@{{ user.username }}</router-link>
+          <router-link :to="{name: 'profile', params: {id: user.id}}">@{{ user.username }}</router-link>
           <template v-if="hasOneSocial">
             &middot;
             <nav class="socials">

@@ -30,9 +30,9 @@
         <b-navbar-item :active="$i18n.locale === 'fr'" @click="changeLanguage('fr')">Français</b-navbar-item>
       </b-navbar-dropdown>
       <b-navbar-dropdown v-if="isAuthenticated" :label="$t('my-account')">
-        <b-navbar-item tag="router-link" to="/profile">
+        <b-navbar-item tag="router-link" to="/account">
           <i class="fas fa-user-circle"></i>
-          {{ $t('profile') }}
+          {{ $t('account') }}
         </b-navbar-item>
         <b-navbar-item tag="router-link" to="/settings">
           <i class="fas fa-cog"></i>

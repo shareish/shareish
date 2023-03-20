@@ -36,7 +36,7 @@
             <item-type-tag :type="item.type" />
             <span v-if="item.user">
               {{ $t('by') }}
-              <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
+              <router-link :to="{name: 'profile', params: {id: item.user.id}}">
                 @{{ item.user.username }}
               </router-link>
             </span>
@@ -110,8 +110,8 @@ export default {
       );
     }
     const addItemFromLink = {name: 'addItemFrom', params: {id: this.item.id}};
-    const itemDetailLink = {name: 'itemDetail', params: {id: this.item.id}};
-    this.linkOnClick = !this.recurrentList ? itemDetailLink : addItemFromLink;
+    const itemLink = {name: 'item', params: {id: this.item.id}};
+    this.linkOnClick = !this.recurrentList ? itemLink : addItemFromLink;
   },
   computed: {
     itemCategories() {

@@ -15,7 +15,7 @@
             </span>
           </div>
           <div class="level-right">
-            <router-link :to="{name: 'conversationDetail', params: {id: conversation.id}}">
+            <router-link :to="{name: 'conversation', params: {id: conversation.id}}">
               <button class="button is-primary">{{ $t('open-conversation') }}</button>
             </router-link>
           </div>

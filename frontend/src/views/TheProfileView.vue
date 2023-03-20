@@ -85,15 +85,11 @@ export default {
   async created() {
     this.loading = true;
 
-    if (this.$store.state.user.id !== this.userId) {
-      await Promise.all([
-        this.fetchUser(),
-        this.fetchItems()
-      ]);
-      document.title = `Shareish | ${this.user.username}`;
-    } else {
-      await this.$router.push("/profile");
-    }
+    await Promise.all([
+      this.fetchUser(),
+      this.fetchItems()
+    ]);
+    document.title = `Shareish | ${this.user.username}`;
 
     this.loading = false;
   }

@@ -2,7 +2,8 @@
   <div id="page-account">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
-      <h1 class="title">{{ $t('my-account') }}</h1>
+      <h1 class="title is-inline-block mr-3">{{ $t('my-account') }}</h1>
+      <router-link :to="{name: 'profile', params: {id: $store.state.user.id}}" class="button is-primary">{{ $t('view-real-profile') }}</router-link>
       <user-card v-if="user" :user="user" />
       <h1 class="title">{{ $t('my-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">

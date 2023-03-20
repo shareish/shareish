@@ -73,15 +73,15 @@ const routes = [
     },
     {
         path: "/map",
-        name: 'itemsMap',
+        name: 'map',
         component: TheMapView,
         meta: {
             requireLogin: true
         }
     },
     {
-        path: "/profile",
-        name: 'myaccount',
+        path: "/account",
+        name: 'account',
         component: TheAccountView,
         meta: {
             requireLogin: true
@@ -89,7 +89,7 @@ const routes = [
     },
     {
         path: "/profile/:id",
-        name: 'userDetails',
+        name: 'profile',
         component: TheProfileView,
         meta: {
             requireLogin: true
@@ -105,7 +105,7 @@ const routes = [
     },
     {
         path: "/items/:id",
-        name: 'itemDetail',
+        name: 'item',
         component: TheItemView,
         meta: {
             requireLogin: true
@@ -153,7 +153,7 @@ const routes = [
     },
     {
         path: "/conversations/:id",
-        name: 'conversationDetail',
+        name: 'conversation',
         component: TheConversationView,
         meta: {
             requireLogin: true
@@ -168,8 +168,8 @@ const routes = [
         }
     },
     {
-        path: "/settings/:page",
-        name: 'settingsPage',
+        path: "/settings/:tab",
+        name: 'settingsTab',
         component: TheSettingsView,
         meta: {
             requireLogin: true

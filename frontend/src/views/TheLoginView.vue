@@ -61,7 +61,7 @@ export default {
         this.$store.commit('setUserID', user['id']);
         localStorage.setItem("user_id", user['id']);
 
-        await this.$router.push('/dashboard');
+        await this.$router.push('/');
       }
       catch (error) {
         this.snackbarError(this.$t('notif-error-user-login'));
