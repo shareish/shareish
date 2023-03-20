@@ -7,7 +7,7 @@
       </div>
       <div class="media-content box">
         <h4 class="title is-size-5 mb-3">
-          <b-tooltip multilined position="is-top">
+          <b-tooltip multilined position="is-bottom">
             <template v-slot:content>
               <p v-html="$t('info-profile-picture-recommendation')"></p>
             </template>
