@@ -5,7 +5,7 @@
         <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
           <figure class="image">
             <img v-if="item.images.length > 0" :src="item.images[0]" alt="Image">
-            <img v-else :src="category1['image-placeholder']" alt="Image">
+            <img v-else :src="itemCategories[0]['image-placeholder']" alt="Image">
           </figure>
         </router-link>
       </div>
@@ -13,7 +13,7 @@
         <div class="content">
           <p class="is-size-4 mb-1 wbbw has-text-weight-bold">{{ item.name }}</p>
           <div class="mb-1">
-            <item-type-tag :type="item.item_type" />
+            <item-type-tag :type="item.type" />
             <span v-if="item.user">
               {{ $t('by') }}
               <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
@@ -37,9 +37,7 @@
           </small>
           <div class="level is-mobile categories-icons">
             <div class="level-left">
-              <i v-if="category1" :class="category1.icon" :title="$t(category1.slug)" class="level-item fa-2x" />
-              <i v-if="category2" :class="category2.icon" :title="$t(category2.slug)" class="level-item fa-2x" />
-              <i v-if="category3" :class="category3.icon" :title="$t(category3.slug)" class="level-item fa-2x" />
+              <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" :title="$t(category.slug)" class="level-item fa-2x" />
             </div>
           </div>
           <p class="description wbbw wspw">{{ item.description }}</p>
@@ -74,28 +72,26 @@ export default {
     }
   },
   computed: {
-    category1() {
-      return this.category(this.item.category1);
-    },
-    category2() {
-      return this.category(this.item.category2);
-    },
-    category3() {
-      return this.category(this.item.category3);
-    },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
     notAvailableYet() {
       return this.item.startdate && new Date(this.item.startdate) > Date.now();
+    },
+    itemCategories() {
+      let itemCategories = [];
+      if (categories[this.item.category1])
+        itemCategories.push(categories[this.item.category1]);
+      if (categories[this.item.category2])
+        itemCategories.push(categories[this.item.category2]);
+      if (categories[this.item.category3])
+        itemCategories.push(categories[this.item.category3]);
+      return itemCategories;
     }
   },
   methods: {
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
-    },
-    category(category) {
-      return categories[category];
     }
   }
 };

@@ -197,7 +197,7 @@ export default {
           tagValue: 'food_bank',
           color: 'is-dark'
         },
-	{
+	      {
           id: 'food-sharings',
           slugMarker: 'food-sharing',
           markers: [],
@@ -249,7 +249,7 @@ export default {
         'give-boxes': giveBoxIcon,
         'drinking-water-spots': drinkingWaterIcon,
         'free-shops': freeShopIcon,
-	'food-sharings': foodSharingIcon,  
+        'food-sharings': foodSharingIcon,
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon
