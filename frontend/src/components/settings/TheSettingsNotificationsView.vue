@@ -139,8 +139,8 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        positon => {
-          this.geoLocation = positon;
+        position => {
+          this.geoLocation = position;
         },
         null,
         {

@@ -25,27 +25,49 @@
               </button>
             </div>
           </div>
-          <article id="item-image">
-            <div class="item-image-background">
-              <img :src="item.images[item.images.length - 1]" />
-            </div>
-            <figure>
-              <img :src="item.images[item.images.length - 1]" />
-            </figure>
-          </article>
+          <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+            <template v-if="item.images.length > 0">
+              <b-carousel-item v-for="image in item.images" :key="image.position">
+                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                  <figure id="item-image">
+                    <div class="item-image-background">
+                      <img :src="image" />
+                    </div>
+                    <figure>
+                      <img :src="image" />
+                    </figure>
+                  </figure>
+                </router-link>
+              </b-carousel-item>
+            </template>
+            <template v-else>
+              <b-carousel-item>
+                <router-link :to="{name: 'itemDetail', params: {id: item.id}}">
+                  <figure id="item-image">
+                    <div class="item-image-background">
+                      <img :src="itemCategories[0]['image-placeholder']" />
+                    </div>
+                    <figure>
+                      <img :src="itemCategories[0]['image-placeholder']" />
+                    </figure>
+                  </figure>
+                </router-link>
+              </b-carousel-item>
+            </template>
+          </b-carousel>
           <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
             <div class="level-left">
               <p class="level-item is-size-5 has-text-weight-bold level-left-description">
                 {{ $t('management') }}
               </p>
-              <button class="level-item button is-primary" @click="startEdition">{{ $t('edit') }}</button>
+              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="level-item button is-primary">{{ $t('edit') }}</router-link>
               <button class="level-item button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
             </div>
           </div>
         </section>
         <section id="item-info" class="column is-7">
           <h1 class="title is-size-2">{{ item.name }}
-            <item-type-tag :type="item.item_type" />
+            <item-type-tag :type="item.type" />
           </h1>
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}
@@ -127,7 +149,6 @@ import moment from "moment";
 import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag";
 import UserCard from "@/components/UserCard";
-import TheEditItemModal from "@/components/TheEditItemModal.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
@@ -156,11 +177,11 @@ export default {
     },
     itemCategories() {
       let itemCategories = [];
-      if (this.item.category1 in categories)
+      if (categories[this.item.category1])
         itemCategories.push(categories[this.item.category1]);
-      if (this.item.category2 in categories)
+      if (categories[this.item.category2])
         itemCategories.push(categories[this.item.category2]);
-      if (this.item.category3 in categories)
+      if (categories[this.item.category3])
         itemCategories.push(categories[this.item.category3]);
       return itemCategories;
     },
@@ -248,19 +269,6 @@ export default {
       this.item = item;
       await this.fetchAddress();
       this.loading = false;
-    },
-    startEdition() {
-      this.$buefy.modal.open({
-        parent: this,
-        props: {
-          item: this.item,
-          address: this.address
-        },
-        events: {updateItem: this.updateItem},
-        component: TheEditItemModal,
-        hasModalCard: true,
-        trapFocus: true,
-      })
     }
   },
   async mounted() {

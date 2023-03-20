@@ -1,25 +1,39 @@
 <template>
   <div class="card">
     <div class="card-image">
-      <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
-        <figure class="image">
-          <b-image v-if="item.images.length > 0" :src="item.images[item.images.length - 1]" ratio="5by3"></b-image>
-          <b-image v-else :src="category1['image-placeholder']" ratio="5by3"></b-image>
-          <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
-        </figure>
-      </router-link>
+      <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+        <template v-if="item.images.length > 0">
+          <b-carousel-item v-for="image in item.images" :key="image.position">
+            <router-link :to="linkOnClick">
+              <figure class="image">
+                <b-image :src="image" ratio="5by3" />
+              </figure>
+            </router-link>
+          </b-carousel-item>
+        </template>
+        <template v-else>
+          <b-carousel-item>
+            <router-link :to="linkOnClick">
+              <figure class="image">
+                <b-image :src="itemCategories[0]['image-placeholder']" ratio="5by3" />
+              </figure>
+            </router-link>
+          </b-carousel-item>
+        </template>
+      </b-carousel>
+      <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
     </div>
     <div class="card-content">
       <div class="media">
         <div class="media-content">
           <p class="title is-5 mb-2">
-            <router-link :to="{name: 'itemDetail', params: {id: item.id}, query: itemDetailQueryParams}">
+            <router-link :to="linkOnClick">
               {{ item.name }}
             </router-link>
           </p>
           <p class="mb-2 description wbbw wspw">{{ item.description }}</p>
           <p class="subtitle is-6 mt-0">
-            <item-type-tag :type="item.item_type" />
+            <item-type-tag :type="item.type" />
             <span v-if="item.user">
               {{ $t('by') }}
               <router-link :to="{name: 'userDetails', params: {id: item.user.id}}">
@@ -42,13 +56,13 @@
         </small>
         <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
       </div>
-      <span v-for="category in categories" :key="category.slug" class="icon-text">
+      <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
         <span>{{ $t(category.slug) }}</span>
       </span>
     </div>
     <div v-if="recurrentList" class="card-footer">
-      <a class="card-footer-item" @click="$emit('submitAgain', item)">{{ $t('submit-again') }}</a>
+      <router-link :to="{name: 'addItemFrom', params: {id: item.id}}" class="card-footer-item">{{ $t('submit-again') }}</router-link>
     </div>
   </div>
 </template>
@@ -75,7 +89,8 @@ export default {
   },
   data() {
     return {
-      geoLocation: null
+      geoLocation: null,
+      linkOnClick: ""
     }
   },
   created() {
@@ -83,8 +98,8 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        positon => {
-          this.geoLocation = positon;
+        position => {
+          this.geoLocation = position;
         },
         null,
         {
@@ -94,35 +109,20 @@ export default {
         }
       );
     }
+    const addItemFromLink = {name: 'addItemFrom', params: {id: this.item.id}};
+    const itemDetailLink = {name: 'itemDetail', params: {id: this.item.id}};
+    this.linkOnClick = !this.recurrentList ? itemDetailLink : addItemFromLink;
   },
   computed: {
-    category1() {
-      return this.category(this.item.category1);
-    },
-    category2() {
-      return this.category(this.item.category2);
-    },
-    category3() {
-      return this.category(this.item.category3);
-    },
-    categories() {
-      let categories = [];
-      if (this.category1) {
-        categories.push(this.category1);
-      }
-      if (this.category2) {
-        categories.push(this.category2);
-      }
-      if (this.category3) {
-        categories.push(this.category3);
-      }
-      return categories;
-    },
-    itemKind() {
-      return (this.recurrentList) ? 'recurrent' : null;
-    },
-    itemDetailQueryParams() {
-      return (this.itemKind) ? {'kind': this.itemKind} : {};
+    itemCategories() {
+      let itemCategories = [];
+      if (categories[this.item.category1])
+        itemCategories.push(categories[this.item.category1]);
+      if (categories[this.item.category2])
+        itemCategories.push(categories[this.item.category2]);
+      if (categories[this.item.category3])
+        itemCategories.push(categories[this.item.category3]);
+      return itemCategories;
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
@@ -131,9 +131,6 @@ export default {
   methods: {
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
-    },
-    category(category) {
-      return categories[category];
     },
     deg2rad(deg) {
       return deg * (Math.PI / 180)
@@ -163,34 +160,22 @@ export default {
 </script>
 
 <style scoped>
-.image {
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+.card-image {
   position: relative;
 }
 
-.image .hitcount {
+.card-image .hitcount {
   position: absolute;
   right: 10px;
   bottom: 10px;
   font-weight: bold;
 }
 
-.image .hitcount i {
+.card-image .hitcount i {
   margin-left: 4px;
 }
 
-.image .item-type {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-}
-
-.media-content {
-  max-width: 100%;
-}
-
+/* Adding ellipsis to second line of item name */
 .media-content .title {
   overflow: hidden;
   display: -webkit-box;

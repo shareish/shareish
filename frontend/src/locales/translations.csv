@@ -113,11 +113,15 @@ i-am-interested,Details,Détails
 button-load-more,Load more,Charger plus
 no-items,No item,Pas d'élément
 add-new-item,Add a new item,Ajout d'élément
+add-new-item-from-recurrents,Add a new item from recurrents,Ajout d'élément à partir de récurrents
 i-have-image,I have image for my item,J'ai une image pour mon élément
 i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon élément
 help_item_name,"Name or short title of your item. An AI algorithm suggests a name if you uploaded an item picture but you can edit it to make it more sound.","Nom ou titre court décrivant votre élément. Un algorithme suggère un nom si vous avez fourni une image, mais vous pouvez toujours l'éditer pour rendre le titre plus pertinent."
-my-recurrent-items,My recurrent items,Mes éléments récurrents
-upload-your-item-image,Upload your item image,Transférer votre image d'élément
+add-images-to-item,Add images to the item,Ajouter des images à l'élément
+drop-or-click-to-upload,Drop your files here or click to upload,Déposez vos fichiers ici ou cliquez pour transférer
+uploaded-images,Uploaded images,Images transférées
+no-uploaded-images,No images have been uploaded yet.,Aucune image n'a encore été transférée.
+publish-item,Publish item,Publier l'élément
 name,Name,Nom
 address,Address,Adresse
 help_item_address,"Enter the address of the item (where it is offered/requested, optional but strongly recommended). You can click on the localization button to copy your current geolocalization and edit it if necessary. The more precise the address, the better, but you can discard some details for privacy, e.g. use either streetname with or without the street number, the city or area name.","Entrez l'adresse de l'élément (où il est offert/demandé, information facultative mais fortement conseillée). Cliquez sur le bouton pour copier l'adresse détectée par géolocalisaiton et éditez-la si nécessaire. Plus l'adresse est précise, mieux c'est, mais vous pouvez la simplifier pour protéger votre vie privée, par exemple utilisez le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier."
@@ -128,7 +132,7 @@ end-date,End date,Date de fin
 help_item_start_date,"Enter a different start date (by default it is now) if your item is not yet available/applicable","Entrez une date de début différente (par défaut l'heure actuelle) si votre élément n'est pas encore disponible/applicable"
 help_item_end_date,"Enter an end date if your item is valid for a limited period of time (e.g. expiration date for food, or period during which you wish to be helped), otherwise leave this field empty","Entrez une date de fin si votre élément a une période de validité limitée (p.ex. date limite de consommation pour de la nourriture, ou période pendant laquelle vous avez besoin d'une aide), sinon laissez ce champ vide."
 views,views,vues
-save-as-recurrent-item,Save as recurrent item,Sauvé comme élément récurrent
+save-as-recurrent-item,Save as recurrent item,Sauvegarder comme élément récurrent
 help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
 submit,Submit,Soumettre
 ends,Ends,Se termine
@@ -143,7 +147,7 @@ language-en,English,Anglais
 language-fr,French,Français
 to,to,à
 too-small-zoom,Zoom to show more data,Zoomez pour voir plus de données
-edit,Edit,Editer
+edit,Edit,Éditer
 log-out,Log out,Se déconnecter
 my-items,My items,Mes éléments
 firstname,First name,Prénom
@@ -221,7 +225,7 @@ notif-error-password-reset-sent,An error prevented to reset your password.,Une e
 enter-new-password,Enter your new password here...,Entrez votre nouveau mot de passe ici...
 notif-success-password-reset,Your password has been changed.,Votre mot de passe a été modifié.
 notif-error-password-reset,An error prevented to change your password.,Une erreur a empêché la mise à jour de votre mot de passe.
-edit-item,Edit an item,Editer un élément
+edit-item,Edit an item,Éditer un élément
 notif-success-item-update,The item has been successfully edited,L'élément a été correctement édité
 item-image,Image,Image
 item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
@@ -244,4 +248,26 @@ item-not-available-anymore-warning,"This item is not available anymore. This pag
 item-not-available-anymore-warning-owner,"Your item is not available anymore. This page is still accessible for information purpose.","Votre élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
 warning,Warning,Attention
 enable-geolocation-to-use-feature,You must enable geolocation to use this feature.,Vous devez activer la géolocalisation pour utiliser cette fonctionnalité.
-available,Available,Disponible
+too-many-images-selected-to-upload,Too many images selected to upload. You can only upload {n} more.,Trop d'images sélectionnées à transférer. Vous ne pouvez en transférer qu'une supplémentaire.|Trop d'images sélectionnées à transférer. Vous ne pouvez en transférer que {n} supplémentaires.
+max-images-uploaded-reached,You've reached the maximum amount of images allowed to be uploaded.,Vous avez atteint la limite maximum d'images pouvant être transférées.
+ask-fill-form-using-recurrents,Fill the form using one of your recurrent items?,Remplir le formulaire en utilisant un de vos éléments récurrents?
+yes-please,"Yes, please!","Oui, je veux!"
+no-thanks,"No, thanks.",Non merci.
+want-an-other-recurrent,"You are using item <strong>#{n}</strong>. Want to use an other one?","Vous utilisez l'élément #{n}. Voulez-vous en utiliser un autre?"
+reset,Reset,Réinitialiser
+profile-picture,Profile picture|Profile pictures,Photo de profil|Photos de profil
+remove,Remove,Retirer
+removing-picture,Removing picture,Retirer l'image
+removing-picture-confirmation,"Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.","Êtes-vous sûr de vouloir <b>retirer</b> cette image de votre profil? Cette action ne peut pas être annulée."
+upload-a-new-one,Upload a new one,Transférer pour changer
+current-profile-picture,Current profile picture,Photo de profil actuelle
+other-profile-pictures,Other profile pictures,Autres photos de profil
+info-already-uploaded-profile-pictures,"If you have already uploaded profile pictures in the past, you can look through them and <b>select one as your current profile picture</b>. Just click on it!","Si vous avez déjà transféré des photos de profil dans le passé, vous pouvez y jeter un oeil et en <b>sélectionner une comme nouvelle photo de profil</b>. Il suffit de cliquer dessus!"
+info-no-profile-picture-uploaded-yet,You haven't uploaded any profile pictures yet.,Vous n'avez encore jamais transféré de photo de profil.
+no-images,No images,Pas d'images
+info-profile-picture-recommendation,"Using a profile picture is <strong>recommended</strong> as it helps other users to identify who they are interacting with and thus <strong>improve trust</strong> on the website. You can even upload several pictures!","Utiliser une photo de profil est <b>recommandé</b> car cela aide les autres utilisateurs à identifier avec qui ils intéragissent et donc <b>améliorer la confiance</b> en chacun sur le site. Vous pouvez même transférer plusieurs photos!"
+manage-profile-picture,Manage profile pictures,Gérer les photos de profil
+and-n-more,And {n} more,Et {n} de plus
+picture-removed,Picture removed!,Image retirée!
+aware-changes-not-saved,Aware! Your new profile picture needs to be saved!,Attention! Votre nouvelle photo de profil doit être sauvegardée!
+image-already-profile-picture,This image is already your profile picture!,Cette image est déjà votre photo de profil!

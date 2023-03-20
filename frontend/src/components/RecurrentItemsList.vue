@@ -1,15 +1,12 @@
 <template>
-  <div>
+  <div id="items-container" ref="items-container">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
-    <template v-else>
-      <h1 class="title">{{ $t('my-recurrent-items') }}</h1>
-      <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
-        <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
-          <item-card :item="item" :recurrent-list="true" @submitAgain="$emit('submitAgain', $event)" />
-        </div>
+    <div v-else-if="items && items.length" ref="items-container" class="columns is-mobile is-flex-wrap-wrap">
+      <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
+        <item-card :item="item" :recurrent-list="true" />
       </div>
-      <div v-else>{{ $t('no-items') }}</div>
-    </template>
+    </div>
+    <div v-else>{{ $t('no-items') }}</div>
   </div>
 </template>
 
@@ -25,9 +22,14 @@ export default {
   components: {ItemCard},
   data() {
     return {
+      windowResizeWatchedRefsProperties: {
+        'items-container': {
+          'clientWidth': 0
+        }
+      },
       items: [],
       loading: true,
-      columnsWidthClass: null,
+      columnsWidthClass: null
     }
   },
   methods: {
@@ -41,19 +43,20 @@ export default {
     },
     windowWidthChanged() {
       // Below or equal 520
-      let columnsWidthClass = 'is-full';
-      if (this.windowWidth > 550) { // Arbitrary
-        columnsWidthClass = 'is-half';
-        if (this.windowWidth > 768) { // Over PAL* (768x576)
-          columnsWidthClass = 'is-one-third';
-          if (this.windowWidth > 1152) { // Over XGA+ (1152x864)
-            columnsWidthClass = 'is-one-quarter';
-            if (this.windowWidth > 1600) { // Over UXGA (1600x1200)
-              columnsWidthClass = 'is-one-fifth';
-              if (this.windowWidth > 2560) { // Over WQHD (2560x1440)
-                columnsWidthClass = 'is-2';
-                if (this.windowWidth > 3840) { // Over UHD-1 (3840x2160)
-                  columnsWidthClass = 'is-1';
+      const clientWidth = this.windowResizeWatchedRefsProperties['items-container']['clientWidth'];
+      let columnsWidthClass = "is-full";
+      if (clientWidth > 550) { // Arbitrary
+        columnsWidthClass = "is-half";
+        if (clientWidth > 768) { // Over PAL* (768x576)
+          columnsWidthClass = "is-one-third";
+          if (clientWidth > 1152) { // Over XGA+ (1152x864)
+            columnsWidthClass = "is-one-quarter";
+            if (clientWidth > 1600) { // Over UXGA (1600x1200)
+              columnsWidthClass = "is-one-fifth";
+              if (clientWidth > 2560) { // Over WQHD (2560x1440)
+                columnsWidthClass = "is-2";
+                if (clientWidth > 3840) { // Over UHD-1 (3840x2160)
+                  columnsWidthClass = "is-1";
                 }
               }
             }

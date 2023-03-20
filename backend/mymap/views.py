@@ -1,3 +1,5 @@
+import base64
+import json
 import re
 from datetime import datetime, timezone
 
@@ -56,9 +58,9 @@ def verif_location(data):
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        item_type = request.query_params.get('item_type')
-        if item_type is not None:
-            return queryset.filter(item_type=item_type)
+        type = request.query_params.get('type')
+        if type is not None:
+            return queryset.filter(type=type)
         return queryset
 
 
@@ -130,7 +132,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         item = serializer.save(user=self.request.user)
         if item.location is not None:
-            if item.item_type != "EV":
+            if item.type != "EV":
                 from .mail import send_mail_notif_new_single_item_published
                 send_mail_notif_new_single_item_published(item, self.request.user)
             else:
@@ -156,38 +158,37 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class RecurrentItemViewSet(ItemViewSet):
-    filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
-    ]  # Do not need ActiveItemFilterBackend
+    filter_backends = [filters.OrderingFilter]
+    ordering = ['-startdate']
 
     def get_queryset(self):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
 
 class ActiveItemViewSet(ItemViewSet):
+    filter_backends = [filters.OrderingFilter, ActiveItemFilterBackend]
     pagination_class = ActivePaginationClass
-
-    def get_queryset(self):
-        return Item.objects.filter(in_progress=True)
+    ordering = ['-startdate']
 
 
 class UserItemViewSet(ItemViewSet):
-    filter_backends = [UserItemFilterBackend]
+    filter_backends = [filters.OrderingFilter, UserItemFilterBackend]
+    ordering = ['-startdate']
 
 
 class ItemImageViewSet(viewsets.ViewSet):
-    def list(self, request):
-        images = ItemImage.objects.all()
-        serializer = ItemImageSerializer(images, many=True)
-        return Response(serializer.data)
 
     def create(self, request):
+        # Remove all previous images if any (edition case)
+        ItemImage.objects.filter(item_id=request.POST['item_id']).delete()
+
+        # Add all news images received (add/edition cases)
         item = Item.objects.get(pk=request.POST['item_id'])
-        image = request.FILES.get('image')
-        new_image = ItemImage(image=image, item=item)
-        new_image.save()
-        serialized_image = ItemImageSerializer(new_image)
-        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
+        images = request.FILES.getlist('images')
+        for i in range(0, len(images)):
+            new_image = ItemImage(image=images[i], position=i, item=item)
+            new_image.save()
+        return Response(status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         try:
@@ -196,25 +197,6 @@ class ItemImageViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = ItemImageSerializer(image)
         return Response(serializer.data)
-
-    def update(self, request, pk=None):
-        try:
-            image = ItemImage.objects.get(pk=pk)
-        except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ItemImageSerializer(image, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        try:
-            image = ItemImage.objects.get(pk=pk)
-        except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        image.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -278,7 +260,7 @@ class UserImageViewSet(viewsets.ViewSet):
         new_image = UserImage(image=image, user=user)
         new_image.save()
         serialized_image = UserImageSerializer(new_image)
-        return Response(serialized_image.data['url'], status=status.HTTP_201_CREATED)
+        return Response(serialized_image.data, status=status.HTTP_201_CREATED)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -359,7 +341,7 @@ def searchItemFilter(request):
         if searched['name'] == "":
             searched['name'] = None
 
-        if searched['name'] is None and searched['item_type'] is None and searched['category'] is None:
+        if searched['name'] is None and searched['type'] is None and searched['category'] is None:
             serialized_items = ItemSerializer(queryset, many=True)
             return Response(serialized_items.data, status=status.HTTP_200_OK)
 
@@ -367,9 +349,9 @@ def searchItemFilter(request):
             items_name = queryset.filter(name__icontains=searched['name'])
             items_description = queryset.filter(description__icontains=searched['name'])
             items = items | items_description | items_name
-        if searched['item_type'] is not None:
-            items_item_type = queryset.filter(item_type__exact=searched['item_type'])
-            items = items | items_item_type
+        if searched['type'] is not None:
+            items_type = queryset.filter(type__exact=searched['type'])
+            items = items | items_type
         if searched['category'] is not None:
             items_category1 = queryset.filter(category1__exact=searched['category'])
             items_category2 = queryset.filter(category2__exact=searched['category'])
@@ -401,13 +383,7 @@ def predictClass(request):
     if request.method == 'POST':
         image = request.FILES.get('image')
         if image:
-            class_found, category_found, detected_text = findClass(image)
-            response = {
-                'suggested_class': class_found,
-                'suggested_category': category_found,
-                'detected_text': detected_text
-            }
-            return JsonResponse(response, status=status.HTTP_200_OK)
+            return JsonResponse(findClass(image), status=status.HTTP_200_OK, safe=False)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -495,13 +471,19 @@ def republishItemImagesFromItem(request, new_item_id, parent_item_id):
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getUserImage(request, userimage_id):
+def userImage(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
             return FileResponse(open(image.path, 'rb'))
+        except UserImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    elif request.method == 'DELETE':
+        try:
+            UserImage.objects.get(pk=userimage_id).delete()
+            return Response(status=status.HTTP_200_OK)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -529,5 +511,39 @@ def increaseHitcountItem(request, item_id):
             item.save()
             return Response(status=status.HTTP_200_OK)
         except Item.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getItemImagesBase64(request, item_id):
+    if request.method == 'GET':
+        try:
+            item_images = ItemImage.objects.filter(item_id=item_id)
+            images = []
+            for item_image in item_images:
+                images.append({
+                   "name": str(item_image.image.name),
+                   "base64_url": "data:image/png;base64," + str(base64.b64encode(item_image.image.file.read()).decode("utf-8"))
+                })
+            return Response(json.dumps(images), status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
+def getUserImageBase64(request, userimage_id):
+    if request.method == 'GET':
+        try:
+            userimage = UserImage.objects.get(pk=userimage_id)
+            response = {
+               "name": str(userimage.image.name),
+               "base64_url": "data:image/png;base64," + str(base64.b64encode(userimage.image.file.read()).decode("utf-8"))
+            }
+            return Response(json.dumps(response), status=status.HTTP_200_OK)
+        except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

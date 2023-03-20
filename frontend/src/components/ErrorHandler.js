@@ -17,32 +17,32 @@ export default {
           } else {
             const data = error.response.data;
             if (typeof data === 'object') {
-              if (this.keyInDictIsString('message', data)) {
+              if (this._keyInDictIsString('message', data)) {
                 this.message = data.message;
-              } else if (this.keyInDictIsString('error', data)) {
+              } else if (this._keyInDictIsString('error', data)) {
                 this.message = data.error;
-              } else if (this.keyInDictIsString('detail', data)) {
+              } else if (this._keyInDictIsString('detail', data)) {
                 this.message = data.detail;
               } else {
-                this.unableToParse(error);
+                this._unableToParse(error);
               }
             } else {
-              this.unableToParse(error);
+              this._unableToParse(error);
             }
           }
         }
       } else if (typeof error === 'object') {
-        if (this.keyInDictIsString('message', error)) {
+        if (this._keyInDictIsString('message', error)) {
           // Error is a casual Exception that have been caught
           this.message = error.message;
         } else {
-          this.unableToParse(error);
+          this._unableToParse(error);
         }
       } else if (typeof error === 'string') {
         // Error is sent from Vue file intendedly
         this.message = error;
       } else {
-        this.unableToParse(error);
+        this._unableToParse(error);
       }
 
       // Building error message
@@ -62,7 +62,7 @@ export default {
       });
 
       // Reset the component fields
-      this.reset();
+      this._reset();
     },
     fullErrorHandling(error) {
       if (this.isSerializationError(error)) {
@@ -79,11 +79,11 @@ export default {
         this.snackbarError(error);
       }
     },
-    reset() {
+    _reset() {
       this.code = null;
       this.message = null;
     },
-    unableToParse(error) {
+    _unableToParse(error) {
       this.message = "Unable to parse error, please check console.";
       console.log(error);
     },
@@ -93,7 +93,7 @@ export default {
     isSerializationError(error) {
       return (this.isFromAxios(error) && typeof error.response.data === 'object' && 'serializer_errors' in error.response.data);
     },
-    keyInDictIsString(elem, dict) {
+    _keyInDictIsString(elem, dict) {
       return elem in dict && typeof dict[elem] === 'string'
     }
   }

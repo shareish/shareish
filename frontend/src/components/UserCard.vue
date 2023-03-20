@@ -1,12 +1,24 @@
 <template>
   <div class="box" ref="UserCard">
     <div class="media">
-      <figure class="media-left">
-        <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
-          <b-image v-if="user.images.length > 0" :src="user.images[user.images.length - 1]" ratio="1by1"></b-image>
-          <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
-        </router-link>
-      </figure>
+      <div class="media-left">
+        <b-carousel class="carousel" :autoplay="false" :arrow-hover="true" :arrow="user.images.length > 1" :indicator="user.images.length > 1">
+          <template v-if="user.images.length > 0">
+            <b-carousel-item v-for="(image, index) in user.images" :key="index">
+              <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
+                <b-image :src="image.url" ratio="1by1"></b-image>
+              </router-link>
+            </b-carousel-item>
+          </template>
+          <template v-else>
+            <b-carousel-item>
+              <router-link :to="{name: 'userDetails', params: {id: user.id}}" class="image">
+                <b-image ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
+              </router-link>
+            </b-carousel-item>
+        </template>
+        </b-carousel>
+      </div>
       <div class="media-content">
         <h2 class="title" :class="titleSizeClass">{{ user.first_name }} {{ user.last_name }}</h2>
         <div class="subtitle mb-3" :class="subtitleSizeClass">
@@ -36,7 +48,7 @@
 </template>
 
 <script>
-import moment from 'moment/moment';
+import moment from "moment/moment";
 import WindowSize from "@/components/WindowSize";
 
 export default {
@@ -51,13 +63,13 @@ export default {
   data() {
     return {
       windowResizeWatchedRefsProperties: {
-        "UserCard": {
-          "clientWidth": 0
+        'UserCard': {
+          'clientWidth': 0
         }
       },
       titleSizeClass: null,
       subtitleSizeClass: null,
-      userImageSize: null
+      mediaLeftSquareSize: null
     }
   },
   computed: {
@@ -70,28 +82,30 @@ export default {
       return moment(date).locale(this.$i18n.locale).fromNow();
     },
     windowWidthChanged() {
-      let userImageSize = 128;
+      let mediaLeftSquareSize = 150;
       let titleSizeClass = "is-3";
       let subtitleSizeClass = "is-5";
-      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 680) {
-        userImageSize = 96;
+      if (this.windowResizeWatchedRefsProperties['UserCard']['clientWidth'] < 680) {
+        mediaLeftSquareSize = 128;
       }
-      if (this.windowResizeWatchedRefsProperties["UserCard"]["clientWidth"] < 590) {
-        userImageSize = 72;
+      if (this.windowResizeWatchedRefsProperties['UserCard']['clientWidth'] < 590) {
+        mediaLeftSquareSize = 100;
         titleSizeClass = "is-4";
         subtitleSizeClass = "is-6";
       }
       this.titleSizeClass = titleSizeClass;
       this.subtitleSizeClass = subtitleSizeClass;
-      this.userImageSize = userImageSize + "px";
+      this.mediaLeftSquareSize = mediaLeftSquareSize + "px";
     }
   }
 };
 </script>
 
 <style scoped>
-.media-left .image {
-  width: v-bind('userImageSize');
+.media-left, .carousel {
+  width: v-bind('mediaLeftSquareSize');
+  height: v-bind('mediaLeftSquareSize');
+  min-height: v-bind('mediaLeftSquareSize');
 }
 
 .joined {
@@ -109,9 +123,6 @@ nav.socials a.social {
 nav.socials a.social:last-child {
   margin-right: 0;
 }
-
-
-
 
 .media-right button {
   margin-left: 8px;

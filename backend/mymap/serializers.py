@@ -5,9 +5,19 @@ from rest_framework import serializers
 
 from .models import Conversation, Item, ItemImage, Message, User, UserImage
 
+class UserImageSerializer(serializers.ModelSerializer):
+    url = serializers.CharField()
+
+    class Meta:
+        model = UserImage
+        fields = [
+            'id', 'image', 'user', 'url'
+        ]
+
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
-    images = serializers.StringRelatedField(many=True)
+    images = UserImageSerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = User
@@ -40,16 +50,6 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class UserImageSerializer(serializers.ModelSerializer):
-    url = serializers.CharField()
-
-    class Meta:
-        model = UserImage
-        fields = [
-            'id', 'image', 'user', 'url'
-        ]
-
-
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
         fields = [
@@ -65,7 +65,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'creationdate', 'startdate',
-            'enddate', 'item_type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
+            'enddate', 'type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
         ]
 
     def validate(self, data):

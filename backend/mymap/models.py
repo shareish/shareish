@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import date
 
 from PIL import Image
@@ -7,6 +9,14 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.geos import Point
+
+
+def get_random_string(length):
+    options = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    return ''.join(random.choice(options) for _ in range(length))
+
+def get_random_file_name():
+    return str(int(timezone.now().timestamp())) + "_" + get_random_string(5)
 
 
 class MyUserManager(BaseUserManager):
@@ -119,17 +129,17 @@ class User(AbstractBaseUser):
 
 
 class UserImage(models.Model):
-    image = models.ImageField(upload_to='')
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='images', on_delete=models.CASCADE
-    )
+    image = models.ImageField(upload_to='users_images')
+    user = models.ForeignKey(User, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        self.image.name = get_random_file_name()
         super().save(*args, **kwargs)
-
         img = Image.open(self.image.path)
-        if img.height > 256 or img.width > 256:
-            output_size = (256, 256)
+
+        MAX_SIZE = 256
+        if img.height > MAX_SIZE or img.width > MAX_SIZE:
+            output_size = (MAX_SIZE, MAX_SIZE)
             img.thumbnail(output_size)
             img.save(self.image.path, format=img.format)
 
@@ -145,7 +155,7 @@ class UserImage(models.Model):
         return "{}/api/v1/users/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
-        ordering = ['user']
+        ordering = ['user_id', '-id']
 
 
 class Item(models.Model):
@@ -191,7 +201,7 @@ class Item(models.Model):
     is_recurrent = models.BooleanField(default=False)
     hitcount = models.IntegerField(verbose_name="Hit Count", default=0)
 
-    item_type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
+    type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
     category2 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
@@ -207,10 +217,12 @@ class Item(models.Model):
 
 
 class ItemImage(models.Model):
-    image = models.ImageField(upload_to='')
+    image = models.ImageField(upload_to='items_images')
+    position = models.IntegerField()
     item = models.ForeignKey(Item, related_name='images', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        self.image.name = get_random_file_name()
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)
 
@@ -232,7 +244,7 @@ class ItemImage(models.Model):
         return "{}/api/v1/items/images/{}".format(settings.API_URL, self.pk)
 
     class Meta:
-        ordering = ['item']
+        ordering = ['item_id', 'position']
 
 
 class Conversation(models.Model):

@@ -67,10 +67,6 @@ def findOCR(filename):
 def findClass(filename):
     image = getImage(filename)
 
-    # call pytesseract for OCR
-    detected_text = findOCR(filename)
-    print(detected_text)
-
     if torch.cuda.is_available():
         image = image.to('cuda')
         model.to('cuda')
@@ -81,12 +77,24 @@ def findClass(filename):
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
 
     top5_prob, top5_catid = torch.topk(probabilities, 5)
-    for i in range(top5_prob.size(0)):
-        print(categories[str(top5_catid[i].item())][1] + " & " + str(top5_prob[i].item()) + "\\\\")
 
-    #mapped category in json file
-    detected_category = categories[str(top5_catid[0].item())][2]
-    return categories[str(top5_catid[0].item())][1], detected_category, detected_text
+    # call pytesseract for OCR
+    detected_text = findOCR(filename)
+
+    response = {
+        'probabilities': [],
+        'detected_text': detected_text
+    }
+
+    for i in range(top5_prob.size(0)):
+        current_item = categories[str(top5_catid[i].item())]
+        response['probabilities'].append({
+            'class': current_item[1],
+            'category': current_item[2],
+            'probability': top5_prob[i].item()
+        })
+
+    return response
 
 
 # These two functions are implemented to plot the save the figures on files

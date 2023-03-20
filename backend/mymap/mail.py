@@ -56,7 +56,7 @@ def _get_last_new_items_near_user(user, frequency: MailNotificationFrequencies):
     queryset = Item.objects.filter(
         Q(creationdate__gte=start),
         Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
-        ~Q(item_type='EV'),
+        ~Q(type='EV'),
         ~Q(user=user)
     ).annotate(distance=Distance("location", user.ref_location)).order_by("distance")
 
@@ -74,7 +74,7 @@ def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies)
 
     # Events sorted by delay before event starting
     queryset = Item.objects.filter(
-        Q(item_type='EV'),
+        Q(type='EV'),
         Q(creationdate__gte=start),
         Q(location__dwithin=(user.ref_location, D(km=user.dwithin_notifications))),
         ~Q(user=user)
@@ -162,7 +162,7 @@ def send_mail_notif_new_single_item_published(item, user_that_published):
         context = {
             "user": user,
             "item": item,
-            "item_type": item_types[item.item_type],
+            "type": item_types[item.type],
             "app_url": settings.APP_URL
         }
 
