@@ -1,4 +1,5 @@
 {% extends "mail_templated/base.tpl" %}
+{% load my_filters %}
 
 {% block subject %}
     [Shareish] A new event just got published on Shareish mutual aid platform!
