@@ -28,7 +28,7 @@
       <div id="profile-images">
         <hr />
         <h2 class="title is-size-5 mb-5">
-          <b-tooltip multilined position="is-top">
+          <b-tooltip multilined position="is-bottom">
             <template v-slot:content>
               <p v-html="$t('info-already-uploaded-profile-pictures')"></p>
             </template>
