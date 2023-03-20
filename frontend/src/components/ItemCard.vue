@@ -31,7 +31,7 @@
               {{ item.name }}
             </router-link>
           </p>
-          <p class="mb-2">{{ truncate(item.description) }}</p>
+          <p class="mb-2 description wbbw wspw">{{ item.description }}</p>
           <p class="subtitle is-6 mt-0">
             <item-type-tag :type="item.type" />
             <span v-if="item.user">
@@ -43,20 +43,18 @@
           </p>
         </div>
       </div>
-      <div class="content">
-        <template v-if="!recurrentList">
-          <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
-          <small class="is-block" v-if="item.enddate">
-            <template v-if="!itemHasEnded">
-              {{ $t('ends') }}
-            </template>
-            <template v-else>
-              {{ $t('ended') }}
-            </template>
-            {{ formattedDateFromNow(item.enddate) }}
-          </small>
-          <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
-        </template>
+      <div v-if="!recurrentList" class="content">
+        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+        <small class="is-block" v-if="item.enddate">
+          <template v-if="!itemHasEnded">
+            {{ $t('ends') }}
+          </template>
+          <template v-else>
+            {{ $t('ended') }}
+          </template>
+          {{ formattedDateFromNow(item.enddate) }}
+        </small>
+        <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
       </div>
       <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
@@ -134,9 +132,6 @@ export default {
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
     },
-    truncate(description) {
-      return (description.length > 150) ? description.slice(0, 150) + '[...]' : description;
-    },
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },
@@ -182,16 +177,21 @@ export default {
 
 /* Adding ellipsis to second line of item name */
 .media-content .title {
-  height: 2.25em; /* line-height is set to 1.125 by default */
   overflow: hidden;
-  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-.title a {
+.media-content .title a {
   color: #4a4a4a !important;
+}
+
+.media-content .description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 .icon-text span {

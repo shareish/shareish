@@ -19,7 +19,7 @@
             </router-link>
           </small>
         </p>
-        <p class="message_content" style="white-space: pre-wrap;">{{ message.content }}</p>
+        <p class="wbbw wspw">{{ message.content }}</p>
         <p class="has-text-grey"><small>{{ formattedDate }}</small></p>
       </div>
     </div>
@@ -55,6 +55,5 @@ export default {
 
 .media-content .content p {
   margin: 0.25em 0;
-  word-break: break-word;
 }
 </style>

@@ -107,6 +107,16 @@ export const freeShopIcon = new L.Icon({
 });
 
 
+export const foodSharingIcon = new L.Icon({
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/56/FoodBankGreen.png',
+    //Designed by Ellenjhinds, CC BY-SA 4.0, via Wikimedia Commons
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [31, 31],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -20],
+    shadowSize: [41, 41]
+});
+
 export const foodBankIcon = new L.Icon({
     iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Food_Bank_icon.svg',
     //Designed by Iconathlon as a collaboration with Edward Boatman., CC0, via Wikimedia Commons

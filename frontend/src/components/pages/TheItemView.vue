@@ -72,12 +72,25 @@
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}
             {{ formattedDateFromNow(item.creationdate) }}
+            &middot;
+            <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
           <article id="categories" class="mb-5-5">
             <p v-for="category in itemCategories" :key="category.slug" class="category">
               <span class="icon"><i :class="category.icon"></i></span>
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
+          </article>
+          <article id="description" class="mb-5-5">
+            <div class="title is-size-4 mb-1">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
+                <span>{{ $t('description') }}</span>
+              </div>
+            </div>
+            <div class="box has-background-white-ter">
+              <p class="description wbbw wspw">{{ item.description }}</p>
+            </div>
           </article>
           <article id="location" class="mb-5-5">
             <div class="title is-size-4">
@@ -95,7 +108,7 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
+          <article id="availability" v-if="isOwner || itemHasEnded || notAvailableYet || itemHasNotEndedYet" class="mb-5-5">
             <div class="title is-size-4">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
@@ -115,7 +128,7 @@
               </span>
             </template>
           </article>
-          <article class="mb-5-5">
+          <article id="user">
             <div class="title is-size-4 mb-1">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
@@ -123,17 +136,6 @@
               </div>
             </div>
             <user-card :user="user" />
-          </article>
-          <article>
-            <div class="title is-size-4 mb-1">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
-                <span>{{ $t('description') }}</span>
-              </div>
-            </div>
-            <div class="box has-background-white-ter">
-              <p class="content" style="white-space: pre-wrap;">{{ item.description }}</p>
-            </div>
           </article>
         </section>
       </div>
@@ -184,7 +186,7 @@ export default {
       return itemCategories;
     },
     notAvailableYet() {
-      return new Date(this.item.startdate) > Date.now();
+      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
     itemHasNotEndedYet() {
       return this.item.enddate && new Date(this.item.enddate) > Date.now();
@@ -335,6 +337,10 @@ div.icon-text {
 #item-info .subtitle {
   font-style: italic;
   opacity: 0.9;
+}
+
+#item-info .subtitle i {
+  margin: 0 0.2em 0 0.1em;
 }
 
 #item-info #categories .category {

@@ -92,4 +92,12 @@ export default {
   flex-direction: column;
   align-items: flex-start;
 }
+
+.wbbw {
+  word-break: break-word;
+}
+.wspw {
+  white-space: pre-wrap;
+}
+
 </style>
