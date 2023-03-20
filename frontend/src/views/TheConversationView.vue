@@ -37,7 +37,7 @@
 
 <script>
 import axios from "axios";
-import ItemCard from "@/components/ItemCard";
+import ItemCard from "@/components/ItemCard.vue";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 

@@ -105,11 +105,11 @@
 <script>
 import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
-import TheManageProfilePicturesModal from "@/components/settings/TheManageProfilePicturesModal.vue";
+import TheManageProfilePicturesModal from "@/components/TheManageProfilePicturesModal.vue";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'TheSettingsProfileView',
+  name: 'TheSettingsProfile',
   mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'

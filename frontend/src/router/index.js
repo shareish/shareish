@@ -2,24 +2,24 @@ import VueRouter from "vue-router";
 import store from "../store"
 import i18n from "@/i18n"
 
-import TheHomeView from "@/components/pages/TheHomeView.vue"
-import TheSignUpView from "@/components/user-management/TheSignUpView.vue"
-import TheLoginView from "@/components/user-management/TheLoginView.vue"
-import TheResetPasswordView from "@/components/user-management/TheResetPasswordView.vue"
-import TheResetPasswordConfirmView from "@/components/user-management/TheResetPasswordConfirmView.vue"
-import TheActivateView from "@/components/user-management/TheActivateView.vue"
-import TheAccountView from "@/components/pages/TheAccountView.vue";
-import TheProfileView from "@/components/pages/TheProfileView.vue";
-import TheSettingsView from "@/components/pages/TheSettingsView.vue";
-import TheItemsView from "@/components/pages/TheItemsView.vue";
-import TheItemView from "@/components/pages/TheItemView.vue"
-import TheMapView from "@/components/pages/TheMapView.vue";
-import TheAddItemView from "@/components/pages/TheAddItemView.vue"
-import TheConversationsView from "@/components/pages/TheConversationsView.vue"
-import TheConversationView from "@/components/pages/TheConversationView.vue"
-import TheAboutView from "@/components/pages/TheAboutView.vue";
-import TheAddItemFromRecurrentsView from "@/components/pages/TheAddItemFromRecurrentsView.vue";
-import TheEditItemView from "@/components/pages/TheEditItemView.vue";
+import TheHomeView from "@/views/TheHomeView.vue"
+import TheSignUpView from "@/views/TheSignUpView.vue"
+import TheLoginView from "@/views/TheLoginView.vue"
+import TheResetPasswordView from "@/views/TheResetPasswordView.vue"
+import TheResetPasswordConfirmView from "@/views/TheResetPasswordConfirmView.vue"
+import TheActivateView from "@/views/TheActivateView.vue"
+import TheAccountView from "@/views/TheAccountView.vue";
+import TheProfileView from "@/views/TheProfileView.vue";
+import TheSettingsView from "@/views/TheSettingsView.vue";
+import TheItemsView from "@/views/TheItemsView.vue";
+import TheItemView from "@/views/TheItemView.vue"
+import TheMapView from "@/views/TheMapView.vue";
+import TheAddItemView from "@/views/TheAddItemView.vue"
+import TheConversationsView from "@/views/TheConversationsView.vue"
+import TheConversationView from "@/views/TheConversationView.vue"
+import TheAboutView from "@/views/TheAboutView.vue";
+import TheAddItemFromRecurrentsView from "@/views/TheAddItemFromRecurrentsView.vue";
+import TheEditItemView from "@/views/TheEditItemView.vue";
 
 const routes = [
     {

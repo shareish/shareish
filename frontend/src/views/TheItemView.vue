@@ -147,8 +147,8 @@
 import axios from "axios";
 import moment from "moment";
 import {categories} from "@/categories";
-import ItemTypeTag from "@/components/ItemTypeTag";
-import UserCard from "@/components/UserCard";
+import ItemTypeTag from "@/components/ItemTypeTag.vue";
+import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {

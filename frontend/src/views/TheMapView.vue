@@ -92,7 +92,7 @@ import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
 import axios from "axios"
-import ItemsFilters from "@/components/ItemsFilters";
+import ItemsFilters from "@/components/ItemsFilters.vue";
 
 import {
   greenIcon,
@@ -109,7 +109,7 @@ import {
 import {latLng} from "leaflet";
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
-import ItemMapPopup from "@/components/ItemMapPopup";
+import ItemMapPopup from "@/components/ItemMapPopup.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 const itemTypeIcons = {

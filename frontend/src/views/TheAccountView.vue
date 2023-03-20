@@ -1,10 +1,10 @@
 <template>
-  <div id="page-profile">
+  <div id="page-account">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
-      <h1 class="title">@{{ user.username }}</h1>
+      <h1 class="title">{{ $t('my-account') }}</h1>
       <user-card v-if="user" :user="user" />
-      <h1 class="title">{{ $t('user-items') }}</h1>
+      <h1 class="title">{{ $t('my-items') }}</h1>
       <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
         <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
           <item-card :item="item" />
@@ -16,14 +16,14 @@
 </template>
 
 <script>
-import UserCard from "@/components/UserCard";
+import UserCard from "@/components/UserCard.vue";
 import axios from "axios";
-import ItemCard from "@/components/ItemCard";
+import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'TheProfileView',
+  name: 'TheAccountView',
   mixins: [ErrorHandler, WindowSize],
   components: {UserCard, ItemCard},
   data() {
@@ -35,15 +35,10 @@ export default {
       loading: true
     }
   },
-  computed: {
-    userId() {
-      return Number(this.$route.params.id);
-    }
-  },
   methods: {
     async fetchUser() {
       try {
-        this.user = (await axios.get(`/api/v1/webusers/${this.userId}`)).data;
+        this.user = (await axios.get("/api/v1/users/me/")).data;
       }
       catch (error) {
         this.snackbarError(error);
@@ -51,12 +46,14 @@ export default {
     },
     async fetchItems() {
       try {
-        const params = {id: this.userId}
-        this.items = (await axios.get("/api/v1/user_items/", {params: params})).data;
+        this.items = (await axios.get("/api/v1/user_items/")).data;
       }
       catch (error) {
         this.snackbarError(error);
       }
+    },
+    updateUser(user) {
+      this.user = user;
     },
     windowWidthChanged() {
       // Below or equal 520
@@ -84,18 +81,14 @@ export default {
   },
   async created() {
     this.loading = true;
-
-    if (this.$store.state.user.id !== this.userId) {
-      await Promise.all([
-        this.fetchUser(),
-        this.fetchItems()
-      ]);
-      document.title = `Shareish | ${this.user.username}`;
-    } else {
-      await this.$router.push("/profile");
-    }
-
+    await Promise.all([
+      this.fetchUser(),
+      this.fetchItems()
+    ]);
     this.loading = false;
+  },
+  mounted() {
+    document.title = `Shareish | ${this.$t('my-account')}`;
   }
 };
 </script>

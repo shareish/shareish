@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import RecurrentItemsList from "@/components/RecurrentItemsList";
+import RecurrentItemsList from "@/components/RecurrentItemsList.vue";
 
 export default {
   name: 'TheAddItemFromRecurrentsView',

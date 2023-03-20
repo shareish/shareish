@@ -2,7 +2,7 @@
   <b-loading v-if="loading" :active="true" :is-full-page="false" />
   <div v-else id="page-add-item" class="max-width-is-max-container" ref="page-container">
     <h1 class="title has-text-centered mb-6">
-      {{ $t('edit-item') }}
+      {{ $t('add-new-item') }}
       <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
         <i class="icon far fa-question-circle"></i>
       </b-tooltip>
@@ -22,20 +22,20 @@
             </section>
           </b-upload>
         </b-field>
-        <div id="previews" v-if="images['previews']" class="mt-4">
+        <div id="previews" v-if="images" class="mt-4">
           <h2 class="is-size-5 has-text-weight-bold mb-3">
             {{ $t('uploaded-images') }}
-            <span class="tag vertical-align-middle ml-1" :class="imagesSlotsLeftColorClass">{{ images['previews'].length }} / {{ imagesSlots }}</span>
+            <span class="tag vertical-align-middle ml-1" :class="imagesSlotsLeftColorClass">{{ images.length }} / {{ imagesSlots }}</span>
           </h2>
-          <template v-if="images['previews'].length === 0">
+          <template v-if="images.length === 0">
             <p>{{ $t('no-uploaded-images') }}</p>
           </template>
           <template v-else>
             <div class="columns is-mobile is-flex-wrap-wrap">
-              <div v-for="(preview, index) in images['previews']" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
+              <div v-for="(image, index) in images" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
                 <div class="square">
                   <figure class="image">
-                    <b-image :src="preview" ratio="1by1" />
+                    <b-image :src="image['preview']" ratio="1by1" />
                   </figure>
                   <div class="remove" @click="removeImage(index)">
                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -49,16 +49,34 @@
         </div>
       </section>
       <section id="form-side" class="column is-8">
+        <div class="box mb-6" :class="{'is-hidden': hideRecurrentsItemsInfoBox}" style="border: 2px solid #3eaf7c;">
+          <template v-if="!isRecurrentItemUsed">
+            {{ $t('ask-fill-form-using-recurrents') }}
+          </template>
+          <template v-else>
+            {{ $tc('want-an-other-recurrent', recurrentItemId) }}
+          </template>
+          <router-link to="/add-item/from-recurrents" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
+          <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
+        </div>
         <div id="form">
           <div class="columns">
             <div class="column">
-              <b-field key="name" :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
+              <b-field key="name" expanded :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
                 <template #label>{{ $t('name') }}
                   <b-tooltip :label="$t('help_item_name')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="internalItem.name" name="name" v-validate="'required'" />
+                <b-autocomplete
+                    v-model="name"
+                    :open-on-focus="true"
+                    :data="suggestedNames"
+                    field="name"
+                    @select="option => assignCategory(option)"
+                    :clearable="true"
+                >
+                </b-autocomplete>
               </b-field>
             </div>
             <div class="column">
@@ -68,7 +86,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="internalItem.type" expanded name="type" v-validate="'required'">
+                <b-select v-model="type" expanded name="type" v-validate="'required'">
                   <option value="RQ">{{ $t('request') }}</option>
                   <option value="DN">{{ $t('donation') }}</option>
                   <option value="LN">{{ $t('loan') }}</option>
@@ -79,13 +97,13 @@
           </div>
           <div class="columns">
             <div class="column">
-              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded />
+              <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded />
             </div>
             <div class="column">
-              <category-selector v-model="internalItem.category2" :number="2" expanded />
+              <category-selector v-model="category2" :number="2" expanded />
             </div>
             <div class="column">
-              <category-selector v-model="internalItem.category3" :number="3" expanded />
+              <category-selector v-model="category3" :number="3" expanded />
             </div>
           </div>
           <div class="columns">
@@ -96,7 +114,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="internalItem.description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
               </b-field>
             </div>
           </div>
@@ -125,10 +143,10 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
-                    v-model="internalItem.startdate"
-                    :max-datetime="internalItem.enddate"
+                    v-model="startdate"
+                    :max-datetime="enddate"
                     icon="calendar"
-                    :icon-right="internalItem.startdate ? 'close-circle' : ''"
+                    :icon-right="startdate ? 'close-circle' : ''"
                     icon-right-clickable
                     @icon-right-click="clearStartdate"
                     icon-pack="fas"
@@ -145,10 +163,10 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
-                    v-model="internalItem.enddate"
-                    :min-datetime="minEnddate"
+                    v-model="enddate"
+                    :min-datetime="startdate"
                     icon="calendar"
-                    :icon-right="internalItem.enddate ? 'close-circle' : ''"
+                    :icon-right="enddate ? 'close-circle' : ''"
                     icon-right-clickable
                     @icon-right-click="clearEnddate"
                     icon-pack="fas"
@@ -159,19 +177,19 @@
             </div>
           </div>
           <div class="columns">
-          <div class="column">
-          <b-checkbox v-model="internalItem.is_recurrent">
-            <strong>{{ $t('save-as-recurrent-item') }}</strong>
-            <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
-              <i class="icon far fa-question-circle"></i>
-            </b-tooltip>
-          </b-checkbox>
-          </div>
+            <div class="column">
+              <b-checkbox v-model="isRecurrent">
+                <strong>{{ $t('save-as-recurrent-item') }}</strong>
+                <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
+                  <i class="icon far fa-question-circle"></i>
+                </b-tooltip>
+              </b-checkbox>
+            </div>
           </div>
         </div>
         <div class="container has-text-centered mt-5">
           <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
-          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('save') }}</b-button>
+          <b-button class="button is-primary mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('publish-item') }}</b-button>
         </div>
       </section>
     </div>
@@ -180,13 +198,13 @@
 
 <script>
 import axios from "axios";
-import CategorySelector from "@/components/CategorySelector";
+import CategorySelector from "@/components/CategorySelector.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'TheEditItemView',
+  name: 'TheAddItemView',
   mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'
@@ -198,25 +216,35 @@ export default {
       step: 0,
 
       filesSelected: [],
-      images: {
-        'files': [],
-        'previews': []
-      },
+      images: [],
       imagesSlots: 12,
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
 
-      item: {},
-      internalItem: {},
+      hideRecurrentsItemsInfoBox: false,
+
+      probabilities: [],
+      suggestedNames: [],
+
+      recurrentItem: null,
+
+      name: "",
+      description: "",
+      type: '',
+      category1: '',
+      category2: '',
+      category3: '',
       location: "",
-      initialStartdate: Date.now(),
+      startdate: null,
+      enddate: null,
+      isRecurrent: false,
 
       geoLocation: null,
       waitingFormResponse: false
     }
   },
   created() {
-    this.fetchItem();
+    this.fetchRecurrentItem();
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -234,14 +262,14 @@ export default {
       );
     }
 
-    document.title = `Shareish | ${this.$t('edit-item')}`;
+    document.title = `Shareish | ${this.$t('add-new-item')}`;
   },
   computed: {
     canStillUploadImages() {
-      return this.imagesSlots > this.images['previews'].length;
+      return this.imagesSlots > this.images.length;
     },
     imagesSlotsLeft() {
-      return this.imagesSlots - this.images['previews'].length;
+      return this.imagesSlots - this.images.length;
     },
     imagesSlotsLeftColorClass () {
       if (this.imagesSlotsLeft >= 6)
@@ -251,16 +279,11 @@ export default {
       else
         return 'is-danger';
     },
-    itemId() {
+    recurrentItemId() {
       return Number(this.$route.params.id);
     },
-    minEnddate() {
-      const now = new Date();
-      if (this.internalItem.startdate) {
-        const startdate = new Date(this.internalItem.startdate);
-        return (startdate > now) ? startdate : now;
-      }
-      return now;
+    isRecurrentItemUsed() {
+      return this.recurrentItemId > 0;
     }
   },
   watch: {
@@ -281,48 +304,43 @@ export default {
     }
   },
   methods: {
-    async fetchItem() {
-      try {
-        this.item = (await axios.get(`/api/v1/user_items/${this.itemId}`)).data;
-        this.setFieldFromItem();
-      } catch (error) {
-        this.snackbarError(error);
-        await this.$router.push("/items");
+    async fetchRecurrentItem() {
+      if (this.isRecurrentItemUsed) {
+        try {
+          this.recurrentItem = (await axios.get(`/api/v1/recurrents/${this.recurrentItemId}`)).data;
+          this.setFieldFromRecurrentItem();
+        } catch (error) {
+          this.snackbarError(error);
+          await this.$router.push("/add-item");
+        }
       }
     },
-    async setFieldFromItem() {
-      if (this.item !== null) {
-
-        this.internalItem = {...this.item};
-
-        if (this.internalItem.startdate) {
-          this.internalItem.startdate = new Date(this.internalItem.startdate);
-          this.initialStartdate = this.internalItem.startdate;
-        }
-
-        if (this.internalItem.enddate)
-          this.internalItem.enddate = new Date(this.internalItem.enddate);
+    async setFieldFromRecurrentItem() {
+      if (this.recurrentItem !== null) {
+        this.name = this.recurrentItem.name;
+        this.description = this.recurrentItem.description;
+        this.type = this.recurrentItem.type;
+        this.category1 = this.recurrentItem.category1;
+        this.category2 = this.recurrentItem.category2;
+        this.category3 = this.recurrentItem.category3;
+        this.isRecurrent = false;
 
         try {
-          this.images['files'] = [];
-          this.images['previews'] = [];
-
-          const images = JSON.parse((await axios.get(`/api/v1/items/${this.itemId}/images/base64`)).data);
+          const images = JSON.parse((await axios.get(`/api/v1/items/${this.recurrentItemId}/images/base64`)).data);
           for (const i in images) {
-            this.images['files'].push(images[i].name);
-            this.images['previews'].push(images[i].base64_url);
+            this.images.push({"filename": images[i].name, 'predictions': [], 'preview': images[i].base64_url, 'probability': 0});
           }
         } catch (error) {
           this.snackbarError(error);
         }
 
-        this.fetchAddress(this.internalItem.location);
+        this.fetchAddress(this.recurrentItem.location);
       }
     },
     async fetchAddressGeoLoc() {
       // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
       if (this.geoLocation !== null) {
-        const geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
+        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
         this.fetchAddress(geoLocPoint);
       } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
@@ -341,57 +359,131 @@ export default {
     async processImage(file) {
       this.loading = true;
 
-      this.images['files'].unshift(file.name);
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        this.images['previews'].unshift(reader.result)
+        this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
+        this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
 
       this.loading = false;
     },
+    async fetchPredictions(file, position) {
+      try {
+        let data = new FormData();
+        data.append('image', file);
+        const response = (await axios.post("/api/v1/predictClass/", data)).data;
+        const probabilities = response['probabilities'];
+        this.images[position]['predictions'] = probabilities;
+
+        for (let i in probabilities) {
+          let found = false;
+          for (let j in this.probabilities) {
+            if (this.probabilities[j]['class'] === probabilities[i]['class']) {
+              this.probabilities[j]['probability'] += probabilities[i]['probability'];
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+              this.probabilities.push({...probabilities[i]});
+        }
+
+        this.sortPredictions();
+        this.refreshSuggestedNames();
+
+        this.description += response['detected_text']
+
+        if (this.probabilities[0])
+          this.category1 = this.probabilities[0]['category'];
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+    },
     removeImage(index) {
-      this.images['files'].splice(index, 1);
-      this.images['previews'].splice(index, 1);
+      const imagePredictionsToRemove = this.images[index]['predictions'];
+      for (let i in imagePredictionsToRemove) {
+        for (let j in this.probabilities) {
+          if (this.probabilities[j]['class'] === imagePredictionsToRemove[i]['class']) {
+            this.probabilities[j]['probability'] -= imagePredictionsToRemove[i]['probability'];
+            break;
+          }
+        }
+      }
+
+      let j = 0;
+      while (j < this.probabilities.length) {
+        if (this.probabilities[j]['probability'] <= 0)
+          this.probabilities.splice(j, 1);
+        else
+          j++;
+      }
+
+      this.sortPredictions();
+      this.refreshSuggestedNames();
+
+      this.images.splice(index, 1);
+    },
+    sortPredictions() {
+      this.probabilities.sort(function(first, second) {
+        return second['probability'] - first['probability'];
+      });
+    },
+    refreshSuggestedNames() {
+      this.suggestedNames = [];
+      const predictionsLength = (this.probabilities.length < 5) ? this.probabilities.length : 5;
+      for (let i = 0; i < predictionsLength; i++)
+        this.suggestedNames.push(this.probabilities[i]['class']);
+    },
+    assignCategory(option) {
+      for (let i in this.probabilities) {
+        if (this.probabilities[i]['class'] === option) {
+          this.category1 = this.probabilities[i]['category'];
+          break;
+        }
+      }
     },
     async submit() {
       this.waitingFormResponse = true;
 
-      if (await this.$validator.validateAll()) {
+      let result = await this.$validator.validateAll();
+      if (result) {
         let startDate;
-        if (this.internalItem.startdate)
-          startDate = moment(this.internalItem.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
+        if (this.startdate)
+          startDate = moment(this.startdate).format("YYYY-MM-DD[T]HH:mm:ss");
         else
           startDate = moment().format("YYYY-MM-DD[T]HH:mm:ss");
 
         let endDate;
-        if (this.internalItem.enddate)
-          endDate = moment(this.internalItem.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
+        if (this.enddate)
+          endDate = moment(this.enddate).format("YYYY-MM-DD[T]HH:mm:ss");
         else
           endDate = null;
 
         try {
-          const item = (await axios.patch(`/api/v1/items/${this.item.id}/`, {
-            name: this.internalItem.name,
-            type: this.internalItem.type,
-            category1: this.internalItem.category1,
-            category2: this.internalItem.category2,
-            category3: this.internalItem.category3,
-            description: this.internalItem.description,
+          let item = (await axios.post("/api/v1/items/", {
+            name: this.name,
+            type: this.type,
+            category1: this.category1,
+            category2: this.category2,
+            category3: this.category3,
+            description: this.description,
             location: this.location,
-            is_recurrent: this.internalItem.is_recurrent,
+            is_recurrent: this.isRecurrent,
             startdate: startDate,
-            enddate: endDate
+            enddate: endDate,
+            images: []
           })).data;
 
-          if (this.images['files'].length > 0) {
+          if (this.images.length > 0) {
             try {
-              const data = new FormData();
+              let data = new FormData();
               data.append('item_id', item.id);
 
-              for (let i in this.images['files']) {
-                const blob = await (await fetch(this.images['previews'][i])).blob();
-                const tempFile = new File([blob], this.images['files'][i]);
+              for (let i in this.images) {
+                const blob = await (await fetch(this.images[i]['preview'])).blob();
+                const tempFile = new File([blob], this.images[i]['filename']);
                 data.append('images', tempFile);
               }
 
@@ -412,26 +504,38 @@ export default {
       this.waitingFormResponse = false;
     },
     reset() {
-      this.setFieldFromItem();
+      this.name = "";
+      this.description = "";
+      this.type = '';
+      this.category1 = '';
+      this.category2 = '';
+      this.category3 = '';
+      this.startdate = null;
+      this.enddate = null;
+      this.isRecurrent = false;
+      this.recurrentItem = null;
+
+      this.images['files'] = [];
+      this.images['previews'] = [];
     },
     clearStartdate() {
-      this.internalItem.startdate = this.initialStartdate;
+      this.startdate = null;
       this.startdateChanged();
     },
     clearEnddate() {
-      this.internalItem.enddate = null;
+      this.enddate = null;
       this.enddateChanged();
     },
     startdateChanged() {
-      if (this.internalItem.enddate && this.internalItem.startdate) {
-        if (this.internalItem.startdate > this.internalItem.enddate)
-          this.internalItem.enddate = this.internalItem.startdate;
+      if (this.enddate && this.startdate) {
+        if (this.startdate > this.enddate)
+          this.enddate = this.startdate;
       }
     },
     enddateChanged() {
-      if (this.internalItem.enddate && this.internalItem.startdate) {
-        if (this.internalItem.enddate < this.internalItem.startdate)
-          this.internalItem.startdate = this.internalItem.enddate;
+      if (this.enddate && this.startdate) {
+        if (this.enddate < this.startdate)
+          this.startdate = this.enddate;
       }
     },
     windowWidthChanged() {

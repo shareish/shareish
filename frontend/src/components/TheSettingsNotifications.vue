@@ -5,8 +5,7 @@
         <div class="tile is-child box">
           <div class="field is-horizontal">
             <div class="field-body">
-              <b-field key="ref_location" :message="errors.first('ref_location')"
-                       :type="{'is-danger': errors.has('ref_location')}">
+              <b-field key="ref_location" :message="errors.first('ref_location')" :type="{'is-danger': errors.has('ref_location')}">
                 <template #label>
                   <b-tooltip key="ref_location" :label="$t('help_ref_location')" multilined position="is-right">
                     {{ $t('reflocation') }}
@@ -16,8 +15,7 @@
                 <b-button type="is-primary" @click="fetchAddressGeoLoc">
                   <i class="icon fas fa-map-marker-alt"></i>
                 </b-button>
-                <b-input v-model="internalUser['ref_location']" class="is-expanded ml-2" name="ref_location"
-                         type="text"/>
+                <b-input v-model="internalUser['ref_location']" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -25,16 +23,21 @@
       </div>
       <div class="tile is-parent">
         <div class="tile is-child box">
-          <b-field key="dwithin_notifications" :message="errors.first('dwithin_notifications')"
-                   :type="{'is-danger': errors.has('dwithin_notifications')}">
+          <b-field key="dwithin_notifications" :message="errors.first('dwithin_notifications')" :type="{'is-danger': errors.has('dwithin_notifications')}">
             <template #label>
               <b-tooltip key="dwithin_notifications" :label="$t('help_dwithin')" multilined position="is-right">
                 {{ $t('dwithin_notif') }}
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-slider v-model="internalUser['dwithin_notifications']" :max="99" :tooltip="false" class="mt-5 pl-3 pr-3" format="raw"
-                      indicator/>
+            <b-slider
+                v-model="internalUser['dwithin_notifications']"
+                :max="99"
+                :tooltip="false"
+                class="mt-5 pl-3 pr-3"
+                format="raw"
+                indicator
+            />
           </b-field>
         </div>
       </div>
@@ -48,16 +51,20 @@
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
-          <b-radio-button v-for="{key, translationKey, color} in conversationsFrequencies" :key="key"
-                          v-model="radioGroups['notif_conversations']" :native-value="key" :type="color">
+          <b-radio-button
+              v-for="{key, translationKey, color} in conversationsFrequencies"
+              :key="key"
+              v-model="radioGroups['notif_conversations']"
+              :native-value="key"
+              :type="color"
+          >
             <span>{{ $t(translationKey) }}</span>
           </b-radio-button>
         </template>
         <template v-else>
           <b-select v-model="radioGroups['notif_conversations']" expanded placeholder="Select a frequency">
-            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{
-                $t(translationKey)
-              }}
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">
+              {{ $t(translationKey) }}
             </option>
           </b-select>
         </template>
@@ -72,22 +79,25 @@
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
-          <b-radio-button v-for="{key, translationKey, color} in frequencies" :key="key" v-model="radioGroups[field]"
-                          :native-value="key" :type="color">
+          <b-radio-button
+              v-for="{key, translationKey, color} in frequencies"
+              :key="key"
+              v-model="radioGroups[field]"
+              :native-value="key" :type="color"
+          >
             <span>{{ $t(translationKey) }}</span>
           </b-radio-button>
         </template>
         <template v-else>
           <b-select v-model="radioGroups[field]" expanded placeholder="Select a name">
-            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">{{
-                $t(translationKey)
-              }}
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">
+              {{ $t(translationKey) }}
             </option>
           </b-select>
         </template>
       </b-field>
     </div>
-    <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save"/>
+    <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save" />
   </section>
 </template>
 
@@ -98,7 +108,7 @@ import ErrorHandler from "@/components/ErrorHandler";
 import WindowSize from "@/components/WindowSize";
 
 export default {
-  name: 'TheSettingsNotificationsView',
+  name: 'TheSettingsNotifications',
   mixins: [ErrorHandler, WindowSize],
   $_veeValidate: {
     validator: 'new'

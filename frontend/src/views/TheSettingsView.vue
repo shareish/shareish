@@ -29,24 +29,24 @@
           </li>
         </ul>
       </aside>
-      <the-settings-profile-view v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
-      <the-settings-account-view v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
-      <the-settings-notifications-view v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
+      <the-settings-profile v-if="currentView==='profile'" :user="user" @updateUser="updateUser" />
+      <the-settings-account v-else-if="currentView==='account'" :user="user" @updateUser="updateUser" />
+      <the-settings-notifications v-else-if="currentView==='notifications'" :user="user" @updateUser="updateUser" />
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import TheSettingsProfileView from "@/components/settings/TheSettingsProfileView.vue";
-import TheSettingsNotificationsView from "@/components/settings/TheSettingsNotificationsView.vue";
-import TheSettingsAccountView from "@/components/settings/TheSettingsAccountView.vue";
+import TheSettingsProfile from "@/components/TheSettingsProfile.vue";
+import TheSettingsNotifications from "@/components/TheSettingsNotifications.vue";
+import TheSettingsAccount from "@/components/TheSettingsAccount.vue";
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'TheSettingsView',
   mixins: [ErrorHandler],
-  components: {TheSettingsAccountView, TheSettingsNotificationsView, TheSettingsProfileView},
+  components: {TheSettingsAccount, TheSettingsNotifications, TheSettingsProfile},
   $_veeValidate: {
     validator: 'new'
   },

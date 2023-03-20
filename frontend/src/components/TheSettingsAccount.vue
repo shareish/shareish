@@ -66,7 +66,7 @@ import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
-  name: 'TheSettingsAccountView',
+  name: 'TheSettingsAccount',
   mixins: [ErrorHandler],
   $_veeValidate: {
     validator: 'new'
