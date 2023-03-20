@@ -166,7 +166,7 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
-    filter_backends = [filters.OrderingFilter, ActiveItemFilterBackend]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend, ItemTypeFilterBackend]
     pagination_class = ActivePaginationClass
     ordering = ['-startdate']
 
