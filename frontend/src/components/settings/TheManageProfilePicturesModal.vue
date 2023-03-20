@@ -2,7 +2,7 @@
   <b-loading v-if="loading" :active="true" :is-full-page="false" />
   <div v-else class="modal-card">
     <header class="modal-card-head">
-      <p class="modal-card-title">{{ $t('profile-picture') }}</p>
+      <p class="modal-card-title">{{ $tc('profile-picture') }}</p>
       <button class="delete" type="button" @click="$emit('close')" />
     </header>
     <section class="modal-card-body">
@@ -27,8 +27,15 @@
       </div>
       <div id="profile-images">
         <hr />
-        <h2 class="title is-size-5 mb-3">{{ $t('other-profile-pictures') }}</h2>
-        <p class="mb-5" v-html="$t('info-already-uploaded-profile-pictures')"></p>
+        <h2 class="title is-size-5 mb-5">
+          <b-tooltip multilined position="is-right">
+            <template v-slot:content>
+              <p v-html="$t('info-already-uploaded-profile-pictures')"></p>
+            </template>
+            {{ $t('other-profile-pictures') }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </h2>
         <div v-if="user.images.length > 0" class="columns is-mobile is-flex-wrap-wrap">
           <div v-for="(image, index) in user.images" :key="index" class="column" :class="imagesPreviewColumnSizeClass">
             <div class="square">
@@ -59,7 +66,7 @@ import WindowSize from "@/components/WindowSize";
 import axios from "axios";
 
 export default {
-  name: 'TheUpdateProfilePictureModal',
+  name: 'TheManageProfilePicturesModal',
   mixins: [ErrorHandler, WindowSize],
   props: {
     user: {

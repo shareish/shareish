@@ -6,43 +6,43 @@
         <b-image v-else ratio="1by1" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"></b-image>
       </div>
       <div class="media-content box">
-        <div class="columns">
-          <div class="column">
-            <h2 class="title is-size-4 mb-4">{{ $t('profile-picture') }}</h2>
-            <p class="mb-2" v-html="$t('info-profile-picture-recommendation')"></p>
-            <b-button type="is-primary" @click="updateProfilePicture()" class="mt-3">{{ $t('update-profile-picture') }}</b-button>
-          </div>
-          <div class="column">
-            <h4 class="title is-size-5 mb-3">{{ $t('other-profile-pictures') }}</h4>
-            <div id="profile-images" class="columns is-mobile is-flex-wrap-wrap">
-              <template v-if="user.images.length > 0">
-                <template v-for="(image, index) in user.images">
-                  <div :key="index" v-if="index < maxImagesToShow[imagesPreviewColumnSizeClass]" class="column" :class="imagesPreviewColumnSizeClass">
-                    <figure class="image">
-                      <b-image :src="image.url" ratio="1by1" />
-                    </figure>
-                  </div>
-                </template>
-                <div v-if="user.images.length > maxImagesToShow[imagesPreviewColumnSizeClass]" class="column" :class="imagesPreviewColumnSizeClass">
-                  <div class="square image-placeholder" @click="updateProfilePicture()">
-                    <div class="square-content">
-                      <p><small>{{ $tc('and-n-more', user.images.length - maxImagesToShow[imagesPreviewColumnSizeClass]) }}</small></p>
-                    </div>
-                  </div>
+        <h4 class="title is-size-5 mb-3">
+          <b-tooltip multilined position="is-right">
+            <template v-slot:content>
+              <p v-html="$t('info-profile-picture-recommendation')"></p>
+            </template>
+            {{ $tc('profile-picture', user.images.length) }} ({{ user.images.length }})
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </h4>
+        <div id="profile-images" class="columns is-mobile is-flex-wrap-wrap">
+          <template v-if="user.images.length > 0">
+            <template v-for="(image, index) in user.images">
+              <div :key="index" v-if="index < maxImagesToShow[imagesPreviewColumnSizeClass]" class="column" :class="imagesPreviewColumnSizeClass">
+                <figure class="image">
+                  <b-image :src="image.url" ratio="1by1" />
+                </figure>
+              </div>
+            </template>
+            <div v-if="user.images.length > maxImagesToShow[imagesPreviewColumnSizeClass]" class="column" :class="imagesPreviewColumnSizeClass">
+              <div class="square image-placeholder" @click="manageProfilePictures()">
+                <div class="square-content">
+                  <p><small>{{ $tc('and-n-more', user.images.length - maxImagesToShow[imagesPreviewColumnSizeClass]) }}</small></p>
                 </div>
-              </template>
-              <template v-else>
-                <div class="column" :class="imagesPreviewColumnSizeClass">
-                  <div class="square image-placeholder" @click="updateProfilePicture()">
-                    <div class="square-content">
-                      <p><small>{{ $t('no-images') }}</small></p>
-                    </div>
-                  </div>
-                </div>
-              </template>
+              </div>
             </div>
-          </div>
+          </template>
+          <template v-else>
+            <div class="column" :class="imagesPreviewColumnSizeClass">
+              <div class="square image-placeholder" @click="manageProfilePictures()">
+                <div class="square-content">
+                  <p><small>{{ $t('no-images') }}</small></p>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
+        <b-button type="is-primary" @click="manageProfilePictures()">{{ $t('manage-profile-picture') }}</b-button>
       </div>
     </div>
     <div class="box">
@@ -105,7 +105,7 @@
 <script>
 import axios from 'axios';
 import ErrorHandler from "@/components/ErrorHandler";
-import TheUpdateProfilePictureModal from "@/components/settings/TheUpdateProfilePictureModal.vue";
+import TheManageProfilePicturesModal from "@/components/settings/TheManageProfilePicturesModal.vue";
 import WindowSize from "@/components/WindowSize";
 
 export default {
@@ -124,12 +124,12 @@ export default {
     return {
       internalUser: null,
       waitingFormResponse: false,
-      imagesPreviewColumnSizeClass: 'is-one-third',
-      mediaLeftProfilePictureWidth: "200px",
+      imagesPreviewColumnSizeClass: 'is-2',
       maxImagesToShow: {
         'is-one-third': 2,
         'is-one-quarter': 3,
-        'is-one-fifth': 4
+        'is-one-fifth': 4,
+        'is-2': 5
       }
     }
   },
@@ -169,29 +169,28 @@ export default {
     updatePictures() {
 
     },
-    updateProfilePicture() {
+    manageProfilePictures() {
       this.$buefy.modal.open({
         parent: this,
         props: {
           user: this.user
         },
         events: {updatePictures: this.updatePictures},
-        component: TheUpdateProfilePictureModal,
+        component: TheManageProfilePicturesModal,
         hasModalCard: true,
         trapFocus: true,
       });
     },
     windowWidthChanged() {
-      let imagesPreviewColumnSizeClass = 'is-one-third';
-      let mediaLeftProfilePictureWidth = "200px";
-      if (this.windowWidth < 1300) {
-        if (this.windowWidth < 1216) {
-          mediaLeftProfilePictureWidth = "150px";
-          imagesPreviewColumnSizeClass = 'is-one-fifth';
-          if (this.windowWidth < 1100) {
-            imagesPreviewColumnSizeClass = 'is-one-quarter';
+      let imagesPreviewColumnSizeClass = 'is-2';
+      if (this.windowWidth < 1340) {
+        imagesPreviewColumnSizeClass = 'is-one-fifth';
+        if (this.windowWidth < 1190) {
+          imagesPreviewColumnSizeClass = 'is-one-quarter';
+          if (this.windowWidth < 1070) {
+            imagesPreviewColumnSizeClass = 'is-one-third';
             if (this.windowWidth < 1024) {
-              mediaLeftProfilePictureWidth = '200px';
+              imagesPreviewColumnSizeClass = 'is-one-quarter';
               if (this.windowWidth < 840) {
                 imagesPreviewColumnSizeClass = 'is-one-third';
                 if (this.windowWidth < 769) {
@@ -206,7 +205,6 @@ export default {
         }
       }
       this.imagesPreviewColumnSizeClass = imagesPreviewColumnSizeClass;
-      this.mediaLeftProfilePictureWidth = mediaLeftProfilePictureWidth;
     }
   }
 };
@@ -214,20 +212,20 @@ export default {
 
 <style scoped>
 .media-left {
-  width: v-bind('mediaLeftProfilePictureWidth');
+  width: 200px;
 }
 
-.square{
+.square {
   position: relative;
   width: 100%;
   overflow: hidden;
 }
-.square:before{
+.square:before {
   content: "";
   display: block;
   padding-top: 100%;
 }
-.square-content{
+.square-content {
   position: absolute;
   top: 0;
   left: 0;
@@ -247,15 +245,6 @@ export default {
   transform: translate(-50%, -50%);
   color: white;
   text-align: center;
-}
-
-@media screen and (max-width: 1215px) {
-  .media .media-content > .columns {
-    display: block;
-  }
-  .media .media-content > .columns > .column {
-    width: 100%;
-  }
 }
 
 @media screen and (max-width: 1023px) {
