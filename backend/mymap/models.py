@@ -248,12 +248,8 @@ class ItemImage(models.Model):
 
 
 class Conversation(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.CharField(max_length=100, null=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_as_owner', on_delete=models.CASCADE,
-                              null=True)
-    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_as_buyer', on_delete=models.CASCADE,
-                              null=True)
+    starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
+                                on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, related_name='conversations', on_delete=models.CASCADE, null=True)
     lastmessagedate = models.DateTimeField(auto_now_add=True)
 
@@ -269,4 +265,4 @@ class Message(models.Model):
     seen = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']

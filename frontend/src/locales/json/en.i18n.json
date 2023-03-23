@@ -275,5 +275,7 @@
   "picture-removed": "Picture removed!",
   "aware-changes-not-saved": "Aware! Your new profile picture needs to be saved!",
   "image-already-profile-picture": "This image is already your profile picture!",
-  "view-real-profile": "View real profile"
+  "view-real-profile": "View real profile",
+  "search": "Search",
+  "click-to-view-on-map": "Click to view on map"
 }

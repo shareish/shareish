@@ -15,11 +15,10 @@ import TheItemsView from "@/views/TheItemsView.vue";
 import TheItemView from "@/views/TheItemView.vue"
 import TheMapView from "@/views/TheMapView.vue";
 import TheAddItemView from "@/views/TheAddItemView.vue"
-import TheConversationsView from "@/views/TheConversationsView.vue"
-import TheConversationView from "@/views/TheConversationView.vue"
 import TheAboutView from "@/views/TheAboutView.vue";
 import TheAddItemFromRecurrentsView from "@/views/TheAddItemFromRecurrentsView.vue";
 import TheEditItemView from "@/views/TheEditItemView.vue";
+import TheConversationsView from "@/views/TheConversationsView.vue";
 
 const routes = [
     {
@@ -154,7 +153,7 @@ const routes = [
     {
         path: "/conversations/:id",
         name: 'conversation',
-        component: TheConversationView,
+        component: TheConversationsView,
         meta: {
             requireLogin: true
         }

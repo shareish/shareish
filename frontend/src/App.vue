@@ -73,9 +73,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import "@/assets/styles/main.scss";
-
+<style scoped>
 .wrapper {
   display: flex;
   height: 100%;
@@ -91,12 +89,26 @@ export default {
   flex-direction: column;
   align-items: flex-start;
 }
+</style>
+
+<style lang="scss">
+@import "@/assets/styles/main.scss";
 
 .wbbw {
   word-break: break-word;
 }
+
 .wspw {
   white-space: pre-wrap;
 }
 
+.v-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
 </style>

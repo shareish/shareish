@@ -54,7 +54,7 @@
           </template>
           {{ formattedDateFromNow(item.enddate) }}
         </small>
-        <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
+        <small class="is-block" v-if="item.location && this.geoLocation">{{ ucfirst($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
       </div>
       <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
@@ -72,6 +72,7 @@ import ItemTypeTag from "@/components/ItemTypeTag";
 import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/components/ErrorHandler";
+import {ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -129,6 +130,7 @@ export default {
     }
   },
   methods: {
+    ucfirst,
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
     },
@@ -148,14 +150,8 @@ export default {
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c; // Distance in km
-    },
-    capitalize(s) {
-      const capitalizedFirst = s[0].toUpperCase();
-      const rest = s.slice(1);
-
-      return capitalizedFirst + rest;
     }
-  },
+  }
 };
 </script>
 

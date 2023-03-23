@@ -240,8 +240,6 @@ export default {
     async startConversation() {
       try {
         const data = {
-          'owner_id': this.item['user_id'],
-          'buyer_id': this.$store.state.user.id,
           'item_id': this.item['id']
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
@@ -336,7 +334,7 @@ div.icon-text {
 
 #item-info .subtitle {
   font-style: italic;
-  opacity: 0.9;
+  color: #767676;
 }
 
 #item-info .subtitle i {

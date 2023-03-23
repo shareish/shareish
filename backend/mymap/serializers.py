@@ -122,11 +122,15 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     unread_messages = serializers.SerializerMethodField()
+    last_message = serializers.SerializerMethodField()
+    starter = UserSerializer()
+    item = ItemSerializer()
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'name', 'owner', 'buyer', 'item', 'slug', 'lastmessagedate', 'unread_messages'
+            'id', 'item_id', 'starter_id', 'lastmessagedate', 'unread_messages', 'last_message',
+            'starter', 'item'
         ]
 
     def get_unread_messages(self, obj):
@@ -134,6 +138,14 @@ class ConversationSerializer(serializers.ModelSerializer):
         if request is not None:
             return Message.objects.filter(conversation=obj, seen=False).exclude(user=request.user.id).count()
         return 0
+
+    def get_last_message(self, obj):
+        request = self.context.get('request')
+        if request is not None:
+            last_message = Message.objects.filter(conversation=obj).last()
+            if last_message is not None:
+                return last_message.content
+        return None
 
 
 class MessageSerializer(serializers.ModelSerializer):

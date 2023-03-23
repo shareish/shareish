@@ -58,10 +58,10 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             from .mail import send_mail_notif_new_message_received
 
             conversation = Conversation.objects.get(pk=conversation_id)
-            if conversation.buyer_id == user_id:
-                receiver = conversation.owner
+            if conversation.starter_id == user_id:
+                receiver = conversation.item.user
             else:
-                receiver = conversation.buyer
+                receiver = conversation.starter
             send_mail_notif_new_message_received(conversation, content, receiver)
 
         message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)
