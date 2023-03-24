@@ -7,12 +7,12 @@ from django.db.models import F
 def forwards_func(apps, schema_editor):
     Conversation = apps.get_model("mymap", "Conversation")
     db_alias = schema_editor.connection.alias
-    Conversation.objects.using(db_alias).update(starter_id=F('buyer_id'))
+    Conversation.objects.using(db_alias).update(starter=F('buyer_id'))
 
 def reverse_func(apps, schema_editor):
     Conversation = apps.get_model("mymap", "Conversation")
     db_alias = schema_editor.connection.alias
-    Conversation.objects.using(db_alias).update(buyer_id=F('starter_id'))
+    Conversation.objects.using(db_alias).update(buyer=F('starter_id'))
 
 class Migration(migrations.Migration):
 
@@ -21,9 +21,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards_func, reverse_func),
-        migrations.RemoveField(
-            model_name='conversation',
-            name='buyer',
-        ),
+        migrations.RunPython(forwards_func, reverse_func)
     ]
