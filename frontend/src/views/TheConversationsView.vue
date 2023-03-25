@@ -183,6 +183,8 @@ export default {
       await this.fetchConversation();
       await this.setMessagesAsSeen();
       this.connectToConversation();
+      if (this.messages.length === 0)
+        this.messageToSend = this.$t('intro-' + this.conversation.item.type + '-first-message');
     },
     clickCategory(category) {
       if (this.canChangeCategory)
@@ -258,7 +260,7 @@ export default {
       }
     },
     async setMessagesAsSeen() {
-      if (this.conversation && this.conversation.unread_messages > 0) {
+      if (this.conversation && this.conversation.unread_messages > 0 && this.messages.length > 0) {
         try {
           const data = {
             'conversation_id': this.conversation.id,
@@ -295,11 +297,13 @@ export default {
       return -1;
     },
     goToLastMessage() {
-      this.$nextTick(function () {
-        const parent = this.$el.querySelector("#messages");
-        const child = this.$el.querySelector("#messages article:last-child");
-        scrollParentToChild(parent, child);
-      });
+      if (this.messages.length > 0) {
+        this.$nextTick(function () {
+          const parent = this.$el.querySelector("#messages");
+          const child = this.$el.querySelector("#messages article:last-child");
+          scrollParentToChild(parent, child);
+        });
+      }
     },
     async connectToConversation() {
       if (this.conversation) {
