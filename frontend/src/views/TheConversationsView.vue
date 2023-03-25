@@ -167,8 +167,11 @@ export default {
       return Number(this.$store.state.user.id);
     },
     receiver() {
-      if (this.conversation)
-        return (this.conversation.starter === this.userId) ? this.conversation.item.user : this.conversation.starter;
+      if (this.conversation) {
+        let ids = [this.conversation.item.user.id, this.conversation.starter.id];
+        ids.splice(ids.indexOf(this.userId), 1);
+        return (this.conversation.starter.id === ids[0]) ? this.conversation.starter : this.conversation.item.user;
+      }
       return {};
     },
     webSocketHost() {
