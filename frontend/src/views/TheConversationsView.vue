@@ -383,7 +383,10 @@ export default {
     this.loading = false;
   },
   destroyed() {
-    clearTimeout(this.timeout);
+    for (let i in this.timeouts)
+      clearTimeout(this.timeouts[i]);
+    if (this.ws)
+      this.ws.close();
   }
 };
 </script>
