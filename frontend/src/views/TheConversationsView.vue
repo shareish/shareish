@@ -215,7 +215,8 @@ export default {
           search: this.search,
           selectedCategory: this.selectedCategory
         };
-        let conversations = (await axios.get("/api/v1/conversations/", {params: filters})).data;
+        const conversations = (await axios.get("/api/v1/conversations/", {params: filters})).data;
+        this.$store.state.notifications = Number((await axios.get("/api/v1/notifications/")).data);
         this.conversations = conversations.map(conversation => {
           let image = categories[conversation.item.category1]['image-placeholder'];
           if (conversation.item.images.length > 0)
