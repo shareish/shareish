@@ -8,30 +8,35 @@
       </router-link>
     </div>
     <div class="media-content">
-      <div class="columns">
-        <div class="column is-half">
-          <div class="v-align-center" style="height: 100%;">
+      <div class="columns is-mobile">
+        <div class="column">
+          <div :class="{'v-align-center': windowWidth > 1023}" style="height: 100%;">
             <div class="inner">
-              <h3 class="title is-size-4">
-                <item-type-tag :type="item.type" />
-                <router-link :to="{name: 'item', params: {id: item.id}}">
-                  {{ item.name }}
-                </router-link>
-              </h3>
-              <p class="subtitle is-size-6">
+              <div class="title columns is-mobile">
+                <div class="column pr-2">
+                  <item-type-tag :type="item.type" />
+                </div>
+                <div class="column pl-0">
+                  <router-link :to="{name: 'item', params: {id: item.id}}" class="item-name">
+                    {{ item.name }}
+                  </router-link>
+                </div>
+              </div>
+              <p class="subtitle">
                 {{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}
-                &middot;
-                <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
+                <template v-if="showHitcount">
+                  &middot;
+                  <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
+                </template>
               </p>
             </div>
           </div>
         </div>
-        <div class="column is-half">
-          <b-tooltip :label="$t('click-to-view-on-map')" position="is-bottom">
-            <router-link v-if="address" :to="{name: 'map', query: {id: item.id}}">
-              <span class="address">{{ address }}</span>
-            </router-link>
-          </b-tooltip>
+        <div class="column">
+          <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" class="category mr-2" :title="$t(category.slug)" />
+          <router-link v-if="address" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
+            <i class="fas fa-map-marker-alt"></i>
+          </router-link>
         </div>
       </div>
     </div>
@@ -44,10 +49,11 @@ import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import {categories} from "@/categories";
 import moment from "moment";
 import axios from "axios";
+import WindowSize from "@/components/WindowSize";
 
 export default {
   name: "ItemCardHorizontal",
-  mixins: [ErrorHandler],
+  mixins: [ErrorHandler, WindowSize],
   components: {ItemTypeTag},
   props: {
     item: {
@@ -58,6 +64,11 @@ export default {
       type: Number,
       required: false,
       default: 100
+    },
+    showHitcount: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -158,28 +169,64 @@ export default {
   .media-content {
     height: v-bind(heightPx);
 
-    .columns {
+    & > .columns {
       height: v-bind(heightPx);
       margin: 0;
-    }
 
-    .title span {
-       margin-top: -0.3em;
-    }
-    .subtitle {
-      font-style: italic;
-      color: #767676;
+      & > .column:first-child {
 
-      i {
-        margin: 0 0.2em 0 0.1em;
+        .title {
+          font-size: 1.25rem;
+          margin-bottom: 0.75em;
+
+          .column {
+            flex-basis: auto;
+          }
+
+          span {
+            margin-top: -0.3em;
+          }
+
+          .item-name {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+          }
+        }
+        .subtitle {
+          font-size: 0.875rem;
+          font-style: italic;
+          color: #767676;
+
+          i {
+            margin: 0 0.2em 0 0.1em;
+          }
+        }
+      }
+
+      & > .column:last-child {
+        flex: 0 0 200px;
+        display: flex;
+        justify-content: flex-end;
+
+        .category {
+          font-size: 1.5em;
+          line-height: 40px;
+        }
       }
     }
+  }
+}
 
-    .address {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
+@media screen and (max-width: 1023px) {
+  .media {
+    .media-content > .columns  {
+      display: block;
+
+      & > .column:last-child {
+        display: none;
+      }
     }
   }
 }
