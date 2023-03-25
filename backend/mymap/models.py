@@ -125,7 +125,7 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     class Meta:
-        ordering = ['sign_up_date']
+        ordering = ['-id']
 
 
 class UserImage(models.Model):
@@ -213,7 +213,7 @@ class Item(models.Model):
         return self.name + " : " + self.description + " (" + self.category1 + ")"
 
     class Meta:
-        ordering = ['startdate']
+        ordering = ['-id']
 
 
 class ItemImage(models.Model):
