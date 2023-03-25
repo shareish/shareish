@@ -59,7 +59,10 @@
               class="conversation columns"
           >
             <div class="column">
-              <b-image :src="conversation.image" ratio="1by1" class="conversationImage" />
+              <b-image :src="conversation.image" ratio="1by1" class="conversation-image" />
+              <div v-if="conversation.unread_messages > 0" class="unread-messages">
+                {{ conversation.unread_messages }}
+              </div>
             </div>
             <div class="column">
               <p class="title mb-1">{{ conversation.item.name }}</p>
@@ -82,6 +85,8 @@
               placeholder="Write your message"
               :rows="textareaRows"
               @input="checkRows"
+              @keydown.enter.exact.prevent="sendMessage"
+              @keydown.enter.shift.exact.prevent="shiftEnterPressed"
           />
           <div class="level">
             <div class="level-left">
@@ -106,7 +111,7 @@
 import axios from "axios";
 import ErrorHandler from "@/components/ErrorHandler";
 import {categories} from "@/categories";
-import {scrollParentToChild, rem, isDictEmpty, isArrEmpty} from "@/functions";
+import {scrollParentToChild, rem, isArrEmpty, isDictEmpty} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 
@@ -136,7 +141,7 @@ export default {
   },
   watch: {
     $route() {
-      this.fetchConversation();
+      this.openConversation();
     },
     search() {
       clearTimeout(this.timeouts['searchInput']);
@@ -162,9 +167,9 @@ export default {
       return Number(this.$store.state.user.id);
     },
     receiver() {
-      if (!this.conversation)
-        return {};
-      return (this.conversation.starter === this.userId) ? this.conversation.item.user : this.conversation.starter;
+      if (this.conversation)
+        return (this.conversation.starter === this.userId) ? this.conversation.item.user : this.conversation.starter;
+      return {};
     },
     webSocketHost() {
       let host = axios.defaults.baseURL;
@@ -174,6 +179,11 @@ export default {
     }
   },
   methods: {
+    async openConversation() {
+      await this.fetchConversation();
+      await this.setMessagesAsSeen();
+      this.connectToConversation();
+    },
     clickCategory(category) {
       if (this.canChangeCategory)
         this.selectedCategory = category;
@@ -192,6 +202,10 @@ export default {
       const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75);
       this.$el.querySelector("#messages").style.height = (750 - itemHeight - writeHeight - optionsHeight) + "px";
       this.textareaRows = messageRows;
+    },
+    shiftEnterPressed() {
+      this.messageToSend += "\n";
+      this.checkRows();
     },
     async fetchConversations() {
       try {
@@ -219,7 +233,8 @@ export default {
           });
           this.unableToFetchConversations = false;
         }
-      } catch (error) {
+      }
+      catch (error) {
         if (!this.unableToFetchConversations) {
           this.unableToFetchConversations = true;
           this.snackbarError(error);
@@ -231,22 +246,49 @@ export default {
     async fetchConversation() {
       if (this.conversationId) {
         try {
-          this.connectToConversation();
           this.conversation = (await axios.get(`/api/v1/conversations/${this.conversationId}/`)).data;
           this.messages = (await axios.get(`/api/v1/conversations/${this.conversationId}/messages/`)).data;
           this.goToLastMessage();
           document.title = `Shareish | ${this.conversation.item.name}`;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
           this.$router.push("/conversations");
         }
       }
     },
+    async setMessagesAsSeen() {
+      if (this.conversation && this.conversation.unread_messages > 0) {
+        try {
+          const data = {
+            'conversation_id': this.conversation.id,
+            'last_message_date': this.messages[this.messages.length - 1].date
+          }
+          const newUnreadMessages = Number((await axios.post("/api/v1/notifications/", data)).data);
+          this.$store.state.notifications = newUnreadMessages;
+          this.conversation.unread_messages = newUnreadMessages;
+
+          // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
+          // could not be the real last message and this.conversation.unread_messages could be greater than 0
+          const nthChild = this.getIConversation() + 1;
+          const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
+          if (unreadMessagesBadge) {
+            if (newUnreadMessages === 0)
+              unreadMessagesBadge.remove();
+            else
+              unreadMessagesBadge.innerHTML = newUnreadMessages;
+          }
+        }
+        catch (error) {
+          this.snackbarError(error);
+        }
+      }
+    },
     getIConversation() {
-      if (this.conversationId && !isArrEmpty(this.conversations)) {
+      if (this.conversation && !isArrEmpty(this.conversations)) {
         for (let i in this.conversations) {
-          if (this.conversations[i].id === this.conversationId) {
-            return i;
+          if (this.conversations[i].id === this.conversation.id) {
+            return Number(i);
           }
         }
       }
@@ -260,37 +302,40 @@ export default {
       });
     },
     async connectToConversation() {
-      try {
-        if (this.ws !== null)
-          this.ws.close();
-        this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversationId}/`);
-        this.ws.onopen = () => {
-          console.log("Websocket connected.");
-        };
-        this.ws.addEventListener('message', (event) => {
-          const data = JSON.parse(event.data);
-          if (data.content) {
-            this.messages.push(data);
-            this.goToLastMessage();
-            this.updateCurrentConversation(data.content);
-          }
-          this.ws.addEventListener('close', () => {
-            console.log("Websocket has been closed.");
+      if (this.conversation) {
+        try {
+          if (this.ws !== null)
+            this.ws.close();
+          this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversation.id}/`);
+          this.ws.onopen = () => {
+            console.log("Websocket connected.");
+          };
+          this.ws.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            if (data.content) {
+              this.messages.push(data);
+              this.goToLastMessage();
+              this.updateCurrentConversation(data.content);
+              this.conversation.unread_messages += 1;
+              this.setMessagesAsSeen();
+            }
+            this.ws.addEventListener('close', () => {
+              console.log("Websocket has been closed.");
+            });
           });
-        });
-      }
-      catch (error) {
-        this.snackbarError(error);
+        }
+        catch (error) {
+          this.snackbarError(error);
+        }
       }
     },
     sendMessage() {
-      this.waitingFormResponse = true;
-
-      if (this.messageToSend !== "") {
+      if (this.conversation && this.messageToSend !== "") {
+        this.waitingFormResponse = true;
         try {
           const data = {
             'content': this.messageToSend,
-            'conversation_id': this.conversationId,
+            'conversation_id': this.conversation.id,
             'user_id': this.$store.state.user.id,
             'date': new Date()
           };
@@ -303,7 +348,10 @@ export default {
           }, 500);
 
           this.messageToSend = "";
-        } catch (error) {
+
+          this.checkRows();
+        }
+        catch (error) {
           this.snackbarError(this.$t('notif-error-send-message'));
         }
       }
@@ -325,7 +373,8 @@ export default {
   async mounted() {
     document.title = `Shareish | ${this.$t('my-conversations')}`;
     await this.fetchConversations();
-    await this.fetchConversation();
+    if (this.conversationId)
+      await this.openConversation();
     this.loading = false;
   },
   destroyed() {
@@ -402,10 +451,25 @@ $itemHeight: 80px + 2 * rem(0.75);
 
     & > .column:first-child {
       flex: 0 0 $conversationImageSize;
+      position: relative;
 
-      .conversationImage {
+      .conversation-image {
         border-radius: 5px;
         overflow: hidden;
+      }
+
+      .unread-messages {
+        font-size: 14px;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        height: calc(14px + 6px + 2 * 0.2em);
+        min-width: calc(14px + 6px + 2 * 0.2em);
+        padding: 0.2em 0.4em;
+        background-color: red;
+        border-radius: 5px;
+        color: white;
+        text-align: center;
       }
     }
 

@@ -370,12 +370,19 @@ def getNotifications(request):
             # Set all messages sent by other user as seen by current user for this conversation
             Message.objects.filter(
                 Q(conversation__id=request.data['conversation_id']),
-                Q(id__lte=request.data['last_message_id']),
-                ~Q(user=user)
+                ~Q(user=user),
+                Q(date__lte=request.data['last_message_date']),
+                Q(seen=False)
             ).update(seen=True)
 
+            conversation_unread_messages_count =  Message.objects.filter(
+                Q(conversation__id=request.data['conversation_id']),
+                ~Q(user=user),
+                Q(seen=False)
+            ).count()
+
             # Return unread messages count for all conversations
-            return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
+            return Response(conversation_unread_messages_count, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
