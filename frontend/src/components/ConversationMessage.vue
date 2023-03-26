@@ -29,9 +29,11 @@
 <script>
 import moment from "moment";
 import axios from "axios";
+import ErrorHandler from "@/components/ErrorHandler";
 
 export default {
   name: 'ConversationMessage',
+  mixins: [ErrorHandler],
   props: {
     message: {
       type: Object,

@@ -1,5 +1,5 @@
 <template>
-  <div id="page-conversations" class="max-width-is-max-container" :class="{'window-size-is-mobile': isMobile, 'conversation-opened': conversation}">
+  <div id="page-conversations" class="max-width-is-max-container" :class="{'window-size-is-mobile': isMobile, 'conversation-opened': isConversationSelected}">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <div class="columns is-mobile box mt-3">
       <div class="column">
@@ -53,28 +53,27 @@
         </div>
         <div id="conversations">
           <router-link
-              v-for="(conv, index) in conversations"
+              v-for="(conversation, index) in conversations"
               :key="index"
-              :to="{name: 'conversation', params: {id: conv.id}}"
+              :to="{name: 'conversation', params: {id: conversation.id}}"
               class="conversation columns is-mobile"
-              :class="{'is-active': conv.id === conversationId}"
-              @click="openConversation(conv.id)"
+              :class="{'is-active': conversation.id === conversationId}"
           >
             <div class="column">
-              <b-image :src="conv.image" ratio="1by1" class="conversation-image" />
-              <div v-if="conv.unread_messages > 0 && (!conversation || (!!conversation && conv.id !== conversation.id))" class="unread-messages">
-                {{ conv.unread_messages }}
+              <b-image :src="conversation.image" ratio="1by1" class="conversation-image" />
+              <div v-if="conversation.unread_messages > 0" class="unread-messages">
+                {{ conversation.unread_messages }}
               </div>
             </div>
             <div class="column">
-              <p class="title mb-1">{{ conv.item.name }}</p>
-              <p class="subtitle mt-1">{{ conv.last_message }}</p>
+              <p class="title mb-1">{{ conversation.item.name }}</p>
+              <p class="subtitle mt-1">{{ conversation.last_message }}</p>
             </div>
           </router-link>
         </div>
       </div>
       <div id="conversation" class="column">
-        <template v-if="conversation">
+        <template v-if="isConversationSelected">
           <div id="conversation-with">
             <div class="level is-mobile">
               <div class="level-left">
@@ -98,7 +97,7 @@
             </div>
           </div>
           <div id="item">
-            <item-card-horizontal :item="conversation.item" :height="itemCardHorizontalHeight" />
+            <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
           </div>
           <div id="messages" ref="messages">
             <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="removeMessage(index)" />
@@ -152,7 +151,7 @@ export default {
     return {
       loading: true,
       conversations: [],
-      conversation: null,
+      selected: -1,
       messages: [],
       messageToSend: "",
       unableToFetchConversations: false,
@@ -170,8 +169,8 @@ export default {
   watch: {
     $route() {
       this.closeConversation();
-      if (this.conversationId)
-        this.openConversation(this.conversationId);
+      this.selected = (this.conversationId) ? this.getIConversation(this.conversationId) : -1;
+      this.openConversation();
     },
     search() {
       clearTimeout(this.timeouts['searchInput']);
@@ -193,14 +192,20 @@ export default {
     conversationId() {
       return (this.$route.params.id) ? Number(this.$route.params.id) : null;
     },
+    isConversationSelected() {
+      return this.selected >= 0 && this.selected < this.conversations.length;
+    },
+    activeConversation() {
+      return (this.isConversationSelected) ? this.conversations[this.selected] : null;
+    },
     userId() {
       return Number(this.$store.state.user.id);
     },
     receiver() {
-      if (this.conversation) {
-        let ids = [this.conversation.item.user.id, this.conversation.starter.id];
+      if (this.isConversationSelected) {
+        let ids = [this.activeConversation.item.user.id, this.activeConversation.starter.id];
         ids.splice(ids.indexOf(this.userId), 1);
-        return (this.conversation.starter.id === ids[0]) ? this.conversation.starter : this.conversation.item.user;
+        return (this.activeConversation.starter.id === ids[0]) ? this.activeConversation.starter : this.activeConversation.item.user;
       }
       return {};
     },
@@ -215,37 +220,30 @@ export default {
     windowWidthChanged() {
       this.isMobile = (this.windowWidth < 900);
     },
-    async openConversation(conversationId) {
-      try {
-        const iConversation = this.getIConversation(conversationId);
-        if (iConversation !== -1) {
-          this.conversation = this.conversations[iConversation];
-          document.title = `Shareish | ${this.conversation.item.name}`;
+    async openConversation() {
+      if (this.isConversationSelected) {
+        try {
+          document.title = `Shareish | ${this.activeConversation.item.name}`;
 
-          this.messages = (await axios.get(`/api/v1/conversations/${this.conversation.id}/messages/`)).data;
-          if (this.messages.length === 0 && this.conversation)
-            this.messageToSend = this.$t('intro-' + this.conversation.item.type + '-first-message');
+          this.messages = (await axios.get(`/api/v1/conversations/${this.activeConversation.id}/messages/`)).data;
+          if (this.messages.length === 0)
+            this.messageToSend = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
           else
             this.goToLastMessage();
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
-        } else {
-          this.snackbarError("Couldn't find conversation in conversations list.");
         }
-      }
-      catch (error) {
-        this.snackbarError(error);
-        this.$router.push("/conversations");
+        catch (error) {
+          this.snackbarError(error);
+          this.$router.push("/conversations");
+        }
       }
     },
     closeConversation() {
       this.messages = [];
-      if (this.conversation)
-        this.conversation = null;
-      if (this.ws) {
+      if (this.ws)
         this.ws.close();
-      }
     },
     clickCategory(category) {
       if (this.canChangeCategory)
@@ -259,12 +257,14 @@ export default {
         if (messageRows === 4)
           break;
       }
+
       const conversationWithHeight = 40 + 2 * rem(0.75) + 1;
       const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75) + 1;
       const textareaHeight = ((messageRows * 24) + 24);
       const writeHeight = textareaHeight + (2 * rem(0.75));
       const messagesHeight = 750 - conversationWithHeight - itemHeight - writeHeight
       this.$el.querySelector("#messages").style.height = messagesHeight + "px";
+
       this.textareaRows = messageRows;
     },
     shiftEnterPressed() {
@@ -309,28 +309,26 @@ export default {
       this.timeouts['conversations'] = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
     },
     async setMessagesAsSeen() {
-      if (this.conversation && this.conversation.unread_messages > 0 && this.messages.length > 0) {
+      if (this.isConversationSelected && this.activeConversation.unread_messages > 0 && this.messages.length > 0) {
         try {
           const data = {
-            'conversation_id': this.conversation.id,
+            'conversation_id': this.activeConversation.id,
             'last_message_date': this.messages[this.messages.length - 1].date
           }
           const newUnreadMessages = Number((await axios.post("/api/v1/notifications/", data)).data);
           this.$store.state.notifications = newUnreadMessages;
 
-          if (this.conversation) {
-            this.conversation.unread_messages = newUnreadMessages;
+          this.activeConversation.unread_messages = newUnreadMessages;
 
-            // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
-            // could not be the real last message and this.conversation.unread_messages could be greater than 0
-            const nthChild = this.getIConversation() + 1;
-            const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
-            if (unreadMessagesBadge) {
-              if (newUnreadMessages === 0)
-                unreadMessagesBadge.remove();
-              else
-                unreadMessagesBadge.innerHTML = newUnreadMessages;
-            }
+          // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
+          // could not be the real last message and this.conversation.unread_messages could be greater than 0
+          const nthChild = this.getIConversation() + 1;
+          const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
+          if (unreadMessagesBadge) {
+            if (newUnreadMessages === 0)
+              unreadMessagesBadge.remove();
+            else
+              unreadMessagesBadge.innerHTML = newUnreadMessages;
           }
         }
         catch (error) {
@@ -341,9 +339,8 @@ export default {
     getIConversation(conversationId) {
       if (!isArrEmpty(this.conversations)) {
         for (let i in this.conversations) {
-          if (this.conversations[i].id === conversationId) {
+          if (this.conversations[i].id === conversationId)
             return Number(i);
-          }
         }
       }
       return -1;
@@ -358,9 +355,9 @@ export default {
       }
     },
     async connectToConversation() {
-      if (this.conversation) {
+      if (this.isConversationSelected) {
         try {
-          this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversation.id}/`);
+          this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.activeConversation.id}/`);
           this.ws.onopen = () => {
             console.log("Websocket connected.");
           };
@@ -370,8 +367,7 @@ export default {
               this.messages.push(data);
               this.goToLastMessage();
               this.updateCurrentConversation(data.content);
-              if (this.conversation)
-                this.conversation.unread_messages += 1;
+              this.activeConversation.unread_messages += 1;
               this.setMessagesAsSeen();
             }
             this.ws.addEventListener('close', () => {
@@ -385,12 +381,12 @@ export default {
       }
     },
     sendMessage() {
-      if (this.conversation && this.messageToSend !== "") {
+      if (this.isConversationSelected && this.messageToSend !== "") {
         this.waitingFormResponse = true;
         try {
           const data = {
             'content': this.messageToSend,
-            'conversation_id': this.conversation.id,
+            'conversation_id': this.activeConversation.id,
             'user_id': this.$store.state.user.id,
             'date': new Date()
           };
@@ -412,34 +408,37 @@ export default {
       }
     },
     updateCurrentConversation(newMessage) {
-      const iConversation = this.getIConversation(this.conversation.id);
-      if (iConversation > 0) {
-        // Move conversation to top
-        const conversationToPoke = this.conversations.splice(iConversation, 1)[0];
-        this.conversations.unshift(conversationToPoke);
-      }
+      if (this.isConversationSelected) {
+        const iConversation = this.getIConversation(this.activeConversation.id);
+        if (iConversation > 0) {
+          // Move conversation to top
+          const conversationToPoke = this.conversations.splice(iConversation, 1)[0];
+          this.conversations.unshift(conversationToPoke);
+          this.selected = 0;
+        }
 
-      // Replace last message showed in conversations list
-      this.$nextTick(function () {
-        this.$el.querySelector("#conversations > .columns > .column:last-child .subtitle").innerHTML = newMessage;
-      });
+        // Replace last message showed in conversations list
+        this.$nextTick(function () {
+          this.activeConversation.last_message = newMessage;
+          this.$el.querySelector("#conversations > .columns > .column:last-child .subtitle").innerHTML = newMessage;
+        });
+      }
     },
     removeMessage(index) {
-      if (index ===  this.messages.length - 1) {
+      this.messages.splice(index, 1);
+      if (this.isConversationSelected && index === this.messages.length) {
         // Replace last message showed in conversations list
-        const newMessage = (this.messages.length > 1) ? this.messages[this.messages.length - 2].content : "";
-        this.messages.splice(index, 1);
-        this.conversation.last_message = newMessage;
-        const nthChild = this.getIConversation(this.conversation.id) + 1;
-        this.$nextTick(function () {
-          this.$el.querySelector("#conversations > .columns:nth-child(" + nthChild + ") > .column:last-child .subtitle").innerHTML = newMessage;
-          this.$buefy.snackbar.open({
+        const newMessage = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
+        this.activeConversation.last_message = newMessage;
+        this.$buefy.snackbar.open({
             duration: 5000,
             type: 'is-success',
             message: this.$t('message-removed'),
             pauseOnHover: true,
             position: 'is-bottom-right'
           });
+        this.$nextTick(function () {
+          this.$el.querySelector("#conversations > .columns:nth-child(" + (this.selected + 1) + ") > .column:last-child .subtitle").innerHTML = newMessage;
         });
       }
     }
@@ -447,13 +446,16 @@ export default {
   async mounted() {
     document.title = `Shareish | ${this.$t('my-conversations')}`;
     await this.fetchConversations();
-    if (this.conversationId)
-      await this.openConversation(this.conversationId);
+    if (this.conversationId) {
+      this.selected = this.getIConversation(this.conversationId);
+      this.openConversation();
+    }
     this.loading = false;
   },
   destroyed() {
     for (let i in this.timeouts)
       clearTimeout(this.timeouts[i]);
+    this.selected = -1;
     this.closeConversation();
   }
 };
