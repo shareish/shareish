@@ -9,7 +9,12 @@
     </div>
     <div class="media-content">
       <p class="content wbbw wspw">{{ message.content }}</p>
-      <p class="date has-text-grey">{{ formattedDate }}</p>
+      <p class="options has-text-grey">
+        <template v-if="isFromSelf">
+          <span class="delete-message has-text-danger" @click="clickDeleteMessage">Delete</span> &middot;
+        </template>
+        {{ formattedDate }}
+      </p>
     </div>
     <div v-if="isFromSelf" class="media-right">
       <router-link :to="{name: 'profile', params: {id: sender.id}}">
@@ -23,6 +28,7 @@
 
 <script>
 import moment from "moment";
+import axios from "axios";
 
 export default {
   name: 'ConversationMessage',
@@ -54,6 +60,27 @@ export default {
     },
     formattedDate() {
       return moment(this.message.date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
+    }
+  },
+  methods: {
+    clickDeleteMessage() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-message'),
+        message: this.$t('delete-message-confirmation'),
+        confirmText: this.$t('delete'),
+        cancelText: this.$t('cancel'),
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: () => this.deleteMessage()
+      });
+    },
+    async deleteMessage() {
+      try {
+        await axios.delete(`/api/v1/conversations/messages/${this.message.id}`);
+        this.$emit('deleted');
+      } catch (error) {
+        this.snackbarError(error);
+      }
     }
   }
 };
@@ -93,9 +120,17 @@ $arrowWidth: 6px;
         z-index: 1;
       }
 
-      &.date {
+      &.options {
         margin-top: 0.25rem;
         font-size: 0.75rem;
+
+        .delete-message {
+          cursor: pointer;
+
+          &:hover {
+            color: hsl(348, 86%, 43%) !important;
+          }
+        }
       }
     }
   }
@@ -111,7 +146,7 @@ $arrowWidth: 6px;
     p.content {
       background-color: #e7e7e7;
     }
-    p.date {
+    p.options {
       text-align: left;
     }
   }
@@ -131,7 +166,7 @@ $arrowWidth: 6px;
       background-color: #3eae7b;
       color: white;
     }
-    p.date {
+    p.options {
       text-align: right;
     }
   }

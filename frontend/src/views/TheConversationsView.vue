@@ -101,7 +101,7 @@
             <item-card-horizontal :item="conversation.item" :height="itemCardHorizontalHeight" />
           </div>
           <div id="messages" ref="messages">
-            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" />
+            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="removeMessage(index)" />
           </div>
           <div id="write">
             <div class="columns is-mobile">
@@ -423,6 +423,25 @@ export default {
       this.$nextTick(function () {
         this.$el.querySelector("#conversations > .columns > .column:last-child .subtitle").innerHTML = newMessage;
       });
+    },
+    removeMessage(index) {
+      if (index ===  this.messages.length - 1) {
+        // Replace last message showed in conversations list
+        const newMessage = (this.messages.length > 1) ? this.messages[this.messages.length - 2].content : "";
+        this.messages.splice(index, 1);
+        this.conversation.last_message = newMessage;
+        const nthChild = this.getIConversation(this.conversation.id) + 1;
+        this.$nextTick(function () {
+          this.$el.querySelector("#conversations > .columns:nth-child(" + nthChild + ") > .column:last-child .subtitle").innerHTML = newMessage;
+          this.$buefy.snackbar.open({
+            duration: 5000,
+            type: 'is-success',
+            message: this.$t('message-removed'),
+            pauseOnHover: true,
+            position: 'is-bottom-right'
+          });
+        });
+      }
     }
   },
   async mounted() {

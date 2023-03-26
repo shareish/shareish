@@ -269,8 +269,11 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
 
     def get_queryset(self):
-        conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
-        return Message.objects.filter(conversation=conversation)
+        if 'conversation_id' in self.kwargs:
+            conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
+            return Message.objects.filter(conversation=conversation)
+        else:
+            return Message.objects.all()
 
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):

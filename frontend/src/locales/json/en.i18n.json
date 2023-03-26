@@ -278,5 +278,8 @@
   "image-already-profile-picture": "This image is already your profile picture!",
   "view-real-profile": "View real profile",
   "search": "Search",
-  "click-to-view-on-map": "Click to view on map"
+  "click-to-view-on-map": "Click to view on map",
+  "delete-message": "Delete message",
+  "delete-message-confirmation": "Are you sure you want to <b>delete</b> this message from the conversation? This action cannot be undone.",
+  "message-removed": "Message removed!"
 }
