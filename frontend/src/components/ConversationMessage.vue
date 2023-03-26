@@ -136,4 +136,28 @@ $arrowWidth: 6px;
     }
   }
 }
+
+@media screen and (max-width: 768px) {
+  .image {
+    width: 48px;
+  }
+
+  .media .media-content {
+    overflow-x: inherit !important;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .media {
+    width: 90%;
+
+    &.from-self {
+      margin-left: 10% !important;
+    }
+
+    .media-left, .media-right {
+      display: none;
+    }
+  }
+}
 </style>

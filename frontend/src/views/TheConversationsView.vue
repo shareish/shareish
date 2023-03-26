@@ -1,5 +1,5 @@
 <template>
-  <div id="page-conversations" class="max-width-is-max-container" :class="{'window-size-is-mobile': isMobile}">
+  <div id="page-conversations" class="max-width-is-max-container" :class="{'window-size-is-mobile': isMobile, 'conversation-opened': conversation}">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <div class="columns is-mobile box mt-3">
       <div class="column">
@@ -53,28 +53,50 @@
         </div>
         <div id="conversations">
           <router-link
-              v-for="(conversation, index) in conversations"
+              v-for="(conv, index) in conversations"
               :key="index"
-              :to="{name: 'conversation', params: {id: conversation.id}}"
+              :to="{name: 'conversation', params: {id: conv.id}}"
               class="conversation columns is-mobile"
-              :class="{'is-active': conversation.id === conversationId}"
-              @click="openConversation(conversation.id)"
+              :class="{'is-active': conv.id === conversationId}"
+              @click="openConversation(conv.id)"
           >
             <div class="column">
-              <b-image :src="conversation.image" ratio="1by1" class="conversation-image" />
-              <div v-if="conversation.unread_messages > 0" class="unread-messages">
-                {{ conversation.unread_messages }}
+              <b-image :src="conv.image" ratio="1by1" class="conversation-image" />
+              <div v-if="conv.unread_messages > 0 && (!conversation || (!!conversation && conv.id !== conversation.id))" class="unread-messages">
+                {{ conv.unread_messages }}
               </div>
             </div>
             <div class="column">
-              <p class="title mb-1">{{ conversation.item.name }}</p>
-              <p class="subtitle mt-1">{{ conversation.last_message }}</p>
+              <p class="title mb-1">{{ conv.item.name }}</p>
+              <p class="subtitle mt-1">{{ conv.last_message }}</p>
             </div>
           </router-link>
         </div>
       </div>
       <div id="conversation" class="column">
         <template v-if="conversation">
+          <div id="conversation-with">
+            <div class="level is-mobile">
+              <div class="level-left">
+                <b-button
+                    tag="router-link"
+                    :to="{name: 'conversations'}"
+                    type="is-primary"
+                    outlined
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </b-button>
+              </div>
+              <div class="level-item">
+                <template v-if="windowWidth > 768">
+                  Chatting with <strong class="ml-1">{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                </template>
+                <template v-else>
+                  <strong>{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                </template>
+              </div>
+            </div>
+          </div>
           <div id="item">
             <item-card-horizontal :item="conversation.item" :height="itemCardHorizontalHeight" />
           </div>
@@ -82,26 +104,26 @@
             <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" />
           </div>
           <div id="write">
-            <textarea
-                v-model="messageToSend"
-                class="textarea mb-2"
-                placeholder="Write your message"
-                :rows="textareaRows"
-                @input="checkRows"
-                @keydown.enter.exact.prevent="sendMessage"
-                @keydown.enter.shift.exact.prevent="shiftEnterPressed"
-            />
-            <div class="level">
-              <div class="level-left">
-                Chatting with
-                <b-tooltip label="View user profile" position="is-top">
-                  <router-link :to="{name: 'profile', params: {id: receiver.id}}" class="ml-1">
-                    @{{ receiver.username }}
-                  </router-link>
-                </b-tooltip>
+            <div class="columns is-mobile">
+              <div class="column">
+                <textarea
+                    v-model="messageToSend"
+                    class="textarea"
+                    placeholder="Write your message"
+                    :rows="textareaRows"
+                    @input="checkRows"
+                    @keydown.enter.exact.prevent="sendMessage"
+                    @keydown.enter.shift.exact.prevent="shiftEnterPressed"
+                />
               </div>
-              <div class="level-right">
-                <b-button class="button is-primary" @click="sendMessage" :disabled="!conversationId" :loading="waitingFormResponse">Send</b-button>
+              <div class="column">
+                <b-button
+                    class="button is-primary"
+                    @click="sendMessage"
+                    :loading="waitingFormResponse"
+                >
+                  <i class="fas fa-paper-plane"></i>
+                </b-button>
               </div>
             </div>
           </div>
@@ -147,7 +169,9 @@ export default {
   },
   watch: {
     $route() {
-      this.openConversation(this.conversationId);
+      this.closeConversation();
+      if (this.conversationId)
+        this.openConversation(this.conversationId);
     },
     search() {
       clearTimeout(this.timeouts['searchInput']);
@@ -199,7 +223,7 @@ export default {
           document.title = `Shareish | ${this.conversation.item.name}`;
 
           this.messages = (await axios.get(`/api/v1/conversations/${this.conversation.id}/messages/`)).data;
-          if (this.messages.length === 0)
+          if (this.messages.length === 0 && this.conversation)
             this.messageToSend = this.$t('intro-' + this.conversation.item.type + '-first-message');
           else
             this.goToLastMessage();
@@ -215,6 +239,14 @@ export default {
         this.$router.push("/conversations");
       }
     },
+    closeConversation() {
+      this.messages = [];
+      if (this.conversation)
+        this.conversation = null;
+      if (this.ws) {
+        this.ws.close();
+      }
+    },
     clickCategory(category) {
       if (this.canChangeCategory)
         this.selectedCategory = category;
@@ -227,11 +259,12 @@ export default {
         if (messageRows === 4)
           break;
       }
+      const conversationWithHeight = 40 + 2 * rem(0.75) + 1;
+      const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75) + 1;
       const textareaHeight = ((messageRows * 24) + 24);
       const writeHeight = textareaHeight + (2 * rem(0.75));
-      const optionsHeight = (40 + rem(0.5))
-      const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75);
-      this.$el.querySelector("#messages").style.height = (750 - itemHeight - writeHeight - optionsHeight) + "px";
+      const messagesHeight = 750 - conversationWithHeight - itemHeight - writeHeight
+      this.$el.querySelector("#messages").style.height = messagesHeight + "px";
       this.textareaRows = messageRows;
     },
     shiftEnterPressed() {
@@ -284,17 +317,20 @@ export default {
           }
           const newUnreadMessages = Number((await axios.post("/api/v1/notifications/", data)).data);
           this.$store.state.notifications = newUnreadMessages;
-          this.conversation.unread_messages = newUnreadMessages;
 
-          // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
-          // could not be the real last message and this.conversation.unread_messages could be greater than 0
-          const nthChild = this.getIConversation() + 1;
-          const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
-          if (unreadMessagesBadge) {
-            if (newUnreadMessages === 0)
-              unreadMessagesBadge.remove();
-            else
-              unreadMessagesBadge.innerHTML = newUnreadMessages;
+          if (this.conversation) {
+            this.conversation.unread_messages = newUnreadMessages;
+
+            // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
+            // could not be the real last message and this.conversation.unread_messages could be greater than 0
+            const nthChild = this.getIConversation() + 1;
+            const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
+            if (unreadMessagesBadge) {
+              if (newUnreadMessages === 0)
+                unreadMessagesBadge.remove();
+              else
+                unreadMessagesBadge.innerHTML = newUnreadMessages;
+            }
           }
         }
         catch (error) {
@@ -324,8 +360,6 @@ export default {
     async connectToConversation() {
       if (this.conversation) {
         try {
-          if (this.ws !== null)
-            this.ws.close();
           this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.conversation.id}/`);
           this.ws.onopen = () => {
             console.log("Websocket connected.");
@@ -336,7 +370,8 @@ export default {
               this.messages.push(data);
               this.goToLastMessage();
               this.updateCurrentConversation(data.content);
-              this.conversation.unread_messages += 1;
+              if (this.conversation)
+                this.conversation.unread_messages += 1;
               this.setMessagesAsSeen();
             }
             this.ws.addEventListener('close', () => {
@@ -400,8 +435,7 @@ export default {
   destroyed() {
     for (let i in this.timeouts)
       clearTimeout(this.timeouts[i]);
-    if (this.ws)
-      this.ws.close();
+    this.closeConversation();
   }
 };
 </script>
@@ -415,7 +449,8 @@ $boxHeight: 750px;
 $conversationsWidth: 425px;
 $conversationImageSize: 100px;
 $searchNFiltersHeight: 40px + 2 * rem(0.75) + 1px;
-$itemHeight: 70px + 2 * rem(0.75);
+$conversationWithHeight: 40px + 2 * rem(0.75) + 1px;
+$itemHeight: 70px + 2 * rem(0.75) + 1px;
 
 .max-width-is-max-container {
   margin: 0 auto;
@@ -520,6 +555,24 @@ $itemHeight: 70px + 2 * rem(0.75);
 }
 
 #conversation {
+  #conversation-with {
+    height: $conversationWithHeight;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e9e9e9;
+
+    .level-left, .level-right {
+      a {
+        width: 40px;
+      }
+    }
+
+    .level-item {
+      line-height: 40px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
   #item {
     height: $itemHeight;
     padding: 0.75rem;
@@ -527,8 +580,8 @@ $itemHeight: 70px + 2 * rem(0.75);
   }
 
   #messages {
-    // $boxHeight - $itemHeight - base textarea height - save button height - save button margin - 2 * outer padding
-    height: $boxHeight - $itemHeight - 48px - 40px - rem(0.5) - (2 * rem(0.75));
+    // $boxHeight - $itemHeight - base textarea height - 2 * outer padding
+    height: $boxHeight - $conversationWithHeight - $itemHeight - 48px - (2 * rem(0.75));
     overflow-y: scroll;
     overscroll-behavior: none;
     display: flex;
@@ -543,8 +596,18 @@ $itemHeight: 70px + 2 * rem(0.75);
     padding: 0.75rem;
     border-top: 1px solid #e9e9e9;
 
+    .column:last-child {
+      flex: 0 0 calc(60px + 0.75rem);
+      padding-left: 0;
+    }
+
     textarea {
       resize: none;
+    }
+
+    button {
+      width: 60px;
+      height: 48px;
     }
   }
 }
@@ -581,18 +644,33 @@ $itemHeight: 70px + 2 * rem(0.75);
 }
 
 @media screen and (max-width: 900px) {
-  #page-conversations > .columns > .column:first-child {
-    flex: 1 1 auto;
+  #page-conversations.conversation-opened > .columns > .column:first-child {
     border-right: 0;
   }
+
+  #page-conversations.conversation-opened > .columns > .column {
+    &:first-child {
+      display: none;
+    }
+    &:last-child {
+      flex: 1 1 auto;
+      border-right: 0;
+    }
+  }
+  #page-conversations:not(.conversation-opened) > .columns > .column {
+    &:first-child {
+      flex: 1 1 auto;
+    }
+    &:last-child {
+      display: none;
+    }
+  }
+
   #search-n-filters .is-clearfix {
     width: calc(100% - 3 * 40px - 2 * 5px - #{rem(0.75)});
   }
   #search-n-filters #search-input {
     width: 100%;
-  }
-  #page-conversations > .columns > .column:last-child {
-    display: none;
   }
 }
 </style>

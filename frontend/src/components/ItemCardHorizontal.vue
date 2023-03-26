@@ -10,7 +10,7 @@
     <div class="media-content">
       <div class="columns is-mobile">
         <div class="column">
-          <div :class="{'v-align-center': windowWidth > 1023}" style="height: 100%;">
+          <div class="v-align-center" style="height: 100%;">
             <div class="inner">
               <div class="title columns is-mobile">
                 <div class="column pr-2">
@@ -174,6 +174,7 @@ export default {
       margin: 0;
 
       & > .column:first-child {
+        height: v-bind(heightPx);
 
         .title {
           font-size: 1.25rem;
@@ -221,6 +222,8 @@ export default {
 
 @media screen and (max-width: 1023px) {
   .media {
+    overflow: hidden;
+
     .media-content > .columns  {
       display: block;
 
