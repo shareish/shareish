@@ -100,7 +100,7 @@
             <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
           </div>
           <div id="messages" ref="messages">
-            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="removeMessage(index)" />
+            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="deletedEmitted(index)" />
           </div>
           <div id="write">
             <div class="columns is-mobile">
@@ -360,18 +360,42 @@ export default {
           this.ws.onopen = () => {
             console.log("Websocket connected.");
           };
+          this.ws.onclose = () => {
+            console.log("Websocket has been closed.");
+          };
           this.ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
-            if (data.content) {
-              this.messages.push(data);
+            if (data.type === 'new_message') {
+              const newMessage = JSON.parse(data['content']);
+              this.messages.push(newMessage);
               this.goToLastMessage();
-              this.updateCurrentConversation(data.content);
+              this.updateCurrentConversation(newMessage.content);
               this.activeConversation.unread_messages += 1;
               this.setMessagesAsSeen();
+            } else if (data.type === 'message_deleted') {
+              const id = Number(data['content']);
+              let messageIndex = -1;
+              for (let i in this.messages) {
+                if (this.messages[i].id === id) {
+                  messageIndex = Number(i);
+                  break;
+                }
+              }
+              if (messageIndex >= 0) {
+                if (this.messages[messageIndex].user_id === this.userId) {
+                  this.$buefy.snackbar.open({
+                    duration: 5000,
+                    type: 'is-success',
+                    message: this.$t('message-removed'),
+                    pauseOnHover: true,
+                    position: 'is-bottom-right'
+                  });
+                }
+                this.messages.splice(messageIndex, 1);
+                if (this.isConversationSelected && messageIndex === this.messages.length)
+                  this.conversations[this.selected].last_message = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
+              }
             }
-            this.ws.addEventListener('close', () => {
-              console.log("Websocket has been closed.");
-            });
           });
         }
         catch (error) {
@@ -384,10 +408,13 @@ export default {
         this.waitingFormResponse = true;
         try {
           const data = {
-            'content': this.messageToSend,
-            'conversation_id': this.activeConversation.id,
-            'user_id': this.$store.state.user.id,
-            'date': new Date()
+            'type': 'new_message',
+            'content': {
+              'content': this.messageToSend,
+              'conversation_id': this.activeConversation.id,
+              'user_id': this.$store.state.user.id,
+              'date': new Date()
+            }
           };
           this.ws.send(JSON.stringify(data));
 
@@ -412,21 +439,17 @@ export default {
         const conversationToPoke = this.conversations.splice(this.selected, 1)[0];
         this.conversations.unshift(conversationToPoke);
         this.selected = 0;
-        this.activeConversation.last_message = newMessage;
+        this.conversations[this.selected].last_message = newMessage;
       }
     },
-    removeMessage(index) {
-      this.messages.splice(index, 1);
-      if (this.isConversationSelected && index === this.messages.length) {
-        this.activeConversation.last_message = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-success',
-          message: this.$t('message-removed'),
-          pauseOnHover: true,
-          position: 'is-bottom-right'
-        });
-      }
+    deletedEmitted(index) {
+      const data = {
+        'type': 'message_deleted',
+        'content': {
+          'id': this.messages[index].id
+        }
+      };
+      this.ws.send(JSON.stringify(data));
     }
   },
   async mounted() {
