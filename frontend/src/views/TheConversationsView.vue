@@ -322,8 +322,7 @@ export default {
 
           // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
           // could not be the real last message and this.conversation.unread_messages could be greater than 0
-          const nthChild = this.getIConversation() + 1;
-          const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + nthChild + ") > .column:first-child .unread-messages");
+          const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + (this.selected + 1) + ") > .column:first-child .unread-messages");
           if (unreadMessagesBadge) {
             if (newUnreadMessages === 0)
               unreadMessagesBadge.remove();
@@ -409,36 +408,23 @@ export default {
     },
     updateCurrentConversation(newMessage) {
       if (this.isConversationSelected) {
-        const iConversation = this.getIConversation(this.activeConversation.id);
-        if (iConversation > 0) {
-          // Move conversation to top
-          const conversationToPoke = this.conversations.splice(iConversation, 1)[0];
-          this.conversations.unshift(conversationToPoke);
-          this.selected = 0;
-        }
-
-        // Replace last message showed in conversations list
-        this.$nextTick(function () {
-          this.activeConversation.last_message = newMessage;
-          this.$el.querySelector("#conversations > .columns > .column:last-child .subtitle").innerHTML = newMessage;
-        });
+        // Move conversation to top
+        const conversationToPoke = this.conversations.splice(this.selected, 1)[0];
+        this.conversations.unshift(conversationToPoke);
+        this.selected = 0;
+        this.activeConversation.last_message = newMessage;
       }
     },
     removeMessage(index) {
       this.messages.splice(index, 1);
       if (this.isConversationSelected && index === this.messages.length) {
-        // Replace last message showed in conversations list
-        const newMessage = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
-        this.activeConversation.last_message = newMessage;
+        this.activeConversation.last_message = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
         this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-success',
-            message: this.$t('message-removed'),
-            pauseOnHover: true,
-            position: 'is-bottom-right'
-          });
-        this.$nextTick(function () {
-          this.$el.querySelector("#conversations > .columns:nth-child(" + (this.selected + 1) + ") > .column:last-child .subtitle").innerHTML = newMessage;
+          duration: 5000,
+          type: 'is-success',
+          message: this.$t('message-removed'),
+          pauseOnHover: true,
+          position: 'is-bottom-right'
         });
       }
     }
