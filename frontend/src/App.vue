@@ -111,4 +111,8 @@ export default {
     transform: translateY(-50%);
   }
 }
+
+.w-100 {
+  width: 100%;
+}
 </style>

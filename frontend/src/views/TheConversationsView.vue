@@ -422,7 +422,7 @@ export default {
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',
-          message: this.$t('message-removed'),
+          message: this.$t('message-deleted'),
           pauseOnHover: true,
           position: 'is-bottom-right'
         });

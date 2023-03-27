@@ -15,14 +15,12 @@
       </article>
       <div class="columns">
         <section class="column is-5">
-          <div v-if="!isOwner && itemHasNotEndedYet" id="start-conversation" class="level mb-3">
-            <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
-                {{ $t("are-you-interested") }}
-              </p>
-              <button class="level-item button is-primary" @click="startConversation">
-                {{ $t('start-conversation') }}
-              </button>
+          <div v-if="isOwner && !itemHasEnded" class="columns">
+            <div class="column is-half">
+              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
+            </div>
+            <div class="column is-half">
+              <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
             </div>
           </div>
           <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
@@ -55,21 +53,12 @@
               </b-carousel-item>
             </template>
           </b-carousel>
-          <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
-            <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
-                {{ $t('management') }}
-              </p>
-              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="level-item button is-primary">{{ $t('edit') }}</router-link>
-              <button class="level-item button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
-            </div>
-          </div>
         </section>
         <section id="item-info" class="column is-7">
-          <h1 class="title is-size-2">{{ item.name }}
-            <item-type-tag :type="item.type" />
-          </h1>
+          <h1 class="title is-size-2">{{ item.name }}</h1>
           <h5 class="subtitle is-size-6">
+            <item-type-tag :type="item.type" />
+            &middot;
             {{ $t("published") }}
             {{ formattedDateFromNow(item.creationdate) }}
             &middot;
@@ -81,6 +70,15 @@
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
           </article>
+          <b-button
+              v-if="!isOwner && itemHasNotEndedYet"
+              type="is-primary"
+              class="mb-5-5"
+              style="width: 100%;"
+              @click="startConversation"
+          >
+            {{ $t('start-conversation') }}
+          </b-button>
           <article id="description" class="mb-5-5">
             <div class="title is-size-4 mb-1">
               <div class="icon-text">
@@ -240,7 +238,7 @@ export default {
     async startConversation() {
       try {
         const data = {
-          'item_id': this.item['id']
+          'item_id': this.item.id
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
         await this.$router.push(`/conversations/${id}`);
@@ -248,25 +246,30 @@ export default {
         this.snackbarError(error);
       }
     },
+    clickDeleteItem() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-item'),
+        message: this.$t('delete-item-confirmation'),
+        confirmText: this.$t('delete'),
+        cancelText: this.$t('cancel'),
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: () => this.deleteItem()
+      });
+    },
     async deleteItem() {
       try {
-        await axios.delete(`/api/v1/items/${this.item['id']}/`);
+        await axios.delete(`/api/v1/items/${this.item.id}/`);
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',
-          message: this.$t('notif-success-item-delete'),
+          message: this.$t('item-deleted'),
           pauseOnHover: true,
         });
         await this.$router.push("/items");
       } catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
-    },
-    async updateItem(item) {
-      this.loading = true;
-      this.item = item;
-      await this.fetchAddress();
-      this.loading = false;
     }
   },
   async mounted() {
@@ -373,16 +376,6 @@ div.icon-text {
 @media screen and (max-width: 768px) {
   #item-info {
     padding-left: 0.75rem;
-  }
-}
-
-@media screen and (max-width: 1215px) {
-  #page-item-details .columns:first-child .column:first-child .level-left .level-item:first-child {
-    display: none;
-  }
-
-  .level-left-description {
-    display: none;
   }
 }
 </style>

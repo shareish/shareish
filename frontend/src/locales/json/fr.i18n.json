@@ -211,7 +211,6 @@
   "intro-EV-first-message": "Bonjour, merci pour de rendre cet évènement possible. Je suis intéressé d'y participer.",
   "avatar": "Avatar",
   "help_avatar": "Transférez une image qui vous représente",
-  "notif-success-item-delete": "L'élément a été correctement supprimé",
   "notif-error-item-delete": "Une erreur a empêché la suppression de l'élément",
   "user-items": "Ses éléments",
   "notif-error-user-login": "Le nom d'utilisateur ou le mot de passe est invalide, ou votre compte n'a pas encore été activé (verifiez vos e-mails).",
@@ -281,5 +280,8 @@
   "click-to-view-on-map": "Cliquer pour voir sur la carte",
   "delete-message": "Supprimer le message",
   "delete-message-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce message de la conversation? Cette action ne peut pas être annulée.",
-  "message-removed": "Message retiré!"
+  "message-deleted": "Message supprimé!",
+  "delete-item": "Supprimer l'élément",
+  "delete-item-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> cet élément? Cette action ne peut pas être annulée.",
+  "item-deleted": "Élément supprimé!"
 }
