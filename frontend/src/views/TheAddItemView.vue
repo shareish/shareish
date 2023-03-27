@@ -56,7 +56,7 @@
           <template v-else>
             {{ $tc('want-an-other-recurrent', recurrentItemId) }}
           </template>
-          <router-link to="/add-item/from-recurrents" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
+          <router-link :to="{name: 'addItemFromRecurrents'}" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
           <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
         </div>
         <div id="form">

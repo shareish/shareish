@@ -19,7 +19,7 @@
           <b-button class="button is-success" :loading="waitingFormResponse" @click="submitForm">{{ $t('log-in') }}</b-button>
         </div>
       </div>
-      <router-link to="/reset-password">{{ $t('password-forgotten-?') }}</router-link>
+      <router-link :to="{name: 'resetPassword'}">{{ $t('password-forgotten-?') }}</router-link>
     </div>
   </div>
 </template>

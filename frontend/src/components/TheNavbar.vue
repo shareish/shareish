@@ -45,11 +45,11 @@
       </b-navbar-dropdown>
       <b-navbar-item v-else tag="div">
         <div class="buttons">
-          <router-link class="button is-primary" to="/sign-up">
+          <router-link :to="{name: 'signup'}" class="button is-primary">
             <i class="fas fa-user-plus"></i>
             <strong>{{ $t('sign-up') }}</strong>
           </router-link>
-          <router-link class="button is-light" to="/log-in">
+          <router-link :to="{name: 'login'}" class="button is-light">
             <i class="fas fa-sign-in-alt"></i>
             {{ $t('log-in') }}
           </router-link>

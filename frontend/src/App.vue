@@ -21,9 +21,9 @@
               {{ $t('useful-links') }}
             </h6>
             <div class="custom-flex-column">
-              <router-link to="/">{{ $t('about-us') }}</router-link>
-              <router-link to="/account">{{ $t('account') }}</router-link>
-              <router-link to="/map">{{ $t('map') }}</router-link>
+              <router-link :to="{name: 'about'}">{{ $t('about-us') }}</router-link>
+              <router-link :to="{name: 'account'}">{{ $t('account') }}</router-link>
+              <router-link :to="{name: 'map'}">{{ $t('map') }}</router-link>
               <a href="https://github.com/anonymous">
                 <img alt="https://github.com/anonymous" src="./assets/GitHub-Mark-32px.png">
               </a>

@@ -7,13 +7,13 @@
         <p class="menu-label">{{ $t('general') }}</p>
         <ul class="menu-list">
           <li>
-            <router-link to="/settings/profile" :class="{'is-active': currentView === 'profile'}">
+            <router-link :to="{name: 'settingsTab', params: {tab: 'profile'}}" :class="{'is-active': currentView === 'profile'}">
               <i class="fas fa-user-circle"></i>
               {{ $t('profile') }}
             </router-link>
           </li>
           <li>
-            <router-link to="/settings/account" :class="{'is-active': currentView === 'account'}">
+            <router-link :to="{name: 'settingsTab', params: {tab: 'account'}}" :class="{'is-active': currentView === 'account'}">
               <i class="fas fa-cog"></i>
               {{ $t('account') }}
             </router-link>
@@ -22,7 +22,7 @@
         <p class="menu-label">{{ $t('email') }} {{ $t('notifications').toLowerCase() }}</p>
         <ul class="menu-list">
           <li>
-            <router-link to="/settings/notifications" :class="{'is-active': currentView === 'notifications'}">
+            <router-link :to="{name: 'settingsTab', params: {tab: 'notifications'}}" :class="{'is-active': currentView === 'notifications'}">
               <i class="fas fa-bell"></i>
               {{ $t('email') }} {{ $t('notifications').toLowerCase() }}
             </router-link>

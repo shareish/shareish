@@ -5,9 +5,9 @@
 
     <p>
       {{ $t('shareish_description') }}.<br /><br />
-      <router-link to="/sign-up">{{ $t('after_registration') }}</router-link> {{ $t('andet') }}
-      <router-link to="/log-in">{{ $t('logged_in') }}</router-link>, Shareish {{ $t('offers') }}
-      <router-link to="/map">{{ $t('interactive_map') }}</router-link> {{ $t('shareish_description2') }}.
+      <router-link :to="{name: 'signup'}">{{ $t('after_registration') }}</router-link> {{ $t('andet') }}
+      <router-link :to="{name: 'login'}">{{ $t('logged_in') }}</router-link>, Shareish {{ $t('offers') }}
+      <router-link :to="{name: 'map'}">{{ $t('interactive_map') }}</router-link> {{ $t('shareish_description2') }}.
     </p>
     <br />
 
