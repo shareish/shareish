@@ -34,7 +34,7 @@
         </div>
         <div class="column">
           <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" class="category mr-2" :title="$t(category.slug)" />
-          <router-link v-if="address" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
+          <router-link v-if="item.location" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
             <i class="fas fa-map-marker-alt"></i>
           </router-link>
         </div>
@@ -73,8 +73,7 @@ export default {
   },
   data() {
     return {
-      geoLocation: null,
-      address: null
+      geoLocation: null
     }
   },
   created() {
@@ -95,12 +94,6 @@ export default {
     }
 
     this.fetchAddress();
-  },
-  watch: {
-    item() {
-      this.address = null;
-      this.fetchAddress();
-    }
   },
   computed: {
     itemCategories() {

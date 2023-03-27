@@ -66,8 +66,14 @@
               </div>
             </div>
             <div class="column">
-              <p class="title mb-1">{{ conversation.item.name }}</p>
-              <p class="subtitle mt-1">{{ conversation.last_message }}</p>
+              <p class="conversation-name mb-1"><strong>{{ conversation.item.name }}</strong></p>
+              <p class="conversation-receiver mt-1">
+                {{ $t('with') }}
+                <router-link :to="{name: 'profile', params: {id: conversation.receiver.id}}">
+                  @{{ conversation.receiver.username }}
+                </router-link>
+              </p>
+              <p class="conversation-last_message mt-1">{{ conversation.last_message }}</p>
             </div>
           </router-link>
         </div>
@@ -88,10 +94,19 @@
               </div>
               <div class="level-item">
                 <template v-if="windowWidth > 768">
-                  Chatting with <strong class="ml-1">{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                  Chatting with
+                  <strong class="ml-1">
+                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
+                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
+                    </router-link>
+                  </strong>
                 </template>
                 <template v-else>
-                  <strong>{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                  <strong>
+                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
+                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
+                    </router-link>
+                  </strong>
                 </template>
               </div>
             </div>
@@ -201,14 +216,6 @@ export default {
     userId() {
       return Number(this.$store.state.user.id);
     },
-    receiver() {
-      if (this.isConversationSelected) {
-        let ids = [this.activeConversation.item.user.id, this.activeConversation.starter.id];
-        ids.splice(ids.indexOf(this.userId), 1);
-        return (this.activeConversation.starter.id === ids[0]) ? this.activeConversation.starter : this.activeConversation.item.user;
-      }
-      return {};
-    },
     webSocketHost() {
       let host = axios.defaults.baseURL;
       host = host.replace("http://", "ws://");
@@ -283,9 +290,13 @@ export default {
           let image = categories[conversation.item.category1]['image-placeholder'];
           if (conversation.item.images.length > 0)
             image = conversation.item.images[0];
+          let ids = [conversation.item.user.id, conversation.starter.id];
+          ids.splice(ids.indexOf(this.userId), 1);
+          const receiver = (ids[0] === conversation.starter.id) ? conversation.starter : conversation.item.user;
           return {
             ...conversation,
-            image: image
+            image: image,
+            receiver: receiver
           };
         });
         if (this.unableToFetchConversations) {
@@ -308,8 +319,8 @@ export default {
       clearTimeout(this.timeouts['conversations']);
       this.timeouts['conversations'] = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
     },
-    async setMessagesAsSeen() {
-      if (this.isConversationSelected && this.activeConversation.unread_messages > 0 && this.messages.length > 0) {
+    async setMessagesAsSeen(force = false) {
+      if (this.isConversationSelected && (this.activeConversation.unread_messages > 0 || force) && this.messages.length > 0) {
         try {
           const data = {
             'conversation_id': this.activeConversation.id,
@@ -318,7 +329,7 @@ export default {
           const newUnreadMessages = Number((await axios.post("/api/v1/notifications/", data)).data);
           this.$store.state.notifications = newUnreadMessages;
 
-          this.activeConversation.unread_messages = newUnreadMessages;
+          this.conversations[this.selected].unread_messages = newUnreadMessages;
 
           // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
           // could not be the real last message and this.conversation.unread_messages could be greater than 0
@@ -370,8 +381,7 @@ export default {
               this.messages.push(newMessage);
               this.goToLastMessage();
               this.updateCurrentConversation(newMessage.content);
-              this.activeConversation.unread_messages += 1;
-              this.setMessagesAsSeen();
+              this.setMessagesAsSeen(true);
             } else if (data.type === 'message_deleted') {
               const id = Number(data['content']);
               let messageIndex = -1;
@@ -476,7 +486,7 @@ export default {
 }
 
 $boxHeight: 750px;
-$conversationsWidth: 425px;
+$conversationsWidth: 424px + 1px;
 $conversationImageSize: 100px;
 $searchNFiltersHeight: 40px + 2 * rem(0.75) + 1px;
 $conversationWithHeight: 40px + 2 * rem(0.75) + 1px;
@@ -523,6 +533,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 #conversations {
   overflow-y: scroll;
   height: $boxHeight - $searchNFiltersHeight;
+  max-width: $conversationsWidth - 1px;
   padding: 0.75rem;
 
   .conversation {
@@ -563,21 +574,23 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 
     & > .column:last-child {
       padding-left: 0.5rem;
-      margin-top: 5px;
+      width: calc(100% - 100px);
 
-      .title {
+      p {
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
-        font-size: 1rem !important;
+        color: black;
       }
-
-      .subtitle {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+      p.conversation-name {
+        font-size: 1.25rem !important;
+      }
+      p.conversation-receiver {
+        font-size: 0.75rem !important;
+        font-style: italic;
+      }
+      p.conversation-last_message {
         font-size: 0.875rem !important;
       }
     }

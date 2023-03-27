@@ -281,5 +281,6 @@
   "click-to-view-on-map": "Cliquer pour voir sur la carte",
   "delete-message": "Supprimer le message",
   "delete-message-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce message de la conversation? Cette action ne peut pas être annulée.",
-  "message-removed": "Message retiré!"
+  "message-removed": "Message retiré!",
+  "with": "avec"
 }
