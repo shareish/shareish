@@ -11,7 +11,7 @@
       </div>
       <div class="field">
         <div class="control">
-          <b-button class="button is-success" :loading="waitingFormResponse" @click="resendActivation">{{ $t('resend-activation') }}</b-button>
+          <b-button type="is-primary" :loading="waitingFormResponse" @click="resendActivation">{{ $t('resend-activation') }}</b-button>
         </div>
       </div>
     </div>

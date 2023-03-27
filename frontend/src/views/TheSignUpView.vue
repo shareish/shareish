@@ -48,7 +48,7 @@
       </div>
       <div class="field">
         <div class="control">
-          <b-button class="button is-success" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>
+          <b-button type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>
         </div>
       </div>
     </div>
