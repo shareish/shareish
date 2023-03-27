@@ -10,9 +10,9 @@
            @update:bounds="fetchMarkers">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
       <l-control class="control-geolocation">
-        <button class="button" @click="setGeolocalizedPosition">
+        <b-button type="is-primary" @click="setGeolocalizedPosition">
           <i class="fas fa-street-view"></i>
-        </button>
+        </b-button>
       </l-control>
       <l-control position="bottomleft">
         <div class="control-loading">

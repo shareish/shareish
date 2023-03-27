@@ -12,9 +12,9 @@
           <item-card :item="item" />
         </div>
         <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
-          <button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" class="button is-primary" @click="loadItems()">
+          <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems()">
             {{ $t('button-load-more') }}
-          </button>
+          </b-button>
         </div>
       </div>
       <div v-else>{{ $t('no-items') }}</div>
