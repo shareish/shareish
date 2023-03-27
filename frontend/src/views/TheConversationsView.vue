@@ -134,12 +134,12 @@
 
 <script>
 import axios from "axios";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import {categories} from "@/categories";
 import {scrollParentToChild, rem, isArrEmpty} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 

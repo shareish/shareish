@@ -20,7 +20,7 @@
 
 <script>
 import axios from "axios"
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export default {
   name: 'TheActivateView',

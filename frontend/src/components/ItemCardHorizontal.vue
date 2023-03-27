@@ -44,12 +44,12 @@
 </template>
 
 <script>
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import {categories} from "@/categories";
 import moment from "moment";
 import axios from "axios";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: "ItemCardHorizontal",

@@ -41,7 +41,7 @@ import axios from "axios";
 import TheSettingsProfile from "@/components/TheSettingsProfile.vue";
 import TheSettingsNotifications from "@/components/TheSettingsNotifications.vue";
 import TheSettingsAccount from "@/components/TheSettingsAccount.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export default {
   name: 'TheSettingsView',

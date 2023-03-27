@@ -62,7 +62,7 @@
 <script>
 import axios from "axios";
 import { logout } from "@/App.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
 

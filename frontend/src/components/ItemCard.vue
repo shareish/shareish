@@ -71,7 +71,7 @@
 import ItemTypeTag from "@/components/ItemTypeTag";
 import moment from "moment/moment";
 import {categories} from '@/categories';
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import {ucfirst} from "@/functions";
 
 export default {

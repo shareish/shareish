@@ -29,7 +29,7 @@
 <script>
 import moment from "moment";
 import axios from "axios";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export default {
   name: 'ConversationMessage',

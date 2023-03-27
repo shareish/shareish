@@ -27,8 +27,8 @@ import _ from "lodash";
 import axios from "axios";
 import ItemsFilters from "@/components/ItemsFilters.vue";
 import ItemCard from "@/components/ItemCard.vue";
-import ErrorHandler from "@/components/ErrorHandler";
-import WindowSize from "@/components/WindowSize";
+import ErrorHandler from "@/mixins/ErrorHandler";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: 'TheItemsView',

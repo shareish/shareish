@@ -49,7 +49,7 @@
 
 <script>
 import moment from "moment/moment";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: 'UserCard',

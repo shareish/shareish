@@ -149,7 +149,7 @@ import moment from "moment";
 import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export default {
   name: 'TheItemView',

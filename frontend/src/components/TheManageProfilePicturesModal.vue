@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import ErrorHandler from "@/components/ErrorHandler";
-import WindowSize from "@/components/WindowSize";
+import ErrorHandler from "@/mixins/ErrorHandler";
+import WindowSize from "@/mixins/WindowSize";
 import axios from "axios";
 
 export default {

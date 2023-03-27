@@ -46,7 +46,7 @@
 <script>
 import axios from "axios"
 import TheNavbar from "@/components/TheNavbar.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export async function logout(instance) {
   try {
