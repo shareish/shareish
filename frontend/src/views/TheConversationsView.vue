@@ -658,7 +658,6 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
     // $boxHeight - $itemHeight - base textarea height - 2 * outer padding
     height: $boxHeight - $conversationWithHeight - $itemHeight - 48px - (2 * rem(0.75));
     overflow-y: scroll;
-    overscroll-behavior: none;
     display: flex;
     flex-direction: column;
 

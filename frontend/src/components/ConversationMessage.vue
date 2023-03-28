@@ -18,8 +18,8 @@
         </figure>
       </router-link>
     </div>
-    <div v-if="isFromSelf" class="delete-message vh-align-center">
-      <i class="fas fa-trash" @click="clickDeleteMessage"></i>
+    <div v-if="isFromSelf" class="delete-message vh-align-center" @click="clickDeleteMessage">
+      <i class="fas fa-trash"></i>
     </div>
   </article>
 </template>
