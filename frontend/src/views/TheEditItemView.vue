@@ -181,9 +181,9 @@
 <script>
 import axios from "axios";
 import CategorySelector from "@/components/CategorySelector.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: 'TheEditItemView',

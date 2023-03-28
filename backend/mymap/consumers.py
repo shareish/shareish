@@ -25,20 +25,40 @@ class ConversationConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
-        data['content'] = data['content'].strip()
+        type = data['type']
+        content = data['content']
 
-        if len(data['content']) > 0:
-            message = await self.save_message(data['content'].strip(), data['user_id'], data['conversation_id'], data['date'])
+        response = None
+        if type == 'new_message':
+            content['content'] = content['content'].strip()
+            if len(content['content']) > 0:
+                message = await self.save_message(
+                    content['content'],
+                    content['user_id'],
+                    content['conversation_id'],
+                    content['date']
+                )
+                response = json.dumps({
+                    'type': 'new_message',
+                    'content': message
+                })
+        elif type == 'message_deleted':
+            response = json.dumps({
+                'type': 'message_deleted',
+                'content': content['id']
+            })
 
-            await self.channel_layer.group_send(
-                self.conversation_group_name,
-                {
-                    'type': 'conversation.message',
-                    'message': message,
-                }
-            )
+        if response is not None:
+            await self.channel_layer.group_send(self.conversation_group_name, {
+                'type': 'conversation.' + type,
+                'message': response
+            })
 
-    async def conversation_message(self, event):
+
+    async def conversation_new_message(self, event):
+        await self.send(text_data=event['message'])
+
+    async def conversation_message_deleted(self, event):
         await self.send(text_data=event['message'])
 
     @sync_to_async
@@ -58,10 +78,10 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             from .mail import send_mail_notif_new_message_received
 
             conversation = Conversation.objects.get(pk=conversation_id)
-            if conversation.buyer_id == user_id:
-                receiver = conversation.owner
+            if conversation.starter_id == user_id:
+                receiver = conversation.item.user
             else:
-                receiver = conversation.buyer
+                receiver = conversation.starter
             send_mail_notif_new_message_received(conversation, content, receiver)
 
         message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)

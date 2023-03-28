@@ -21,9 +21,9 @@
               {{ $t('useful-links') }}
             </h6>
             <div class="custom-flex-column">
-              <router-link to="/">{{ $t('about-us') }}</router-link>
-              <router-link to="/account">{{ $t('account') }}</router-link>
-              <router-link to="/map">{{ $t('map') }}</router-link>
+              <router-link :to="{name: 'about'}">{{ $t('about-us') }}</router-link>
+              <router-link :to="{name: 'account'}">{{ $t('account') }}</router-link>
+              <router-link :to="{name: 'map'}">{{ $t('map') }}</router-link>
               <a href="https://github.com/anonymous">
                 <img alt="https://github.com/anonymous" src="./assets/GitHub-Mark-32px.png">
               </a>
@@ -46,7 +46,7 @@
 <script>
 import axios from "axios"
 import TheNavbar from "@/components/TheNavbar.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export async function logout(instance) {
   try {
@@ -73,9 +73,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import "@/assets/styles/main.scss";
-
+<style scoped>
 .wrapper {
   display: flex;
   height: 100%;
@@ -91,12 +89,47 @@ export default {
   flex-direction: column;
   align-items: flex-start;
 }
+</style>
+
+<style lang="scss">
+@import "@/assets/styles/main.scss";
 
 .wbbw {
   word-break: break-word;
 }
+
 .wspw {
   white-space: pre-wrap;
 }
 
+.v-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.h-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.vh-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
 </style>

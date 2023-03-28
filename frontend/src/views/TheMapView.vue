@@ -110,7 +110,7 @@ import {latLng} from "leaflet";
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
 import ItemMapPopup from "@/components/ItemMapPopup.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 const itemTypeIcons = {
   'DN': greenIcon,

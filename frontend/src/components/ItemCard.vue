@@ -44,7 +44,7 @@
         </div>
       </div>
       <div v-if="!recurrentList" class="content">
-        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}</small>
         <small class="is-block" v-if="item.enddate">
           <template v-if="!itemHasEnded">
             {{ $t('ends') }}
@@ -52,9 +52,9 @@
           <template v-else>
             {{ $t('ended') }}
           </template>
-          {{ formattedDateFromNow(item.enddate) }}
+          {{ formattedDateFromNow(item.enddate, $i18n.locale) }}
         </small>
-        <small class="is-block" v-if="item.location && this.geoLocation">{{ capitalize($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
+        <small class="is-block" v-if="item.location && this.geoLocation">{{ ucfirst($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
       </div>
       <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
@@ -69,9 +69,9 @@
 
 <script>
 import ItemTypeTag from "@/components/ItemTypeTag";
-import moment from "moment/moment";
 import {categories} from '@/categories';
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
+import {formattedDateFromNow, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -129,9 +129,8 @@ export default {
     }
   },
   methods: {
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    ucfirst,
+    formattedDateFromNow,
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },
@@ -148,14 +147,8 @@ export default {
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c; // Distance in km
-    },
-    capitalize(s) {
-      const capitalizedFirst = s[0].toUpperCase();
-      const rest = s.slice(1);
-
-      return capitalizedFirst + rest;
     }
-  },
+  }
 };
 </script>
 

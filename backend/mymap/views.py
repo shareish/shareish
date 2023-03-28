@@ -7,9 +7,9 @@ from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
+from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
+    ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend
 from .models import Conversation, Item, ItemImage, Message, UserImage
-
-User = get_user_model()
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -27,8 +27,9 @@ from .ai import findClass
 
 from geopy.geocoders import Nominatim
 
-locator = Nominatim(user_agent='shareish')
 
+User = get_user_model()
+locator = Nominatim(user_agent='shareish')
 LOCATION_PREFIX = "SRID=4326;POINT"
 
 
@@ -56,53 +57,16 @@ def verif_location(data):
         return {'success': address}
 
 
-class ItemTypeFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        type = request.query_params.get('type')
-        if type is not None:
-            return queryset.filter(type=type)
-        return queryset
-
-
-class ItemCategoryFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        category = request.query_params.get('category')
-        if category is not None:
-            return queryset.filter(
-                Q(category1=category) | Q(category2=category) | Q(category3=category)
-            )
-        return queryset
-
-
-class ActiveItemFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        return queryset.filter(
-            Q(in_progress=True),
-            Q(enddate__isnull=True) | Q(enddate__gte=datetime.now())
-        )
-
-
-class UserItemFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        user = request.query_params.get('id')
-        if user is not None:
-            return queryset.filter(user_id=int(user))
-        else:
-            return queryset.filter(user=request.user)
-
-
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
-
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
         ActiveItemFilterBackend
     ]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
-    ordering = ['-startdate']
 
     def retrieve(self, request, *args, **kwargs):
         # Solution to view ended item, maybe temporary
@@ -159,25 +123,24 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 class RecurrentItemViewSet(ItemViewSet):
     filter_backends = [filters.OrderingFilter]
-    ordering = ['-startdate']
 
     def get_queryset(self):
         return Item.objects.filter(is_recurrent=True, user=self.request.user)
 
 
 class ActiveItemViewSet(ItemViewSet):
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend, ItemTypeFilterBackend]
+    filter_backends = [
+        filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
+        ItemTypeFilterBackend
+    ]
     pagination_class = ActivePaginationClass
-    ordering = ['-startdate']
 
 
 class UserItemViewSet(ItemViewSet):
     filter_backends = [filters.OrderingFilter, UserItemFilterBackend]
-    ordering = ['-startdate']
 
 
 class ItemImageViewSet(viewsets.ViewSet):
-
     def create(self, request):
         # Remove all previous images if any (edition case)
         ItemImage.objects.filter(item_id=request.POST['item_id']).delete()
@@ -265,52 +228,60 @@ class UserImageViewSet(viewsets.ViewSet):
 
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [ConversationContentFilterBackend, ConversationSelectedCategoryFilterBackend]
 
     def get_queryset(self):
-        user = self.request.user
-        return Conversation.objects.filter(Q(owner=user) | Q(buyer=user))
+        starter = self.request.user
+        return Conversation.objects.filter(Q(starter=starter) | Q(item__user=starter))
 
     def create(self, request, *args, **kwargs):
         data = request.data
         try:
-            already_exist = Conversation.objects.filter(
-                owner_id=data['owner_id'],
-                buyer_id=data['buyer_id'],
-                item_id=data['item_id']
-            )
-            if already_exist:
-                serializer = ConversationSerializer(already_exist[0], many=False)
-                return Response(serializer.data['id'], status=status.HTTP_200_OK)
-
-            to_serialize = {}
-
-            # Retrieving objects instead of ids
             item = Item.objects.get(pk=data['item_id'])
+        except Item.DoesNotExist:
+            return Response("This item doesn't exist.", status=status.HTTP_400_BAD_REQUEST)
+        except Item.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if item.user_id == request.user.id:
+            return Response("You cannot start a conversation on an item you own.", status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            conversation = Conversation.objects.get(
+                starter_id=request.user.id,
+                item=item
+            )
+            serializer = ConversationSerializer(conversation, many=False)
+            return Response(serializer.data['id'], status=status.HTTP_200_OK)
+        except Conversation.DoesNotExist:
             if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
-                return Response("You can't start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
-            owner = User.objects.get(pk=data['owner_id'])
-            buyer = User.objects.get(pk=data['buyer_id'])
+                return Response("You cannot start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
+            starter = User.objects.get(pk=request.user.id)
 
-            # Generating conversation slug
-            to_serialize['name'] = str(data['item_id']) + "-" + str(data['owner_id']) + "-" + str(data['buyer_id'])
-            to_serialize['slug'] = item.name + " (" + owner.username + " and " + buyer.username + ")"
-
-            serializer = self.get_serializer(data=to_serialize)
-            if serializer.is_valid():
-                serializer.save(owner=owner, buyer=buyer, item=item)
-                headers = self.get_success_headers(serializer.data)
-                return Response(serializer.data['id'], status=status.HTTP_201_CREATED, headers=headers)
-            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response("Couldn't create the new conversation.", status=status.HTTP_400_BAD_REQUEST)
+            conversation = Conversation.objects.create(starter=starter, item=item)
+            return Response(conversation.id, status=status.HTTP_201_CREATED)
+        except Conversation.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
 
     def get_queryset(self):
-        conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
-        return Message.objects.filter(conversation=conversation)
+        if 'conversation_id' in self.kwargs:
+            conversation = Conversation.objects.get(pk=self.kwargs['conversation_id'])
+            return Message.objects.filter(conversation=conversation)
+        else:
+            return Message.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user.id == request.user.id:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response("You can't delete a message that do not belongs to you.", status=status.HTTP_403_FORBIDDEN)
 
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
@@ -394,7 +365,7 @@ def getNotifications(request):
     def _get_unread_messages(user):
         return Message.objects.filter(
             ~Q(user=user), Q(seen=False),
-            Q(conversation__owner=user) | Q(conversation__buyer=user)
+            Q(conversation__starter=user) | Q(conversation__item__user=user)
         ).count()
 
     user = request.user
@@ -404,18 +375,25 @@ def getNotifications(request):
     elif request.method == 'POST':
         try:
             conversation = Conversation.objects.get(pk=request.data['conversation_id'])
-            if conversation.buyer != user and conversation.owner != user:
+            if conversation.starter != user and conversation.item.user != user:
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
             # Set all messages sent by other user as seen by current user for this conversation
             Message.objects.filter(
                 Q(conversation__id=request.data['conversation_id']),
-                Q(id__lte=request.data['last_message_id']),
-                ~Q(user=user)
+                ~Q(user=user),
+                Q(date__lte=request.data['last_message_date']),
+                Q(seen=False)
             ).update(seen=True)
 
+            conversation_unread_messages_count =  Message.objects.filter(
+                Q(conversation__id=request.data['conversation_id']),
+                ~Q(user=user),
+                Q(seen=False)
+            ).count()
+
             # Return unread messages count for all conversations
-            return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
+            return Response(conversation_unread_messages_count, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -482,8 +460,11 @@ def userImage(request, userimage_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
         try:
-            UserImage.objects.get(pk=userimage_id).delete()
-            return Response(status=status.HTTP_200_OK)
+            user_image = UserImage.objects.get(pk=userimage_id)
+            if user_image.user_id == request.user.id:
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response("You are not the owner of this image.", status=status.HTTP_403_FORBIDDEN)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

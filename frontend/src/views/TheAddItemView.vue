@@ -56,7 +56,7 @@
           <template v-else>
             {{ $tc('want-an-other-recurrent', recurrentItemId) }}
           </template>
-          <router-link to="/add-item/from-recurrents" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
+          <router-link :to="{name: 'addItemFromRecurrents'}" class="button is-primary vertical-align-middle ml-2">{{ $t('yes-please') }}</router-link>
           <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
         </div>
         <div id="form">
@@ -199,9 +199,9 @@
 <script>
 import axios from "axios";
 import CategorySelector from "@/components/CategorySelector.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: 'TheAddItemView',

@@ -71,7 +71,7 @@
           </h1>
           <h5 class="subtitle is-size-6">
             {{ $t("published") }}
-            {{ formattedDateFromNow(item.creationdate) }}
+            {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
             &middot;
             <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
@@ -118,13 +118,13 @@
             <template v-if="isOwner || itemHasEnded || notAvailableYet">
               <span>
                 {{ $t('item-availability-from') }}
-                {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
+                {{ formattedDate(item.startdate, $i18n.locale) }} ({{ formattedDateFromNow(item.startdate, $i18n.locale) }})
               </span><br />
             </template>
             <template v-if="item.enddate">
               <span>
                 {{ $t('item-availability-until') }}
-                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
+                {{ formattedDate(item.enddate, $i18n.locale) }} ({{ formattedDateFromNow(item.enddate, $i18n.locale) }})
               </span>
             </template>
           </article>
@@ -145,11 +145,11 @@
 
 <script>
 import axios from "axios";
-import moment from "moment";
 import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
+import {formattedDate, formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -231,17 +231,11 @@ export default {
         }
       }
     },
-    formattedDate(date) {
-      return (moment(date).locale(this.$i18n.locale).format("LLLL"));
-    },
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
+    formattedDate,
     async startConversation() {
       try {
         const data = {
-          'owner_id': this.item['user_id'],
-          'buyer_id': this.$store.state.user.id,
           'item_id': this.item['id']
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
@@ -336,7 +330,7 @@ div.icon-text {
 
 #item-info .subtitle {
   font-style: italic;
-  opacity: 0.9;
+  color: #767676;
 }
 
 #item-info .subtitle i {

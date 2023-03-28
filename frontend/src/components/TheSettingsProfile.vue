@@ -104,9 +104,9 @@
 
 <script>
 import axios from 'axios';
-import ErrorHandler from "@/components/ErrorHandler";
+import ErrorHandler from "@/mixins/ErrorHandler";
 import TheManageProfilePicturesModal from "@/components/TheManageProfilePicturesModal.vue";
-import WindowSize from "@/components/WindowSize";
+import WindowSize from "@/mixins/WindowSize";
 
 export default {
   name: 'TheSettingsProfile',

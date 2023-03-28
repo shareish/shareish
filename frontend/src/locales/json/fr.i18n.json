@@ -205,9 +205,10 @@
   "item-availability-until": "Jusqu'au",
   "delete": "Supprimer",
   "start-conversation": "Lancer une conversation",
-  "intro-donation-first-message": "Bonjour, merci pour votre proposition de don. Je suis intéressé pour ...",
-  "intro-request-first-message": "Bonjour, je pense pouvoir répondre à votre demande. Je peux ...",
-  "intro-loan-first-message": "Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ...",
+  "intro-DN-first-message": "Bonjour, merci pour votre proposition de don. Je suis intéressé pour ...",
+  "intro-RQ-first-message": "Bonjour, je pense pouvoir répondre à votre demande. Je peux ...",
+  "intro-LN-first-message": "Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ...",
+  "intro-EV-first-message": "Bonjour, merci pour de rendre cet évènement possible. Je suis intéressé d'y participer.",
   "avatar": "Avatar",
   "help_avatar": "Transférez une image qui vous représente",
   "notif-success-item-delete": "L'élément a été correctement supprimé",
@@ -275,5 +276,11 @@
   "picture-removed": "Image retirée!",
   "aware-changes-not-saved": "Attention! Votre nouvelle photo de profil doit être sauvegardée!",
   "image-already-profile-picture": "Cette image est déjà votre photo de profil!",
-  "view-real-profile": "Voir le profil réel"
+  "view-real-profile": "Voir le profil réel",
+  "search": "Recherche",
+  "click-to-view-on-map": "Cliquer pour voir sur la carte",
+  "delete-message": "Supprimer le message",
+  "delete-message-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce message de la conversation? Cette action ne peut pas être annulée.",
+  "message-removed": "Message retiré!",
+  "with": "avec"
 }
