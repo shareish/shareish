@@ -10,7 +10,7 @@
     <div class="media-content">
       <p class="content wbbw wspw has-background-white-ter">{{ comment.content }}</p>
       <p class="options has-text-grey">
-        {{ formattedDate }} &middot;
+        {{ formattedDateFromNow(comment.creationdate) }} &middot;
         <template v-if="isFromSelf">
           <span class="delete-comment has-text-danger" @click="clickDeleteComment">Delete</span>
         </template>
@@ -39,12 +39,12 @@ export default {
     },
     isFromSelf() {
       return this.$store.state.user.id === this.comment.user.id;
-    },
-    formattedDate() {
-      return moment(this.comment.creationdate, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
     }
   },
   methods: {
+    formattedDateFromNow(date) {
+      return moment(date).locale(this.$i18n.locale).fromNow();
+    },
     clickDeleteComment() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-comment'),
