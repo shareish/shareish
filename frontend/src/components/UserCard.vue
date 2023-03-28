@@ -39,7 +39,7 @@
               </small>
             </nav>
           </template>
-          <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_up_date) }})</p>
+          <p class="joined mt-2">({{ $t('joined') }} {{ formattedDateFromNow(user.sign_up_date, $i18n.locale) }})</p>
         </div>
         <p class="description wbbw wspw">{{ user.description }}</p>
       </div>
@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
+import {formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'UserCard',
@@ -78,9 +78,7 @@ export default {
     }
   },
   methods: {
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
     windowWidthChanged() {
       let mediaLeftSquareSize = 150;
       let titleSizeClass = "is-3";

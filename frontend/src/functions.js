@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const scrollParentToChild = function(parent, child, offset = 0) {
   if (typeof parent === 'object' && typeof child === 'object' && parent !== null && child !== null) {
     // Functions from Mina on StackOverflow
@@ -55,4 +57,12 @@ export const isArrEmpty = function (arr) {
 
 export const ucfirst = function (s) {
   return s[0].toUpperCase() + s.slice(1);
+}
+
+export const formattedDateFromNow = function(date, locale) {
+  return moment(date).locale(locale).fromNow();
+}
+
+export const formattedDate = function(date, locale, format = "LLLL") {
+  return moment(date).locale(locale).format(format);
 }

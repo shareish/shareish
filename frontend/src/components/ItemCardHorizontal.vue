@@ -23,7 +23,7 @@
                 </div>
               </div>
               <p class="subtitle">
-                {{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}
+                {{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
                 <template v-if="showHitcount">
                   &middot;
                   <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
@@ -47,9 +47,9 @@
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import {categories} from "@/categories";
-import moment from "moment";
 import axios from "axios";
 import WindowSize from "@/mixins/WindowSize";
+import {formattedDateFromNow} from "@/functions";
 
 export default {
   name: "ItemCardHorizontal",
@@ -117,9 +117,7 @@ export default {
     }
   },
   methods: {
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },

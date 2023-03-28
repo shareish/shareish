@@ -9,7 +9,7 @@
     </div>
     <div class="media-content">
       <p class="content wbbw wspw" :class="{'show-arrow': showSide}">{{ message.content }}</p>
-      <p v-if="showSide" class="date has-text-grey">{{ formattedDate }}</p>
+      <p v-if="showSide" class="date has-text-grey">{{ formattedDateFromNow(message.date, $i18n.locale) }}</p>
     </div>
     <div v-if="isFromSelf" class="media-right">
       <router-link v-if="showSide" :to="{name: 'profile', params: {id: sender.id}}">
@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import moment from "moment";
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import {formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'ConversationMessage',
@@ -62,9 +62,6 @@ export default {
       if (this.message.user.images.length > 0)
         return this.message.user.images[0].url;
       return "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
-    },
-    formattedDate() {
-      return moment(this.message.date, "YYYY-MM-DD[T]HH:mm:ss").fromNow();
     }
   },
   methods: {
@@ -86,7 +83,8 @@ export default {
       } catch (error) {
         this.snackbarError(error);
       }
-    }
+    },
+    formattedDateFromNow
   }
 };
 </script>
