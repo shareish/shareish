@@ -117,7 +117,7 @@
           <div id="messages" ref="messages" class="pt-4">
             <div class="messages-header has-text-centered mb-4">
               <template v-if="allMessagesLoaded">
-                <p class="has-text-grey has-text-centered" style="height: 40px; line-height: 40px;">Start of the conversation</p>
+                <p class="has-text-grey has-text-centered" style="height: 40px; line-height: 40px;">{{ $t('start-of-the-conversation') }}</p>
               </template>
               <template v-else>
                 <b-button v-if="!allMessagesLoaded" :loading="messagesLoading" @click="loadMessages">
