@@ -38,3 +38,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .item-type.tag {
+    font-style: normal;
+  }
+</style>

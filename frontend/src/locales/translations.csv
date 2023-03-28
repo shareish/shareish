@@ -280,3 +280,8 @@ message-deleted,Message deleted!,Message supprimé!
 delete-item,Delete item,Supprimer l'élément
 delete-item-confirmation,"Are you sure you want to <b>delete</b> this item? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> cet élément? Cette action ne peut pas être annulée."
 item-deleted,Item deleted!,Élément supprimé!
+comment,Comments|Comment|Comments,Commentaires|Commentaire|Commentaires
+notif-error-post-comment,An error prevented your comment to be posted,Une erreur a empêché votre commentaire d'être publié
+delete-comment,Delete comment,Supprimer le commentaire
+delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
+comment-deleted,Comment deleted!,Commentaire supprimé!

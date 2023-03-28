@@ -283,5 +283,10 @@
   "message-deleted": "Message deleted!",
   "delete-item": "Delete item",
   "delete-item-confirmation": "Are you sure you want to <b>delete</b> this item? This action cannot be undone.",
-  "item-deleted": "Item deleted!"
+  "item-deleted": "Item deleted!",
+  "comment": "Comments|Comment|Comments",
+  "notif-error-post-comment": "An error prevented your comment to be posted",
+  "delete-comment": "Delete comment",
+  "delete-comment-confirmation": "Are you sure you want to <b>delete</b> this comment? This action cannot be undone.",
+  "comment-deleted": "Comment deleted!"
 }

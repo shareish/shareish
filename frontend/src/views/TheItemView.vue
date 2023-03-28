@@ -14,46 +14,80 @@
         </div>
       </article>
       <div class="columns">
-        <section class="column is-5">
-          <div v-if="isOwner && !itemHasEnded" class="columns">
-            <div class="column is-half">
-              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
-            </div>
-            <div class="column is-half">
-              <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
-            </div>
-          </div>
-          <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
-            <template v-if="item.images.length > 0">
-              <b-carousel-item v-for="image in item.images" :key="image.position">
-                <router-link :to="{name: 'item', params: {id: item.id}}">
-                  <figure id="item-image">
-                    <div class="item-image-background">
-                      <img :src="image" />
-                    </div>
-                    <figure>
-                      <img :src="image" />
+        <div class="column is-5">
+          <section id="carousel" class="mb-5-5">
+            <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+              <template v-if="item.images.length > 0">
+                <b-carousel-item v-for="image in item.images" :key="image.position">
+                  <router-link :to="{name: 'item', params: {id: item.id}}">
+                    <figure id="item-image">
+                      <div class="item-image-background">
+                        <img :src="image" />
+                      </div>
+                      <figure>
+                        <img :src="image" />
+                      </figure>
                     </figure>
-                  </figure>
-                </router-link>
-              </b-carousel-item>
-            </template>
-            <template v-else>
-              <b-carousel-item>
-                <router-link :to="{name: 'item', params: {id: item.id}}">
-                  <figure id="item-image">
-                    <div class="item-image-background">
-                      <img :src="itemCategories[0]['image-placeholder']" />
-                    </div>
-                    <figure>
-                      <img :src="itemCategories[0]['image-placeholder']" />
+                  </router-link>
+                </b-carousel-item>
+              </template>
+              <template v-else>
+                <b-carousel-item>
+                  <router-link :to="{name: 'item', params: {id: item.id}}">
+                    <figure id="item-image">
+                      <div class="item-image-background">
+                        <img :src="itemCategories[0]['image-placeholder']" />
+                      </div>
+                      <figure>
+                        <img :src="itemCategories[0]['image-placeholder']" />
+                      </figure>
                     </figure>
-                  </figure>
-                </router-link>
-              </b-carousel-item>
-            </template>
-          </b-carousel>
-        </section>
+                  </router-link>
+                </b-carousel-item>
+              </template>
+            </b-carousel>
+          </section>
+          <section id="comments">
+            <div class="title is-size-4">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-map-pin"></i></span>
+                <span>{{ $tc('comment', 0) }}</span>
+              </div>
+            </div>
+            <div id="write" class="mb-5">
+              <div class="columns is-mobile">
+                <div class="column">
+                  <textarea
+                      v-model="commentToSend"
+                      class="textarea"
+                      placeholder="Write your message"
+                      :rows="textareaRows"
+                      @input="checkRows"
+                      @keydown.enter.exact.prevent="sendComment"
+                      @keydown.enter.shift.exact.prevent="shiftEnterPressed"
+                  />
+                </div>
+                <div class="column">
+                  <b-button
+                      type="is-primary"
+                      @click="sendComment"
+                      :loading="waitingFormResponse"
+                  >
+                    <i class="fas fa-paper-plane"></i>
+                  </b-button>
+                </div>
+              </div>
+            </div>
+            <div id="comments-list">
+              <item-comment
+                  v-for="(comment, index) in comments"
+                  :key="index"
+                  :comment="comment"
+                  @deleted="removeComment(index)"
+              />
+            </div>
+          </section>
+        </div>
         <section id="item-info" class="column is-7">
           <h1 class="title is-size-2">{{ item.name }}</h1>
           <h5 class="subtitle is-size-6">
@@ -64,21 +98,33 @@
             &middot;
             <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
-          <article id="categories" class="mb-5-5">
+          <article id="categories" class="mb-5">
             <p v-for="category in itemCategories" :key="category.slug" class="category">
               <span class="icon"><i :class="category.icon"></i></span>
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
           </article>
-          <b-button
-              v-if="!isOwner && itemHasNotEndedYet"
-              type="is-primary"
-              class="mb-5-5"
-              style="width: 100%;"
-              @click="startConversation"
-          >
-            {{ $t('start-conversation') }}
-          </b-button>
+          <template v-if="!isOwner">
+            <b-button
+                v-if="itemHasNotEndedYet"
+                type="is-primary"
+                class="mb-5-5"
+                style="width: 100%;"
+                @click="startConversation"
+            >
+              {{ $t('start-conversation') }}
+            </b-button>
+          </template>
+          <template v-else>
+            <div v-if="!itemHasEnded" class="columns">
+              <div class="column is-half">
+                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
+              </div>
+              <div class="column is-half">
+                <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
+              </div>
+            </div>
+          </template>
           <article id="description" class="mb-5-5">
             <div class="title is-size-4 mb-1">
               <div class="icon-text">
@@ -148,16 +194,22 @@ import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import ItemComment from "@/components/ItemComment.vue";
 
 export default {
   name: 'TheItemView',
   mixins: [ErrorHandler],
-  components: {UserCard, ItemTypeTag},
+  components: {ItemComment, UserCard, ItemTypeTag},
   data() {
     return {
       item: {},
       user: {},
       address: null,
+
+      comments: [],
+      commentToSend: "",
+      textareaRows: 1,
+      waitingFormResponse: false,
 
       redirection: false,
       loading: true
@@ -166,6 +218,9 @@ export default {
   computed: {
     userId() {
       return Number(this.item.user.id);
+    },
+    itemId() {
+      return (this.$route.params.id) ? Number(this.$route.params.id) : null;
     },
     apiURI() {
       return (this.$route.query.kind === 'recurrent') ? 'recurrents' : 'items';
@@ -197,9 +252,8 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
-          const item_id = this.$route.params.id;
-          this.item = (await axios.get(`/api/v1/${this.apiURI}/${item_id}/`)).data;
-          await axios.get(`/api/v1/items/${item_id}/increase_hitcount`);
+          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`)).data;
+          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
         } catch (error) {
           this.snackbarError(error);
           this.redirection = true;
@@ -224,8 +278,15 @@ export default {
           this.user = (await axios.get(`/api/v1/webusers/${this.userId}/`)).data;
         } catch (error) {
           this.snackbarError(error);
-          this.redirection = true;
-          await this.$router.push("/items");
+        }
+      }
+    },
+    async fetchComments() {
+      if (!this.redirection) {
+        try {
+          this.comments = (await axios.get(`/api/v1/items/${this.itemId}/comments/`)).data;
+        } catch (error) {
+          this.snackbarError(error);
         }
       }
     },
@@ -270,6 +331,54 @@ export default {
       } catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
+    },
+    shiftEnterPressed() {
+      this.commentToSend += "\n";
+      this.checkRows();
+    },
+    checkRows() {
+      let commentRows = 1;
+      for (let i in this.commentToSend) {
+        if (this.commentToSend[i] === '\n')
+          commentRows++;
+        if (commentRows === 4)
+          break;
+      }
+      this.textareaRows = commentRows;
+    },
+    async sendComment() {
+      if (this.commentToSend !== "") {
+        this.waitingFormResponse = true;
+        try {
+          const data = {
+            'content': this.commentToSend,
+            'creationdate': new Date()
+          };
+          const comment = (await axios.post(`/api/v1/items/${this.itemId}/comments/`, data)).data;
+          this.comments.unshift(comment);
+
+          setTimeout(() => {
+            this.waitingFormResponse = false;
+          }, 500);
+
+          this.commentToSend = "";
+
+          this.checkRows();
+        }
+        catch (error) {
+          this.snackbarError(this.$t('notif-error-post-comment'));
+        }
+      }
+    },
+    removeComment(index) {
+      this.comments.splice(index, 1);
+      this.$buefy.snackbar.open({
+        duration: 5000,
+        type: 'is-success',
+        message: this.$t('comment-deleted'),
+        pauseOnHover: true,
+        position: 'is-bottom-right'
+      });
     }
   },
   async mounted() {
@@ -277,13 +386,14 @@ export default {
     await this.fetchItem();
     await this.fetchAddress();
     await this.fetchUser();
+    await this.fetchComments();
     document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .max-width-is-max-container {
   margin: 0 auto;
   max-width: 1344px;
@@ -365,6 +475,24 @@ div.icon-text {
 
 #item-info #categories .category .slug {
   font-size: 16px;
+}
+
+#write {
+  padding: 0;
+
+  .column:last-child {
+    flex: 0 0 calc(60px + 0.75rem);
+    padding-left: 0;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  button {
+    width: 60px;
+    height: 48px;
+  }
 }
 
 @media screen and (max-width: 1215px) and (min-width: 769px) {

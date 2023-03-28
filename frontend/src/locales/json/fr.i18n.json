@@ -283,5 +283,10 @@
   "message-deleted": "Message supprimé!",
   "delete-item": "Supprimer l'élément",
   "delete-item-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> cet élément? Cette action ne peut pas être annulée.",
-  "item-deleted": "Élément supprimé!"
+  "item-deleted": "Élément supprimé!",
+  "comment": "Commentaires|Commentaire|Commentaires",
+  "notif-error-post-comment": "Une erreur a empêché votre commentaire d'être publié",
+  "delete-comment": "Supprimer le commentaire",
+  "delete-comment-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée.",
+  "comment-deleted": "Commentaire supprimé!"
 }

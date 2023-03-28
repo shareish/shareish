@@ -3,7 +3,8 @@ import re
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from .models import Conversation, Item, ItemImage, Message, User, UserImage
+from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment
+
 
 class UserImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()
@@ -155,4 +156,15 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = [
             'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user'
+        ]
+
+
+class ItemCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+    item = ItemSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = ItemComment
+        fields = [
+            'id', 'content', 'creationdate', 'item_id', 'user_id', 'item', 'user'
         ]

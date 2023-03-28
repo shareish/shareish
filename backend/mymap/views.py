@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend
-from .models import Conversation, Item, ItemImage, Message, UserImage
+from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -18,7 +18,8 @@ from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer,
-    ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer
+    ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer,
+    ItemCommentSerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -77,7 +78,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         except Item.DoesNotExist:
-            return Response("Item doesn't exist.", status=status.HTTP_404_NOT_FOUND)
+            return Response("This item doest not exist.", status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['location'])
@@ -138,6 +139,37 @@ class ActiveItemViewSet(ItemViewSet):
 
 class UserItemViewSet(ItemViewSet):
     filter_backends = [filters.OrderingFilter, UserItemFilterBackend]
+
+
+class ItemCommentViewSet(viewsets.ModelViewSet):
+    serializer_class = ItemCommentSerializer
+
+    def get_queryset(self):
+        if 'item_id' in self.kwargs:
+            item = Item.objects.get(pk=self.kwargs['item_id'])
+            return ItemComment.objects.filter(item=item)
+        else:
+            return ItemComment.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        if 'item_id' in self.kwargs:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("You must provide and item id to post a comment.", status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer):
+        try:
+            item = Item.objects.get(pk=self.kwargs['item_id'])
+            serializer.save(user=self.request.user, item=item)
+        except Item.DoesNotExist:
+            return Response("This item doest not exist.", status=status.HTTP_400_BAD_REQUEST)
+        except Item.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ItemImageViewSet(viewsets.ViewSet):
@@ -240,7 +272,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         try:
             item = Item.objects.get(pk=data['item_id'])
         except Item.DoesNotExist:
-            return Response("This item doesn't exist.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("This item doest not exist.", status=status.HTTP_400_BAD_REQUEST)
         except Item.MultipleObjectsReturned:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
