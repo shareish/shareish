@@ -275,6 +275,14 @@ class MessageViewSet(viewsets.ModelViewSet):
         else:
             return Message.objects.all()
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user.id == request.user.id:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response("You can't delete a message that do not belongs to you.", status=status.HTTP_403_FORBIDDEN)
+
 
 class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
     serializer_class = MapNameAndDescriptionSerializer

@@ -1,4 +1,4 @@
-export const scrollParentToChild = function(parent, child) {
+export const scrollParentToChild = function(parent, child, offset = 0) {
   if (typeof parent === 'object' && typeof child === 'object' && parent !== null && child !== null) {
     // Functions from Mina on StackOverflow
     // Author: https://stackoverflow.com/users/11887902/mina
@@ -24,10 +24,10 @@ export const scrollParentToChild = function(parent, child) {
       const scrollBot = childRect.bottom - parentRect.bottom;
       if (Math.abs(scrollTop) < Math.abs(scrollBot)) {
         // we're near the top of the list
-        parent.scrollTop += scrollTop;
+        parent.scrollTop += scrollTop + offset;
       } else {
         // we're near the bottom of the list
-        parent.scrollTop += scrollBot;
+        parent.scrollTop += scrollBot + offset;
       }
     }
   }

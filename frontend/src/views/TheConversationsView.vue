@@ -115,7 +115,20 @@
             <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
           </div>
           <div id="messages" ref="messages">
-            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="deletedEmitted(index)" />
+            <template v-if="allMessagesLoaded">
+              <p class="has-text-grey has-text-centered mt-4 mb-4">Start of the conversation</p>
+            </template>
+            <template v-else>
+              <p class="has-text-grey has-text-centered mt-4 mb-4">Scroll to load more...</p>
+            </template>
+            <conversation-message
+                v-for="(message, index) in messages"
+                :key="index"
+                :message="message"
+                :receiver="userId"
+                :show-side="messageShowSide(index)"
+                @deleted="deletedEmitted(index)"
+            />
           </div>
           <div id="write">
             <div class="columns is-mobile">
@@ -178,7 +191,8 @@ export default {
       canChangeCategory: true,
       timeouts: {},
       itemCardHorizontalHeight: 70,
-      isMobile: false
+      isMobile: false,
+      allMessagesLoaded: false
     }
   },
   watch: {
@@ -236,7 +250,7 @@ export default {
           if (this.messages.length === 0)
             this.messageToSend = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
           else
-            this.goToLastMessage();
+            this.scrollLastMessageIntoView();
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
@@ -355,12 +369,12 @@ export default {
       }
       return -1;
     },
-    goToLastMessage() {
+    scrollLastMessageIntoView() {
       if (this.messages.length > 0) {
         this.$nextTick(function () {
           const parent = this.$el.querySelector("#messages");
           const child = this.$el.querySelector("#messages article:last-child");
-          scrollParentToChild(parent, child);
+          scrollParentToChild(parent, child, rem(0.75));
         });
       }
     },
@@ -379,7 +393,7 @@ export default {
             if (data.type === 'new_message') {
               const newMessage = JSON.parse(data['content']);
               this.messages.push(newMessage);
-              this.goToLastMessage();
+              this.scrollLastMessageIntoView();
               this.updateCurrentConversation(newMessage.content);
               this.setMessagesAsSeen(true);
             } else if (data.type === 'message_deleted') {
@@ -460,6 +474,24 @@ export default {
         }
       };
       this.ws.send(JSON.stringify(data));
+    },
+    messageShowSide(index) {
+      if (index === this.messages.length - 1) {
+        // Message is the last one
+        return true;
+      } else if (index < this.messages.length - 1) {
+        if (this.messages[index].user_id !== this.messages[index + 1].user_id) {
+          // Next message is from different user
+          return true;
+        } else {
+          // Next message if from same user
+          const messageTimestamp = new Date(this.messages[index].date).getTime();
+          const nextMessageTimestamp = new Date(this.messages[index + 1].date).getTime();
+          if (messageTimestamp - nextMessageTimestamp >= 10 * 60)
+            return true;
+        }
+      }
+      return false;
     }
   },
   async mounted() {
