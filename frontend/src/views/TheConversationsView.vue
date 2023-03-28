@@ -66,12 +66,12 @@
               </div>
             </div>
             <div class="column">
-              <p class="conversation-name mb-1"><strong>{{ conversation.item.name }}</strong></p>
-              <p class="conversation-receiver mt-1">
+              <p class="conversation-name"><strong>{{ conversation.item.name }}</strong></p>
+              <p class="conversation-receiver mb-1">
                 {{ $t('with') }}
-                <router-link :to="{name: 'profile', params: {id: conversation.receiver.id}}">
+                <span class="has-text-primary">
                   @{{ conversation.receiver.username }}
-                </router-link>
+                </span>
               </p>
               <p class="conversation-last_message mt-1">{{ conversation.last_message }}</p>
             </div>
@@ -114,13 +114,17 @@
           <div id="item">
             <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
           </div>
-          <div id="messages" ref="messages">
-            <template v-if="allMessagesLoaded">
-              <p class="has-text-grey has-text-centered mt-4 mb-4">Start of the conversation</p>
-            </template>
-            <template v-else>
-              <p class="has-text-grey has-text-centered mt-4 mb-4">Scroll to load more...</p>
-            </template>
+          <div id="messages" ref="messages" class="pt-4">
+            <div class="messages-header has-text-centered mb-4">
+              <template v-if="allMessagesLoaded">
+                <p class="has-text-grey has-text-centered" style="height: 40px; line-height: 40px;">Start of the conversation</p>
+              </template>
+              <template v-else>
+                <b-button v-if="!allMessagesLoaded" :loading="messagesLoading" @click="loadMessages">
+                  {{ $t('button-load-more') }}
+                </b-button>
+              </template>
+            </div>
             <conversation-message
                 v-for="(message, index) in messages"
                 :key="index"
@@ -168,6 +172,7 @@ import {scrollParentToChild, rem, isArrEmpty} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
+import _ from "lodash";
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 
@@ -192,7 +197,9 @@ export default {
       timeouts: {},
       itemCardHorizontalHeight: 70,
       isMobile: false,
-      allMessagesLoaded: false
+      allMessagesLoaded: false,
+      messagesSection: 1,
+      messagesLoading: false
     }
   },
   watch: {
@@ -246,14 +253,17 @@ export default {
         try {
           document.title = `Shareish | ${this.activeConversation.item.name}`;
 
-          this.messages = (await axios.get(`/api/v1/conversations/${this.activeConversation.id}/messages/`)).data;
+          await this.loadMessages(false);
+
           if (this.messages.length === 0)
             this.messageToSend = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
-          else
-            this.scrollLastMessageIntoView();
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
+
+          this.$nextTick(function () {
+            document.getElementById('messages').addEventListener('scroll', this.scrollHandler);
+          });
         }
         catch (error) {
           this.snackbarError(error);
@@ -262,7 +272,10 @@ export default {
       }
     },
     closeConversation() {
-      this.messages = [];
+      if (this.messages.length > 0) {
+        document.getElementById('messages').removeEventListener('scroll', this.scrollHandler);
+        this.messages = [];
+      }
       if (this.ws)
         this.ws.close();
     },
@@ -369,12 +382,14 @@ export default {
       }
       return -1;
     },
-    scrollLastMessageIntoView() {
+    scrollLastMessageIntoView(messageIndex = "last", position = "bottom", offset = rem(0.75)) {
       if (this.messages.length > 0) {
         this.$nextTick(function () {
           const parent = this.$el.querySelector("#messages");
-          const child = this.$el.querySelector("#messages article:last-child");
-          scrollParentToChild(parent, child, rem(0.75));
+          const childSelector = (messageIndex === "last") ? "last-child" : "nth-child(" + (messageIndex + 1) + ")";
+          console.log("#messages article:" + childSelector);
+          const child = this.$el.querySelector("#messages article:" + childSelector);
+          scrollParentToChild(parent, child, position, offset);
         });
       }
     },
@@ -393,7 +408,7 @@ export default {
             if (data.type === 'new_message') {
               const newMessage = JSON.parse(data['content']);
               this.messages.push(newMessage);
-              this.scrollLastMessageIntoView();
+              this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
               this.updateCurrentConversation(newMessage.content);
               this.setMessagesAsSeen(true);
             } else if (data.type === 'message_deleted') {
@@ -492,6 +507,43 @@ export default {
         }
       }
       return false;
+    },
+    scrollHandler: _.debounce(async function () {
+      const scrollBlock = document.getElementById('messages');
+      if (scrollBlock.scrollTop <= 80 && !this.allMessagesLoaded)
+        await this.loadMessages();
+    }, 100),
+    async loadMessages(append = true) {
+      this.messagesLoading = true;
+
+      if (!append) {
+        this.messagesSection = 1;
+        this.allMessagesLoaded = false;
+        this.messages = [];
+      }
+
+      try {
+        const data = (await axios.get(`/api/v1/conversations/${this.activeConversation.id}/messages/`, {params: {page: this.messagesSection}})).data;
+        for (let i in data.results)
+          this.messages.unshift(data.results[i]);
+        this.messagesSection += 1;
+
+        if (data.next === null)
+          this.allMessagesLoaded = true;
+
+        if (!append)
+          this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
+        else
+          // length +1 because there is always 1 element at the top of the messages list (loader/start of conv msg)
+          this.scrollLastMessageIntoView(data.results.length + 1, "top", 0);
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+
+      setTimeout(() => {
+        this.messagesLoading = false;
+      }, 400);
     }
   },
   async mounted() {
@@ -499,14 +551,13 @@ export default {
     await this.fetchConversations();
     if (this.conversationId) {
       this.selected = this.getIConversation(this.conversationId);
-      this.openConversation();
+      await this.openConversation();
     }
     this.loading = false;
   },
   destroyed() {
     for (let i in this.timeouts)
       clearTimeout(this.timeouts[i]);
-    this.selected = -1;
     this.closeConversation();
   }
 };
@@ -565,7 +616,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 #conversations {
   overflow-y: scroll;
   height: $boxHeight - $searchNFiltersHeight;
-  max-width: $conversationsWidth - 1px;
+  width: $conversationsWidth - 1px;
   padding: 0.75rem;
 
   .conversation {
@@ -606,13 +657,13 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 
     & > .column:last-child {
       padding-left: 0.5rem;
+      margin-top: 2px;
       width: calc(100% - 100px);
 
       p {
+        text-overflow: ellipsis;
+        white-space: nowrap;
         overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
         color: black;
       }
       p.conversation-name {
@@ -661,7 +712,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
     display: flex;
     flex-direction: column;
 
-    article:first-child {
+    *:first-child {
       margin-top: auto !important;
     }
   }
@@ -693,7 +744,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
         flex: 0 0 80px;
       }
       & > .column:last-child {
-        margin-top: 2px;
+        margin-top: 0;
         padding-left: 0;
 
         .title {
@@ -709,6 +760,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 }
 
 @media screen and (max-width: 1215px) and (min-width: 901px) {
+  #conversations {
+    width: 324px;
+  }
+
   #page-conversations > .columns > .column:first-child {
     flex: 0 0 325px;
   }
@@ -718,6 +773,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 }
 
 @media screen and (max-width: 900px) {
+  #conversations {
+    width: 100%;
+  }
+
   #page-conversations.conversation-opened > .columns > .column:first-child {
     border-right: 0;
   }
@@ -734,6 +793,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   #page-conversations:not(.conversation-opened) > .columns > .column {
     &:first-child {
       flex: 1 1 auto;
+      max-width: 100%;
     }
     &:last-child {
       display: none;

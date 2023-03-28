@@ -15,7 +15,7 @@ from rest_framework import filters, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
-from .pagination import ActivePaginationClass
+from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer,
     ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer
@@ -267,6 +267,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
+    pagination_class = MessagePaginationClass
 
     def get_queryset(self):
         if 'conversation_id' in self.kwargs:
