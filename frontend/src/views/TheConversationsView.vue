@@ -487,7 +487,7 @@ export default {
           // Next message if from same user
           const messageTimestamp = new Date(this.messages[index].date).getTime();
           const nextMessageTimestamp = new Date(this.messages[index + 1].date).getTime();
-          if (messageTimestamp - nextMessageTimestamp >= 10 * 60)
+          if (nextMessageTimestamp - messageTimestamp >= 10 * 60 * 1000)
             return true;
         }
       }
