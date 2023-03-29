@@ -387,7 +387,6 @@ export default {
         this.$nextTick(function () {
           const parent = this.$el.querySelector("#messages");
           const childSelector = (messageIndex === "last") ? "last-child" : "nth-child(" + (messageIndex + 1) + ")";
-          console.log("#messages article:" + childSelector);
           const child = this.$el.querySelector("#messages article:" + childSelector);
           scrollParentToChild(parent, child, position, offset);
         });
@@ -397,12 +396,6 @@ export default {
       if (this.isConversationSelected) {
         try {
           this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.activeConversation.id}/`);
-          this.ws.onopen = () => {
-            console.log("Websocket connected.");
-          };
-          this.ws.onclose = () => {
-            console.log("Websocket has been closed.");
-          };
           this.ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'new_message') {
