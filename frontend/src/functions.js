@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const scrollParentToChild = function(parent, child, offset = 0) {
+export const scrollParentToChild = function(parent, child, position = "top", offset = 0) {
   if (typeof parent === 'object' && typeof child === 'object' && parent !== null && child !== null) {
     // Functions from Mina on StackOverflow
     // Author: https://stackoverflow.com/users/11887902/mina
@@ -24,7 +24,7 @@ export const scrollParentToChild = function(parent, child, offset = 0) {
       // Should we scroll using top or bottom? Find the smaller ABS adjustment
       const scrollTop = childRect.top - parentRect.top;
       const scrollBot = childRect.bottom - parentRect.bottom;
-      if (Math.abs(scrollTop) < Math.abs(scrollBot)) {
+      if (position === "top") {
         // we're near the top of the list
         parent.scrollTop += scrollTop + offset;
       } else {
