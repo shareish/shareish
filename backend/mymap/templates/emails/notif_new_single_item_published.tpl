@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block text %}
-    Dear {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),{{ text|linebreaks }}
+    Dear {{ user.first_name }} {{ user.last_name }} (@{{ user.username }}),{{ text|linebreaks }}
     {{ text|linebreaks }}
     A new item just got published within your neighbourhood on Shareish mutual aid platform.{{ text|linebreaks }}
     {{ text|linebreaks }}
@@ -40,7 +40,7 @@
         margin-right: 0;
     }
     </style>
-    <p>Dear {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),</p>
+    <p>Dear {{ user.first_name }} {{ user.last_name }} (@{{ user.username }}),</p>
     <p>A new item just got published within your neighbourhood on Shareish mutual aid platform.</p>
     <ul>
         <li><span class="type">{{ item_type }}</span><a href='{{ app_url }}/items/{{ item.id }}'>{{ item.name }}</a>, at {{ user.distance_from_item.km|floatformat:2 }}km</li>

@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block text %}
-    Dear {{ receiver.first_name }} {{ receiver.last_name }} ({{ receiver.username }}),{{ text|linebreaks }}
+    Dear {{ receiver.first_name }} {{ receiver.last_name }} (@{{ receiver.username }}),{{ text|linebreaks }}
     {{ text|linebreaks }}
-    Someone just sent you a message and is waiting for your answer on Shareish mutual aid platform.{{ text|linebreaks }}
+    {{ sender.first_name }} {{ sender.last_name }} (@{{ sender.username }}) just sent you a message and is waiting for your answer on Shareish mutual aid platform.{{ text|linebreaks }}
     {{ text|linebreaks }}
-    ({{ conversation.slug }}): {{ message_content|ellipsis:80 }} @ {{ app_url }}/conversations/{{ conversation.id }}{{ text|linebreaks }}
+    ({{ conversation.item.name }}): {{ message_content|ellipsis:80 }} @ {{ app_url }}/conversations/{{ conversation.id }}{{ text|linebreaks }}
     {{ text|linebreaks }}
     Please login on {{ app_url }} to view it.{{ text|linebreaks }}
     {{ text|linebreaks }}
@@ -37,11 +37,11 @@
         margin-right: 0;
     }
     </style>
-    <p>Dear {{ receiver.first_name }} {{ receiver.last_name }} ({{ receiver.username }}),</p>
-    <p>Someone just sent you a message and is waiting for your answer on Shareish mutual aid platform.</p>
+    <p>Dear {{ receiver.first_name }} {{ receiver.last_name }} (@{{ receiver.username }}),</p>
+    <p>{{ sender.first_name }} {{ sender.last_name }} (@{{ sender.username }}) just sent you a message and is waiting for your answer on Shareish mutual aid platform.</p>
     <ul>
         <li>
-            <a href='{{ app_url }}/conversations/{{ conversation.id }}'>{{ conversation.slug }}</a><br />
+            <a href='{{ app_url }}/conversations/{{ conversation.id }}'>{{ conversation.item.name }}</a><br />
             {{ message_content|ellipsis:80 }}
         </li>
     </ul>

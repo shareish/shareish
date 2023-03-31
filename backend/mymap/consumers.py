@@ -80,9 +80,11 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             conversation = Conversation.objects.get(pk=conversation_id)
             if conversation.starter_id == user_id:
                 receiver = conversation.item.user
+                sender = conversation.starter
             else:
                 receiver = conversation.starter
-            send_mail_notif_new_message_received(conversation, content, receiver)
+                sender = conversation.item.user
+            send_mail_notif_new_message_received(conversation, content, sender, receiver)
 
         message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)
         Conversation.objects.filter(pk=conversation_id).update(lastmessagedate=datetime.now(timezone.utc))
