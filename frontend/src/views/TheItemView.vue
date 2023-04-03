@@ -14,7 +14,7 @@
         </div>
       </article>
       <div class="columns">
-        <div class="column is-5">
+        <div class="column is-6">
           <section id="carousel" class="mb-5-5">
             <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
               <template v-if="item.images.length > 0">
@@ -47,11 +47,120 @@
               </template>
             </b-carousel>
           </section>
-          <section id="comments">
-            <div class="title is-size-4">
+          <article id="user">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
+                <span>{{ $t('shared-by') }}</span>
+              </div>
+            </div>
+            <user-card :user="user" />
+          </article>
+        </div>
+        <section id="item-info" class="column is-6">
+          <h1 class="title is-size-3 mb-3">{{ item.name }}</h1>
+          <h5 class="subtitle mt-3">
+            <item-type-tag :type="item.type" />
+            &middot;
+            {{ $t("published") }}
+            {{ formattedDateFromNow(item.creationdate) }}
+            &middot;
+            <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
+          </h5>
+          <article id="categories" class="mb-5">
+            <p v-for="category in itemCategories" :key="category.slug" class="category">
+              <span class="icon"><i :class="category.icon"></i></span>
+              <span class="slug">{{ $t(category.slug) }}</span>
+            </p>
+          </article>
+          <template v-if="!isOwner">
+            <div class="columns">
+              <div class="column is-half">
+                <b-button
+                    :disabled="itemHasEnded"
+                    type="is-primary"
+                    style="width: 100%;"
+                    @click="startConversation"
+                >
+                  <i class="far fa-envelope mr-1"></i>
+                  {{ $t('start-conversation') }}
+                </b-button>
+              </div>
+              <div class="column is-half">
+                <b-button
+                    type="is-primary"
+                    outlined
+                    style="width: 100%;"
+                    @click="scrollToComments"
+                >
+                  <i class="fas fa-comments mr-1"></i>
+                  {{ $t('leave-a-comment') }}
+                </b-button>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!itemHasEnded" class="columns">
+              <div class="column is-half">
+                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
+              </div>
+              <div class="column is-half">
+                <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
+              </div>
+            </div>
+          </template>
+          <article id="description" class="mb-5-5">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
+                <span>{{ $t('description') }}</span>
+              </div>
+            </div>
+            <div class="box has-background-white-ter">
+              <p class="description wbbw wspw">{{ item.description }}</p>
+            </div>
+          </article>
+          <article id="location" class="mb-5-5">
+            <div class="title is-size-4 mb-2">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-map-pin"></i></span>
-                <span>{{ $tc('comment', 0) }}</span>
+                <span>{{ $t('location') }}</span>
+              </div>
+            </div>
+            <div v-if="address">
+              <router-link :to="{name: 'map', query: {id: item.id}}">
+                {{ address }}
+              </router-link>
+            </div>
+            <div v-else>
+              <em>{{ $t('no-address') }}</em>
+            </div>
+          </article>
+          <article id="availability" v-if="isOwner || notAvailableYet || item.enddate" class="mb-5-5">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
+                <span>{{ $t('availability') }}</span>
+              </div>
+            </div>
+            <template v-if="isOwner || itemHasEnded || notAvailableYet">
+              <span>
+                {{ $t('item-availability-from') }}
+                {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
+              </span><br />
+            </template>
+            <template v-if="item.enddate">
+              <span>
+                {{ $t('item-availability-until') }}
+                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
+              </span>
+            </template>
+          </article>
+          <section id="comments">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-comments"></i></span>
+                <span>{{ $tc('comment', 0) }} ({{ comments.length }})</span>
               </div>
             </div>
             <div id="write" class="mb-5">
@@ -78,7 +187,7 @@
                 </div>
               </div>
             </div>
-            <div id="comments-list">
+            <div v-if="comments.length > 0" id="comments-list">
               <item-comment
                   v-for="(comment, index) in comments"
                   :key="index"
@@ -86,101 +195,10 @@
                   @deleted="removeComment(index)"
               />
             </div>
+            <div v-else class="box has-background-white-ter">
+              No comments yet.
+            </div>
           </section>
-        </div>
-        <section id="item-info" class="column is-7">
-          <h1 class="title is-size-2">{{ item.name }}</h1>
-          <h5 class="subtitle is-size-6">
-            <item-type-tag :type="item.type" />
-            &middot;
-            {{ $t("published") }}
-            {{ formattedDateFromNow(item.creationdate) }}
-            &middot;
-            <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
-          </h5>
-          <article id="categories" class="mb-5">
-            <p v-for="category in itemCategories" :key="category.slug" class="category">
-              <span class="icon"><i :class="category.icon"></i></span>
-              <span class="slug">{{ $t(category.slug) }}</span>
-            </p>
-          </article>
-          <template v-if="!isOwner">
-            <b-button
-                v-if="itemHasNotEndedYet"
-                type="is-primary"
-                class="mb-5-5"
-                style="width: 100%;"
-                @click="startConversation"
-            >
-              {{ $t('start-conversation') }}
-            </b-button>
-          </template>
-          <template v-else>
-            <div v-if="!itemHasEnded" class="columns">
-              <div class="column is-half">
-                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
-              </div>
-              <div class="column is-half">
-                <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
-              </div>
-            </div>
-          </template>
-          <article id="description" class="mb-5-5">
-            <div class="title is-size-4 mb-1">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
-                <span>{{ $t('description') }}</span>
-              </div>
-            </div>
-            <div class="box has-background-white-ter">
-              <p class="description wbbw wspw">{{ item.description }}</p>
-            </div>
-          </article>
-          <article id="location" class="mb-5-5">
-            <div class="title is-size-4">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-map-pin"></i></span>
-                <span>{{ $t('location') }}</span>
-              </div>
-            </div>
-            <div v-if="address">
-              <router-link :to="{name: 'map', query: {id: item.id}}">
-                {{ address }}
-              </router-link>
-            </div>
-            <div v-else>
-              <em>{{ $t('no-address') }}</em>
-            </div>
-          </article>
-          <article id="availability" v-if="isOwner || notAvailableYet || item.enddate" class="mb-5-5">
-            <div class="title is-size-4">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
-                <span>{{ $t('availability') }}</span>
-              </div>
-            </div>
-            <template v-if="isOwner || itemHasEnded || notAvailableYet">
-              <span>
-                {{ $t('item-availability-from') }}
-                {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
-              </span><br />
-            </template>
-            <template v-if="item.enddate">
-              <span>
-                {{ $t('item-availability-until') }}
-                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
-              </span>
-            </template>
-          </article>
-          <article id="user">
-            <div class="title is-size-4 mb-1">
-              <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
-                <span>{{ $t('shared-by') }}</span>
-              </div>
-            </div>
-            <user-card :user="user" />
-          </article>
         </section>
       </div>
     </template>
@@ -195,6 +213,7 @@ import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
+import {scrollParentToChild} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -379,6 +398,9 @@ export default {
         pauseOnHover: true,
         position: 'is-bottom-right'
       });
+    },
+    scrollToComments() {
+      this.$el.querySelector("#comments").scrollIntoView({behavior: "smooth", block: "start"});
     }
   },
   async mounted() {
@@ -446,6 +468,7 @@ div.icon-text {
 }
 
 #item-info .subtitle {
+  font-size: 0.875em;
   font-style: italic;
   color: #767676;
 }

@@ -253,6 +253,9 @@ class ItemComment(models.Model):
     item = models.ForeignKey(Item, related_name='comments', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='comments', on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['-creationdate']
+
 
 class Conversation(models.Model):
     starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
