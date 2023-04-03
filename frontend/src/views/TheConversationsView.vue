@@ -273,7 +273,9 @@ export default {
     },
     closeConversation() {
       if (this.messages.length > 0) {
-        document.getElementById('messages').removeEventListener('scroll', this.scrollHandler);
+        const messages = document.getElementById('messages');
+        if (messages)
+          messages.removeEventListener('scroll', this.scrollHandler);
         this.messages = [];
       }
       if (this.ws)
