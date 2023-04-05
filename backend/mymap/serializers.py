@@ -3,7 +3,7 @@ import re
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment
+from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -61,6 +61,7 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
     user = UserSerializer(allow_null=True, default=None)
+    hitcount = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -94,6 +95,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return data
 
+    def get_hitcount(self, obj):
+        return ItemView.objects.filter(item=obj).count()
 
 class ItemImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()

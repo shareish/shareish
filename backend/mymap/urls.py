@@ -30,7 +30,6 @@ urlpatterns = [
     path("notifications/", views.getNotifications, name='notifications'),
     path("items/<int:item_id>/has_images", views.itemHasImage, name='item_has_images'),
     path("items/<int:item_id>/images/first", views.getItemFirstImage, name='get_item_first_image'),
-    path("items/<int:item_id>/increase_hitcount", views.increaseHitcountItem, name='increase_item_hitcount'),
     path("items/images/<int:itemimage_id>", views.getItemImage, name='get_item_image'),
     path("users/images/<int:userimage_id>", views.userImage, name='user_image'),
     path("users/images/<int:userimage_id>/base64", views.getUserImageBase64, name='get_user_image_base64'),

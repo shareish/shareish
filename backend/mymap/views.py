@@ -3,13 +3,14 @@ import json
 import re
 from datetime import datetime, timezone
 
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
-    ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend
-from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment
+    ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend
+from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -76,6 +77,14 @@ class ItemViewSet(viewsets.ModelViewSet):
         try:
             instance = Item.objects.get(pk=pk)
             serializer = self.get_serializer(instance)
+
+            if 'view_date' in request.query_params:
+                try:
+                    ItemView.objects.create(item=instance, user=request.user, view_date=request.query_params['view_date'])
+                except IntegrityError:
+                    # Item already viewed
+                    pass
+
             return Response(serializer.data)
         except Item.DoesNotExist:
             return Response("This item doest not exist.", status=status.HTTP_404_NOT_FOUND)
@@ -132,7 +141,7 @@ class RecurrentItemViewSet(ItemViewSet):
 class ActiveItemViewSet(ItemViewSet):
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
-        ItemTypeFilterBackend
+        ItemTypeFilterBackend, ItemViewFilterBackend
     ]
     search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass
@@ -503,20 +512,6 @@ def getItemImage(request, itemimage_id):
             image = ItemImage.objects.get(pk=itemimage_id)
             return FileResponse(open(image.path, 'rb'))
         except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def increaseHitcountItem(request, item_id):
-    if request.method == 'GET':
-        try:
-            item = Item.objects.get(pk=item_id)
-            item.hitcount += 1
-            item.save()
-            return Response(status=status.HTTP_200_OK)
-        except Item.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

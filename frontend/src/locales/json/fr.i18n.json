@@ -295,5 +295,7 @@
   "or": "ou",
   "searched-categories": "Catégories recherchées",
   "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",
-  "filter": "Filtres|Filtre|Filtres"
+  "filter": "Filtres|Filtre|Filtres",
+  "only-new": "Nouveautés",
+  "more-filters": "Plus de filtres"
 }

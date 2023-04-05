@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db.models import Q
-from django.contrib.postgres import search
 from rest_framework import filters
 
 
@@ -10,6 +9,14 @@ class ItemTypeFilterBackend(filters.BaseFilterBackend):
         types = request.query_params.getlist('types[]')
         if len(types) > 0:
             return queryset.filter(type__in=types)
+        return queryset
+
+
+class ItemViewFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        only_new = request.query_params.get('onlyNew') == "true"
+        if only_new:
+            return queryset.exclude(item_views__user=request.user)
         return queryset
 
 

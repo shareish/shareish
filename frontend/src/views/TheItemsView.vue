@@ -6,12 +6,26 @@
         <div id="filters">
           <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
           <div class="list">
-            <div class="search">
+            <div class="search mb-4">
               <b-field :label="$t('search')">
                 <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
               </b-field>
             </div>
-            <toggle-box :title="$tc('type', 0)" outlined :title-size="6">
+            <div class="columns mb-3">
+              <div class="column is-half pr-2">
+                <b-button type="is-primary" :outlined="onlyNew" @click="onlyNew = false" expanded>
+                  {{ ucfirst($t('all')) }}
+                </b-button>
+              </div>
+              <div class="column is-half pl-2">
+                <b-button type="is-purple" :outlined="!onlyNew" @click="onlyNew = true" expanded>
+                  <i class="far fa-star mr-1"></i>
+                  {{ $t('only-new') }}
+                </b-button>
+              </div>
+            </div>
+            <label class="label mb-2">{{ $t('more-filters') }}</label>
+            <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mb-3">
               <b-field class="mb-1">
                 <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
                   <span>{{ $t('donation') }}</span>
@@ -89,6 +103,7 @@ export default {
       searchTypes: [],
       searchCategories: [],
       selectedCategory: null,
+      onlyNew: false,
 
       loading: false,
       itemsLoading: false,
@@ -105,7 +120,8 @@ export default {
       return {
         search: this.searchString,
         types: this.searchTypes,
-        categories: this.searchCategories
+        categories: this.searchCategories,
+        onlyNew: this.onlyNew
       };
     }
   },
@@ -234,14 +250,6 @@ $filtersWidth: 400px;
 
         .list {
           padding: 0.75rem;
-
-          & > * {
-            margin-bottom: 1.25rem;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-          }
         }
 
         #selected-categories {

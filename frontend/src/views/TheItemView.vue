@@ -271,8 +271,10 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
-          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`)).data;
-          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
+          const params = {
+            'view_date': new Date()
+          };
+          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`, {params: params})).data;
         } catch (error) {
           this.snackbarError(error);
           this.redirection = true;

@@ -199,7 +199,6 @@ class Item(models.Model):
     enddate = models.DateTimeField(null=True)
     in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
-    hitcount = models.IntegerField(verbose_name="Hit Count", default=0)
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
@@ -257,6 +256,19 @@ class ItemComment(models.Model):
         ordering = ['-creationdate']
 
 
+class ItemView(models.Model):
+    item = models.ForeignKey(Item, related_name='item_views', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.CASCADE)
+    view_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(fields=['item', 'user'], name='unique__mymap_itemviews__item_user')
+        ]
+
+
 class Conversation(models.Model):
     starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
                                 on_delete=models.CASCADE, null=True)
@@ -271,7 +283,7 @@ class Message(models.Model):
     content = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE, null=True)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE, null=True)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
 
     class Meta:
