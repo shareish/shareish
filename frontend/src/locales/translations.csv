@@ -47,6 +47,7 @@ contact,Contact,Contact
 about-us,About us,À propos
 what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
 item-type,Type,Type
+type,Types|Type|Types,Types|Type|Types
 help_add_item,"An element can be of several types (request for good or service, offer for good or service, loan offer, event) but the encoding form is identical. If you want to encode data on public roads such as a public bookcase or a source of drinking water, it is best to use other existing tools for that, see our FAQ on the home page","Un élément peut être de plusieurs types (demande de bien ou service, offre de bien ou service, offre de prêt, évènement) mais le formulaire d'encodage est identique. Si vous voulez encoder une donnée sur la voie publique comme une boîte à livres ou une source d'eau potable, il est préférable d'utiliser les outils prévus pour, voir la FAQ en page d'accueil"
 help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Évènement pour un évènement gratuit et solidaire"
 help_item_ihaveimage,"Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)","Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)"
@@ -61,7 +62,7 @@ events,Events,Évènements
 loan,Loan,Prêt
 loans,Loans,Prêts
 all,All,Tous
-category,Category,Catégorie
+category,Categories|Category|Categories,Catégories|Catégorie|Catégories
 food,Food and Supplies,Aliments et provisions
 animals,Pets and Animals,Animaux de compagnie et animaux
 aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
@@ -286,3 +287,8 @@ delete-comment,Delete comment,Supprimer le commentaire
 delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
 comment-deleted,Comment deleted!,Commentaire supprimé!
 leave-a-comment,Leave a comment,Laisser un commentaire
+author,Author,Auteur
+or,or,ou
+searched-categories,Search categories,Catégories recherchées
+no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
+filter,Filters|Filter|Filters,Filtres|Filtre|Filtres

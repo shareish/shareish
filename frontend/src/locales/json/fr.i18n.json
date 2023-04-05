@@ -47,6 +47,7 @@
   "about-us": "À propos",
   "what-are-you-looking-for": "Que cherchez-vous?",
   "item-type": "Type",
+  "type": "Types|Type|Types",
   "help_add_item": "Un élément peut être de plusieurs types (demande de bien ou service, offre de bien ou service, offre de prêt, évènement) mais le formulaire d'encodage est identique. Si vous voulez encoder une donnée sur la voie publique comme une boîte à livres ou une source d'eau potable, il est préférable d'utiliser les outils prévus pour, voir la FAQ en page d'accueil",
   "help_item_type": "Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Évènement pour un évènement gratuit et solidaire",
   "help_item_ihaveimage": "Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)",
@@ -61,7 +62,7 @@
   "loan": "Prêt",
   "loans": "Prêts",
   "all": "Tous",
-  "category": "Catégorie",
+  "category": "Catégories|Catégorie|Catégories",
   "food": "Aliments et provisions",
   "animals": "Animaux de compagnie et animaux",
   "aee": "Arts, culture et divertissements",
@@ -289,5 +290,10 @@
   "delete-comment": "Supprimer le commentaire",
   "delete-comment-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée.",
   "comment-deleted": "Commentaire supprimé!",
-  "leave-a-comment": "Laisser un commentaire"
+  "leave-a-comment": "Laisser un commentaire",
+  "author": "Auteur",
+  "or": "ou",
+  "searched-categories": "Catégories recherchées",
+  "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",
+  "filter": "Filtres|Filtre|Filtres"
 }

@@ -47,6 +47,7 @@
   "about-us": "About us",
   "what-are-you-looking-for": "What are you looking for?",
   "item-type": "Type",
+  "type": "Types|Type|Types",
   "help_add_item": "An element can be of several types (request for good or service, offer for good or service, loan offer, event) but the encoding form is identical. If you want to encode data on public roads such as a public bookcase or a source of drinking water, it is best to use other existing tools for that, see our FAQ on the home page",
   "help_item_type": "Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event",
   "help_item_ihaveimage": "Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)",
@@ -61,7 +62,7 @@
   "loan": "Loan",
   "loans": "Loans",
   "all": "All",
-  "category": "Category",
+  "category": "Categories|Category|Categories",
   "food": "Food and Supplies",
   "animals": "Pets and Animals",
   "aee": "Arts and Culture and Entertainments",
@@ -289,5 +290,10 @@
   "delete-comment": "Delete comment",
   "delete-comment-confirmation": "Are you sure you want to <b>delete</b> this comment? This action cannot be undone.",
   "comment-deleted": "Comment deleted!",
-  "leave-a-comment": "Leave a comment"
+  "leave-a-comment": "Leave a comment",
+  "author": "Author",
+  "or": "or",
+  "searched-categories": "Search categories",
+  "no-categories-selected-for-search": "No category filter applied. Select a category below to add it to the search!",
+  "filter": "Filters|Filter|Filters"
 }

@@ -1,23 +1,69 @@
 <template>
   <div id="page-items">
-    <items-filters
-        @update:selectedType="selectedType = $event"
-        @update:selectedCategory="selectedCategory = $event"
-        @update:searchString="searchString = $event"
-    />
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
-    <div v-else ref="listItems" class="scrollable">
-      <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
-        <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
-          <item-card :item="item" />
-        </div>
-        <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
-          <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems()">
-            {{ $t('button-load-more') }}
-          </b-button>
+    <div v-else class="columns">
+      <div class="column">
+        <div id="filters">
+          <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
+          <div class="list">
+            <div class="search">
+              <b-field :label="$t('search')">
+                <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+              </b-field>
+            </div>
+            <toggle-box :title="$tc('type', 0)" outlined :title-size="6">
+              <b-field class="mb-1">
+                <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                  <span>{{ $t('donation') }}</span>
+                </b-checkbox-button>
+              </b-field>
+              <b-field class="mb-1">
+                <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                  <span>{{ $t('request') }}</span>
+                </b-checkbox-button>
+              </b-field>
+              <b-field class="mb-1">
+                <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                  <span>{{ $t('loan') }}</span>
+                </b-checkbox-button>
+              </b-field>
+              <b-field class="mb-1">
+                <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                  <span>{{ $t('event') }}</span>
+                </b-checkbox-button>
+              </b-field>
+            </toggle-box>
+            <toggle-box :title="$tc('category', 0)" outlined :title-size="6">
+              <div v-if="searchCategories.length > 0" id="selected-categories">
+                <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
+                <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
+                  <div class="column name">{{ getCategory(category) }}</div>
+                  <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
+                </div>
+              </div>
+              <template v-else>
+                <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
+              </template>
+              <category-selector v-model="selectedCategory" />
+            </toggle-box>
+          </div>
         </div>
       </div>
-      <div v-else>{{ $t('no-items') }}</div>
+      <div class="column">
+        <div ref="listItems" class="scrollable">
+          <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
+            <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
+              <item-card :item="item" />
+            </div>
+            <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
+              <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems()">
+                {{ $t('button-load-more') }}
+              </b-button>
+            </div>
+          </div>
+          <div v-else>{{ $t('no-items') }}</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,19 +71,23 @@
 <script>
 import _ from "lodash";
 import axios from "axios";
-import ItemsFilters from "@/components/ItemsFilters.vue";
 import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
+import {lcall, ucfirst} from "@/functions";
+import ToggleBox from "@/components/ToggleBox.vue";
+import CategorySelector from "@/components/CategorySelector.vue";
+import {categories} from "@/categories";
 
 export default {
   name: 'TheItemsView',
   mixins: [ErrorHandler, WindowSize],
-  components: {ItemsFilters, ItemCard},
+  components: {CategorySelector, ToggleBox, ItemCard},
   data() {
     return {
       searchString: null,
-      selectedType: null,
+      searchTypes: [],
+      searchCategories: [],
       selectedCategory: null,
 
       loading: false,
@@ -54,17 +104,35 @@ export default {
     params() {
       return {
         search: this.searchString,
-        type: this.selectedType,
-        category: this.selectedCategory
+        types: this.searchTypes,
+        categories: this.searchCategories
       };
     }
   },
   watch: {
     params() {
       this.loadItems(false);
+    },
+    selectedCategory() {
+      if (this.searchCategories.indexOf(this.selectedCategory) === -1) {
+        this.searchCategories.push(this.selectedCategory);
+      }
     }
   },
   methods: {
+    ucfirst,
+    lcall,
+    getCategory(category) {
+      if (category in categories) {
+        return this.$t(categories[category]['slug']);
+      }
+      return "";
+    },
+    removeCategory(category) {
+      const index = this.searchCategories.indexOf(category);
+      if (index > -1)
+        this.searchCategories.splice(index, 1);
+    },
     scrollHandler: _.debounce(function () {
       let scrollBlock = document.getElementById('wrapper');
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
@@ -77,13 +145,16 @@ export default {
       if (!append) {
         this.page = 1;
         this.loadedAllItems = false;
-        this.items = [];
       }
 
       try {
         const data = (await axios.get("/api/v1/actives/", {params: {page: this.page, ...this.params}})).data;
 
-        this.items.push(...data.results);
+        if (!append) {
+          this.items = data.results;
+        } else {
+          this.items.push(...data.results);
+        }
         this.page += 1;
 
         if (data.next === null) {
@@ -137,10 +208,76 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$filtersWidth: 400px;
+
 .vertical-center {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+#page-items {
+  & > .columns {
+    & > .column:first-child {
+      flex: 0 0 400px;
+
+      #filters {
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+        max-width: calc(#{$filtersWidth} - 2 * 0.75rem);
+
+        .title {
+          margin-bottom: 0;
+        }
+
+        .list {
+          padding: 0.75rem;
+
+          & > * {
+            margin-bottom: 1.25rem;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+
+        #selected-categories {
+          .selected-category {
+            padding: 0;
+            margin: 0 0 5px 0;
+            font-size: 0.75rem;
+            background-color: white;
+            border-radius: 5px;
+
+            .column.name {
+              flex: 0 0 calc(400px - 0.75rem * 6 - 40px - 2px);
+              padding: 10px;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              overflow: hidden;
+            }
+
+            .column.close {
+              flex: 0 0 40px;
+              padding: 10px;
+              text-align: center;
+              cursor: pointer;
+
+              i {
+                vertical-align: middle;
+              }
+            }
+
+            &:last-child {
+              margin-bottom: 0.75rem !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </style>

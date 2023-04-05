@@ -7,9 +7,9 @@ from rest_framework import filters
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        type = request.query_params.get('type')
-        if type is not None and type != "":
-            return queryset.filter(type=type)
+        types = request.query_params.getlist('types[]')
+        if len(types) > 0:
+            return queryset.filter(type__in=types)
         return queryset
 
 
@@ -36,10 +36,10 @@ class ConversationSelectedCategoryFilterBackend(filters.BaseFilterBackend):
 
 class ItemCategoryFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        category = request.query_params.get('category')
-        if category is not None and category != "":
+        categories = request.query_params.getlist('categories[]')
+        if len(categories) > 0:
             return queryset.filter(
-                Q(category1=category) | Q(category2=category) | Q(category3=category)
+                Q(category1__in=categories) | Q(category2__in=categories) | Q(category3__in=categories)
             )
         return queryset
 

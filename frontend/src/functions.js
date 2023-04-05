@@ -56,3 +56,15 @@ export const isArrEmpty = function (arr) {
 export const ucfirst = function (s) {
   return s[0].toUpperCase() + s.slice(1);
 }
+
+export const lcfirst = function (s) {
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+export const ucall = function (s) {
+  return s.toUpperCase();
+}
+
+export const lcall = function (s) {
+  return s.toLowerCase();
+}

@@ -134,6 +134,7 @@ class ActiveItemViewSet(ItemViewSet):
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend
     ]
+    search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass
 
 
