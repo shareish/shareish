@@ -31,7 +31,7 @@
                     </template>
                     <template v-else>
                       <template v-if="windowWidth >= 400">
-                        {{ $t('show-filters') }}
+                        {{ $t('close') }}
                       </template>
                       <template v-else>
                         <i class="fas fa-times"></i>
