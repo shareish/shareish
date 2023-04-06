@@ -204,7 +204,6 @@
   "item-availability-from": "À partir du",
   "item-availability-until": "Jusqu'au",
   "delete": "Supprimer",
-  "start-conversation": "Lancer une conversation",
   "intro-DN-first-message": "Bonjour, merci pour votre proposition de don. Je suis intéressé pour ...",
   "intro-RQ-first-message": "Bonjour, je pense pouvoir répondre à votre demande. Je peux ...",
   "intro-LN-first-message": "Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ...",
@@ -289,7 +288,8 @@
   "delete-comment": "Supprimer le commentaire",
   "delete-comment-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée.",
   "comment-deleted": "Commentaire supprimé!",
-  "leave-a-comment": "Laisser un commentaire"
+  "send-private-message": "Contacter",
+  "leave-comment": "Commenter",
   "with": "avec",
   "start-of-the-conversation": "Début de la conversation"
 }

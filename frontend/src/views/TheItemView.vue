@@ -83,7 +83,7 @@
                     @click="startConversation"
                 >
                   <i class="far fa-envelope mr-1"></i>
-                  {{ $t('start-conversation') }}
+                  {{ $t('send-private-message') }} {{ item.user.first_name }}
                 </b-button>
               </div>
               <div class="column is-half">
@@ -93,8 +93,8 @@
                     style="width: 100%;"
                     @click="scrollToComments"
                 >
-                  <i class="fas fa-comments mr-1"></i>
-                  {{ $t('leave-a-comment') }}
+                  <i class="fas fa-bullhorn mr-1"></i>
+                  {{ $t('leave-comment') }}
                 </b-button>
               </div>
             </div>

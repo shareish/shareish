@@ -200,7 +200,6 @@ no-address,No address provided,Pas d'adresse renseignée
 item-availability-from,From,À partir du
 item-availability-until,Until,Jusqu'au
 delete,Delete,Supprimer
-start-conversation,Start conversation,Lancer une conversation
 intro-DN-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
 intro-RQ-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
 intro-LN-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
@@ -285,6 +284,7 @@ notif-error-post-comment,An error prevented your comment to be posted,Une erreur
 delete-comment,Delete comment,Supprimer le commentaire
 delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
 comment-deleted,Comment deleted!,Commentaire supprimé!
-leave-a-comment,Leave a comment,Laisser un commentaire
+send-private-message,Message,Contacter
+leave-comment,Comment,Commenter
 with,with,avec
 start-of-the-conversation,Start of the conversation,Début de la conversation
