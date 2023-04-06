@@ -9,7 +9,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mymap', '0064_alter_itemcomment_options'),
+        ('mymap', '0065_alter_message_options'),
     ]
 
     operations = [

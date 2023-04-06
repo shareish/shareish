@@ -9,7 +9,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mymap', '0065_auto_20230406_0050'),
+        ('mymap', '0066_auto_20230406_0050'),
     ]
 
     operations = [
