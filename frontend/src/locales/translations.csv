@@ -200,6 +200,8 @@ location,Location,Lieu
 no-address,No address provided,Pas d'adresse renseignée
 item-availability-from,From,À partir du
 item-availability-until,Until,Jusqu'au
+from,From,À partir du
+until,Until,Jusqu'au
 delete,Delete,Supprimer
 start-conversation,Start conversation,Lancer une conversation
 intro-DN-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
@@ -294,3 +296,6 @@ no-categories-selected-for-search,No category filter applied. Select a category 
 filter,Filters|Filter|Filters,Filtres|Filtre|Filtres
 only-new,Only new,Nouveautés
 more-filters,More filters,Plus de filtres
+show-filters,Show filters,Afficher les filtres
+startdate,Start date,Date de début
+close,Close,Fermer

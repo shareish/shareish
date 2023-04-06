@@ -132,6 +132,7 @@ export default {
     }
 
     .content {
+      overflow: visible;
       height: auto;
     }
   }

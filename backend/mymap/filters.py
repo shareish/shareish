@@ -20,6 +20,17 @@ class ItemViewFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
+class ItemAvailabilityFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        available_from = request.query_params.get('availableFrom')
+        available_until = request.query_params.get('availableUntil')
+        if available_from:
+            return queryset.filter(startdate__lte=available_from)
+        if available_until:
+            return queryset.filter(Q(enddate__gte=available_until) | Q(enddate__isnull=True))
+        return queryset
+
+
 class ConversationContentFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search = request.query_params.get('search')

@@ -9,7 +9,8 @@ from django.http import FileResponse, JsonResponse
 from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
-    ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend
+    ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
+    ItemAvailabilityFilterBackend
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView
 
 from rest_framework import filters, viewsets
@@ -141,7 +142,7 @@ class RecurrentItemViewSet(ItemViewSet):
 class ActiveItemViewSet(ItemViewSet):
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
-        ItemTypeFilterBackend, ItemViewFilterBackend
+        ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend
     ]
     search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass

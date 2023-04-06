@@ -347,7 +347,7 @@ export default {
     },
     goToLastMessage() {
       if (this.messages.length > 0) {
-        this.$nextTick(function () {
+        this.$nextTick(() => {
           const parent = this.$el.querySelector("#messages");
           const child = this.$el.querySelector("#messages article:last-child");
           scrollParentToChild(parent, child);

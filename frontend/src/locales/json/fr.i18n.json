@@ -204,6 +204,8 @@
   "no-address": "Pas d'adresse renseignée",
   "item-availability-from": "À partir du",
   "item-availability-until": "Jusqu'au",
+  "from": "À partir du",
+  "until": "Jusqu'au",
   "delete": "Supprimer",
   "start-conversation": "Lancer une conversation",
   "intro-DN-first-message": "Bonjour, merci pour votre proposition de don. Je suis intéressé pour ...",
@@ -297,5 +299,8 @@
   "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",
   "filter": "Filtres|Filtre|Filtres",
   "only-new": "Nouveautés",
-  "more-filters": "Plus de filtres"
+  "more-filters": "Plus de filtres",
+  "show-filters": "Afficher les filtres",
+  "startdate": "Date de début",
+  "close": "Fermer"
 }
