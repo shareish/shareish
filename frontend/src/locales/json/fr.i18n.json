@@ -290,4 +290,6 @@
   "delete-comment-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée.",
   "comment-deleted": "Commentaire supprimé!",
   "leave-a-comment": "Laisser un commentaire"
+  "with": "avec",
+  "start-of-the-conversation": "Début de la conversation"
 }

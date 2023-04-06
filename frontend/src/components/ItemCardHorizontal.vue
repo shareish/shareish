@@ -23,7 +23,7 @@
                 </div>
               </div>
               <p class="subtitle">
-                {{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}
+                {{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
                 <template v-if="showHitcount">
                   &middot;
                   <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
@@ -34,7 +34,7 @@
         </div>
         <div class="column">
           <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" class="category mr-2" :title="$t(category.slug)" />
-          <router-link v-if="address" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
+          <router-link v-if="item.location" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
             <i class="fas fa-map-marker-alt"></i>
           </router-link>
         </div>
@@ -47,9 +47,9 @@
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import {categories} from "@/categories";
-import moment from "moment";
 import axios from "axios";
 import WindowSize from "@/mixins/WindowSize";
+import {formattedDateFromNow} from "@/functions";
 
 export default {
   name: "ItemCardHorizontal",
@@ -73,8 +73,7 @@ export default {
   },
   data() {
     return {
-      geoLocation: null,
-      address: null
+      geoLocation: null
     }
   },
   created() {
@@ -95,12 +94,6 @@ export default {
     }
 
     this.fetchAddress();
-  },
-  watch: {
-    item() {
-      this.address = null;
-      this.fetchAddress();
-    }
   },
   computed: {
     itemCategories() {
@@ -124,9 +117,7 @@ export default {
     }
   },
   methods: {
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },

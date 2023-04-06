@@ -115,4 +115,25 @@ export default {
 .w-100 {
   width: 100%;
 }
+
+.h-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.vh-align-center {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
 </style>

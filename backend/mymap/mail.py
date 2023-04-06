@@ -86,11 +86,12 @@ def _get_last_new_events_near_user(user, frequency: MailNotificationFrequencies)
     return queryset[:to_show['events']], queryset.count()
 
 
-def send_mail_notif_new_message_received(conversation, message_content, receiver):
+def send_mail_notif_new_message_received(conversation, message_content, sender, receiver):
     connection = mail.get_connection(fail_silently=True)
 
     context = {
         "receiver": receiver,
+        "sender": sender,
         "conversation": conversation,
         "message_content": message_content,
         "app_url": settings.APP_URL

@@ -44,7 +44,7 @@
         </div>
       </div>
       <div v-if="!recurrentList" class="content">
-        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}</small>
         <small class="is-block" v-if="item.enddate">
           <template v-if="!itemHasEnded">
             {{ $t('ends') }}
@@ -52,7 +52,7 @@
           <template v-else>
             {{ $t('ended') }}
           </template>
-          {{ formattedDateFromNow(item.enddate) }}
+          {{ formattedDateFromNow(item.enddate, $i18n.locale) }}
         </small>
         <small class="is-block" v-if="item.location && this.geoLocation">{{ ucfirst($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
       </div>
@@ -69,10 +69,9 @@
 
 <script>
 import ItemTypeTag from "@/components/ItemTypeTag";
-import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {ucfirst} from "@/functions";
+import {formattedDateFromNow, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -131,9 +130,7 @@ export default {
   },
   methods: {
     ucfirst,
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
     deg2rad(deg) {
       return deg * (Math.PI / 180)
     },
