@@ -211,7 +211,6 @@
   "intro-EV-first-message": "Hello, thank you for making this event possible. I am interested to participate.",
   "avatar": "Avatar",
   "help_avatar": "Upload an image that represents you",
-  "notif-success-item-delete": "The item has been successfully deleted",
   "notif-error-item-delete": "An error prevented the item to be deleted",
   "user-items": "His/her items",
   "notif-error-user-login": "The username or the password is invalid, or your account is not activated yet (check your emails).",
@@ -281,7 +280,16 @@
   "click-to-view-on-map": "Click to view on map",
   "delete-message": "Delete message",
   "delete-message-confirmation": "Are you sure you want to <b>delete</b> this message from the conversation? This action cannot be undone.",
-  "message-removed": "Message removed!",
+  "message-deleted": "Message deleted!",
+  "delete-item": "Delete item",
+  "delete-item-confirmation": "Are you sure you want to <b>delete</b> this item? This action cannot be undone.",
+  "item-deleted": "Item deleted!",
+  "comment": "Comments|Comment|Comments",
+  "notif-error-post-comment": "An error prevented your comment to be posted",
+  "delete-comment": "Delete comment",
+  "delete-comment-confirmation": "Are you sure you want to <b>delete</b> this comment? This action cannot be undone.",
+  "comment-deleted": "Comment deleted!",
+  "leave-a-comment": "Leave a comment"
   "with": "with",
   "start-of-the-conversation": "Start of the conversation"
 }

@@ -74,13 +74,13 @@ class User(AbstractBaseUser):
     birth_date = models.DateField(default=date.today, blank=True)
     sign_up_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
-    username = models.CharField(max_length=20, default='')
+    username = models.CharField(max_length=20, default="")
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    description = models.TextField(blank=True, default='', max_length=300)
-    homepage_url = models.URLField(blank=True, default='')
-    facebook_url = models.URLField(blank=True, default='')
-    instagram_url = models.URLField(blank=True, default='')
+    description = models.TextField(blank=True, default="", max_length=300)
+    homepage_url = models.URLField(blank=True, default="")
+    facebook_url = models.URLField(blank=True, default="")
+    instagram_url = models.URLField(blank=True, default="")
     ref_location = models.PointField(blank=True, geography=True, null=True, default=Point(0.0, 0.0))
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_freq_conversations = models.CharField(
@@ -204,8 +204,8 @@ class Item(models.Model):
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
     category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
-    category2 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
-    category3 = models.CharField(max_length=2, choices=Categories.choices, default='', blank=True)
+    category2 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
+    category3 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE, null=True)
 
@@ -247,6 +247,16 @@ class ItemImage(models.Model):
         ordering = ['item_id', 'position']
 
 
+class ItemComment(models.Model):
+    content = models.TextField(blank=True, default="")
+    creationdate = models.DateTimeField(auto_now_add=True)
+    item = models.ForeignKey(Item, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='comments', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-creationdate']
+
+
 class Conversation(models.Model):
     starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
                                 on_delete=models.CASCADE, null=True)
@@ -258,7 +268,7 @@ class Conversation(models.Model):
 
 
 class Message(models.Model):
-    content = models.TextField(null=True)
+    content = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE, null=True)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE, null=True)
     date = models.DateTimeField(auto_now=True)

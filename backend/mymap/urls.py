@@ -3,13 +3,13 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 from .views import (
-    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet,
-    MapNameAndDescriptionViewSet, MessageViewSet, RecurrentItemViewSet, UserImageViewSet,
-    UserItemViewSet, UserViewSet
+    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MapNameAndDescriptionViewSet, MessageViewSet,
+    RecurrentItemViewSet, UserImageViewSet, UserItemViewSet, UserViewSet, ItemCommentViewSet
 )
 
 router = DefaultRouter()
 router.register("items", ItemViewSet, basename='items')
+router.register("items/(?P<item_id>\d+)/comments", ItemCommentViewSet, basename='items_comments')
 router.register("images", ItemImageViewSet, basename='images')
 router.register("webusers", UserViewSet, basename='webusers')
 router.register("conversations", ConversationViewSet, basename='conversations')

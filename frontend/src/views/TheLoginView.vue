@@ -16,7 +16,7 @@
       </div>
       <div class="field">
         <div class="control">
-          <b-button class="button is-success" :loading="waitingFormResponse" @click="submitForm">{{ $t('log-in') }}</b-button>
+          <b-button type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('log-in') }}</b-button>
         </div>
       </div>
       <router-link :to="{name: 'resetPassword'}">{{ $t('password-forgotten-?') }}</router-link>

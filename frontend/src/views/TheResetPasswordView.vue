@@ -11,7 +11,7 @@
         </div>
         <div class="field">
           <div class="control">
-            <button class="button is-success">{{ $t('reset-password') }}</button>
+            <b-button type="is-primary">{{ $t('reset-password') }}</b-button>
           </div>
         </div>
       </form>

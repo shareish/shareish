@@ -20,7 +20,8 @@
                   :outlined="selectedCategory !== 'all'"
                   :active="selectedCategory === 'all'"
                   @click="clickCategory('all')"
-                  class="button is-primary ml-0"
+                  type="is-primary"
+                  class="ml-0"
               >
                 <i class="fas fa-list-ul"></i>
               </b-button>
@@ -32,7 +33,7 @@
                   :outlined="selectedCategory !== 'asked'"
                   :active="selectedCategory === 'asked'"
                   @click="clickCategory('asked')"
-                  class="button is-primary"
+                  type="is-primary"
               >
                 <i class="far fa-hand-paper"></i>
               </b-button>
@@ -44,7 +45,7 @@
                   :outlined="selectedCategory !== 'yours'"
                   :active="selectedCategory === 'yours'"
                   @click="clickCategory('yours')"
-                  class="button is-primary"
+                  type="is-primary"
               >
                 <i class="fas fa-user"></i>
               </b-button>
@@ -149,7 +150,7 @@
               </div>
               <div class="column">
                 <b-button
-                    class="button is-primary"
+                    type="is-primary"
                     @click="sendMessage"
                     :loading="waitingFormResponse"
                 >

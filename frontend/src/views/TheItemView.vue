@@ -14,75 +14,103 @@
         </div>
       </article>
       <div class="columns">
-        <section class="column is-5">
-          <div v-if="!isOwner && itemHasNotEndedYet" id="start-conversation" class="level mb-3">
-            <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
-                {{ $t("are-you-interested") }}
-              </p>
-              <button class="level-item button is-primary" @click="startConversation">
-                {{ $t('start-conversation') }}
-              </button>
-            </div>
-          </div>
-          <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
-            <template v-if="item.images.length > 0">
-              <b-carousel-item v-for="image in item.images" :key="image.position">
-                <router-link :to="{name: 'item', params: {id: item.id}}">
-                  <figure id="item-image">
-                    <div class="item-image-background">
-                      <img :src="image" />
-                    </div>
-                    <figure>
-                      <img :src="image" />
+        <div class="column is-6">
+          <section id="carousel" class="mb-5-5">
+            <b-carousel :autoplay="false" :arrow-hover="false" :arrow="item.images.length > 1" :indicator="item.images.length > 1">
+              <template v-if="item.images.length > 0">
+                <b-carousel-item v-for="image in item.images" :key="image.position">
+                  <router-link :to="{name: 'item', params: {id: item.id}}">
+                    <figure id="item-image">
+                      <div class="item-image-background">
+                        <img :src="image" />
+                      </div>
+                      <figure>
+                        <img :src="image" />
+                      </figure>
                     </figure>
-                  </figure>
-                </router-link>
-              </b-carousel-item>
-            </template>
-            <template v-else>
-              <b-carousel-item>
-                <router-link :to="{name: 'item', params: {id: item.id}}">
-                  <figure id="item-image">
-                    <div class="item-image-background">
-                      <img :src="itemCategories[0]['image-placeholder']" />
-                    </div>
-                    <figure>
-                      <img :src="itemCategories[0]['image-placeholder']" />
+                  </router-link>
+                </b-carousel-item>
+              </template>
+              <template v-else>
+                <b-carousel-item>
+                  <router-link :to="{name: 'item', params: {id: item.id}}">
+                    <figure id="item-image">
+                      <div class="item-image-background">
+                        <img :src="itemCategories[0]['image-placeholder']" />
+                      </div>
+                      <figure>
+                        <img :src="itemCategories[0]['image-placeholder']" />
+                      </figure>
                     </figure>
-                  </figure>
-                </router-link>
-              </b-carousel-item>
-            </template>
-          </b-carousel>
-          <div v-if="isOwner && !itemHasEnded" id="item-management" class="level mt-3">
-            <div class="level-left">
-              <p class="level-item is-size-5 has-text-weight-bold level-left-description">
-                {{ $t('management') }}
-              </p>
-              <router-link :to="{name: 'editItem', params: {id: item.id}}" class="level-item button is-primary">{{ $t('edit') }}</router-link>
-              <button class="level-item button is-danger" @click="deleteItem">{{ $t('delete') }}</button>
+                  </router-link>
+                </b-carousel-item>
+              </template>
+            </b-carousel>
+          </section>
+          <article id="user">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
+                <span>{{ $t('shared-by') }}</span>
+              </div>
             </div>
-          </div>
-        </section>
-        <section id="item-info" class="column is-7">
-          <h1 class="title is-size-2">{{ item.name }}
+            <user-card :user="user" />
+          </article>
+        </div>
+        <section id="item-info" class="column is-6">
+          <h1 class="title is-size-3 mb-3">{{ item.name }}</h1>
+          <h5 class="subtitle mt-3">
             <item-type-tag :type="item.type" />
-          </h1>
-          <h5 class="subtitle is-size-6">
+            &middot;
             {{ $t("published") }}
             {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
             &middot;
             <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
-          <article id="categories" class="mb-5-5">
+          <article id="categories" class="mb-5">
             <p v-for="category in itemCategories" :key="category.slug" class="category">
               <span class="icon"><i :class="category.icon"></i></span>
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
           </article>
+          <template v-if="!isOwner">
+            <div class="columns">
+              <div class="column is-half">
+                <b-button
+                    :disabled="itemHasEnded"
+                    type="is-primary"
+                    style="width: 100%;"
+                    @click="startConversation"
+                >
+                  <i class="far fa-envelope mr-1"></i>
+                  {{ $t('start-conversation') }}
+                </b-button>
+              </div>
+              <div class="column is-half">
+                <b-button
+                    type="is-primary"
+                    outlined
+                    style="width: 100%;"
+                    @click="scrollToComments"
+                >
+                  <i class="fas fa-comments mr-1"></i>
+                  {{ $t('leave-a-comment') }}
+                </b-button>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!itemHasEnded" class="columns">
+              <div class="column is-half">
+                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
+              </div>
+              <div class="column is-half">
+                <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
+              </div>
+            </div>
+          </template>
           <article id="description" class="mb-5-5">
-            <div class="title is-size-4 mb-1">
+            <div class="title is-size-4 mb-2">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
                 <span>{{ $t('description') }}</span>
@@ -93,7 +121,7 @@
             </div>
           </article>
           <article id="location" class="mb-5-5">
-            <div class="title is-size-4">
+            <div class="title is-size-4 mb-2">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-map-pin"></i></span>
                 <span>{{ $t('location') }}</span>
@@ -109,7 +137,7 @@
             </div>
           </article>
           <article id="availability" v-if="isOwner || notAvailableYet || item.enddate" class="mb-5-5">
-            <div class="title is-size-4">
+            <div class="title is-size-4 mb-2">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
                 <span>{{ $t('availability') }}</span>
@@ -128,15 +156,49 @@
               </span>
             </template>
           </article>
-          <article id="user">
-            <div class="title is-size-4 mb-1">
+          <section id="comments">
+            <div class="title is-size-4 mb-2">
               <div class="icon-text">
-                <span class="icon is-medium"><i class="fas fa-hand-holding-heart"></i></span>
-                <span>{{ $t('shared-by') }}</span>
+                <span class="icon is-medium"><i class="fas fa-comments"></i></span>
+                <span>{{ $tc('comment', 0) }} ({{ comments.length }})</span>
               </div>
             </div>
-            <user-card :user="user" />
-          </article>
+            <div id="write" class="mb-5">
+              <div class="columns is-mobile">
+                <div class="column">
+                  <textarea
+                      v-model="commentToSend"
+                      class="textarea"
+                      placeholder="Write your message"
+                      :rows="textareaRows"
+                      @input="checkRows"
+                      @keydown.enter.exact.prevent="sendComment"
+                      @keydown.enter.shift.exact.prevent="shiftEnterPressed"
+                  />
+                </div>
+                <div class="column">
+                  <b-button
+                      type="is-primary"
+                      @click="sendComment"
+                      :loading="waitingFormResponse"
+                  >
+                    <i class="fas fa-paper-plane"></i>
+                  </b-button>
+                </div>
+              </div>
+            </div>
+            <div v-if="comments.length > 0" id="comments-list">
+              <item-comment
+                  v-for="(comment, index) in comments"
+                  :key="index"
+                  :comment="comment"
+                  @deleted="removeComment(index)"
+              />
+            </div>
+            <div v-else class="box has-background-white-ter">
+              No comments yet.
+            </div>
+          </section>
         </section>
       </div>
     </template>
@@ -149,17 +211,24 @@ import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import ItemComment from "@/components/ItemComment.vue";
+import {scrollParentToChild} from "@/functions";
 import {formattedDate, formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'TheItemView',
   mixins: [ErrorHandler],
-  components: {UserCard, ItemTypeTag},
+  components: {ItemComment, UserCard, ItemTypeTag},
   data() {
     return {
       item: {},
       user: {},
       address: null,
+
+      comments: [],
+      commentToSend: "",
+      textareaRows: 1,
+      waitingFormResponse: false,
 
       redirection: false,
       loading: true
@@ -168,6 +237,9 @@ export default {
   computed: {
     userId() {
       return Number(this.item.user.id);
+    },
+    itemId() {
+      return (this.$route.params.id) ? Number(this.$route.params.id) : null;
     },
     apiURI() {
       return (this.$route.query.kind === 'recurrent') ? 'recurrents' : 'items';
@@ -199,9 +271,8 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
-          const item_id = this.$route.params.id;
-          this.item = (await axios.get(`/api/v1/${this.apiURI}/${item_id}/`)).data;
-          await axios.get(`/api/v1/items/${item_id}/increase_hitcount`);
+          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`)).data;
+          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
         } catch (error) {
           this.snackbarError(error);
           this.redirection = true;
@@ -226,8 +297,15 @@ export default {
           this.user = (await axios.get(`/api/v1/webusers/${this.userId}/`)).data;
         } catch (error) {
           this.snackbarError(error);
-          this.redirection = true;
-          await this.$router.push("/items");
+        }
+      }
+    },
+    async fetchComments() {
+      if (!this.redirection) {
+        try {
+          this.comments = (await axios.get(`/api/v1/items/${this.itemId}/comments/`)).data;
+        } catch (error) {
+          this.snackbarError(error);
         }
       }
     },
@@ -236,7 +314,7 @@ export default {
     async startConversation() {
       try {
         const data = {
-          'item_id': this.item['id']
+          'item_id': this.item.id
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
         await this.$router.push(`/conversations/${id}`);
@@ -244,13 +322,24 @@ export default {
         this.snackbarError(error);
       }
     },
+    clickDeleteItem() {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-item'),
+        message: this.$t('delete-item-confirmation'),
+        confirmText: this.$t('delete'),
+        cancelText: this.$t('cancel'),
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: () => this.deleteItem()
+      });
+    },
     async deleteItem() {
       try {
-        await axios.delete(`/api/v1/items/${this.item['id']}/`);
+        await axios.delete(`/api/v1/items/${this.item.id}/`);
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',
-          message: this.$t('notif-success-item-delete'),
+          message: this.$t('item-deleted'),
           pauseOnHover: true,
         });
         await this.$router.push("/items");
@@ -258,11 +347,56 @@ export default {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
     },
-    async updateItem(item) {
-      this.loading = true;
-      this.item = item;
-      await this.fetchAddress();
-      this.loading = false;
+    shiftEnterPressed() {
+      this.commentToSend += "\n";
+      this.checkRows();
+    },
+    checkRows() {
+      let commentRows = 1;
+      for (let i in this.commentToSend) {
+        if (this.commentToSend[i] === '\n')
+          commentRows++;
+        if (commentRows === 4)
+          break;
+      }
+      this.textareaRows = commentRows;
+    },
+    async sendComment() {
+      if (this.commentToSend !== "") {
+        this.waitingFormResponse = true;
+        try {
+          const data = {
+            'content': this.commentToSend,
+            'creationdate': new Date()
+          };
+          const comment = (await axios.post(`/api/v1/items/${this.itemId}/comments/`, data)).data;
+          this.comments.unshift(comment);
+
+          setTimeout(() => {
+            this.waitingFormResponse = false;
+          }, 500);
+
+          this.commentToSend = "";
+
+          this.checkRows();
+        }
+        catch (error) {
+          this.snackbarError(this.$t('notif-error-post-comment'));
+        }
+      }
+    },
+    removeComment(index) {
+      this.comments.splice(index, 1);
+      this.$buefy.snackbar.open({
+        duration: 5000,
+        type: 'is-success',
+        message: this.$t('comment-deleted'),
+        pauseOnHover: true,
+        position: 'is-bottom-right'
+      });
+    },
+    scrollToComments() {
+      this.$el.querySelector("#comments").scrollIntoView({behavior: "smooth", block: "start"});
     }
   },
   async mounted() {
@@ -270,13 +404,14 @@ export default {
     await this.fetchItem();
     await this.fetchAddress();
     await this.fetchUser();
+    await this.fetchComments();
     document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .max-width-is-max-container {
   margin: 0 auto;
   max-width: 1344px;
@@ -329,6 +464,7 @@ div.icon-text {
 }
 
 #item-info .subtitle {
+  font-size: 0.875em;
   font-style: italic;
   color: #767676;
 }
@@ -360,6 +496,24 @@ div.icon-text {
   font-size: 16px;
 }
 
+#write {
+  padding: 0;
+
+  .column:last-child {
+    flex: 0 0 calc(60px + 0.75rem);
+    padding-left: 0;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  button {
+    width: 60px;
+    height: 48px;
+  }
+}
+
 @media screen and (max-width: 1215px) and (min-width: 769px) {
   #item-info {
     padding-left: 20px;
@@ -369,16 +523,6 @@ div.icon-text {
 @media screen and (max-width: 768px) {
   #item-info {
     padding-left: 0.75rem;
-  }
-}
-
-@media screen and (max-width: 1215px) {
-  #page-item-details .columns:first-child .column:first-child .level-left .level-item:first-child {
-    display: none;
-  }
-
-  .level-left-description {
-    display: none;
   }
 }
 </style>
