@@ -59,7 +59,7 @@
                 </div>
               </div>
               <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
-                <template v-if="windowWidth >= 768">
+                <template v-if="windowWidth >= 768 && windowWidth < 1024">
                   <div class="columns is-mobile">
                     <div class="column pr-2">
                       <b-field class="mb-1">
