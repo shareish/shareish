@@ -388,25 +388,25 @@ export default {
     }, 100),
     async loadItems(append = false) {
       this.itemsLoading = true;
-
-      if (!append) {
-        this.page = 1;
-        this.loadedAllItems = false;
-      }
-
       try {
-        const data = (await axios.get("/api/v1/actives/", {params: {page: this.page, ...this.params}})).data;
+        if (!append) {
+          this.page = 1;
+          this.loadedAllItems = false;
+        } else {
+          this.page += 1;
+        }
+
+        const items = (await axios.get("/api/v1/actives/", {params: {page: this.page, ...this.params}})).data;
 
         if (!append)
-          this.items = data.results;
+          this.items = items.results;
         else
-          this.items.push(...data.results);
+          this.items.push(...items.results);
 
-        this.page += 1;
-
-        if (data.next === null)
+        if (items.next === null)
           this.loadedAllItems = true;
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
 

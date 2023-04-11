@@ -93,10 +93,7 @@ class ItemCategoryFilterBackend(filters.BaseFilterBackend):
 
 class ActiveItemFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        return queryset.filter(
-            Q(in_progress=True),
-            Q(enddate__isnull=True) | Q(enddate__gte=datetime.now())
-        )
+        return queryset.filter(Q(enddate__isnull=True) | Q(enddate__gte=datetime.now()))
 
 
 class UserItemFilterBackend(filters.BaseFilterBackend):

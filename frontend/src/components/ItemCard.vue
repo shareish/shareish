@@ -45,6 +45,10 @@
       </div>
       <div v-if="!recurrentList" class="content">
         <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+          <small v-if="notAvailableYet">
+            {{ $t('available') }}
+            {{ formattedDateFromNow(item.startdate) }}
+          </small>
         <small class="is-block" v-if="item.enddate">
           <template v-if="!itemHasEnded">
             {{ $t('ends') }}
@@ -121,6 +125,9 @@ export default {
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
+    },
+    notAvailableYet() {
+      return this.item.startdate && new Date(this.item.startdate) > Date.now();
     }
   },
   methods: {

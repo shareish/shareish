@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 from .views import (
-    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MapNameAndDescriptionViewSet, MessageViewSet,
+    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MessageViewSet,
     RecurrentItemViewSet, UserImageViewSet, UserItemViewSet, UserViewSet, ItemCommentViewSet
 )
 
@@ -19,14 +19,11 @@ router.register("recurrents", RecurrentItemViewSet, basename='recurrents')
 router.register("actives", ActiveItemViewSet, basename='actives')
 router.register("user_items", UserItemViewSet, basename='user_items')
 router.register("user_image", UserImageViewSet, basename='user_image')
-router.register("mapnd", MapNameAndDescriptionViewSet, basename='mapnd')
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("requestFilter/", views.search_item_filter, name='search_item_filter'),
     path("address", views.get_address, name='get_address'),
     path("address/reverse", views.get_address_reverse, name='get_address'),
-    path("requestItems/", views.search_items, name='search_items'),
     path("predictClass/", views.predict_class, name='predict_class'),
     path("notifications/", views.get_notifications, name='notifications'),
     path("items/images/<int:itemimage_id>", views.get_item_image, name='get_item_image'),
