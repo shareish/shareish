@@ -200,7 +200,7 @@
   "notif-error-send-message": "Une erreur a empêché votre message d'être envoyé",
   "availability": "Disponibilité",
   "shared-by": "Partagé par",
-  "location": "Lieu",
+  "location": "Localisation",
   "no-address": "Pas d'adresse renseignée",
   "item-availability-from": "À partir du",
   "item-availability-until": "Jusqu'au",
@@ -305,7 +305,8 @@
   "use-geolocation": "Utiliser la géolocalisation",
   "use-reflocation": "Utiliser la localisation de référence",
   "dont-use-geolocation": "Ne pas utiliser la géolocalisation",
-  "or-type-the-address": "Ou entrez l'adresse",
+  "or-enter-an-address": "Ou entrez une adresse",
   "radius-from-location": "Rayon depuis la localisation (km)",
-  "use-a-radius-distance": "Utiliser un rayon distance"
+  "restrict-distance": "Restreindre la distance",
+  "order-by": "Trier par"
 }

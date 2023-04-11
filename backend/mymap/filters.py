@@ -1,9 +1,10 @@
 import json
 from datetime import datetime
+from itertools import chain
 
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework import filters
 
 from .functions import verif_location
@@ -40,15 +41,22 @@ class ItemLocationFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         user_location = request.query_params.get('userLocation')
         distances_radius = request.query_params.getlist('distancesRadius[]')
-        if user_location is not None and len(distances_radius) > 0:
+        if user_location is not None:
             user_location = json.loads(user_location)
             user_location = GEOSGeometry('POINT(' + str(user_location['latitude']) + ' ' + str(user_location['longitude']) + ')', srid=4326)
+            queryset = queryset.annotate(distance=Distance("location", user_location))
 
-            distances_radius = [int(distance) for distance in distances_radius]
-            min_distance = min(distances_radius) * 1000
-            max_distance = max(distances_radius) * 1000
+            if len(distances_radius) > 0:
+                distances_radius = [int(distance) for distance in distances_radius]
+                min_distance = min(distances_radius) * 1000
+                max_distance = max(distances_radius) * 1000
+                queryset = queryset.filter(Q(distance__gte=min_distance, distance__lte=max_distance) | Q(distance__isnull=True))
 
-            return queryset.annotate(distance=Distance("location", user_location)).filter(distance__gte=min_distance, distance__lte=max_distance)
+            ordering = request.query_params.get('ordering')
+            if ordering == 'distance':
+                queryset = queryset.order_by(F('distance').asc(nulls_last=True))
+            if ordering == '-distance':
+                queryset = queryset.order_by(F('distance').desc(nulls_last=True))
         return queryset
 
 

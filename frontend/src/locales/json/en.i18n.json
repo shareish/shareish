@@ -305,7 +305,8 @@
   "use-geolocation": "Use geolocation",
   "use-reflocation": "Use reference location",
   "dont-use-geolocation": "Don't use geolocation",
-  "or-type-the-address": "Or type the address",
+  "or-enter-an-address": "Or enter an address",
   "radius-from-location": "Radius from location (km)",
-  "use-a-radius-distance": "Use a radius distance"
+  "restrict-distance": "Restrict distance",
+  "order-by": "Order by"
 }
