@@ -176,7 +176,7 @@ export default {
     async fetchAddress(location) {
       if (location !== null) {
         try {
-          this.internalUser.ref_location = (await axios.post("/api/v1/address/", location)).data;
+          this.internalUser.ref_location = (await axios.post("/api/v1/address/reverse", location)).data;
         } catch (error) {
           this.fullErrorHandling(error);
         }

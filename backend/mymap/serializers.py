@@ -50,6 +50,19 @@ class UserSerializer(serializers.ModelSerializer):
 
         return data
 
+    def to_representation(self, obj):
+        rep = super(UserSerializer, self).to_representation(obj)
+        new_rep = rep.copy()
+
+        if 'request' in self.context:
+            columns = self.context['request'].query_params.getlist('columns[]')
+            if len(columns) > 0:
+                for column in rep:
+                    if column not in columns:
+                        new_rep.pop(column)
+
+        return new_rep
+
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
