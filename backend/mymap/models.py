@@ -197,7 +197,6 @@ class Item(models.Model):
     creationdate = models.DateTimeField(auto_now_add=True)
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
-    in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)

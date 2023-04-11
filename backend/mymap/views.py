@@ -20,9 +20,8 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass
 from .serializers import (
-    ItemSerializer, UserSerializer, ItemImageSerializer,
-    ConversationSerializer, MessageSerializer, UserImageSerializer, MapNameAndDescriptionSerializer,
-    ItemCommentSerializer
+    ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
+    UserImageSerializer, ItemCommentSerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -301,11 +300,6 @@ class MessageViewSet(viewsets.ModelViewSet):
             return Message.objects.all()
 
 
-class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
-    serializer_class = MapNameAndDescriptionSerializer
-    queryset = Item.objects.filter(in_progress=True)
-
-
 @api_view(['POST'])
 def get_address_reverse(request):
     if request.method == 'POST':
@@ -326,53 +320,6 @@ def get_address(request):
         if location is not None:
             return Response((location.latitude, location.longitude), status=status.HTTP_200_OK)
         return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['POST'])
-def search_item_filter(request):
-    if request.method == 'POST':
-        searched = request.data
-        items = Item.objects.none()
-        queryset = Item.objects.filter(in_progress=True)
-
-        if searched['name'] == "":
-            searched['name'] = None
-
-        if searched['name'] is None and searched['type'] is None and searched['category'] is None:
-            serialized_items = ItemSerializer(queryset, many=True)
-            return Response(serialized_items.data, status=status.HTTP_200_OK)
-
-        if searched['name'] is not None:
-            items_name = queryset.filter(name__icontains=searched['name'])
-            items_description = queryset.filter(description__icontains=searched['name'])
-            items = items | items_description | items_name
-        if searched['type'] is not None:
-            items_type = queryset.filter(type__exact=searched['type'])
-            items = items | items_type
-        if searched['category'] is not None:
-            items_category1 = queryset.filter(category1__exact=searched['category'])
-            items_category2 = queryset.filter(category2__exact=searched['category'])
-            items_category3 = queryset.filter(category3__exact=searched['category'])
-            items = items | items_category1 | items_category2 | items_category3
-        serialized_items = ItemSerializer(items, many=True)
-        return Response(serialized_items.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['POST'])
-def search_items(request):
-    if request.method == 'POST':
-        paginator = ActivePaginationClass()
-        search = request.data['search']
-        items = Item.objects.none()
-        if search is not None:
-            items_name = Item.objects.filter(name__icontains=search)
-            items_description = Item.objects.filter(description__icontains=search)
-            items = items | items_description | items_name
-        items = paginator.paginate_queryset(items, request)
-        serialized_items = ItemSerializer(items, many=True)
-        return paginator.get_paginated_response(serialized_items.data)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
