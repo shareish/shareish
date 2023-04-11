@@ -7,13 +7,19 @@
           <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
           <div class="list">
             <div class="search">
-              <b-field v-if="windowWidth >= 1024" :label="$t('search')">
-                <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
-              </b-field>
+              <template v-if="windowWidth >= 1024">
+                <b-field :label="$t('search')">
+                  <b-input
+                      v-model="searchString"
+                      :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                </b-field>
+              </template>
               <div v-else class="columns is-mobile">
                 <div class="column pr-2">
                   <b-field :label="$t('search')">
-                    <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                    <b-input
+                        v-model="searchString"
+                        :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
                   </b-field>
                 </div>
                 <div class="column pl-1" style="flex-grow: 0; padding-top: calc(24px + 0.5rem + 0.75rem);">
@@ -42,6 +48,18 @@
               </div>
             </div>
             <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
+              <b-field :label="$t('order-by')">
+                <b-select expanded v-model="orderBy">
+                  <option value="-creationdate">{{ $t('creationdate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="creationdate">{{ $t('creationdate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="startdate">{{ $t('startdate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="-startdate">{{ $t('startdate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="enddate">{{ $t('enddate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="-enddate">{{ $t('enddate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="distance">{{ $t('distance') }} ({{ $t('close-to-far') }})</option>
+                  <option value="-distance">{{ $t('distance') }} ({{ $t('far-to-close') }})</option>
+                </b-select>
+              </b-field>
               <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
                 <template v-if="windowWidth >= 768 && windowWidth < 1024">
                   <div class="columns is-mobile">
@@ -136,7 +154,7 @@
                 </b-field>
               </toggle-box>
               <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
-                <div class="columns mb-2">
+                <div class="columns is-mobile mb-2">
                   <div class="column is-one-third pr-1">
                     <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" style="width: 100%;">
                       <b-button
@@ -180,13 +198,13 @@
                     </b-tooltip>
                   </div>
                 </div>
-                <b-field :label="$t('or-type-the-address') + ':'">
+                <b-field :label="$t('or-enter-an-address') + ':'">
                   <b-input v-model="address" :placeholder="$t('address')" />
                 </b-field>
                 <b-field>
-                  <b-switch v-model="useDistance" type="is-primary">{{ $t('use-a-radius-distance') }}</b-switch>
+                  <b-switch v-model="restrictDistance" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
                 </b-field>
-                <b-field :label="$t('radius-from-location') + ':'" v-if="useDistance">
+                <b-field :label="$t('radius-from-location') + ':'" v-if="restrictDistance">
                   <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="0" :max="200" :step="1" indicator :tooltip="false" />
                 </b-field>
               </toggle-box>
@@ -239,7 +257,9 @@ export default {
       searchAvailabilityUntil: null,
       searchDistancesRadius: null,
       searchLocation: null,
-      initialtemsLoadDone: false,
+      initialItemsLoadDone: false,
+
+      orderBy: '-creationdate',
 
       loading: true,
       itemsLoading: false,
@@ -248,7 +268,7 @@ export default {
       loadedAllItems: false,
       columnsWidthClass: null,
       isMoreFiltersOpened: false,
-      useDistance: false,
+      restrictDistance: false,
       distancesRadiusInput: [0, 200],
       timeouts: {},
 
@@ -271,6 +291,7 @@ export default {
         search: this.searchString,
         types: this.searchTypes,
         categories: this.searchCategories,
+        ordering: this.orderBy,
         onlyNew: (this.onlyNew) ? this.onlyNew : null,
         availableFrom: this.searchAvailabilityFrom,
         availableUntil: this.searchAvailabilityUntil,
@@ -284,7 +305,7 @@ export default {
   },
   watch: {
     params() {
-      if (this.initialtemsLoadDone)
+      if (this.initialItemsLoadDone)
         this.loadItems();
     },
     selectedCategory() {
@@ -325,11 +346,11 @@ export default {
         this.checkAddress = true;
       }
     },
-    useDistance() {
+    restrictDistance() {
       this.locationLoading = true;
-      clearTimeout(this.timeouts['useDistance']);
-      this.timeouts['useDistance'] = setTimeout(() => {
-        if (this.useDistance)
+      clearTimeout(this.timeouts['restrictDistance']);
+      this.timeouts['restrictDistance'] = setTimeout(() => {
+        if (this.restrictDistance)
           this.searchDistancesRadius = this.distancesRadiusInput;
         else
           this.searchDistancesRadius = null;
@@ -337,7 +358,7 @@ export default {
       }, 600);
     },
     distancesRadiusInput() {
-      if (this.useDistance) {
+      if (this.restrictDistance) {
         clearTimeout(this.timeouts['distancesRadius']);
         this.timeouts['distancesRadius'] = setTimeout(() => {
           this.searchDistancesRadius = this.distancesRadiusInput;
@@ -485,7 +506,7 @@ export default {
 
     await this.loadItems();
 
-    this.initialtemsLoadDone = true;
+    this.initialItemsLoadDone = true;
 
     this.loading = false;
 
