@@ -301,12 +301,19 @@
   "only-new": "Nouveautés",
   "show-filters": "Afficher les filtres",
   "hide-filters": "Masquer les filtres",
+  "creationdate": "Date de publication",
   "startdate": "Date de début",
+  "enddate": "Date de fin",
+  "distance": "Distance",
   "use-geolocation": "Utiliser la géolocalisation",
   "use-reflocation": "Utiliser la localisation de référence",
   "dont-use-geolocation": "Ne pas utiliser la géolocalisation",
   "or-enter-an-address": "Ou entrez une adresse",
   "radius-from-location": "Rayon depuis la localisation (km)",
   "restrict-distance": "Restreindre la distance",
-  "order-by": "Trier par"
+  "order-by": "Trier par",
+  "recent-to-old": "plus récent au plus ancien",
+  "old-to-recent": "plus ancien au plus récent",
+  "close-to-far": "plus proche au plus lointain",
+  "far-to-close": "plus lointain au plus proche"
 }

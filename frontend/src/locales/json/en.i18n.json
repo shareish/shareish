@@ -301,12 +301,19 @@
   "only-new": "Only new",
   "show-filters": "Show filters",
   "hide-filters": "Hide filters",
+  "creationdate": "Publication date",
   "startdate": "Start date",
+  "enddate": "End date",
+  "distance": "Distance",
   "use-geolocation": "Use geolocation",
   "use-reflocation": "Use reference location",
   "dont-use-geolocation": "Don't use geolocation",
   "or-enter-an-address": "Or enter an address",
   "radius-from-location": "Radius from location (km)",
   "restrict-distance": "Restrict distance",
-  "order-by": "Order by"
+  "order-by": "Order by",
+  "recent-to-old": "recent to old",
+  "old-to-recent": "old to recent",
+  "close-to-far": "close to far",
+  "far-to-close": "far to close"
 }

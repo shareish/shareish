@@ -50,14 +50,14 @@
             <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
               <b-field :label="$t('order-by')">
                 <b-select expanded v-model="orderBy">
-                  <option value="-creationdate">Publication date (recent to old)</option>
-                  <option value="creationdate">Publication date (old to recent)</option>
-                  <option value="startdate">Start date (recent to old)</option>
-                  <option value="-startdate">Start date (old to recent)</option>
-                  <option value="enddate">End date (recent to old)</option>
-                  <option value="-enddate">End date (old to recent)</option>
-                  <option value="distance">Distance (close to far)</option>
-                  <option value="-distance">Distance (far to close)</option>
+                  <option value="-creationdate">{{ $t('creationdate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="creationdate">{{ $t('creationdate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="startdate">{{ $t('startdate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="-startdate">{{ $t('startdate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="enddate">{{ $t('enddate') }} ({{ $t('recent-to-old') }})</option>
+                  <option value="-enddate">{{ $t('enddate') }} ({{ $t('old-to-recent') }})</option>
+                  <option value="distance">{{ $t('distance') }} ({{ $t('close-to-far') }})</option>
+                  <option value="-distance">{{ $t('distance') }} ({{ $t('far-to-close') }})</option>
                 </b-select>
               </b-field>
               <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">

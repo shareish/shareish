@@ -297,7 +297,10 @@ filter,Filters|Filter|Filters,Filtres|Filtre|Filtres
 only-new,Only new,Nouveautés
 show-filters,Show filters,Afficher les filtres
 hide-filters,Hide filters,Masquer les filtres
+creationdate,Publication date,Date de publication
 startdate,Start date,Date de début
+enddate,End date,Date de fin
+distance,Distance,Distance
 use-geolocation,Use geolocation,Utiliser la géolocalisation
 use-reflocation,Use reference location,Utiliser la localisation de référence
 dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
@@ -305,3 +308,7 @@ or-enter-an-address,Or enter an address,Ou entrez une adresse
 radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
 restrict-distance,Restrict distance,Restreindre la distance
 order-by,Order by,Trier par
+recent-to-old,recent to old,plus récent au plus ancien
+old-to-recent,old to recent,plus ancien au plus récent
+close-to-far,close to far,plus proche au plus lointain
+far-to-close,far to close,plus lointain au plus proche
