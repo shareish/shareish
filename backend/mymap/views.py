@@ -10,7 +10,8 @@ from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
-    ItemAvailabilityFilterBackend
+    ItemAvailabilityFilterBackend, ItemLocationFilterBackend
+from .functions import verif_location
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView
 
 from rest_framework import filters, viewsets
@@ -30,34 +31,8 @@ from .ai import findClass
 
 from geopy.geocoders import Nominatim
 
-
 User = get_user_model()
 locator = Nominatim(user_agent='shareish')
-LOCATION_PREFIX = "SRID=4326;POINT"
-
-
-def verif_location(data):
-    if isinstance(data, str):
-        address = data.strip()
-        if address == "":
-            return {'success': ""}
-    elif data is None:
-        return {'success': ""}
-    else:
-        return {'error': "No suitable address to process."}
-
-    if not address.startswith(LOCATION_PREFIX):
-        location = locator.geocode(address)
-        if location is not None:
-            return {'success': "{} ({} {})".format(
-                LOCATION_PREFIX,
-                str(location.latitude),
-                str(location.longitude)
-            )}
-        else:
-            return {'error': "Couldn't find location."}
-    else:
-        return {'success': address}
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -66,7 +41,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
-        ActiveItemFilterBackend
+        ActiveItemFilterBackend  # TODO: Remove this filter?
     ]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
@@ -81,7 +56,8 @@ class ItemViewSet(viewsets.ModelViewSet):
 
             if 'view_date' in request.query_params:
                 try:
-                    ItemView.objects.create(item=instance, user=request.user, view_date=request.query_params['view_date'])
+                    ItemView.objects.create(item=instance, user=request.user,
+                                            view_date=request.query_params['view_date'])
                 except IntegrityError:
                     # Item already viewed
                     pass
@@ -142,7 +118,7 @@ class RecurrentItemViewSet(ItemViewSet):
 class ActiveItemViewSet(ItemViewSet):
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
-        ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend
+        ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend
     ]
     search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass
@@ -213,12 +189,17 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_instance(self):
         return self.request.user
 
-    @action(['put', 'patch'], detail=False)
+    @action(['get', 'put', 'patch'], detail=False)
     def me(self, request, *args, **kwargs):
-        if request.method == 'PUT':
+        self.get_object = self.get_instance
+        if request.method == 'GET':
+            return self.retrieve(request, *args, **kwargs)
+        elif request.method == 'PUT':
             return self.update(request, *args, **kwargs)
         elif request.method == 'PATCH':
             return self.partial_update(request, *args, **kwargs)
+        elif request.method == 'DELETE':
+            return self.destroy(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['ref_location'])
@@ -299,7 +280,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
             return Response(serializer.data['id'], status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
-                return Response("You cannot start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
+                return Response("You cannot start a conversation on this item, it has already ended.",
+                                status=status.HTTP_400_BAD_REQUEST)
             starter = User.objects.get(pk=request.user.id)
 
             conversation = Conversation.objects.create(starter=starter, item=item)
@@ -325,7 +307,7 @@ class MapNameAndDescriptionViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
-def getAddress(request):
+def get_address_reverse(request):
     if request.method == 'POST':
         coords = request.data['SRID'].split(' ')[1:]
         latitude = coords[0][1:]
@@ -338,7 +320,17 @@ def getAddress(request):
 
 
 @api_view(['POST'])
-def searchItemFilter(request):
+def get_address(request):
+    if request.method == 'POST':
+        location = locator.geocode(request.POST['address'])
+        if location is not None:
+            return Response((location.latitude, location.longitude), status=status.HTTP_200_OK)
+        return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+def search_item_filter(request):
     if request.method == 'POST':
         searched = request.data
         items = Item.objects.none()
@@ -369,7 +361,7 @@ def searchItemFilter(request):
 
 
 @api_view(['POST'])
-def searchItems(request):
+def search_items(request):
     if request.method == 'POST':
         paginator = ActivePaginationClass()
         search = request.data['search']
@@ -385,7 +377,7 @@ def searchItems(request):
 
 
 @api_view(['POST'])
-def predictClass(request):
+def predict_class(request):
     if request.method == 'POST':
         image = request.FILES.get('image')
         if image:
@@ -395,8 +387,8 @@ def predictClass(request):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
-def getNotifications(request):
+@permission_classes([IsAuthenticated])
+def get_notifications(request):
     def _get_unread_messages(user):
         return Message.objects.filter(
             ~Q(user=user), Q(seen=False),
@@ -421,7 +413,7 @@ def getNotifications(request):
                 Q(seen=False)
             ).update(seen=True)
 
-            conversation_unread_messages_count =  Message.objects.filter(
+            conversation_unread_messages_count = Message.objects.filter(
                 Q(conversation__id=request.data['conversation_id']),
                 ~Q(user=user),
                 Q(seen=False)
@@ -434,59 +426,9 @@ def getNotifications(request):
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def itemHasImage(request, item_id):
-    if request.method == 'GET':
-        try:
-            images = ItemImage.objects.filter(item_id=item_id)
-            if len(images) > 0:
-                return Response(status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getItemFirstImage(request, item_id):
-    if request.method == 'GET':
-        try:
-            image = ItemImage.objects.filter(item_id=item_id).first()
-            if image is not None:
-                return FileResponse(open(image.path, 'rb'))
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])  # TODO: use short living token instead of allowing any
-def republishItemImagesFromItem(request, new_item_id, parent_item_id):
-    if request.method == 'GET':
-        try:
-            new_item = Item.objects.get(pk=new_item_id)
-            parent_item = Item.objects.get(pk=parent_item_id)
-            if new_item.user == request.user and parent_item.user == request.user:
-                parent_item_images = ItemImage.objects.filter(item=parent_item)
-                if len(parent_item_images) > 0:
-                    for new_item_image in parent_item_images:
-                        new_item_image.pk = None
-                        new_item_image.item_id = new_item_id
-                        new_item_image.save()
-                    return Response(status=status.HTTP_201_CREATED)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
 @api_view(['GET', 'DELETE'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def userImage(request, userimage_id):
+@permission_classes([AllowAny])
+def user_image(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
@@ -506,8 +448,8 @@ def userImage(request, userimage_id):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getItemImage(request, itemimage_id):
+@permission_classes([AllowAny])
+def get_item_image(request, itemimage_id):
     if request.method == 'GET':
         try:
             image = ItemImage.objects.get(pk=itemimage_id)
@@ -518,16 +460,17 @@ def getItemImage(request, itemimage_id):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getItemImagesBase64(request, item_id):
+@permission_classes([AllowAny])
+def get_item_images_base64(request, item_id):
     if request.method == 'GET':
         try:
             item_images = ItemImage.objects.filter(item_id=item_id)
             images = []
             for item_image in item_images:
                 images.append({
-                   "name": str(item_image.image.name),
-                   "base64_url": "data:image/png;base64," + str(base64.b64encode(item_image.image.file.read()).decode("utf-8"))
+                    "name": str(item_image.image.name),
+                    "base64_url": "data:image/png;base64," + str(
+                        base64.b64encode(item_image.image.file.read()).decode("utf-8"))
                 })
             return Response(json.dumps(images), status=status.HTTP_200_OK)
         except:
@@ -536,14 +479,15 @@ def getItemImagesBase64(request, item_id):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])  # TODO: use short living token instead of allowing any
-def getUserImageBase64(request, userimage_id):
+@permission_classes([AllowAny])
+def get_user_image_base64(request, userimage_id):
     if request.method == 'GET':
         try:
             userimage = UserImage.objects.get(pk=userimage_id)
             response = {
-               "name": str(userimage.image.name),
-               "base64_url": "data:image/png;base64," + str(base64.b64encode(userimage.image.file.read()).decode("utf-8"))
+                "name": str(userimage.image.name),
+                "base64_url": "data:image/png;base64," + str(
+                    base64.b64encode(userimage.image.file.read()).decode("utf-8"))
             }
             return Response(json.dumps(response), status=status.HTTP_200_OK)
         except UserImage.DoesNotExist:

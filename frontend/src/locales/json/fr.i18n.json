@@ -299,8 +299,13 @@
   "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",
   "filter": "Filtres|Filtre|Filtres",
   "only-new": "Nouveautés",
-  "more-filters": "Plus de filtres",
   "show-filters": "Afficher les filtres",
+  "hide-filters": "Masquer les filtres",
   "startdate": "Date de début",
-  "close": "Fermer"
+  "use-geolocation": "Utiliser la géolocalisation",
+  "use-reflocation": "Utiliser la localisation de référence",
+  "dont-use-geolocation": "Ne pas utiliser la géolocalisation",
+  "or-type-the-address": "Ou entrez l'adresse",
+  "radius-from-location": "Rayon depuis la localisation (km)",
+  "use-a-radius-distance": "Utiliser un rayon distance"
 }

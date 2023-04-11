@@ -147,7 +147,7 @@ export default {
     async fetchAddress() {
       if (this.item.location !== null) {
         try {
-          this.address = (await axios.post("/api/v1/address/", this.item.location)).data;
+          this.address = (await axios.post("/api/v1/address/reverse", this.item.location)).data;
         } catch (error) {
           this.snackbarError(error);
         }

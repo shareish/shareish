@@ -68,3 +68,34 @@ export const ucall = function (s) {
 export const lcall = function (s) {
   return s.toLowerCase();
 }
+
+export class Geolocation {
+  constructor(param1, param2 = null) {
+    if (typeof param1 === 'object') {
+      this.latitude = param1.coords.latitude;
+      this.longitude = param1.coords.longitude;
+    } else {
+      this.latitude = param1;
+      this.longitude = param2;
+    }
+  }
+  toRadians(deg) {
+    return deg * (Math.PI / 180)
+  }
+
+  distanceFrom(geolocation) {
+    let R = 6378.1370; // Radius of the earth in km
+    let dLat = this.toRadians(geolocation.latitude - this.latitude);
+    let dLon = this.toRadians(geolocation.longitude - this.longitude);
+    let a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRadians(this.latitude)) * Math.cos(this.toRadians(geolocation.latitude)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in kilometers
+  }
+
+  distanceTo(geolocation) {
+    return this.distanceFrom(geolocation);
+  }
+}

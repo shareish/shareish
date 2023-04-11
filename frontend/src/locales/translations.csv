@@ -295,7 +295,12 @@ searched-categories,Search categories,Catégories recherchées
 no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
 filter,Filters|Filter|Filters,Filtres|Filtre|Filtres
 only-new,Only new,Nouveautés
-more-filters,More filters,Plus de filtres
 show-filters,Show filters,Afficher les filtres
+hide-filters,Hide filters,Masquer les filtres
 startdate,Start date,Date de début
-close,Close,Fermer
+use-geolocation,Use geolocation,Utiliser la géolocalisation
+use-reflocation,Use reference location,Utiliser la localisation de référence
+dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
+or-type-the-address,Or type the address,Ou entrez l'adresse
+radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
+use-a-radius-distance,Use a radius distance,Utiliser un rayon distance

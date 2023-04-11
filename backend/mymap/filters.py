@@ -1,7 +1,12 @@
+import json
 from datetime import datetime
 
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
 from rest_framework import filters
+
+from .functions import verif_location
 
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
@@ -25,9 +30,25 @@ class ItemAvailabilityFilterBackend(filters.BaseFilterBackend):
         available_from = request.query_params.get('availableFrom')
         available_until = request.query_params.get('availableUntil')
         if available_from:
-            return queryset.filter(startdate__lte=available_from)
+            return queryset.filter(Q(startdate__gte=available_from) | Q(startdate__lte=available_until))
         if available_until:
-            return queryset.filter(Q(enddate__gte=available_until) | Q(enddate__isnull=True))
+            return queryset.filter(Q(enddate__gte=available_from) | Q(enddate__lte=available_until) | Q(enddate__isnull=True))
+        return queryset
+
+
+class ItemLocationFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user_location = request.query_params.get('userLocation')
+        distances_radius = request.query_params.getlist('distancesRadius[]')
+        if user_location is not None and len(distances_radius) > 0:
+            user_location = json.loads(user_location)
+            user_location = GEOSGeometry('POINT(' + str(user_location['latitude']) + ' ' + str(user_location['longitude']) + ')', srid=4326)
+
+            distances_radius = [int(distance) for distance in distances_radius]
+            min_distance = min(distances_radius) * 1000
+            max_distance = max(distances_radius) * 1000
+
+            return queryset.annotate(distance=Distance("location", user_location)).filter(distance__gte=min_distance, distance__lte=max_distance)
         return queryset
 
 
@@ -75,5 +96,4 @@ class UserItemFilterBackend(filters.BaseFilterBackend):
         user = request.query_params.get('id')
         if user is not None and user != "":
             return queryset.filter(user_id=int(user))
-        else:
-            return queryset.filter(user=request.user)
+        return queryset.filter(user=request.user)

@@ -23,7 +23,7 @@
                       @click="isMoreFiltersOpened = !isMoreFiltersOpened">
                     <template v-if="!isMoreFiltersOpened">
                       <template v-if="windowWidth >= 400">
-                        {{ $t('show-filters') }}
+                        {{ $t('show-filters') }}<i class="fas fa-chevron-down ml-2" style="margin-top: -1px; vertical-align: middle;"></i>
                       </template>
                       <template v-else>
                         <i class="fas fa-plus"></i>
@@ -31,7 +31,7 @@
                     </template>
                     <template v-else>
                       <template v-if="windowWidth >= 400">
-                        {{ $t('close') }}
+                        {{ $t('hide-filters') }}<i class="fas fa-chevron-up ml-2"></i>
                       </template>
                       <template v-else>
                         <i class="fas fa-times"></i>
@@ -41,23 +41,7 @@
                 </div>
               </div>
             </div>
-            <div class="more-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
-              <label class="label">{{ $t('more-filters') }}</label>
-              <div class="columns is-mobile mt-2">
-                <div class="column is-half pr-1 pb-0 pt-0">
-                  <b-button type="is-primary" :outlined="onlyNew" @click="onlyNew = false" expanded>
-                    {{ ucfirst($t('all')) }}
-                  </b-button>
-                </div>
-                <div class="column is-half pl-1 pb-0 pt-0">
-                  <b-button type="is-purple" :outlined="!onlyNew" @click="onlyNew = true" expanded>
-                    <i class="far fa-star mr-1"></i>
-                    <template v-if="windowWidth >= 360">
-                      {{ $t('only-new') }}
-                    </template>
-                  </b-button>
-                </div>
-              </div>
+            <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
               <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
                 <template v-if="windowWidth >= 768 && windowWidth < 1024">
                   <div class="columns is-mobile">
@@ -134,7 +118,7 @@
                       icon="calendar"
                       :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
                       icon-right-clickable
-                      @icon-right-click="clearDate('searchAvailabilityFrom')"
+                      @icon-right-click="searchAvailabilityFrom = null"
                       icon-pack="fas"
                       :locale="$i18n.locale"
                   />
@@ -145,10 +129,65 @@
                       icon="calendar"
                       :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
                       icon-right-clickable
-                      @icon-right-click="clearDate('searchAvailabilityUntil')"
+                      @icon-right-click="searchAvailabilityUntil = null"
                       icon-pack="fas"
                       :locale="$i18n.locale"
                   />
+                </b-field>
+              </toggle-box>
+              <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
+                <div class="columns mb-2">
+                  <div class="column is-one-third pr-1">
+                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'none'"
+                          :outlined="locationTypeChosen !== 'none'"
+                          :disabled="locationTypeChosen !== 'none' && locationLoading"
+                          :loading="locationTypeChosen === 'none' && locationLoading"
+                          type="is-danger"
+                      >
+                        <i class="fas fa-times"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                  <div class="column is-one-third pr-1 pl-1">
+                    <b-tooltip :label="$t('use-geolocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'geoLocation'"
+                          :outlined="locationTypeChosen !== 'geoLocation'"
+                          :disabled="locationTypeChosen !== 'geoLocation' && locationLoading"
+                          :loading="locationTypeChosen === 'geoLocation' && locationLoading"
+                          type="is-primary"
+                      >
+                        <i class="icon fas fa-map-marker-alt"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                  <div class="column is-one-third pl-1">
+                    <b-tooltip :label="$t('use-reflocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'refLocation'"
+                          :outlined="locationTypeChosen !== 'refLocation'"
+                          :disabled="locationTypeChosen !== 'refLocation' && locationLoading"
+                          :loading="locationTypeChosen === 'refLocation' && locationLoading"
+                          type="is-info"
+                      >
+                        <i class="fas fa-home"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                </div>
+                <b-field :label="$t('or-type-the-address') + ':'">
+                  <b-input v-model="address" :placeholder="$t('address')" />
+                </b-field>
+                <b-field>
+                  <b-switch v-model="useDistance" type="is-primary">{{ $t('use-a-radius-distance') }}</b-switch>
+                </b-field>
+                <b-field :label="$t('radius-from-location') + ':'" v-if="useDistance">
+                  <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="0" :max="200" :step="1" indicator :tooltip="false" />
                 </b-field>
               </toggle-box>
             </div>
@@ -159,10 +198,10 @@
         <div id="items-list" class="scrollable">
           <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
             <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
-              <item-card :item="item" />
+              <item-card :item="item" :user-location="searchLocation" />
             </div>
             <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
-              <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems()">
+              <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems(true)">
                 {{ $t('button-load-more') }}
               </b-button>
             </div>
@@ -180,7 +219,7 @@ import axios from "axios";
 import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
-import {lcall, ucfirst} from "@/functions";
+import {Geolocation, lcall, ucfirst} from "@/functions";
 import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import {categories} from "@/categories";
@@ -198,14 +237,30 @@ export default {
       onlyNew: false,
       searchAvailabilityFrom: null,
       searchAvailabilityUntil: null,
+      searchDistancesRadius: null,
+      searchLocation: null,
+      initialtemsLoadDone: false,
 
-      loading: false,
+      loading: true,
       itemsLoading: false,
       page: 1,
       nbItemsPerPage: 20,
       loadedAllItems: false,
       columnsWidthClass: null,
       isMoreFiltersOpened: false,
+      useDistance: false,
+      distancesRadiusInput: [0, 200],
+      timeouts: {},
+
+      user: {},
+      address: "",
+      checkAddress: true,
+      geoLocation: null,
+      refLocation: null,
+      geoLocationAddress: "",
+      refLocationAddress: "",
+      locationTypeChosen: 'geoLocation',
+      locationLoading: false,
 
       items: []
     }
@@ -218,39 +273,81 @@ export default {
         categories: this.searchCategories,
         onlyNew: (this.onlyNew) ? this.onlyNew : null,
         availableFrom: this.searchAvailabilityFrom,
-        availableUntil: this.searchAvailabilityUntil
+        availableUntil: this.searchAvailabilityUntil,
+        userLocation: this.searchLocation,
+        distancesRadius: this.searchDistancesRadius
       };
+    },
+    userId() {
+      return Number(this.$store.state.user.id);
     }
   },
   watch: {
     params() {
-      this.loadItems(false);
+      if (this.initialtemsLoadDone)
+        this.loadItems();
     },
     selectedCategory() {
-      if (this.searchCategories.indexOf(this.selectedCategory) === -1) {
+      if (this.searchCategories.indexOf(this.selectedCategory) === -1)
         this.searchCategories.push(this.selectedCategory);
+    },
+    locationTypeChosen() {
+      clearTimeout(this.timeouts['locationTypeChosen']);
+      this.locationLoading = true;
+      this.timeouts['locationTypeChosen'] = setTimeout(() => {
+        switch (this.locationTypeChosen) {
+          case 'geoLocation':
+            this.checkAddress = false;
+            this.address = this.geoLocationAddress;
+            this.searchLocation = this.geoLocation;
+            break;
+          case 'refLocation':
+            this.checkAddress = false;
+            this.address = this.refLocationAddress;
+            this.searchLocation = this.refLocation;
+            break;
+          case 'none':
+            this.checkAddress = false;
+            this.address = "";
+            this.searchLocation = null;
+            break;
+        }
+        this.locationLoading = false;
+      }, 600);
+    },
+    address() {
+      if (this.checkAddress) {
+        clearTimeout(this.timeouts['address']);
+        this.timeouts['address'] = setTimeout(() => {
+          this.updateGeolocationFromAddress();
+        }, 1000);
+      } else {
+        this.checkAddress = true;
       }
     },
-    searchStartdateFrom() {
-      console.log("test 1");
+    useDistance() {
+      this.locationLoading = true;
+      clearTimeout(this.timeouts['useDistance']);
+      this.timeouts['useDistance'] = setTimeout(() => {
+        if (this.useDistance)
+          this.searchDistancesRadius = this.distancesRadiusInput;
+        else
+          this.searchDistancesRadius = null;
+        this.locationLoading = false;
+      }, 600);
     },
-    searchStartdateUntil() {
-      console.log("test 2");
+    distancesRadiusInput() {
+      if (this.useDistance) {
+        clearTimeout(this.timeouts['distancesRadius']);
+        this.timeouts['distancesRadius'] = setTimeout(() => {
+          this.searchDistancesRadius = this.distancesRadiusInput;
+        }, 600);
+      }
     }
   },
   methods: {
     ucfirst,
     lcall,
-    clearDate(name) {
-      switch (name) {
-        case "searchAvailabilityFrom":
-          this.searchAvailabilityFrom = null;
-          break;
-        case "searchAvailabilityUntil":
-          this.searchAvailabilityUntil = null;
-          break;
-      }
-    },
     getCategory(category) {
       if (category in categories) {
         return this.$t(categories[category]['slug']);
@@ -265,12 +362,12 @@ export default {
     scrollHandler: _.debounce(function () {
       let scrollBlock = document.getElementById('wrapper');
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
-      if (bottom && !this.loadedAllItems) {
-        this.loadItems();
-      }
+      if (bottom && !this.loadedAllItems)
+        this.loadItems(true);
     }, 100),
-    async loadItems(append = true) {
+    async loadItems(append = false) {
       this.itemsLoading = true;
+
       if (!append) {
         this.page = 1;
         this.loadedAllItems = false;
@@ -279,18 +376,16 @@ export default {
       try {
         const data = (await axios.get("/api/v1/actives/", {params: {page: this.page, ...this.params}})).data;
 
-        if (!append) {
+        if (!append)
           this.items = data.results;
-        } else {
+        else
           this.items.push(...data.results);
-        }
+
         this.page += 1;
 
-        if (data.next === null) {
+        if (data.next === null)
           this.loadedAllItems = true;
-        }
-      }
-      catch (error) {
+      } catch (error) {
         this.snackbarError(error);
       }
 
@@ -318,24 +413,116 @@ export default {
         }
       }
       this.columnsWidthClass = columnsWidthClass;
+    },
+    async fetchUser() {
+      try {
+        const params = {
+          columns: ['ref_location']
+        }
+        this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
+        if (this.user.ref_location !== null) {
+          const coords = this.user.ref_location.slice(17, -1).split(' ');
+          this.refLocation = new Geolocation(coords[0], coords[1]);
+        }
+      } catch (error) {
+        this.snackbarError(error);
+      }
+    },
+    async fetchGeolocationAddress(geolocation) {
+      let locationPoint = "SRID=4326;POINT (" + geolocation.latitude + " " + geolocation.longitude + ")";
+      return this.fetchAddress(locationPoint);
+    },
+    async fetchAddress(location) {
+      if (location !== null) {
+        try {
+          return (await axios.post("/api/v1/address/reverse", location)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+    },
+    async fetchGeolocation(address) {
+      if (address !== null && address !== "") {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          return (await axios.post("/api/v1/address", formData)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+    },
+    async updateGeolocationFromAddress() {
+      if (this.address !== "") {
+        const geolocation = await this.fetchGeolocation(this.address);
+        this.searchLocation = new Geolocation(geolocation[0], geolocation[1])
+      } else {
+        this.searchLocation = null;
+      }
     }
   },
-  mounted() {
+  async mounted() {
     document.title = `Shareish | ${this.$t('items')}`;
-    this.loadItems();
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries)
-        this.itemListWidthChanged(entry.contentRect.width);
+    await this.fetchUser();
+
+    if (this.geoLocation !== null)
+      this.geoLocationAddress = await this.fetchGeolocationAddress(this.geoLocation);
+    if (this.refLocation !== null)
+      this.refLocationAddress = await this.fetchGeolocationAddress(this.refLocation);
+
+    if (this.locationTypeChosen === 'geoLocation') {
+      this.checkAddress = false;
+      this.address = this.geoLocationAddress;
+      this.searchLocation = this.geoLocation;
+    } else if (this.locationTypeChosen === 'refLocation') {
+      this.checkAddress = false;
+      this.address = this.refLocationAddress;
+      this.searchLocation = this.refLocation;
+    }
+
+    await this.loadItems();
+
+    this.initialtemsLoadDone = true;
+
+    this.loading = false;
+
+    this.$nextTick(() => {
+      const itemsList = document.getElementById("items-list");
+      if (itemsList !== null) {
+        const resizeObserver = new ResizeObserver((entries) => {
+          for (const entry of entries)
+            this.itemListWidthChanged(entry.contentRect.width);
+        });
+        resizeObserver.observe(itemsList);
+      }
     });
-    const itemsList = document.getElementById("items-list");
-    resizeObserver.observe(itemsList);
   },
-  created: function () {
+  created() {
+    // Has the user activated geolocation?
+    if ('geolocation' in navigator) {
+      // Get the position
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          this.geoLocation = new Geolocation(position);
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
+    }
+
     window.addEventListener('scroll', this.scrollHandler);
   },
   destroyed: function () {
     window.removeEventListener('scroll', this.scrollHandler);
+    for (let i in this.timeouts)
+      clearTimeout(this.timeouts[i]);
   }
 };
 </script>
@@ -431,7 +618,7 @@ $filtersWidth: 400px;
   #filters {
     min-width: $filtersWidth;
 
-    .more-filters:not(.is-opened) {
+    .other-filters:not(.is-opened) {
       display: none;
     }
   }

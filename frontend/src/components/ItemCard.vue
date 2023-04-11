@@ -54,7 +54,7 @@
           </template>
           {{ formattedDateFromNow(item.enddate) }}
         </small>
-        <small class="is-block" v-if="item.location && this.geoLocation">{{ ucfirst($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
+        <small class="is-block" v-if="itemLocation && userLocation">{{ ucfirst($t('at')) }} &#177; {{ userLocation.distanceTo(itemLocation).toFixed(2) }} km</small>
       </div>
       <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
@@ -72,7 +72,7 @@ import ItemTypeTag from "@/components/ItemTypeTag";
 import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {ucfirst} from "@/functions";
+import {Geolocation, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -86,33 +86,27 @@ export default {
     recurrentList: {
       type: Boolean,
       default: false
+    },
+    userLocation: {
+      type: Object,
+      required: false
     }
   },
   data() {
     return {
-      geoLocation: null,
+      itemLocation: null,
       linkOnClick: ""
     }
   },
   created() {
-    // Has the user activated geolocation?
-    if ('geolocation' in navigator) {
-      // Get the position
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          this.geoLocation = position;
-        },
-        null,
-        {
-          maximumAge: 10000,
-          timeout: 5000,
-          enableHighAccuracy: true
-        }
-      );
-    }
     const addItemFromLink = {name: 'addItemFrom', params: {id: this.item.id}};
     const itemLink = {name: 'item', params: {id: this.item.id}};
     this.linkOnClick = !this.recurrentList ? itemLink : addItemFromLink;
+
+    if (this.item['location'] !== null) {
+      const coords = this.item['location'].slice(17, -1).split(' ');
+      this.itemLocation = new Geolocation(coords[0], coords[1]);
+    }
   },
   computed: {
     itemCategories() {
@@ -133,23 +127,6 @@ export default {
     ucfirst,
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
-    },
-    deg2rad(deg) {
-      return deg * (Math.PI / 180)
-    },
-    getDistanceFromCoords() {
-      let latLong = this.item['location'].slice(17, -1).split(' ');
-      let lat2 = latLong[0];
-      let lon2 = latLong[1];
-      let R = 6371; // Radius of the earth in km
-      let dLat = this.deg2rad(lat2 - this.geoLocation.coords.latitude);  // deg2rad below
-      let dLon = this.deg2rad(lon2 - this.geoLocation.coords.longitude);
-      let a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(this.deg2rad(this.geoLocation.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c; // Distance in km
     }
   }
 };
