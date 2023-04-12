@@ -79,7 +79,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = [
-            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'creationdate', 'startdate',
+            'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate',
             'enddate', 'type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
         ]
 
