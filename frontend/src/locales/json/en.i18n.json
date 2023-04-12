@@ -316,5 +316,8 @@
   "order-by-availability-startdate": "Availability (starting date)",
   "order-by-availability-enddate": "Availability (ending date)",
   "closest-distance": "Distance (closest)",
-  "available": "Available"
+  "available": "Available",
+  "corresponding-to-search": "matches your search.|match your search.",
+  "found": "found.",
+  "item": "item|items"
 }

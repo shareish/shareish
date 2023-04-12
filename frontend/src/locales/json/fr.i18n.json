@@ -312,9 +312,12 @@
   "radius-from-location": "Rayon depuis la localisation (km)",
   "restrict-distance": "Restreindre la distance",
   "order-by": "Trier par",
-  "recent-first": "Les plus récents en premier",
+  "recent-first": "Récents en premier",
   "order-by-availability-startdate": "Disponibilité (date de début)",
   "order-by-availability-enddate": "Disponibilité (date de fin)",
   "closest-distance": "Distance (les plus proches)",
-  "available": "Disponible"
+  "available": "Disponible",
+  "corresponding-to-search": "correspond à votre recherche.|correspondent à votre recherche.",
+  "found": "trouvé.|trouvés.",
+  "item": "élément|élements"
 }

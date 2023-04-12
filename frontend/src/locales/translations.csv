@@ -308,8 +308,11 @@ or-enter-an-address,Or enter an address,Ou entrez une adresse
 radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
 restrict-distance,Restrict distance,Restreindre la distance
 order-by,Order by,Trier par
-recent-first,Recents first,Les plus récents en premier
+recent-first,Recents first,Récents en premier
 order-by-availability-startdate,Availability (starting date),Disponibilité (date de début)
 order-by-availability-enddate,Availability (ending date),Disponibilité (date de fin)
 closest-distance,Distance (closest),Distance (les plus proches)
 available,Available,Disponible
+corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
+found,found.,trouvé.|trouvés.
+item,item|items,élément|élements
