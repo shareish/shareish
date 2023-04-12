@@ -202,13 +202,22 @@
       </div>
       <div class="column">
         <div id="items-list" class="scrollable">
-          <div class="columns is-mobile">
+          <header class="columns is-mobile">
             <div class="column">
-              <p><b>{{ items.length }} éléments</b> correspondent à votre recherche.</p>
+              <p id="items-match-count">
+                <b>{{ items.length }} {{ $tc('item', items.length) }}</b>
+                <template v-if="windowWidth > 1180">
+                  {{ $tc('corresponding-to-search', items.length) }}
+                </template>
+                <template v-else>
+                  {{ $tc('found', items.length) }}
+                </template>
+              </p>
             </div>
-            <div class="column" style="flex: 0 0 auto;">
-              <b-field :label="$t('order-by')" horizontal style="white-space: nowrap;">
-                <b-select expanded v-model="orderBy">
+            <div class="column" style="flex: 0 0 auto; display: inline-flex;">
+              <div class="order-by-label">{{ $t('order-by') }}</div>
+              <b-field class="wsnw">
+                <b-select expanded v-model="orderBy" class="order-by-select">
                   <option value="-creationdate">{{ $t('recent-first') }}</option>
                   <option value="startdate">{{ $t('order-by-availability-startdate') }}</option>
                   <option value="enddate">{{ $t('order-by-availability-enddate') }}</option>
@@ -216,13 +225,13 @@
                 </b-select>
               </b-field>
             </div>
-          </div>
+          </header>
           <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
             <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
               <item-card :item="item" :user-location="searchLocation" />
             </div>
-            <div v-if="!loadedAllItems" class="column is-narrow vertical-center">
-              <b-button v-if="!loadedAllItems" :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems(true)">
+            <div v-if="loadedAllItems" id="load-more-items" class="column is-narrow">
+              <b-button :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems(true)">
                 {{ $t('button-load-more') }}
               </b-button>
             </div>
@@ -554,75 +563,87 @@ export default {
 <style lang="scss" scoped>
 $filtersWidth: 400px;
 
-.vertical-center {
+#page-items > .columns > .column:first-child {
+  flex: 0 0 $filtersWidth;
+  max-width: $filtersWidth;
+}
+
+#filters {
+  border-radius: 5px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+  max-width: calc(#{$filtersWidth} - 2 * 0.75rem);
+
+  .title {
+    margin-bottom: 0;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .list {
+    padding: 0.75rem;
+    border-radius: 0 0 5px 5px;
+  }
+}
+
+
+#selected-categories {
+  .selected-category {
+    padding: 0;
+    margin: 0 0 5px 0;
+    font-size: 0.75rem;
+    background-color: white;
+    border-radius: 5px;
+
+    .column.name {
+      flex: 0 0 calc(400px - 0.75rem * 6 - 40px - 2px);
+      padding: 10px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .column.close {
+      flex: 0 0 40px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+
+      i {
+        vertical-align: middle;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0.75rem !important;
+    }
+  }
+}
+
+#items-list header {
+  .order-by-label {
+    height: 40px;
+    line-height: 40px;
+    margin-right: 0.5rem;
+    font-weight: bold;
+  }
+  .order-by-select {
+    width: 200px;
+  }
+}
+
+#items-match-count {
+  height: 40px;
+  line-height: 40px;
+  font-size: 1.3em;
+}
+
+#load-more-items {
   display: flex;
-  flex-direction: row;
   align-items: center;
 }
 
-#page-items {
-  & > .columns {
-    & > .column:first-child {
-      flex: 0 0 $filtersWidth;
-      max-width: $filtersWidth;
-
-      #filters {
-        border-radius: 5px;
-        box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
-        max-width: calc(#{$filtersWidth} - 2 * 0.75rem);
-
-        .title {
-          margin-bottom: 0;
-          border-radius: 5px 5px 0 0;
-        }
-
-        .list {
-          padding: 0.75rem;
-          border-radius: 0 0 5px 5px;
-        }
-
-        #selected-categories {
-          .selected-category {
-            padding: 0;
-            margin: 0 0 5px 0;
-            font-size: 0.75rem;
-            background-color: white;
-            border-radius: 5px;
-
-            .column.name {
-              flex: 0 0 calc(400px - 0.75rem * 6 - 40px - 2px);
-              padding: 10px;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              overflow: hidden;
-            }
-
-            .column.close {
-              flex: 0 0 40px;
-              padding: 10px;
-              text-align: center;
-              cursor: pointer;
-
-              i {
-                vertical-align: middle;
-              }
-            }
-
-            &:last-child {
-              margin-bottom: 0.75rem !important;
-            }
-          }
-        }
-      }
-    }
-
-    & > .column:last-child {
-      #items-list > .columns > .column:first-child p {
-        height: 40px;
-        line-height: 40px;
-        font-size: 1.3em;
-      }
-    }
+@media screen and (max-width: 1350px) {
+  #items-match-count {
+    font-size: 1.1em;
   }
 }
 
@@ -652,6 +673,44 @@ $filtersWidth: 400px;
 
     .other-filters:not(.is-opened) {
       display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #items-list header .order-by-label {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  #filters {
+    margin-bottom: 0.25rem;
+  }
+
+  #items-list header {
+    display: block;
+
+    & > .column {
+      width: 100%;
+      padding: 0 0.75rem;
+
+      &:last-child {
+        display: flex;
+        margin-bottom: 0.75rem;
+
+        .field {
+          flex-basis: 100%;
+        }
+      }
+    }
+    .order-by-label {
+      flex: 0 0 auto;
+      display: block;
+    }
+
+    .order-by-select {
+      width: 100%;
     }
   }
 }

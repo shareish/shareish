@@ -1,0 +1,318 @@
+key,en,fr
+welcome,Welcome,Bienvenue
+shareish_title,Share and Cherish,Partager et chérir
+on,on,sur
+shareish_description,"Shareish is an open-source web platform to foster mutual aid, and solidarity (also called generalized exchange or gift economy). On shareish, everything is free, no real or virtual currency is used. Everyone is free to request or offer any material, manual, intellectual, logistical aid, and act in solidarity on a regular or occasional basis","Shareish est une plateforme open-source pour faciliter et encourager l'entraide, la solidarité (aussi appelé l'échange généralisé, ou l'économie du don). Sur Shareish, tout est gratuit, aucune monnaie réelle ou virtuelle n'est utilisée. Tout le monde est libre de demander ou de proposer des aides matérielles, manuelles, intellectuelles, ou logistiques et d'agir concrètement de manière solidaire de manière régulière ou occasionnelle"
+after_registration,"Once you are registered","Une fois que vous êtes enregistré"
+andet,"and","et"
+logged_in,"logged in","connecté"
+offers,offers an,offre une
+interactive_map,interactive map, carte interactive
+shareish_description2,"where specific items (goods and services to give or to lend, requests for help, free events) can be viewed, added, and edited by registered users. Items can be geolocated so it is very easy to explore your neighbourdhood hence foster local mutual aid, at your street corner or in your area. Users can start conversations to get further details about an item/request or to arrange an appointment for the exchange. This items can also be viewed as a list where they are sorted by date. External public data (such as free drinking water sources, public bookcases and gift boxes, falling fruits, ...) can also be displayed. Search mechanisms and AI methods can be used to ease search and encoding","où des éléments spécifiques (biens et services à donner ou à prêter, des demandes d'aide, des évènements gratuits) peuvent être consultés, ajoutés, édités, par les utilisateurs enregistrés. Les éléments peuvent être géolocalisés, il est donc facile d'explorer son voisinage et de privilégier l'entraide locale, au coin de votre rue ou dans votre quartier. Les éléments sont aussi consultables sous forme de liste où ils sont triés par dates. Les utilisateurs peuvent entamer des conversations entre eux afin de discuter des détails d'un élément ou pour s'arranger pour procéder au partage. Des notifications sont envoyées lorsque de nouveaux éléments sont ajoutés dans le voisinage de l'utilisateur. Des données externes (comme les sources d'eau potable, les boîtes à livres et à dons, les fruits à glaner...) peuvent également être affichées. Des mécanismes de recherche et d'intelligence artificielle peuvent être utilisés pour aider la recherche et l'encodage.  "
+faq,"Frequently asked questions (FAQ)", Questions fréquemment posées (FAQ)
+faq_nothing,"I have nothing to give/lend, can I still use Shareish ?","Je n'ai rien à donner ou prêter, est-ce que je peux quand même utiliser Shareish ?"
+faq_nothing_answer,"The short answer is: YES ! The long answer is: YES, first take some time and have a look at requests, maybe you can help someone right away ! If not, please note by receiving a free good or service from others, you potentially release them from their feeling of indebtedness as they were probably previously in the same situation than you are. Also consider that you might have items/skills in the future to give/lend, it is not an issue not to have right now, Shareish is promoting mutual aid, solidarity and indirect exchange over the long term. Anyway, please have a look at your belongings/skills, you might already have things/skills to share but you are not yet aware it might be useful for others (see next question) so feel free to reference them on the Shareish platform as others might be interested in the future. Also, if you are aware of free events (give-away, repair café, ...), feel free to encode them","La réponse courte est: OUI ! La réponse longue est: OUI, d'abord vous pouvez regarder les demandes existantes, peut-être pouvez-vous aider quelqu'un tout de suite ! Si ce n'est pas le cas, notez qu'en recevant un bien ou service gratuit d'une autre personne, vous libérez potentiellement cette personne de l'impression d'être redevable comme elle était probablement dans la même situation que vous précédemment. Aussi, considérez que vous pourriez avoir des éléments, connaissances ou aptitudes à donner ou prêter dans le futur, ce n'est pas un problème de ne rien avoir à partager pour le moment. Shareish vise à encourager l'entraide et la solidarité sur le long terme. Néanmoins, réfléchissez à deux fois, vous avez peut-être déjà des biens ou aptitudes que vous pourriez partager et qui pourraient être utiles à d'autres (voir la question suivante). N'hésitez pas à les encoder, cela pourrait susciter l'intérêt dans le futur. Aussi, si vous avez connaissance d'évènements gratuits (donnerie, repair café, ...), n'hésitez pas à les encoder."
+faq_examples,"Can you give examples of items we can create and find on Shareish ?","Pouvez-vous donner des exemples d'éléments qu'on peut créer et trouver sur Shareish ?"
+faq_examples_answer,"Items can be offers (of goods or services), requests (of goods or services), loans (of goods), or free events, so the possibilities are many. Services include, for example, helping someone to move furniture, picking up or delivering groceries, driving them to a certain place, advising them when filling out an administrative document, walking their dog, help to clean up after a flood, ... In terms of goods, we can imagine lending or donating books, kitchen utensils, surplus vegetables from the garden, household appliances, games for kids, a blanket, clothes, protective masks , ... Events can be, for example, repair workshops by volunteers (Repair café), free solidarity meals, ... The possibilities for mutual aid are endless!","Les éléments peuvent être des offres (de biens ou de services), des demandes (de biens ou de services), des prêts (de biens), ou des évènements gratuits, donc les possibilités sont nombreuses. Les services incluent par exemple le fait d'aider quelqu'un à déménager un meuble, enlever ou livrer des courses, conduire une personne chez le médecin, conseiller lors du remplissage d'un document administratif, promener un chien, aider au nettoyage après une inondation, ... En termes de biens, on peut imaginer prêter ou donner des livres, des ustensiles de cuisine, des jeux pour enfants, un surplus de légumes du jardin, un électro-ménager, une couverture, des habits, des masques de protection, ... Les évènements peuvent être par exemple des ateliers de réparation par des bénévoles (Repair café), des repas solidaires gratuits, ... Les possibilités d'entraide sont infinies !"
+faq_everything,"Can I share/search everything ?","Puis-je partager et chercher n'importe quoi ?"
+faq_everything_answer,"Yes, except items/services/events that are prohibited or regulated by law, false, misleading, harmful, or obscene. The Shareish developers and administrators (referred hereafter as The Shareish team) are not liable for any Shareish web server content. The Shareish developers do not control, and are not responsible for content made available through any Shareish web server. Under no circumstances will the Shareish team be liable in any way for any content or for any loss or damage of any kind incurred as a result of the use of any content made available via any Shareish web server. You acknowledge that not all content is pre-screened or approved by the Shareish team, but that Shareish web server moderators/administrators shall have the right (but not the obligation) in its sole discretion to refuse, delete or move any content that is available via their Shareish web server, for violating the terms of use or for any other reason.", "Oui, à l'exception de biens/services/évènements qui sont interdits par la loi, faux, trompeur, blessant, ou obscène. Les développeurs et gestionnaires de Shareish (mentionnés ci-après L'équipe Shareish) ne sont pas responsable des contenus hébergés sur un serveur Shareish. L'équipe Shareish ne contrôle pas et n'est pas responsable des contenus rendus disponibles sur un serveur Shareish. En aucun cas, l'équipe Shareish ne peut être tenue responsable de quelque manière que ce soit du contenu ou de toute perte ou dommage de quelque nature que ce soit résultat de l'utilisation d'un contenu mis à disposition sur ou via un serveur Shareish. En utilisant Shareish, vous reconnaissez qu'aucun contenu n'est présélectionné ou approuvé par l'équipe Shareish, mais que les gestionnaires d'un serveur Shareish auront le droit (mais pas l'obligation), à leur seule discrétion, de refuser, supprimer ou déplacer un contenu disponible sur un serveur Shareish, pour violation des conditions d'utilisation ou pour toute autre raison."
+faq_address,"Are item adresses correct on Shareish ? If I'm interested by an item, can I go there and get it ?","Est-ce que les adresses des éléments sont correctes sur Shareish ? Si je suis intéressé par un élément, puis-je aller à l'adresse indiquée et l'obtenir ?"
+faq_address_answer,"The users who encode the elements themselves decide on the precision of the address they encode. Some users will reference the exact address, others a street name, district, city. In any case, it is recommended to start a conversation with a user of an item to find out the exact address and decide how to proceed with the sharing. For public elements (bookcases, give boxes, drinking water sources, etc.), the addresses are in principle verified by the OpenStreetMap and Falling Fruit communities but it is recommended to further inquire by clicking on the external link (for example some donation boxes are located in buildings that are not open 24 hours a day).","Les utilisateurs qui encodent les éléments décident eux-mêmes de la précision de l'adresse qu'ils encodent. Certains utilisateurs référenceront l'adresse exacte, d'autres un nom de rue, de quartier, de ville. Dans tous les cas, il est recommandé d'entamer une conversation avec un utilisateur d'un élément pour connaître l'adresse exacte et décider comment concrétiser le partage. Il n'est pas recommandé de se présenter à une adresse sans prévenir l'utilisateur. Pour les éléments publics (boîtes à livres et à dons, sources d'eau potable,...), les adresses sont en principe vérifiées par les communautés OpenStreetMap et Falling Fruit mais il est recommandé de se renseigner en cliquant sur le lien externe (p.ex. certaines boîtes à dons sont situées dans des bâtiments qui ne sont pas ouverts 24h/24). "
+faq_colors,"What is the meaning of the colors of the items on the map?","Quelle est la signification des couleurs des éléments sur la carte ?"
+faq_colors_answer,"The colored markers allow you to identify elements added by Shareish users. The red position markers are requests, the green dots are offers (donation, proposals), the yellow dots are loan proposals, the purple dots are events, the blue dot indicates your detected position. In addition to these elements, you can display public data such as book and donation boxes, drinking water sources,... These public points are symbolized by icons (a book for a book box, a cabinet for a donation box, ...).","Les marqueurs (ou repères) colorés permettent de repérer des éléments ajoutés par des utilisateurs de Shareish. Les marqueurs de position rouges sont des demandes, les points verts des propositions de dons, les points jaunes des propositions de prêts, les points mauves des évènements, le point bleu indique votre position détectée. En plus de ces éléments, vous pouvez afficher des données publiques telles que les boîtes à livres et à dons, les sources d'eau potable,... Ces points publics sont symbolisés par des icônes (un livre pour une boîte à livres, une armoire pour une boîte à dons, ...). "
+faq_device,"Can I use Shareish on my computer, tablet or mobile phone?","Puis-je utiliser Shareish sur mon ordinateur, tablette ou téléphone portable ?"
+faq_device_answer,"Yes, Shareish is a website that can be viewed on these different devices. However, we have not tested all combinations of equipment, navigation software, operating systems, if you notice any bugs or display inconveniences, please contact us (see below)","Oui, Shareish est un site web qui peut être consulté sur ces différents équipements. Nous n'avons toutefois pas testé toutes les combinaisons d'équipements, logiciels de navigation, systèmes d'exploitation, si vous constatez des bugs ou inconvénients d'affichage, merci de nous contacter (voir plus bas)"
+faq_data_collection, "What information does Shareish collect about me and for what purpose ?", "Quelles informations sont collectées par Shareish et pour quel usage ?"
+faq_data_collection_answer,"To become a member of a Shareish web server and access information, we collect (store in a computer database) personally identifiable information that you voluntarily provide through the Shareish website (Sign Up form). We do require a basic level of data (an email address, a username, a password) so that you may then log in and receive notifications via email (when getting new messages or when new items are created). Optionnaly, you can also provide additional information (such as other social networks profile) and your geographic location so that the Shareish web server can display items in your geographic area. Shareish platform keep all functional data in a database as long as you have an active account. Shareish platform do not sell such information to third parties. Shareish web server does not utilize cookies (only session data are stored in your browser). Shareish uses the HTTPS protocol so that all communications between your browser and the Shareish web server are encrypted. If you have any questions about the use of your personal information, please contact us (see below).","Pour s'inscrire sur un serveur Shareish et accéder aux contenus, nous enregistrons (dans une base de données informatique) des informations personnelles que vous fournissez volontairement via les formulaires du site Shareish (Page Créer un compte). Pour cela nous avons besoin d'informations de base (une adresse e-mail, un nom d'utilisateur, un mot de passe) de sorte que vous puissiez vous connecter et recevoir des alertes par e-mail (quand un utilisateur vous envoit un message). Optionnellement, vous pouvez fournir des informations supplémentaires comme les liens vers vos comptes sur d'autres réseaux sociaux (pour que les autres utilisateurs vous connaissent mieux), votre géolocalisation (de sorte que le serveur Shareish puisse ajuster la carte et afficher les éléments dans votre voisinage, mais vous pouvez refuser l'autorisation de localisation et naviguer vous-même vers la région qui vous intéresse), et une adresse de référence (dont vous décidez de la précision) afin de vous envoyer des notifications par e-mail lorsque des éléments sont ajoutés dans votre voisinage. Shareish conserve ces données fonctionnelles dans une base de données informatique tant que vous avez un compte actif. L'équipe Shareish ne vend pas ces données à des tiers. Un serveur Shareish n'utilise pas de cookies (seules des informations de session sont stockées dans le cache de votre navigateur). Un serveur Shareish utilise le protocole sécurisé HTTPS de sorte que les communications entre votre navigateur et le serveur Shareish sont cryptées. Si vous avez des questions relatives à l'utilisation de ces données, contactez-nous (voir plus bas)"
+faq_public_resources,"I want to edit or add public resources (public bookcases, drinking water sources,...), how can I do it ?","Je voudrais ajouter ou éditer des données publiques (boîtes à livres, sources d'eau potable,...), comment puis-je faire ?"
+faq_public_resources_answer,"On Shareish you can display specific resources created by users (called individual items) and other public resources (such as drinking water sources). Your specific items are stored in an internal Shareish database and editable on Shareish, but public resources are retrieved from the open-access OpenStreetMap database. To edit public resources, when you click on the map on it, we provide a link (retrieved from OSM) to the corresponding OpenStreetMap node page where it is possible to edit it. An alternative is to use other existing editor tools, those editors allow you to edit and add POI (point of interest) that are later available to the whole OpenStreetMap community and therefore later on Shareish:","Sur la carte de Shareish, vous pouvez afficher des données spécifiques crées par les utilisateurs (appelés éléments individuels) et d'autres ressources publiques (comme les sources d'eau potable). Vos éléments personnels sont enregistrés dans une base de données interne à Shareish et peuvent être édités sur Shareish, mais les ressources publiques sont récupérées de base de données externes comme OpenStreetMap qui ne sont pas directement éditables sur Shareish. Pour consulter les détails et éditer ces ressources publiques, vous pouvez cliquer sur le lien (récupéré via OSM) qui s'affiche dans la bulle pour accéder au noeud OpenStreetMap correspondant et ainsi l'éditer. Une alternative est d'utiliser d'autres éditeurs, ceux-ci vous permettent d'éditer des points d'intérêt (POI) qui deviennent ensuite accessibles à la communauté OpenStreetMap et seront donc par conséquent visibles sur Shareish:"
+faq_how_to_contribute,How can I contribute to Shareish development ?,Comment puis-je contribuer au développement de Shareish
+faq_how_to_contribute_answer,"You can send us constructive comments/issues, remarks, ... (see last question). If you are a software developer, you will soon (after peer review) be able to contribute to the source code (solve current issues or implement new features). If you want to translate the website into your own language, send us a message and we'll let you know how to translate specific messages/sentences (basically: editing a CSV file). In any case, helping others and talking about the project around you is already a nice way to contribute !","Vous pouvez nous envoyer des commentaires, problèmes et remarques de manière constructive (voir la dernière question). Si vous êtes un développeur de logiciels informatiques, vous pourrez bientôt (après examen par les pairs) contribuer au code source (en résolvant des problèmes, ou en implémentant des nouvelles fonctionnalités). Si vous voulez traduire cette plateforme dans d'autres langages, vous pouvez nous contacter et nous vous informerons de la procédure (il s'agit essentiellement d'éditer un fichier CSV). Quoiqu'il en soit, aider les autres et parler du projet autour de vous est déjà une façon de contribuer au projet !"
+faq_local_instance,"Is is possible to launch my own Shareish server instance in my community/city ?","Est-ce possible de lancer mon propre serveur Shareish au sein de ma communauté/ville ?"
+faq_local_instance_answer,"Yes, as Shareish is fully open-source (permissive license) it can be reused for any purposes in a decentralized way. If you want to use Shareish within your community, area, city, region, or organization, you are free to install a Shareish web server following our deployment procedure (to be described after peer-review), and also to modify the code to fit your specific needs. We can also create a free redirection from e.g. https://mycommunity.shareish.org/ to your website and list it here. Please note that the Shareish original team is not liable for any content on any decentralized Shareish web server. If you are looking for collaboration or specific developments, feel free to contact us (see below last question).","Oui, comme Shareish est distribué avec une licence logicielle libre permissive, il peut être réutilisé à toutes fins de façon décentralisée. Si vous voulez utiliser Shareish au sein de votre communauté, quartier, ville, région, ou organisation, vous êtes libres d'installer un serveur Shareish dédié en suivant notre procédure de déploiement (qui sera décrite après examen scientifique par les pairs), et également de modifier le code pour mieux rencontrer vos besoins spécifiques. Nous pourrions également créer une redirection gratuite par exemple https://mycommunity.shareish.org vers votre site web et le référencer sur notre serveur. Veuillez noter que l'équipe originale de Shareish n'est aucunement responsable du contenu qu'on peut trouver sur un serveur Shareish décentralisé. Enfin, si vous cherchez à collaborer ou des développements spécifiques, contactez-vous (voir ci-dessous dernière question)."
+faq_who,Who created this platform ?,Qui a créé cette plateforme ?
+faq_who_answer,"As this project is under review at a scientific conference, we currently have to remain anonymous. The project was initiated by people who believe modern technologies can be better used to foster mutual aid strategies, and that these tools should be open-source to ease their deployment, control, reuse, and improvment. Hopefully a scientific paper will describe our approach in the near future.","Comme ce projet est actuellement en cours d'examen par les pairs pour une conférence scientifique, nous devons actuellement rester anonymes. Le projet a été initié par des personnes qui pensent que les technologies modernes peuvent être mieux utilisées pour encourager les stratégies d'entraide, et que ces outils doivent être diffusés librement pour faciliter leur déploiement, leur contrôle, leur réutilisation, leur amélioration. Nous espérons qu'un article scientifique pourra bientôt davantage expliquer notre démarche. "
+faq_further,"I have further comments, issues, remarks, questions, proposals, where should I send them ?","J'ai d'autres commentaires, problèmes, remarques, questions, propositions, où puis-je les envoyer ?"
+faq_further_answer,"Constructive comments are very welcome and we are open to new ideas. You'll be able to report bugs using a collaborative source code repository after the scientific peer-review (see before). In the meantime, feel free to send us an e-mail here:","Les commentaires constructifs sont toujours les bienvenus et nous sommes ouverts à de nouvelles idées. Il vous sera possible de signaler des bugs en utilisant une plateforme collaborative de gestion de code source après l'examen scientifique par les pairs. Entre-temps, nous vous invitons à nous contacter par courriel ici:"
+map,Map,Carte
+browse-items,Browse items,Liste d'éléments
+add-item,Add item,Ajouter un élément
+conversations,Conversations,Conversations
+my-account,My account,Mon compte
+log-in,Log in,Connexion
+sign-up,Sign up,Créer un compte
+help_signup,"Basic information are required to create an account on Shareish. We suggest you to provide more detailed information in My Account after log in","Des informations de base sont demandées pour pouvoir créer un compte sur Shareish. Nous vous suggérons d'encoder vos informations plus détaillées après connexion dans le menu Mon Compte."
+useful-links,Useful links,Liens utiles
+contact,Contact,Contact
+about-us,About us,À propos
+what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
+item-type,Type,Type
+type,Types|Type|Types,Types|Type|Types
+help_add_item,"An element can be of several types (request for good or service, offer for good or service, loan offer, event) but the encoding form is identical. If you want to encode data on public roads such as a public bookcase or a source of drinking water, it is best to use other existing tools for that, see our FAQ on the home page","Un élément peut être de plusieurs types (demande de bien ou service, offre de bien ou service, offre de prêt, évènement) mais le formulaire d'encodage est identique. Si vous voulez encoder une donnée sur la voie publique comme une boîte à livres ou une source d'eau potable, il est préférable d'utiliser les outils prévus pour, voir la FAQ en page d'accueil"
+help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Évènement pour un évènement gratuit et solidaire"
+help_item_ihaveimage,"Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)","Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)"
+help_item_noimage,"Choose this option if you don't have an image for your item (images are optional and can be uploaded later)","Choisissez cette option si vous n'avez pas d'images pour votre élément (les images sont optionnelles et peuvent être uploadées ultérieurement)"
+help_item_category,"Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items","Choisissez de 1 à 3 catégories pour décrire votre élément ce qui permet aux autres utilisateurs de plus rapidement chercher les éléments qui les intéressent"
+request,Request,Demande
+requests,Requests,Demandes
+donation,Offer,Offre
+donations,Offers,Offres
+event,Event,Évènement
+events,Events,Évènements
+loan,Loan,Prêt
+loans,Loans,Prêts
+all,All,Tous
+category,Categories|Category|Categories,Catégories|Catégorie|Catégories
+food,Food and Supplies,Aliments et provisions
+animals,Pets and Animals,Animaux de compagnie et animaux
+aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
+collectors,Collectibles and decorative objects,Objets de collection et de décoration
+hh,Helping hands and Manual Labor,Coups de main et travaux manuels
+adminit,Administrative tasks,Tâche administratives
+diy,Do-it-yourself and making,Bricolage
+beauty,Wellness and Beauty,Beauté et bien-être
+health,Health care and hygiene,Soins de santé et hygiène
+energy,Energy and heating,Énergie et chauffage
+childhood,Childhood,Enfance
+clothes,Clothes and shoes,Vêtements et chaussures
+it,"Computers, Multimedia, and Network and Communication Hardware","Equipements informatique, multimédia et communication"
+cs,Computer Software,Logiciels informatiques
+garden,"Garden, Nature, and Environment","Jardinage, nature et environnement"
+house,"Living spaces, housing, and home furnitures","Lieux de vie, habitation, et mobilier"
+tools,"Tools, household objects and devices", "Outils, objets et appareils domestiques"
+holidays,"Holidays, Week-ends, and Leisures","Vacances, Week-ends et Loisirs"
+book,"Books and Magazines","Livres, magazines, journaux"
+media,"CDs, DVDs, Blu-rays, Discs","CDs, DVDs, Blu-rays, Disques"
+sport,Sports,Sports
+transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Livraison, Déménagement"
+vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
+other,Other,Autres
+search-dot,Search...,Recherche...
+bookcases,Public bookcases,Boîtes à livres
+bookcase,Public bookcase,Boîte à livre
+defibrillators,Defibrillators,Défibrillateurs
+defibrillator,Defibrillator,Défibrillateur
+give-boxes,Give boxes,Boîtes à dons
+give-box,Give box,Armoire de partage
+drinking-water-spots,Drinking water spots,Points d'eau potable
+drinking-water-spot,Drinking water spot,Point d'eau potable
+free-shops,Free shops,Magasins gratuits
+free-shop,Free shop,Magasin gratuit
+food-sharings,Food Sharing,Frigos solidaires
+food-sharing,Food Sharing,Frigo solidaire
+food-banks,Food Banks,Banques alimentaires
+food-bank,Food Bank,Banque alimentaire
+soup-kitchens,Soup Kitchens, Soupes populaires
+soup-kitchen,Soup Kitchen, Soupe populaire
+falling-fruits,Falling Fruit, Fruits qui tombent
+falling-fruit,Falling Fruit, Fruits qui tombent
+from-osm,details on OpenStreetMap,détails sur OpenStreetMap
+from-ff,details on Falling Fruit,détails sur Falling Fruit
+by,by,par
+at,at,à
+i-am-interested,Details,Détails
+button-load-more,Load more,Charger plus
+no-items,No item,Pas d'élément
+add-new-item,Add a new item,Ajout d'élément
+add-new-item-from-recurrents,Add a new item from recurrents,Ajout d'élément à partir de récurrents
+i-have-image,I have image for my item,J'ai une image pour mon élément
+i-do-not-have-image,I don't have image for my item,Je n'ai pas d'image pour mon élément
+help_item_name,"Name or short title of your item. An AI algorithm suggests a name if you uploaded an item picture but you can edit it to make it more sound.","Nom ou titre court décrivant votre élément. Un algorithme suggère un nom si vous avez fourni une image, mais vous pouvez toujours l'éditer pour rendre le titre plus pertinent."
+add-images-to-item,Add images to the item,Ajouter des images à l'élément
+drop-or-click-to-upload,Drop your files here or click to upload,Déposez vos fichiers ici ou cliquez pour transférer
+uploaded-images,Uploaded images,Images transférées
+no-uploaded-images,No images have been uploaded yet.,Aucune image n'a encore été transférée.
+publish-item,Publish item,Publier l'élément
+name,Name,Nom
+address,Address,Adresse
+help_item_address,"Enter the address of the item (where it is offered/requested, optional but strongly recommended). You can click on the localization button to copy your current geolocalization and edit it if necessary. The more precise the address, the better, but you can discard some details for privacy, e.g. use either streetname with or without the street number, the city or area name.","Entrez l'adresse de l'élément (où il est offert/demandé, information facultative mais fortement conseillée). Cliquez sur le bouton pour copier l'adresse détectée par géolocalisaiton et éditez-la si nécessaire. Plus l'adresse est précise, mieux c'est, mais vous pouvez la simplifier pour protéger votre vie privée, par exemple utilisez le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier."
+description,Description,Description
+help_item_description,"Describe as precisely as possible your item. E.g. if it is a good, you might add brand/model/sizes/year/... and what it can be useful for. If this is a request for service, try to be as precise as possible about the required work and estimated duration. This field is sometimes pre-filled by an AI algorithm based on the uploaded image but you can edit it.", "Décrivez aussi précisément que possible votre élément. Par exemple si c'est un bien, vous pourriez ajouter la marque/modèle/taille/année et à quoi ce bien peut être utile. Si c'est une demande de service soyez le plus précis possible à propos de la tâche et de la durée estimée."
+start-date,Start date,Date de début
+end-date,End date,Date de fin
+help_item_start_date,"Enter a different start date (by default it is now) if your item is not yet available/applicable","Entrez une date de début différente (par défaut l'heure actuelle) si votre élément n'est pas encore disponible/applicable"
+help_item_end_date,"Enter an end date if your item is valid for a limited period of time (e.g. expiration date for food, or period during which you wish to be helped), otherwise leave this field empty","Entrez une date de fin si votre élément a une période de validité limitée (p.ex. date limite de consommation pour de la nourriture, ou période pendant laquelle vous avez besoin d'une aide), sinon laissez ce champ vide."
+views,views,vues
+save-as-recurrent-item,Save as recurrent item,Sauvegarder comme élément récurrent
+help_item_recurrent,"Save this item in your profile so you can later add it again without re-encoding everything (e.g. if you regularly have apples to give at a specific time each year)","Sauvegarder cet élément dans votre profil de manière à pouvoir l'ajouter à nouveau sans devoir tout réencoder (par exemple si vous avez régulièrement des pommes à donner à une période spécifique chaque année)"
+submit,Submit,Soumettre
+ends,Ends,Se termine
+ended,Ended,S'est terminé
+submit-again,Submit again,Soumettre à nouveau
+profile,Profile,Profil
+my-conversations,My conversations,Mes conversations
+new-messages,New messages,Nouveaux messages
+open-conversation,Open conversation,Ouvrir la conversation
+no-conversation,No conversation,Pas de conversation
+language-en,English,Anglais
+language-fr,French,Français
+to,to,à
+too-small-zoom,Zoom to show more data,Zoomez pour voir plus de données
+edit,Edit,Éditer
+log-out,Log out,Se déconnecter
+my-items,My items,Mes éléments
+firstname,First name,Prénom
+help_firstname,Type your firstname (or an alias),Entrez votre prénom (ou un pseudonyme)
+lastname,Last name,Nom
+help_lastname,Type your lastname (or an alias),Entrez votre nom de famille (ou un pseudonyme)
+username,Username,Nom d'utilisateur
+help_username,Type a username (mandatory), Entrez un nom d'utilisateur/utilisatrice (obligatoire)
+member_since,member since,membre depuis le
+password,Password,Mot de passe
+help_password,Enter a password,Entrez un mot de passe
+biography,Biography,Biographie
+help_biography,"Describe yourself, your hobbies, your motivation, anything else you want to share... This helps others to better know you.", "Décrivez-vous, vos passions, votre motivation, tout ce que vous voulez partager à votre sujet... Cela aide les autres à mieux vous connaître."
+homepage-link,Homepage link,Page personnelle
+help_homepage,Type the URL of your website if any,Entrez l'adresse de votre site web personnel si existant
+facebook-link,Facebook profile,Profil Facebook
+help_facebook,Type the URL of your Facebook account if any,"Entrez l'adresse de votre compte Facebook si existant"
+instagram-link,Instagram profile,Profil Instagram
+help_instagram,Type the URL of your Instagram account if any,"Entrez l'adresse de votre compte Instagram si existant"
+reflocation,Reference address,Adresse de référence
+help_ref_location,"Address (optional but recommended) to define your neighbordhood, so typically this is your home address.  You can click on the localization button to update it based on your current geolocation. The more precise, the better, but you can discard some details, e.g. you can use either streetname with or without the street number, the city or area name. This information is not visible for others and only used when sending notifications by e-mail.","Adresse (facultative mais conseillée) pour définir votre voisinage, donc typiquement l'adresse de votre logement. Vous pouvez cliquer sur le bouton de localisation pour la mettre à jour sur base de votre localisation courante. Plus l'adresse est précise, mieux c'est mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier. Cette information n'est pas visible pour les autres utilisateurs et uniquement utilisée lors de l'envoi de notifications par e-mail."
+dwithin_notif,Distance (km) of your neighborhood,Rayon (en km) de votre voisinage
+help_dwithin,Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address),Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)
+email,Email,E-mail
+help_email,"Type your e-mail address (mandatory, one account only per e-mail address)", "Entrez votre adresse e-mail (obligatoire, un seul compte par adresse e-mail)"
+help_notif_conversations,"Tell us how frequently should we notify you from new conversations and messages","Choisissez à quelle fréquence nous devrions vous prévenir de nouvelles conversations et de nouveaux messages"
+help_notif_items,"Tell us how frequently we should notify you from new items being published","Choisissez à quelle fréquence nous devrions vous prévenir de la publication de nouveaux objets"
+help_notif_events,"Tell us how frequently we should notify you from new events being published","Choisissez à quelle fréquence nous devrions vous prévenir de la publication de nouveaux évènements"
+frequency_instantly,Instantly,Directement
+frequency_daily,Daily,Journalier
+frequency_weekly,Weekly,Hebdomadaire
+frequency_never,Never,Jamais
+save,Save,Enregistrer
+cancel,Cancel,Annuler
+validations.messages._default,Invalid field,Champ incorrect
+validations.messages.required,This field is required,Champ obligatoire
+validations.messages.email,Must be a valid email address,Doit être une adresse e-mail valide
+validations.messages.is,Invalid confirmation,Confirmation incorrecte
+validations.messages.min,Must have at least {1} characters,Doit contenir au moins {1} caractères
+edit-my-account,Edit my account,Modifier mon compte
+notif-success-user-update,Your account has been updated successfully,Votre compte a été mis à jour avec succès
+notif-error-user-update,An error prevented your account to be updated,Une erreur a empêché votre compte d'être mis à jour
+add-message-dot,Add a message...,Ajouter un message...
+post-message,Send message,Envoyer le message
+notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
+availability,Availability,Disponibilité
+shared-by,Shared by,Partagé par
+location,Location,Localisation
+no-address,No address provided,Pas d'adresse renseignée
+item-availability-from,From,À partir du
+item-availability-until,Until,Jusqu'au
+from,From,À partir du
+until,Until,Jusqu'au
+delete,Delete,Supprimer
+start-conversation,Start conversation,Lancer une conversation
+intro-DN-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
+intro-RQ-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
+intro-LN-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
+intro-EV-first-message,"Hello, thank you for making this event possible. I am interested to participate.","Bonjour, merci pour de rendre cet évènement possible. Je suis intéressé d'y participer."
+avatar,Avatar,Avatar
+help_avatar,Upload an image that represents you,Transférez une image qui vous représente
+notif-error-item-delete,An error prevented the item to be deleted,Une erreur a empêché la suppression de l'élément
+user-items,His/her items,Ses éléments
+notif-error-user-login,"The username or the password is invalid, or your account is not activated yet (check your emails).","Le nom d'utilisateur ou le mot de passe est invalide, ou votre compte n'a pas encore été activé (verifiez vos e-mails)."
+password-forgotten-?,Forgotten password?,Mot de passe oublié ?
+notif-success-user-sign-up,Your account has been created. Check your emails to activate it.,Votre compte a été créé. Vérifiez vos emails pour l'activer.
+notif-error-user-sign-up,The username or the email is already taken.,Le nom d'utilisateur ou l'e-mail est déjà pris.
+notif-error-email-activation,Something went wrong during email activation,Quelque chose s'est mal passé pendant l'activation de votre compte
+notif-success-email-activation,"The email address has been activated successfully!","L'adresse email a été validée avec succès!"
+activate-your-account,Activate your account,Activation de votre compte
+resend-activation,Resend activation email,Renvoyer l'e-mail d'activation
+notif-success-resend-activation,"A new activation link has been sent to your email address","Un nouveau lien de validation a été envoyé à votre adresse email"
+notif-error-resend-activation,Something went wrong during sending of activation link,Quelque chose s'est mal passé lors de l'envoi du lien d'activation.
+reset-password,Reset password,Réinitialiser le mot de passe
+notif-success-password-reset-sent,Check your emails to continue the password reset procedure,Vérifiez vos emails pour continuer la procédure de réinitialisation du mot de passe
+notif-error-password-reset-sent,An error prevented to reset your password.,Une erreur a empêché de réinitialiser votre mot de passe
+enter-new-password,Enter your new password here...,Entrez votre nouveau mot de passe ici...
+notif-success-password-reset,Your password has been changed.,Votre mot de passe a été modifié.
+notif-error-password-reset,An error prevented to change your password.,Une erreur a empêché la mise à jour de votre mot de passe.
+edit-item,Edit an item,Éditer un élément
+notif-success-item-update,The item has been successfully edited,L'élément a été correctement édité
+item-image,Image,Image
+item-image-info,Only upload image to replace existing one.,Uploadez une image pour remplacer l'actuelle.
+unread-messages,- | 1 unread message | {count} unread messages,- | 1 message non lu | {count} messages non lus
+last-message,Last message,Dernier message
+items,Items,Eléments
+settings,Settings,Paramètres
+notifications,Notifications,Notifications
+privacy,Privacy,Confidentialité
+account,Account,Compte
+general,General,Général
+joined,joined,a rejoint
+published,Published,Publié
+are-you-interested,Are you interested?,Vous êtes intéressé?
+management,Management,Gestion
+conversations-reloaded-successfully,Conversations got reloaded successfully after last error!,Les conversations ont pu être rechargées correctement depuis la dernière erreur!
+notifications-reloaded-successfully,Notifications got reloaded successfully after last error!,Les notifications ont pu être rechargées correctement depuis la dernière erreur!
+connection-error,Connection error. Try again later.,Erreur de connexion. Veuillez réeesayer plus tard.
+item-not-available-anymore-warning,"This item is not available anymore. This page is still accessible for information purpose.","Cet élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
+item-not-available-anymore-warning-owner,"Your item is not available anymore. This page is still accessible for information purpose.","Votre élément n'est plus disponible. Cette page est toujours accessible à titre informatif."
+warning,Warning,Attention
+enable-geolocation-to-use-feature,You must enable geolocation to use this feature.,Vous devez activer la géolocalisation pour utiliser cette fonctionnalité.
+too-many-images-selected-to-upload,Too many images selected to upload. You can only upload {n} more.,Trop d'images sélectionnées à transférer. Vous ne pouvez en transférer qu'une supplémentaire.|Trop d'images sélectionnées à transférer. Vous ne pouvez en transférer que {n} supplémentaires.
+max-images-uploaded-reached,You've reached the maximum amount of images allowed to be uploaded.,Vous avez atteint la limite maximum d'images pouvant être transférées.
+ask-fill-form-using-recurrents,Fill the form using one of your recurrent items?,Remplir le formulaire en utilisant un de vos éléments récurrents?
+yes-please,"Yes, please!","Oui, je veux!"
+no-thanks,"No, thanks.",Non merci.
+want-an-other-recurrent,"You are using item <strong>#{n}</strong>. Want to use an other one?","Vous utilisez l'élément #{n}. Voulez-vous en utiliser un autre?"
+reset,Reset,Réinitialiser
+profile-picture,Profile picture|Profile pictures,Photo de profil|Photos de profil
+remove,Remove,Retirer
+removing-picture,Removing picture,Retirer l'image
+removing-picture-confirmation,"Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.","Êtes-vous sûr de vouloir <b>retirer</b> cette image de votre profil? Cette action ne peut pas être annulée."
+upload-a-new-one,Upload a new one,Transférer pour changer
+current-profile-picture,Current profile picture,Photo de profil actuelle
+other-profile-pictures,Other profile pictures,Autres photos de profil
+info-already-uploaded-profile-pictures,"If you have already uploaded profile pictures in the past, you can look through them and <b>select one as your current profile picture</b>. Just click on it!","Si vous avez déjà transféré des photos de profil dans le passé, vous pouvez y jeter un oeil et en <b>sélectionner une comme nouvelle photo de profil</b>. Il suffit de cliquer dessus!"
+info-no-profile-picture-uploaded-yet,You haven't uploaded any profile pictures yet.,Vous n'avez encore jamais transféré de photo de profil.
+no-images,No images,Pas d'images
+info-profile-picture-recommendation,"Using a profile picture is <strong>recommended</strong> as it helps other users to identify who they are interacting with and thus <strong>improve trust</strong> on the website. You can even upload several pictures!","Utiliser une photo de profil est <b>recommandé</b> car cela aide les autres utilisateurs à identifier avec qui ils intéragissent et donc <b>améliorer la confiance</b> en chacun sur le site. Vous pouvez même transférer plusieurs photos!"
+manage-profile-picture,Manage profile pictures,Gérer les photos de profil
+and-n-more,And {n} more,Et {n} de plus
+picture-removed,Picture removed!,Image retirée!
+aware-changes-not-saved,Aware! Your new profile picture needs to be saved!,Attention! Votre nouvelle photo de profil doit être sauvegardée!
+image-already-profile-picture,This image is already your profile picture!,Cette image est déjà votre photo de profil!
+view-real-profile,View real profile,Voir le profil réel
+search,Search,Recherche
+click-to-view-on-map,Click to view on map,Cliquer pour voir sur la carte
+delete-message,Delete message,Supprimer le message
+delete-message-confirmation,"Are you sure you want to <b>delete</b> this message from the conversation? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce message de la conversation? Cette action ne peut pas être annulée."
+message-deleted,Message deleted!,Message supprimé!
+delete-item,Delete item,Supprimer l'élément
+delete-item-confirmation,"Are you sure you want to <b>delete</b> this item? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> cet élément? Cette action ne peut pas être annulée."
+item-deleted,Item deleted!,Élément supprimé!
+comment,Comments|Comment|Comments,Commentaires|Commentaire|Commentaires
+notif-error-post-comment,An error prevented your comment to be posted,Une erreur a empêché votre commentaire d'être publié
+delete-comment,Delete comment,Supprimer le commentaire
+delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
+comment-deleted,Comment deleted!,Commentaire supprimé!
+leave-a-comment,Leave a comment,Laisser un commentaire
+author,Author,Auteur
+or,or,ou
+searched-categories,Search categories,Catégories recherchées
+no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
+filter,Filters|Filter|Filters,Filtres|Filtre|Filtres
+only-new,Only new,Nouveautés
+show-filters,Show filters,Afficher les filtres
+hide-filters,Hide filters,Masquer les filtres
+creationdate,Publication date,Date de publication
+startdate,Start date,Date de début
+enddate,End date,Date de fin
+distance,Distance,Distance
+use-geolocation,Use geolocation,Utiliser la géolocalisation
+use-reflocation,Use reference location,Utiliser la localisation de référence
+dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
+or-enter-an-address,Or enter an address,Ou entrez une adresse
+radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
+restrict-distance,Restrict distance,Restreindre la distance
+order-by,Order by,Trier par
+recent-first,Recents first,Récents en premier
+order-by-availability-startdate,Availability (starting date),Disponibilité (date de début)
+order-by-availability-enddate,Availability (ending date),Disponibilité (date de fin)
+closest-distance,Distance (closest),Distance (les plus proches)
+available,Available,Disponible
+corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
+found,found.,trouvé.|trouvés.
+item,item|items,élément|élements
