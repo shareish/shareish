@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from itertools import chain
 
 from django.contrib.gis.db.models.functions import Distance
@@ -30,10 +30,15 @@ class ItemAvailabilityFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         available_from = request.query_params.get('availableFrom')
         available_until = request.query_params.get('availableUntil')
+
         if available_from:
-            return queryset.filter(Q(startdate__gte=available_from) | Q(startdate__lte=available_until))
-        if available_until:
-            return queryset.filter(Q(enddate__gte=available_from) | Q(enddate__lte=available_until) | Q(enddate__isnull=True))
+            if available_until:
+                queryset = queryset.filter((Q(startdate__gte=available_from) & Q(startdate__lte=available_until)) | (Q(startdate__lt=available_from) & Q(enddate__isnull=True)))
+                queryset = queryset.filter((Q(enddate__gte=available_from) & Q(enddate__lte=available_until)) | Q(enddate__isnull=True))
+            else:
+                queryset = queryset.filter(Q(enddate__gte=available_from) | (Q(startdate__lt=available_from) & Q(enddate__isnull=True)))
+        elif available_until:
+            queryset = queryset.filter(Q(enddate__lte=available_until) | (Q(startdate__gte=datetime.now(timezone.utc)) & Q(enddate__isnull=True)))
         return queryset
 
 

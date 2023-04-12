@@ -48,18 +48,6 @@
               </div>
             </div>
             <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
-              <b-field :label="$t('order-by')">
-                <b-select expanded v-model="orderBy">
-                  <option value="-creationdate">{{ $t('creationdate') }} ({{ $t('recent-to-old') }})</option>
-                  <option value="creationdate">{{ $t('creationdate') }} ({{ $t('old-to-recent') }})</option>
-                  <option value="startdate">{{ $t('startdate') }} ({{ $t('recent-to-old') }})</option>
-                  <option value="-startdate">{{ $t('startdate') }} ({{ $t('old-to-recent') }})</option>
-                  <option value="enddate">{{ $t('enddate') }} ({{ $t('recent-to-old') }})</option>
-                  <option value="-enddate">{{ $t('enddate') }} ({{ $t('old-to-recent') }})</option>
-                  <option value="distance">{{ $t('distance') }} ({{ $t('close-to-far') }})</option>
-                  <option value="-distance">{{ $t('distance') }} ({{ $t('far-to-close') }})</option>
-                </b-select>
-              </b-field>
               <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
                 <template v-if="windowWidth >= 768 && windowWidth < 1024">
                   <div class="columns is-mobile">
@@ -214,6 +202,21 @@
       </div>
       <div class="column">
         <div id="items-list" class="scrollable">
+          <div class="columns is-mobile">
+            <div class="column">
+              <p><b>{{ items.length }} éléments</b> correspondent à votre recherche.</p>
+            </div>
+            <div class="column" style="flex: 0 0 auto;">
+              <b-field :label="$t('order-by')" horizontal style="white-space: nowrap;">
+                <b-select expanded v-model="orderBy">
+                  <option value="-creationdate">{{ $t('recent-first') }}</option>
+                  <option value="startdate">{{ $t('order-by-availability-startdate') }}</option>
+                  <option value="enddate">{{ $t('order-by-availability-enddate') }}</option>
+                  <option value="distance">{{ $t('closest-distance') }}</option>
+                </b-select>
+              </b-field>
+            </div>
+          </div>
           <div v-if="items && items.length" class="columns is-mobile is-flex-wrap-wrap">
             <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
               <item-card :item="item" :user-location="searchLocation" />
@@ -610,6 +613,14 @@ $filtersWidth: 400px;
             }
           }
         }
+      }
+    }
+
+    & > .column:last-child {
+      #items-list > .columns > .column:first-child p {
+        height: 40px;
+        line-height: 40px;
+        font-size: 1.3em;
       }
     }
   }

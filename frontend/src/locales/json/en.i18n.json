@@ -312,9 +312,9 @@
   "radius-from-location": "Radius from location (km)",
   "restrict-distance": "Restrict distance",
   "order-by": "Order by",
-  "recent-to-old": "recent to old",
-  "old-to-recent": "old to recent",
-  "close-to-far": "close to far",
-  "far-to-close": "far to close",
+  "recent-first": "Recents first",
+  "order-by-availability-startdate": "Availability (starting date)",
+  "order-by-availability-enddate": "Availability (ending date)",
+  "closest-distance": "Distance (closest)",
   "available": "Available"
 }
