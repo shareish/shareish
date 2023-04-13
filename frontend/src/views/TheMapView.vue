@@ -1,11 +1,5 @@
 <template>
   <div id="page-map">
-    <items-filters
-        @update:selectedType="selectedType = $event"
-        @update:selectedCategory="selectedCategory = $event"
-        @update:searchString="searchString = $event"
-    />
-
     <l-map :bounds.sync="bounds" :center.sync="leafletCenter" :zoom.sync="zoom" style="height: 800px"
            @update:bounds="boundsUpdated">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
@@ -18,14 +12,14 @@
         <div class="control-loading">
           <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
         </div>
-        <div v-show="zoom < minZoomForExtraLayers" class="control-zoom-info leaflet-control-attribution">
+        <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
           {{ $t('too-small-zoom') }}
         </div>
       </l-control>
 
       <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
 
-      <l-layer-group>
+      <l-layer-group v-if="zoom >= minZoomToShowElements">
         <v-marker-cluster :options="markerClusterGroupOptions">
           <l-marker
               v-for="item in items"
@@ -40,7 +34,7 @@
           </l-marker>
         </v-marker-cluster>
       </l-layer-group>
-      <l-feature-group v-if="zoom >= minZoomForExtraLayers">
+      <l-feature-group v-if="zoom >= minZoomToShowElements">
         <l-layer-group>
           <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
             <template v-for="extraLayer in extraLayers">
@@ -76,7 +70,7 @@
           v-for="extraLayer in extraLayers"
           :key="`${extraLayer.id}-visibility`"
           v-model="extraLayer.visible"
-          :disabled="zoom < minZoomForExtraLayers"
+          :disabled="zoom < minZoomToShowElements"
           :type="extraLayer.color"
       >
         {{ $t(extraLayer.id) }}
@@ -91,7 +85,6 @@ import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
 import axios from "axios"
-import ItemsFilters from "@/components/ItemsFilters.vue";
 
 import {
   greenIcon,
@@ -105,7 +98,6 @@ import {
   drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
 } from "@/map-icons";
 
-import {latLng} from "leaflet";
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
 import ItemMapPopup from "@/components/ItemMapPopup.vue";
@@ -127,7 +119,6 @@ export default {
   mixins: [ErrorHandler],
   components: {
     ItemMapPopup,
-    ItemsFilters,
     LMap,
     LTileLayer,
     LControl,
@@ -144,6 +135,9 @@ export default {
       preLeafletCenter: new LatLng(50.6450944, 5.5736112),
       leafletCenter: new LatLng(50.6450944, 5.5736112),
       bounds: null,
+
+      searchBounds: null,
+
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
       tileLayerOptions: {
@@ -156,7 +150,7 @@ export default {
         maxClusterRadius: 25,
         disableClusteringAtZoom: 15
       },
-      minZoomForExtraLayers: 12,
+      minZoomToShowElements: 12,
       extraLayersMarkerClusterGroupOptions: {
         disableClusteringAtZoom: 15,
         chunkedLoading: true,
@@ -259,12 +253,10 @@ export default {
       geoLocation: null,
       geoLocationIcon: blueIcon,
       routedItemLocation: null,
-      searchString: null,
-      selectedType: null,
-      selectedCategory: null,
       items: [],
 
       routedItemError: false,
+      timeouts: {}
     }
   },
   async created() {
@@ -279,9 +271,6 @@ export default {
 
     this.leafletCenter = this.preLeafletCenter;
 
-    await this.fetchExtraLayersMakers();
-    await this.fetchItems();
-
     if (this.itemId !== null && !this.routedItemError) {
       this.$nextTick(() => {
         this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
@@ -291,11 +280,9 @@ export default {
     this.mapLoading = false;
   },
   computed: {
-    filterParams() {
+    params() {
       return {
-        type: this.selectedType,
-        category: this.selectedCategory,
-        search: this.searchString
+        // Futures params
       };
     },
     itemId() {
@@ -303,10 +290,8 @@ export default {
     }
   },
   watch: {
-    async filterParams() {
-      this.mapLoading = true;
-      await this.fetchItems();
-      this.mapLoading = false;
+    async params() {
+      await this.fetchMathElements();
     },
   },
   methods: {
@@ -353,25 +338,33 @@ export default {
       }
     },
     async fetchItems() {
-      try {
-        let items = (await axios.get("/api/v1/items", {params: this.filterParams})).data;
+      if (this.zoom >= this.minZoomToShowElements) {
+        try {
+          const params = this.params;
+          params['bounds'] = [this.searchBounds[0].toString(), this.searchBounds[1].toString()];
 
-        this.items = items.filter(item =>
-            item['location'] !== null
-        ).map(item => {
-          return {
-            ...item,
-            icon: itemTypeIcons[item['type']] || greyIcon,
-            location: new GeolocationCoords(item.location)
-          };
-        });
-      }
-      catch (error) {
-        console.log(error);
+          let items = (await axios.get("/api/v1/actives", {params: params})).data;
+
+          if (items.length > 0) {
+            this.items = items.filter(item =>
+                item['location'] !== null
+            ).map(item => {
+              return {
+                ...item,
+                icon: itemTypeIcons[item['type']] || greyIcon,
+                location: new GeolocationCoords(item.location)
+              };
+            });
+          } else {
+            this.items = [];
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
     async fetchExtraLayersMakers() {
-      if (this.bounds !== null && this.zoom >= this.minZoomForExtraLayers) {
+      if (this.zoom >= this.minZoomToShowElements) {
         this.extraLayers = await Promise.all(
           this.extraLayers.map(async extraLayer => {
             try {
@@ -424,7 +417,7 @@ export default {
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
-        const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+        const ffcoords = '&bounds=' + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
         const ffURL = ffbaseURL + ffcoords;
         return (await axios.get(ffURL, {
           transformRequest: (data, headers) => {
@@ -458,9 +451,23 @@ export default {
       }
     },
     async boundsUpdated() {
+      clearTimeout(this.timeouts['boundsUpdated']);
+      this.timeouts['boundsUpdated'] = setTimeout(async () => {
+        const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
+        const SECoords = [this.bounds.getSouthEast().lng, this.bounds.getSouthEast().lat];
+        if (this.searchBounds === null) {
+          this.searchBounds = [new GeolocationCoords(NWCoords), new GeolocationCoords(SECoords)];
+        } else {
+          this.searchBounds[0].update(NWCoords);
+          this.searchBounds[1].update(SECoords);
+        }
+        await this.fetchMathElements();
+      }, 600);
+    },
+    async fetchMathElements() {
       this.mapLoading = true;
-      await this.fetchExtraLayersMakers();
       await this.fetchItems();
+      await this.fetchExtraLayersMakers();
       this.mapLoading = false;
     }
   }

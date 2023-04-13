@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, GEOSGeometry, Polygon
 from django.db.models import Q, F
 from rest_framework import filters
 
@@ -82,6 +82,36 @@ class ItemMinCreationdateFilterBackend(filters.BaseFilterBackend):
         min_creationdate = request.query_params.get('minCreationdate')
         if min_creationdate:
             return queryset.filter(creationdate__gte=min_creationdate)
+        return queryset
+
+
+class ItemMapBoundsFilterBackend(filters.BaseFilterBackend):
+    bbox_margins_ratio = 0.2
+
+    def filter_queryset(self, request, queryset, view):
+        bounds = request.query_params.getlist('bounds[]')
+        if len(bounds) > 0:
+            NW = GEOSGeometry(bounds[0])
+            SE = GEOSGeometry(bounds[1])
+
+            longitude_min=NW.coords[0]
+            longitude_max=SE.coords[0]
+            latitude_min=SE.coords[1]
+            latitude_max=NW.coords[1]
+
+            diff_longitude = abs(longitude_max - longitude_min)
+            diff_latitude = abs(latitude_max - latitude_min)
+            longitude_margin = diff_longitude * self.bbox_margins_ratio
+            latitude_margin = diff_latitude * self.bbox_margins_ratio
+
+            bbox = Polygon.from_bbox([
+                longitude_min - longitude_margin,
+                latitude_min - latitude_margin,
+                longitude_max + longitude_margin,
+                latitude_max + latitude_margin
+            ])
+
+            return queryset.filter(location__coveredby=bbox)
         return queryset
 
 
