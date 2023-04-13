@@ -53,6 +53,18 @@ export const isArrEmpty = function (arr) {
   return isArr(arr) && arr.length === 0;
 }
 
+export const isInt = function(n) {
+    return Number(n) === n && n % 1 === 0;
+}
+
+export const isFloat = function(n) {
+    return Number(n) === n && n % 1 !== 0;
+}
+
+export const isNumber = function(n) {
+    return isInt(n) || isFloat(n);
+}
+
 export const ucfirst = function (s) {
   return s[0].toUpperCase() + s.slice(1);
 }
@@ -69,16 +81,42 @@ export const lcall = function (s) {
   return s.toLowerCase();
 }
 
-export class Geolocation {
+export class GeolocationCoords {
   constructor(param1, param2 = null) {
-    if (typeof param1 === 'object') {
-      this.latitude = param1.coords.latitude;
+    this.longitude = 0;
+    this.latitude = 0;
+
+    this.update(param1, param2);
+  }
+
+  update(param1, param2) {
+    if (isArr(param1)) {
+      if (isNumber(param1[0]) && isNumber(param1[1])) {
+        this.longitude = param1[0];
+        this.latitude = param1[1];
+      }
+    } else if (param1 instanceof GeolocationPosition) {
       this.longitude = param1.coords.longitude;
+      this.latitude = param1.coords.latitude;
+    } else if (typeof param1 === 'string') {
+      const regex = /^SRID=4326;POINT \([0-9]+(\.[0-9]+)? [0-9]+(\.[0-9]+)?\)$/
+      if (regex.test(param1)) {
+        let coords = param1.substring(17, param1.length - 2).split(" ");
+        this.longitude = parseFloat(coords[0]);
+        this.latitude = parseFloat(coords[1]);
+      }
     } else {
-      this.latitude = param1;
-      this.longitude = param2;
+      if (isNumber(param1) && isNumber(param2)) {
+        this.longitude = param1;
+        this.latitude = param2;
+      }
     }
   }
+
+  toString() {
+    return "SRID=4326;POINT (" + this.longitude + " " + this.latitude + ")";
+  }
+
   toRadians(deg) {
     return deg * (Math.PI / 180)
   }

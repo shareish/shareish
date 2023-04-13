@@ -15,7 +15,7 @@
                 <b-button type="is-primary" @click="fetchAddressGeoLoc">
                   <i class="icon fas fa-map-marker-alt"></i>
                 </b-button>
-                <b-input v-model="internalUser['ref_location']" class="is-expanded ml-2" name="ref_location" type="text" />
+                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -106,6 +106,7 @@
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
+import {GeolocationCoords} from "@/functions";
 
 export default {
   name: 'TheSettingsNotifications',
@@ -124,6 +125,8 @@ export default {
       loading: true,
       geoLocation: null,
       internalUser: null,
+      refLocation: null,
+      address: null,
       radioGroups: {
         'notif_conversations': String,
         'notif_events': String,
@@ -138,19 +141,21 @@ export default {
     document.title = 'Shareish | Settings: Notifications';
 
     this.internalUser = {...this.user};
+    if (this.internalUser.ref_location !== null) {
+      this.refLocation = new GeolocationCoords(this.internalUser.ref_location);
+      this.address = await this.fetchAddress(this.refLocation);
+    }
 
     this.radioGroups.notif_conversations = this.internalUser.mail_notif_freq_conversations;
     this.radioGroups.notif_events = this.internalUser.mail_notif_freq_events;
     this.radioGroups.notif_items = this.internalUser.mail_notif_freq_items;
-
-    this.fetchAddress(this.internalUser.ref_location);
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
-          this.geoLocation = position;
+          this.geoLocation = new GeolocationCoords(position);
         },
         null,
         {
@@ -165,22 +170,21 @@ export default {
   },
   methods: {
     async fetchAddressGeoLoc() {
-      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoLocation !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
-        this.fetchAddress(geoLocPoint);
-      } else {
+      if (this.geoLocation !== null)
+        this.address = await this.fetchAddress(this.geoLocation);
+      else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-      }
     },
     async fetchAddress(location) {
-      if (location !== null) {
+      if (location instanceof GeolocationCoords) {
         try {
-          this.internalUser.ref_location = (await axios.post("/api/v1/address/reverse", location)).data;
-        } catch (error) {
+          return (await axios.post("/api/v1/address/reverse", location)).data;
+        }
+        catch (error) {
           this.fullErrorHandling(error);
         }
       }
+      return null
     },
     async save() {
       this.waitingFormResponse = true;
@@ -193,10 +197,24 @@ export default {
           this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
 
           let tempUser = {...this.internalUser}
+          tempUser.ref_location = this.address;
           delete tempUser.images;
           delete tempUser.items;
 
           this.internalUser = (await axios.patch("/api/v1/webusers/me/", tempUser)).data;
+          this.$emit('updateUser', this.internalUser);
+
+          if (this.internalUser.ref_location !== null) {
+            if (this.refLocation === null) {
+              this.refLocation = new GeolocationCoords(this.internalUser.ref_location);
+            } else {
+              this.refLocation.update(this.internalUser.ref_location);
+            }
+            this.address = await this.fetchAddress(this.refLocation);
+          } else {
+            this.refLocation = null;
+            this.address = null;
+          }
 
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -204,10 +222,6 @@ export default {
             message: this.$t('notif-success-user-update'),
             pauseOnHover: true,
           });
-
-          this.$emit('updateUser', this.internalUser);
-
-          this.fetchAddress(this.internalUser.ref_location);
         } catch (error) {
           this.fullErrorHandling(error);
         }

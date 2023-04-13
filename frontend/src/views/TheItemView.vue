@@ -213,7 +213,7 @@ import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
-import {scrollParentToChild} from "@/functions";
+import {GeolocationCoords, scrollParentToChild} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -282,16 +282,18 @@ export default {
         }
       }
     },
-    async fetchAddress() {
+    async fetchAddress(location) {
       if (!this.redirection) {
-        if (this.item.location !== null) {
+        if (location instanceof GeolocationCoords) {
           try {
-            this.address = (await axios.post("/api/v1/address/reverse", this.item.location)).data;
-          } catch (error) {
+            return (await axios.post("/api/v1/address/reverse", location)).data;
+          }
+          catch (error) {
             this.snackbarError(error);
           }
         }
       }
+      return null;
     },
     async fetchUser() {
       if (!this.redirection) {
@@ -408,7 +410,11 @@ export default {
   async mounted() {
     this.loading = true;
     await this.fetchItem();
-    await this.fetchAddress();
+    if (this.item.location !== null) {
+      const testtemp = new GeolocationCoords(this.item.location);
+      console.log(testtemp);
+      this.address = await this.fetchAddress(testtemp);
+    }
     await this.fetchUser();
     await this.fetchComments();
     document.title = `Shareish | ${this.item.name}`;

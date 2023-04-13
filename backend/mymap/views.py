@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from django.db import IntegrityError
 from django.db.models import Q
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse, JsonResponse, QueryDict
 from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
@@ -303,9 +303,15 @@ class MessageViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def get_address_reverse(request):
     if request.method == 'POST':
-        coords = request.data['SRID'].split(' ')[1:]
-        latitude = coords[0][1:]
-        longitude = coords[1][:-1]
+        if isinstance(request.data, QueryDict):
+            coords = request.data['SRID'].split(' ')[1:]
+            latitude = float(coords[0][1:])
+            longitude = float(coords[1][:-1])
+        elif isinstance(request.data, dict) and 'latitude' in request.data and 'longitude' in request.data:
+            latitude = float(request.data['latitude'])
+            longitude = float(request.data['longitude'])
+        else:
+            return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         location = locator.reverse((latitude, longitude), exactly_one=True)
         if location is not None:
             return Response(location.address, status=status.HTTP_200_OK)
@@ -318,7 +324,7 @@ def get_address(request):
     if request.method == 'POST':
         location = locator.geocode(request.POST['address'])
         if location is not None:
-            return Response((location.latitude, location.longitude), status=status.HTTP_200_OK)
+            return Response((location.longitude, location.latitude), status=status.HTTP_200_OK)
         return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

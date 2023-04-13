@@ -1,8 +1,8 @@
+import re
+
 from geopy import Nominatim
 
 locator = Nominatim(user_agent='shareish')
-
-LOCATION_PREFIX = "SRID=4326;POINT"
 
 def verif_location(data):
     if isinstance(data, str):
@@ -14,13 +14,12 @@ def verif_location(data):
     else:
         return {'error': "No suitable address to process."}
 
-    if not address.startswith(LOCATION_PREFIX):
+    if not re.match("^SRID=4326;POINT \([0-9]+(\.[0-9]+)? [0-9]+(\.[0-9]+)?\)$", address):
         location = locator.geocode(address)
         if location is not None:
-            return {'success': "{} ({} {})".format(
-                LOCATION_PREFIX,
-                str(location.latitude),
-                str(location.longitude)
+            return {'success': "SRID=4326;POINT ({} {})".format(
+                str(location.longitude),
+                str(location.latitude)
             )}
         else:
             return {'error': "Couldn't find location."}

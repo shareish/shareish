@@ -230,7 +230,7 @@
             <div v-for="item in items" :key="item.id" class="column" :class="columnsWidthClass">
               <item-card :item="item" :user-location="searchLocation" />
             </div>
-            <div v-if="loadedAllItems" id="load-more-items" class="column is-narrow">
+            <div v-if="!loadedAllItems" id="load-more-items" class="column is-narrow">
               <b-button :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems(true)">
                 {{ $t('button-load-more') }}
               </b-button>
@@ -249,7 +249,7 @@ import axios from "axios";
 import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
-import {Geolocation, lcall, ucfirst} from "@/functions";
+import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import {categories} from "@/categories";
@@ -453,20 +453,14 @@ export default {
           columns: ['ref_location']
         }
         this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
-        if (this.user.ref_location !== null) {
-          const coords = this.user.ref_location.slice(17, -1).split(' ');
-          this.refLocation = new Geolocation(coords[0], coords[1]);
-        }
+        if (this.user.ref_location !== null)
+          this.refLocation = new GeolocationCoords(this.user.ref_location);
       } catch (error) {
         this.snackbarError(error);
       }
     },
-    async fetchGeolocationAddress(geolocation) {
-      let locationPoint = "SRID=4326;POINT (" + geolocation.latitude + " " + geolocation.longitude + ")";
-      return this.fetchAddress(locationPoint);
-    },
     async fetchAddress(location) {
-      if (location !== null) {
+      if (location instanceof GeolocationCoords) {
         try {
           return (await axios.post("/api/v1/address/reverse", location)).data;
         }
@@ -474,6 +468,7 @@ export default {
           this.fullErrorHandling(error);
         }
       }
+      return null;
     },
     async fetchGeolocation(address) {
       if (address !== null && address !== "") {
@@ -486,11 +481,15 @@ export default {
           this.fullErrorHandling(error);
         }
       }
+      return null;
     },
     async updateGeolocationFromAddress() {
       if (this.address !== "") {
         const geolocation = await this.fetchGeolocation(this.address);
-        this.searchLocation = new Geolocation(geolocation[0], geolocation[1])
+        if (geolocation !== null)
+          this.searchLocation = new GeolocationCoords(geolocation)
+        else
+          this.searchLocation = null;
       } else {
         this.searchLocation = null;
       }
@@ -501,10 +500,8 @@ export default {
 
     await this.fetchUser();
 
-    if (this.geoLocation !== null)
-      this.geoLocationAddress = await this.fetchGeolocationAddress(this.geoLocation);
-    if (this.refLocation !== null)
-      this.refLocationAddress = await this.fetchGeolocationAddress(this.refLocation);
+    this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
+    this.refLocationAddress = await this.fetchAddress(this.refLocation);
 
     if (this.locationTypeChosen === 'geoLocation') {
       this.checkAddress = false;
@@ -539,7 +536,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
-          this.geoLocation = new Geolocation(position);
+          this.geoLocation = new GeolocationCoords(position);
         },
         null,
         {

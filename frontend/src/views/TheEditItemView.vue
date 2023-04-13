@@ -112,7 +112,7 @@
                 <b-button type="is-primary" @click="fetchAddressGeoLoc">
                   <i class="icon fas fa-map-marker-alt"></i>
                 </b-button>
-                <b-input v-model="location" class="is-expanded ml-2" name="ref_location" type="text" />
+                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -184,6 +184,7 @@ import CategorySelector from "@/components/CategorySelector.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
+import {GeolocationCoords} from "@/functions";
 
 export default {
   name: 'TheEditItemView',
@@ -208,7 +209,7 @@ export default {
 
       item: {},
       internalItem: {},
-      location: "",
+      address: "",
       initialStartdate: Date.now(),
 
       geoLocation: null,
@@ -223,7 +224,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
-          this.geoLocation = position;
+          this.geoLocation = new GeolocationCoords(position);
         },
         null,
         {
@@ -316,27 +317,26 @@ export default {
           this.snackbarError(error);
         }
 
-        this.fetchAddress(this.internalItem.location);
+        if (this.internalItem.location !== null)
+          this.address = await this.fetchAddress(new GeolocationCoords(this.internalItem.location));
       }
     },
     async fetchAddressGeoLoc() {
-      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoLocation !== null) {
-        const geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
-        this.fetchAddress(geoLocPoint);
-      } else {
+      if (this.geoLocation !== null)
+        this.address = await this.fetchAddress(this.geoLocation);
+      else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-      }
     },
     async fetchAddress(location) {
-      if (location !== null) {
+      if (location instanceof GeolocationCoords) {
         try {
-          this.location = (await axios.post("/api/v1/address/reverse", location)).data;
+          return (await axios.post("/api/v1/address/reverse", location)).data;
         }
         catch (error) {
           this.fullErrorHandling(error);
         }
       }
+      return null;
     },
     async processImage(file) {
       this.loading = true;
@@ -378,7 +378,7 @@ export default {
             category2: this.internalItem.category2,
             category3: this.internalItem.category3,
             description: this.internalItem.description,
-            location: this.location,
+            location: this.address,
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
             enddate: endDate
@@ -469,10 +469,6 @@ export default {
 
   #page-add-item > .columns > .column {
     width: 100%;
-  }
-
-  #form-side > .box {
-    margin-top: 1.5rem !important;
   }
 }
 

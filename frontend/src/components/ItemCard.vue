@@ -76,7 +76,7 @@ import ItemTypeTag from "@/components/ItemTypeTag";
 import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {Geolocation, ucfirst} from "@/functions";
+import {GeolocationCoords, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -107,10 +107,8 @@ export default {
     const itemLink = {name: 'item', params: {id: this.item.id}};
     this.linkOnClick = !this.recurrentList ? itemLink : addItemFromLink;
 
-    if (this.item['location'] !== null) {
-      const coords = this.item['location'].slice(17, -1).split(' ');
-      this.itemLocation = new Geolocation(coords[0], coords[1]);
-    }
+    if (this.item.location !== null)
+      this.itemLocation = new GeolocationCoords(this.item.location);
   },
   computed: {
     itemCategories() {
