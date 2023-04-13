@@ -10,7 +10,7 @@
            @update:bounds="boundsUpdated">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
       <l-control class="control-geolocation">
-        <b-button type="is-primary" @click="updateGeoLocation">
+        <b-button type="is-primary" @click="setCenterAtGeoLocation">
           <i class="fas fa-street-view"></i>
         </b-button>
       </l-control>
@@ -141,8 +141,8 @@ export default {
     return {
       mapLoading: true,
       zoom: 14,
-      preLeafletCenter: new LatLng(0, 0),
-      leafletCenter: new LatLng(0, 0),
+      preLeafletCenter: new LatLng(50.6450944, 5.5736112),
+      leafletCenter: new LatLng(50.6450944, 5.5736112),
       bounds: null,
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
@@ -270,18 +270,23 @@ export default {
   async created() {
     document.title = `Shareish | ${this.$t('map')}`;
 
-    this.updateGeoLocation();
-    this.fetchExtraLayersMakers();
+    await this.updateGeoLocation();
+    if (this.geoLocation instanceof GeolocationCoords)
+      this.preLeafletCenter = this.geoLocation.leafletLatLng;
 
     if (this.itemId !== null)
-      await this.loadRoutedItem();
+      await this.fetchRoutedItem();
 
     this.leafletCenter = this.preLeafletCenter;
 
-    await this.loadItems();
-    this.$nextTick(() => {
-      this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
-    });
+    await this.fetchExtraLayersMakers();
+    await this.fetchItems();
+
+    if (this.itemId !== null && !this.routedItemError) {
+      this.$nextTick(() => {
+        this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
+      });
+    }
 
     this.mapLoading = false;
   },
@@ -294,39 +299,44 @@ export default {
       };
     },
     itemId() {
-      return Number(this.$route.query.id);
+      return (this.$route.query.id) ? Number(this.$route.query.id) : null;
     }
   },
   watch: {
     async filterParams() {
       this.mapLoading = true;
-      await this.loadItems();
+      await this.fetchItems();
       this.mapLoading = false;
     },
   },
   methods: {
-    updateGeoLocation() {
+    async updateGeoLocation() {
       // Has the user activated geolocation?
       if ('geolocation' in navigator) {
         // Get the position
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            if (this.geoLocation === null)
-              this.geoLocation = new GeolocationCoords(position);
-            else
-              this.geoLocation.update(position);
-            this.preLeafletCenter = this.geoLocation.leafletLatLng;
-          },
-          null,
-          {
-            maximumAge: 10000,
-            timeout: 5000,
-            enableHighAccuracy: true
-          }
-        );
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+
+          if (this.geoLocation instanceof GeolocationCoords)
+            this.geoLocation.update(position);
+          else
+            this.geoLocation = new GeolocationCoords(position);
+        }
+        catch {}
       }
     },
-    async loadRoutedItem() {
+    async setCenterAtGeoLocation() {
+      if (!this.mapLoading) {
+        await this.updateGeoLocation();
+        if (this.geoLocation instanceof GeolocationCoords)
+          this.leafletCenter = this.geoLocation.leafletLatLng;
+        else
+          this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
+    },
+    async fetchRoutedItem() {
       try {
         const routedItem = (await axios.get(`/api/v1/items/${this.itemId}`)).data;
         if (routedItem.location !== null) {
@@ -342,7 +352,7 @@ export default {
         console.log(error);
       }
     },
-    async loadItems() {
+    async fetchItems() {
       try {
         let items = (await axios.get("/api/v1/items", {params: this.filterParams})).data;
 
@@ -413,17 +423,15 @@ export default {
     },
     async getFallingFruitElements() {
       try {
-          const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
-	  const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
-          const ffURL = ffbaseURL + ffcoords
-        return (await axios.get(ffURL,
-            {
-              transformRequest: (data, headers) => {
-                delete headers.common['Authorization'];
-                return data;
-              }
-            })).data;
-
+        const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
+        const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+        const ffURL = ffbaseURL + ffcoords;
+        return (await axios.get(ffURL, {
+          transformRequest: (data, headers) => {
+            delete headers.common['Authorization'];
+            return data;
+          }
+        })).data;
       }
       catch (error) {
         console.log(error);
@@ -452,6 +460,7 @@ export default {
     async boundsUpdated() {
       this.mapLoading = true;
       await this.fetchExtraLayersMakers();
+      await this.fetchItems();
       this.mapLoading = false;
     }
   }

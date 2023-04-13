@@ -415,14 +415,11 @@ export default {
   async mounted() {
     this.loading = true;
     await this.fetchItem();
-    if (this.item.location !== null) {
-      const testtemp = new GeolocationCoords(this.item.location);
-      console.log(testtemp);
-      this.address = await this.fetchAddress(testtemp);
-    }
+    document.title = `Shareish | ${this.item.name}`;
+    if (this.item.location !== null)
+      this.address = await this.fetchAddress(new GeolocationCoords(this.item.location));
     await this.fetchUser();
     await this.fetchComments();
-    document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }
 };
