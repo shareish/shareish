@@ -1,3 +1,5 @@
+import {LatLng} from "leaflet/dist/leaflet-src.esm";
+
 export const scrollParentToChild = function(parent, child) {
   if (typeof parent === 'object' && typeof child === 'object' && parent !== null && child !== null) {
     // Functions from Mina on StackOverflow
@@ -85,6 +87,7 @@ export class GeolocationCoords {
   constructor(param1, param2 = null) {
     this.longitude = 0;
     this.latitude = 0;
+    this.leafletLatLng = new LatLng(0, 0);
 
     this.update(param1, param2);
   }
@@ -111,6 +114,9 @@ export class GeolocationCoords {
         this.latitude = param2;
       }
     }
+
+    this.leafletLatLng.lat = this.latitude;
+    this.leafletLatLng.lng = this.longitude;
   }
 
   toString() {
