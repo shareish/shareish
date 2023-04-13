@@ -322,7 +322,7 @@ export default {
       items: [],
 
       useMinCreactiondate: false,
-      timeUnit: 'days',
+      timeUnit: 'hours',
       sliderTimeUnitMemory: {
         'days': 1,
         'hours': 1,
@@ -350,7 +350,7 @@ export default {
         availableUntil: this.searchAvailabilityUntil,
         userLocation: this.searchLocation,
         distancesRadius: this.searchDistancesRadius,
-        minCreationdate: (this.useMinCreactiondate) ? this.searchMinCreationdate : null
+        minCreationdate: this.searchMinCreationdate
       };
     },
     userId() {
@@ -361,27 +361,24 @@ export default {
     }
   },
   watch: {
+    useMinCreactiondate() {
+      if (this.useMinCreactiondate)
+        this.updateSearchMinCreationdate();
+      else
+        this.searchMinCreationdate = null;
+    },
     timeUnit() {
       this.sliderTimeUnit = this.sliderTimeUnitMemory[this.timeUnit];
-      this.minCreationdate = this.getMinCreationdate();
-
-      clearTimeout(this.timeouts['timeUnit']);
-      this.timeouts['timeUnit'] = setTimeout(() => {
-        this.searchMinCreationdate = this.minCreationdate;
-      }, 600);
+      this.updateSearchMinCreationdate();
     },
     sliderTimeUnit() {
       this.sliderTimeUnitMemory[this.timeUnit] = this.sliderTimeUnit;
-      this.minCreationdate = this.getMinCreationdate();
-
-      clearTimeout(this.timeouts['sliderTimeUnit']);
-      this.timeouts['sliderTimeUnit'] = setTimeout(() => {
-        this.searchMinCreationdate = this.minCreationdate;
-      }, 600);
+      this.updateSearchMinCreationdate();
     },
     params() {
-      if (this.initialItemsLoadDone)
+      if (this.initialItemsLoadDone) {
         this.fetchItems();
+      }
     },
     selectedCategory() {
       if (this.searchCategories.indexOf(this.selectedCategory) === -1)
@@ -444,6 +441,14 @@ export default {
   methods: {
     ucfirst,
     lcall,
+    updateSearchMinCreationdate() {
+      this.minCreationdate = this.getMinCreationdate();
+
+      clearTimeout(this.timeouts['searchMinCreationdate']);
+      this.timeouts['searchMinCreationdate'] = setTimeout(() => {
+        this.searchMinCreationdate = this.minCreationdate;
+      }, 600);
+    },
     getMinCreationdate() {
       let minCreationdate = new Date();
 
