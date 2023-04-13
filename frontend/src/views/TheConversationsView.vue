@@ -185,6 +185,7 @@ export default {
     return {
       loading: true,
       conversations: [],
+      conversationsTextarea: {},
       selected: -1,
       messages: [],
       messageToSend: "",
@@ -218,11 +219,18 @@ export default {
     selectedCategory() {
       if (this.canChangeCategory) {
         this.canChangeCategory = false;
-        this.fetchConversations();
-        setTimeout(() => {
-          this.canChangeCategory = true;
-        }, 500);
+        this.closeConversation();
+        this.fetchConversations().then(() => {
+          this.selected = this.getIConversation(this.conversationId);
+          this.openConversation();
+          setTimeout(() => {
+            this.canChangeCategory = true;
+          }, 500);
+        });
       }
+    },
+    messageToSend() {
+      this.conversationsTextarea[this.activeConversation.id] = this.messageToSend;
     }
   },
   computed: {
@@ -256,8 +264,13 @@ export default {
 
           await this.loadMessages(false);
 
-          if (this.messages.length === 0)
-            this.messageToSend = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
+          if (this.conversationsTextarea[this.activeConversation.id] === undefined) {
+            if (this.messages.length === 0)
+               this.conversationsTextarea[this.activeConversation.id] = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
+            else
+              this.conversationsTextarea[this.activeConversation.id] = "";
+          }
+          this.messageToSend = this.conversationsTextarea[this.activeConversation.id];
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
@@ -305,7 +318,7 @@ export default {
       this.textareaRows = messageRows;
     },
     shiftEnterPressed() {
-      this.messageToSend += "\n";
+      this.conversationsTextarea[this.activeConversation.id] += "\n";
       this.checkRows();
     },
     async fetchConversations() {
@@ -329,6 +342,7 @@ export default {
             receiver: receiver
           };
         });
+
         if (this.unableToFetchConversations) {
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -459,7 +473,8 @@ export default {
             this.waitingFormResponse = false;
           }, 500);
 
-          this.messageToSend = "";
+          this.conversationsTextarea[this.activeConversation.id] = "";
+          this.messageToSend = this.conversationsTextarea[this.activeConversation.id]
 
           this.checkRows();
         }
