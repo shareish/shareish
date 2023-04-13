@@ -324,5 +324,10 @@
   "unit": "Unité",
   "day": "jours|jour|jours",
   "hour": "heures|heure|heures",
-  "minute": "minutes|minute|minutes"
+  "minute": "minutes|minute|minutes",
+  "filter-items-creationdate": "Filtrer les items créés après une certaine date",
+  "only-items-created-on": "Seuls les éléments créés le",
+  "only-items-created-at": "Seuls les éléments créés à",
+  "on-day": "le",
+  "or-later-will-be-showed": "ou plus tard seront affichés"
 }

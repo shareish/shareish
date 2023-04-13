@@ -321,3 +321,8 @@ unit,Unit,Unité
 day,days|day|days,jours|jour|jours
 hour,hours|hour|hours,heures|heure|heures
 minute,minutes|minute|minutes,minutes|minute|minutes
+filter-items-creationdate,Filter items created after a certain date,Filtrer les items créés après une certaine date
+only-items-created-on,Only items created on,Seuls les éléments créés le
+only-items-created-at,Only items created at,Seuls les éléments créés à
+on-day,on,le
+or-later-will-be-showed,or later will be showed,ou plus tard seront affichés
