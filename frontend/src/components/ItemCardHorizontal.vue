@@ -34,7 +34,7 @@
         </div>
         <div class="column">
           <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" class="category mr-2" :title="$t(category.slug)" />
-          <router-link v-if="address" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
+          <router-link v-if="item.location" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
             <i class="fas fa-map-marker-alt"></i>
           </router-link>
         </div>
@@ -48,7 +48,6 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import {categories} from "@/categories";
 import moment from "moment";
-import axios from "axios";
 import WindowSize from "@/mixins/WindowSize";
 
 export default {
@@ -69,37 +68,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
-  },
-  data() {
-    return {
-      geoLocation: null,
-      address: null
-    }
-  },
-  created() {
-    // Has the user activated geolocation?
-    if ('geolocation' in navigator) {
-      // Get the position
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          this.geoLocation = position;
-        },
-        null,
-        {
-          maximumAge: 10000,
-          timeout: 5000,
-          enableHighAccuracy: true
-        }
-      );
-    }
-
-    this.fetchAddress();
-  },
-  watch: {
-    item() {
-      this.address = null;
-      this.fetchAddress();
     }
   },
   computed: {
@@ -126,33 +94,7 @@ export default {
   methods: {
     formattedDateFromNow(date) {
       return moment(date).locale(this.$i18n.locale).fromNow();
-    },
-    deg2rad(deg) {
-      return deg * (Math.PI / 180)
-    },
-    getDistanceFromCoords() {
-      let latLong = this.item['location'].slice(17, -1).split(' ');
-      let lat2 = latLong[0];
-      let lon2 = latLong[1];
-      let R = 6371; // Radius of the earth in km
-      let dLat = this.deg2rad(lat2 - this.geoLocation.coords.latitude);  // deg2rad below
-      let dLon = this.deg2rad(lon2 - this.geoLocation.coords.longitude);
-      let a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(this.deg2rad(this.geoLocation.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c; // Distance in km
-    },
-    async fetchAddress() {
-      if (this.item.location !== null) {
-        try {
-          this.address = (await axios.post("/api/v1/address/reverse", this.item.location)).data;
-        } catch (error) {
-          this.snackbarError(error);
-        }
-      }
-    },
+    }
   }
 }
 </script>

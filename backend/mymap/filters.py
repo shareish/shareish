@@ -1,13 +1,10 @@
 import json
 from datetime import datetime, timezone
-from itertools import chain
 
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import Point
 from django.db.models import Q, F
 from rest_framework import filters
-
-from .functions import verif_location
 
 
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
@@ -48,7 +45,7 @@ class ItemLocationFilterBackend(filters.BaseFilterBackend):
         distances_radius = request.query_params.getlist('distancesRadius[]')
         if user_location is not None:
             user_location = json.loads(user_location)
-            user_location = GEOSGeometry('POINT(' + str(user_location['latitude']) + ' ' + str(user_location['longitude']) + ')', srid=4326)
+            user_location = Point(user_location['longitude'], user_location['latitude'], srid=4326)
             queryset = queryset.annotate(distance=Distance("location", user_location))
 
             if len(distances_radius) > 0:
