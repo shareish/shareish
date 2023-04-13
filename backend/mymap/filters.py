@@ -7,6 +7,21 @@ from django.db.models import Q, F
 from rest_framework import filters
 
 
+class ActiveItemFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter(Q(enddate__isnull=True) | Q(enddate__gte=datetime.now()))
+
+
+class ItemCategoryFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        categories = request.query_params.getlist('categories[]')
+        if len(categories) > 0:
+            return queryset.filter(
+                Q(category1__in=categories) | Q(category2__in=categories) | Q(category3__in=categories)
+            )
+        return queryset
+
+
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         types = request.query_params.getlist('types[]')
@@ -62,6 +77,14 @@ class ItemLocationFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
+class ItemMinCreationdateFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        min_creationdate = request.query_params.get('minCreationdate')
+        if min_creationdate:
+            return queryset.filter(creationdate__gte=min_creationdate)
+        return queryset
+
+
 class ConversationContentFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search = request.query_params.get('search')
@@ -81,21 +104,6 @@ class ConversationSelectedCategoryFilterBackend(filters.BaseFilterBackend):
             elif selectedCategory == 'yours':
                 return queryset.filter(item__user=request.user)
         return queryset
-
-
-class ItemCategoryFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        categories = request.query_params.getlist('categories[]')
-        if len(categories) > 0:
-            return queryset.filter(
-                Q(category1__in=categories) | Q(category2__in=categories) | Q(category3__in=categories)
-            )
-        return queryset
-
-
-class ActiveItemFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        return queryset.filter(Q(enddate__isnull=True) | Q(enddate__gte=datetime.now()))
 
 
 class UserItemFilterBackend(filters.BaseFilterBackend):

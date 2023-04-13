@@ -101,7 +101,7 @@ export class GeolocationCoords {
     } else if (typeof param1 === 'string') {
       const regex = /^SRID=4326;POINT \([0-9]+(\.[0-9]+)? [0-9]+(\.[0-9]+)?\)$/
       if (regex.test(param1)) {
-        let coords = param1.substring(17, param1.length - 2).split(" ");
+        let coords = param1.substring(17, param1.length - 1).split(" ");
         this.longitude = parseFloat(coords[0]);
         this.latitude = parseFloat(coords[1]);
       }

@@ -310,7 +310,8 @@ export default {
         try {
           this.recurrentItem = (await axios.get(`/api/v1/recurrents/${this.recurrentItemId}`)).data;
           await this.setFieldFromRecurrentItem();
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
           await this.$router.push("/add-item");
         }
@@ -331,7 +332,8 @@ export default {
           for (const i in images) {
             this.images.push({"filename": images[i].name, 'predictions': [], 'preview': images[i].base64_url, 'probability': 0});
           }
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
 

@@ -15,13 +15,16 @@ def verif_location(data):
         return {'error': "No suitable address to process."}
 
     if not re.match("^SRID=4326;POINT \([0-9]+(\.[0-9]+)? [0-9]+(\.[0-9]+)?\)$", address):
-        location = locator.geocode(address)
-        if location is not None:
-            return {'success': "SRID=4326;POINT ({} {})".format(
-                str(location.longitude),
-                str(location.latitude)
-            )}
-        else:
-            return {'error': "Couldn't find location."}
+        try:
+            location = locator.geocode(address)
+            if location is not None:
+                return {'success': "SRID=4326;POINT ({} {})".format(
+                    str(location.longitude),
+                    str(location.latitude)
+                )}
+            else:
+                return {'error': "Couldn't find location."}
+        except:
+            return {'error': "Third party geolocation service did not work properly."}
     else:
         return {'success': address}
