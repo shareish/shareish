@@ -222,7 +222,8 @@ export default {
             message: this.$t('notif-success-user-update'),
             pauseOnHover: true,
           });
-        } catch (error) {
+        }
+        catch (error) {
           this.fullErrorHandling(error);
         }
       }

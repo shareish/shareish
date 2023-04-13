@@ -294,7 +294,7 @@ or,or,ou
 searched-categories,Search categories,Catégories recherchées
 no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
 filter,Filters|Filter|Filters,Filtres|Filtre|Filtres
-only-new,Only new,Nouveautés
+show-only-unseen,Show only unseen items,N'afficher que les éléments non-vus
 show-filters,Show filters,Afficher les filtres
 hide-filters,Hide filters,Masquer les filtres
 creationdate,Publication date,Date de publication
@@ -316,3 +316,8 @@ available,Available,Disponible
 corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
 found,found.,trouvé.|trouvés.
 item,item|items,élément|élements
+publication,Publication,Publication
+unit,Unit,Unité
+day,days|day|days,jours|jour|jours
+hour,hours|hour|hours,heures|heure|heures
+minute,minutes|minute|minutes,minutes|minute|minutes

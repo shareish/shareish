@@ -127,7 +127,8 @@ export default {
           this.filename = image.name;
           this.preview = image.base64_url;
           this.changesNotSaved = true;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
       } else {
@@ -147,7 +148,8 @@ export default {
         });
 
         this.user.images.splice(index, 1);
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     },

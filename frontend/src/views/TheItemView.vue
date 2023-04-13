@@ -275,7 +275,8 @@ export default {
             'view_date': new Date()
           };
           this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`, {params: params})).data;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
           this.redirection = true;
           await this.$router.push("/items");
@@ -299,7 +300,8 @@ export default {
       if (!this.redirection) {
         try {
           this.user = (await axios.get(`/api/v1/webusers/${this.userId}/`)).data;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
       }
@@ -308,7 +310,8 @@ export default {
       if (!this.redirection) {
         try {
           this.comments = (await axios.get(`/api/v1/items/${this.itemId}/comments/`)).data;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
       }
@@ -326,7 +329,8 @@ export default {
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
         await this.$router.push(`/conversations/${id}`);
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     },
@@ -351,7 +355,8 @@ export default {
           pauseOnHover: true,
         });
         await this.$router.push("/items");
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
     },

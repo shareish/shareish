@@ -298,7 +298,7 @@
   "searched-categories": "Search categories",
   "no-categories-selected-for-search": "No category filter applied. Select a category below to add it to the search!",
   "filter": "Filters|Filter|Filters",
-  "only-new": "Only new",
+  "show-only-unseen": "Show only unseen items",
   "show-filters": "Show filters",
   "hide-filters": "Hide filters",
   "creationdate": "Publication date",
@@ -319,5 +319,10 @@
   "available": "Available",
   "corresponding-to-search": "matches your search.|match your search.",
   "found": "found.",
-  "item": "item|items"
+  "item": "item|items",
+  "publication": "Publication",
+  "unit": "Unit",
+  "day": "days|day|days",
+  "hour": "hours|hour|hours",
+  "minute": "minutes|minute|minutes"
 }

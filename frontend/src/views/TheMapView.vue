@@ -444,7 +444,8 @@ export default {
               }
             })).data;
 
-      } catch (error) {
+      }
+      catch (error) {
         console.log(error);
         return []; // may happen if fallingfruit API returns an error
       }

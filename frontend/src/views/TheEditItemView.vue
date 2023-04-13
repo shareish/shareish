@@ -286,7 +286,8 @@ export default {
       try {
         this.item = (await axios.get(`/api/v1/user_items/${this.itemId}`)).data;
         this.setFieldFromItem();
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
         await this.$router.push("/items");
       }
@@ -313,7 +314,8 @@ export default {
             this.images['files'].push(images[i].name);
             this.images['previews'].push(images[i].base64_url);
           }
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
 

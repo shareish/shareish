@@ -196,6 +196,22 @@
                   <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="0" :max="200" :step="1" indicator :tooltip="false" />
                 </b-field>
               </toggle-box>
+              <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
+                <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
+                <div class="columns is-mobile mb-0 mt-3">
+                  <div class="column pr-1">
+                      <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                  </div>
+                  <div class="column pl-1" style="flex: 0 0 auto;">
+                    <b-select v-model="timeUnit" :placeholder="$t('unit')">
+                        <option value="days">{{ $tc('day', 0) }}</option>
+                        <option value="hours">{{ $tc('hour', 0) }}</option>
+                        <option value="minutes">{{ $tc('minute', 0) }}</option>
+                    </b-select>
+                  </div>
+                </div>
+                <p>Seuls les éléments créés depuis le <b>{{ formattedDate(minCreationdate) }}</b> seront affichés.</p>
+              </toggle-box>
             </div>
           </div>
         </div>
@@ -253,6 +269,7 @@ import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import {categories} from "@/categories";
+import moment from "moment/moment";
 
 export default {
   name: 'TheItemsView',
@@ -264,7 +281,7 @@ export default {
       searchTypes: [],
       searchCategories: [],
       selectedCategory: null,
-      onlyNew: false,
+      onlyUnseen: false,
       searchAvailabilityFrom: null,
       searchAvailabilityUntil: null,
       searchDistancesRadius: null,
@@ -294,7 +311,22 @@ export default {
       locationTypeChosen: 'geoLocation',
       locationLoading: false,
 
-      items: []
+      items: [],
+
+      timeUnit: 'days',
+      sliderTimeUnitMemory: {
+        'days': 1,
+        'hours': 1,
+        'minutes': 1
+      },
+      sliderTimeUnitMaximums: {
+        'days': 31,
+        'hours': 24,
+        'minutes': 60
+      },
+      sliderTimeUnit: 1,
+      minCreationdate: new Date(),
+      searchMinCreationdate: null
     }
   },
   computed: {
@@ -304,18 +336,40 @@ export default {
         types: this.searchTypes,
         categories: this.searchCategories,
         ordering: this.orderBy,
-        onlyNew: (this.onlyNew) ? this.onlyNew : null,
+        onlyNew: (this.onlyUnseen) ? this.onlyUnseen : null,
         availableFrom: this.searchAvailabilityFrom,
         availableUntil: this.searchAvailabilityUntil,
         userLocation: this.searchLocation,
-        distancesRadius: this.searchDistancesRadius
+        distancesRadius: this.searchDistancesRadius,
+        minCreationdate: this.searchMinCreationdate
       };
     },
     userId() {
       return Number(this.$store.state.user.id);
+    },
+    sliderTimeUnitMax() {
+      return this.sliderTimeUnitMaximums[this.timeUnit];
     }
   },
   watch: {
+    timeUnit() {
+      this.sliderTimeUnit = this.sliderTimeUnitMemory[this.timeUnit];
+      this.minCreationdate = this.getMinCreationdate();
+
+      clearTimeout(this.timeouts['timeUnit']);
+      this.timeouts['timeUnit'] = setTimeout(() => {
+        this.searchMinCreationdate = this.minCreationdate;
+      }, 600);
+    },
+    sliderTimeUnit() {
+      this.sliderTimeUnitMemory[this.timeUnit] = this.sliderTimeUnit;
+      this.minCreationdate = this.getMinCreationdate();
+
+      clearTimeout(this.timeouts['sliderTimeUnit']);
+      this.timeouts['sliderTimeUnit'] = setTimeout(() => {
+        this.searchMinCreationdate = this.minCreationdate;
+      }, 600);
+    },
     params() {
       if (this.initialItemsLoadDone)
         this.loadItems();
@@ -381,6 +435,31 @@ export default {
   methods: {
     ucfirst,
     lcall,
+    getMinCreationdate() {
+      let minCreationdate = new Date();
+
+      switch (this.timeUnit) {
+        case 'days':
+          minCreationdate.setDate(minCreationdate.getDate() - this.sliderTimeUnit);
+          minCreationdate.setHours(0);
+          minCreationdate.setMinutes(0);
+          break;
+        case 'hours':
+          minCreationdate.setHours(minCreationdate.getHours() - this.sliderTimeUnit);
+          minCreationdate.setMinutes(0);
+          break;
+        case 'minutes':
+          minCreationdate.setMinutes(minCreationdate.getMinutes() - this.sliderTimeUnit);
+          break;
+      }
+      minCreationdate.setSeconds(0);
+      minCreationdate.setMilliseconds(0);
+
+      return minCreationdate;
+    },
+    formattedDate(date) {
+      return (moment(date).locale(this.$i18n.locale).format("DD/MM/YYYY HH:MM"));
+    },
     getCategory(category) {
       if (category in categories) {
         return this.$t(categories[category]['slug']);
@@ -455,7 +534,8 @@ export default {
         this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     },
