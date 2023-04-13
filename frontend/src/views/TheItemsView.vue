@@ -255,7 +255,7 @@
               <item-card :item="item" :user-location="searchLocation" />
             </div>
             <div v-if="!loadedAllItems" id="load-more-items" class="column is-narrow">
-              <b-button :class="{'is-loading': itemsLoading}" type="is-primary" @click="loadItems(true)">
+              <b-button :class="{'is-loading': itemsLoading}" type="is-primary" @click="fetchItems(true)">
                 {{ $t('button-load-more') }}
               </b-button>
             </div>
@@ -381,7 +381,7 @@ export default {
     },
     params() {
       if (this.initialItemsLoadDone)
-        this.loadItems();
+        this.fetchItems();
     },
     selectedCategory() {
       if (this.searchCategories.indexOf(this.selectedCategory) === -1)
@@ -487,9 +487,9 @@ export default {
       let scrollBlock = document.getElementById('wrapper');
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
       if (bottom && !this.loadedAllItems)
-        this.loadItems(true);
+        this.fetchItems(true);
     }, 100),
-    async loadItems(append = false) {
+    async fetchItems(append = false) {
       this.itemsLoading = true;
       try {
         if (!append) {
@@ -605,7 +605,7 @@ export default {
       this.searchLocation = this.refLocation;
     }
 
-    await this.loadItems();
+    await this.fetchItems();
 
     this.initialItemsLoadDone = true;
 

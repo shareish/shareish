@@ -6,11 +6,11 @@
         @update:searchString="searchString = $event"
     />
 
-    <l-map :bounds.sync="bounds" :center.sync="center" :zoom.sync="zoom" style="height: 800px"
-           @update:bounds="fetchMarkers">
+    <l-map :bounds.sync="bounds" :center.sync="leafletCenter" :zoom.sync="zoom" style="height: 800px"
+           @update:bounds="boundsUpdated">
       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
       <l-control class="control-geolocation">
-        <b-button type="is-primary" @click="setGeolocalizedPosition">
+        <b-button type="is-primary" @click="setCenterAtGeoLocation">
           <i class="fas fa-street-view"></i>
         </b-button>
       </l-control>
@@ -23,17 +23,16 @@
         </div>
       </l-control>
 
-      <l-marker v-if="userPosition" :icon="userPositionIcon" :lat-lng="userPosition" />
+      <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
 
-      <l-layer-group ref="layer">
+      <l-layer-group>
         <v-marker-cluster :options="markerClusterGroupOptions">
           <l-marker
               v-for="item in items"
               :key="item.id"
-              :ref="`marker-item-${item.id}`"
+              :ref="'marker-item-' + item.id"
               :icon="item.icon"
-              :lat-lng="item.latLng"
-              @ready="openRoutedItemPopup(item.id)"
+              :lat-lng="item.location.leafletLatLng"
           >
             <l-popup :options="{className:'item-popup', maxWidth: '500'}">
               <item-map-popup :item="item" />
@@ -41,7 +40,7 @@
           </l-marker>
         </v-marker-cluster>
       </l-layer-group>
-      <l-feature-group v-if="zoom >= minZoomForExtraLayers" ref="markersFeatureGroup">
+      <l-feature-group v-if="zoom >= minZoomForExtraLayers">
         <l-layer-group>
           <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
             <template v-for="extraLayer in extraLayers">
@@ -49,7 +48,7 @@
                   v-for="marker in extraLayer.markers"
                   :key="marker.id"
                   :icon="extraLayersIcons[extraLayer.id]"
-                  :lat-lng="marker.latLng"
+                  :lat-lng="marker.location.leafletLatLng"
                   :visible="extraLayer.visible"
               >
                 <l-popup>
@@ -111,6 +110,8 @@ import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup}
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
 import ItemMapPopup from "@/components/ItemMapPopup.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import {GeolocationCoords} from "@/functions";
+import {LatLng} from "leaflet/dist/leaflet-src.esm";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -140,7 +141,8 @@ export default {
     return {
       mapLoading: true,
       zoom: 14,
-      center: latLng(0, 0),
+      preLeafletCenter: new LatLng(50.6450944, 5.5736112),
+      leafletCenter: new LatLng(50.6450944, 5.5736112),
       bounds: null,
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
@@ -254,9 +256,9 @@ export default {
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon
       },
-      userPosition: null,
-      userPositionIcon: blueIcon,
-      userPositionWatcherId: null,
+      geoLocation: null,
+      geoLocationIcon: blueIcon,
+      routedItemLocation: null,
       searchString: null,
       selectedType: null,
       selectedCategory: null,
@@ -265,27 +267,28 @@ export default {
       routedItemError: false,
     }
   },
-  async mounted() {
+  async created() {
     document.title = `Shareish | ${this.$t('map')}`;
-    if (this.itemId) {
-      await this.setRoutedItem();
-    } else {
-      this.setGeolocalizedPosition();
-    }
-    await Promise.all([
-      this.getItemsLocation(),
-      this.fetchExtraLayersMakers()
-    ]);
 
-    // Start watching user position
-    // TODO: investigate why it's not working
-    // this.userPositionWatcherId = navigator.geolocation.watchPosition(position => {
-    //   const coords = position.coords;
-    //   this.userPosition = latLng(coords.latitude, coords.longitude);
-    // }, () => {}, {timeout: GEOLOCATION_TIMEOUT});
-  },
-  beforeDestroy() {
-    // navigator.geolocation.clearWatch(this.userPositionWatcherId);
+    await this.updateGeoLocation();
+    if (this.geoLocation instanceof GeolocationCoords)
+      this.preLeafletCenter = this.geoLocation.leafletLatLng;
+
+    if (this.itemId !== null)
+      await this.fetchRoutedItem();
+
+    this.leafletCenter = this.preLeafletCenter;
+
+    await this.fetchExtraLayersMakers();
+    await this.fetchItems();
+
+    if (this.itemId !== null && !this.routedItemError) {
+      this.$nextTick(() => {
+        this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
+      });
+    }
+
+    this.mapLoading = false;
   },
   computed: {
     filterParams() {
@@ -296,76 +299,70 @@ export default {
       };
     },
     itemId() {
-      return Number(this.$route.query.id);
+      return (this.$route.query.id) ? Number(this.$route.query.id) : null;
     }
   },
   watch: {
     async filterParams() {
       this.mapLoading = true;
-      await this.getItemsLocation();
+      await this.fetchItems();
       this.mapLoading = false;
     },
   },
   methods: {
-    async setRoutedItem() {
+    async updateGeoLocation() {
+      // Has the user activated geolocation?
+      if ('geolocation' in navigator) {
+        // Get the position
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+
+          if (this.geoLocation instanceof GeolocationCoords)
+            this.geoLocation.update(position);
+          else
+            this.geoLocation = new GeolocationCoords(position);
+        }
+        catch {}
+      }
+    },
+    async setCenterAtGeoLocation() {
+      if (!this.mapLoading) {
+        await this.updateGeoLocation();
+        if (this.geoLocation instanceof GeolocationCoords)
+          this.leafletCenter = this.geoLocation.leafletLatLng;
+        else
+          this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
+    },
+    async fetchRoutedItem() {
       try {
-        if (this.itemId === null) {
-          this.setGeolocalizedPosition();
-          this.routedItemError = true;
-          console.log("Routed id is null");
+        const routedItem = (await axios.get(`/api/v1/items/${this.itemId}`)).data;
+        if (routedItem.location !== null) {
+          this.routedItemLocation = new GeolocationCoords(routedItem.location);
+          this.preLeafletCenter = this.routedItemLocation.leafletLatLng;
         } else {
-          const item = (await axios.get(`/api/v1/items/${this.itemId}/`)).data;
-          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
-          if (item['location'] === null) {
-            this.setGeolocalizedPosition();
-            this.routedItemError = true;
-            console.log("Routed id location is null");
-          } else {
-            const latLong = item['location'].slice(17, -1).split(' ');
-            this.center = latLng(...latLong);
-          }
+          this.routedItemError = true;
+          console.log("Routed id location is null");
         }
       }
       catch (error) {
-        this.setGeolocalizedPosition();
         this.routedItemError = true;
         console.log(error);
       }
     },
-    openRoutedItemPopup(id) {
-      if (this.itemId && this.itemId === id && !this.routedItemError) {
-        this.$nextTick(() => {
-          this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
-          //TODO: popup does not open when clustered. Probably need to to programmatically split the cluster.
-        });
-      }
-    },
-    setGeolocalizedPosition() {
-      navigator.geolocation.getCurrentPosition(position => {
-        const coords = position.coords;
-        this.center = latLng(coords.latitude, coords.longitude);
-        this.userPosition = this.center;
-      }, (error) => {
-        this.zoom = 2;
-      }, {
-        timeout: GEOLOCATION_TIMEOUT
-      });
-    },
-    async getItemsLocation() {
+    async fetchItems() {
       try {
-        let items = (await axios.get("/api/v1/items/", {params: this.filterParams})).data;
+        let items = (await axios.get("/api/v1/items", {params: this.filterParams})).data;
 
         this.items = items.filter(item =>
-            // should not happen, but happens :)
             item['location'] !== null
         ).map(item => {
-          let latLong = item['location'].slice(17, -1).split(' ');
           return {
             ...item,
             icon: itemTypeIcons[item['type']] || greyIcon,
-            latitude: latLong[0],
-            longitude: latLong[1],
-            latLng: latLng(...latLong)
+            location: new GeolocationCoords(item.location)
           };
         });
       }
@@ -374,52 +371,45 @@ export default {
       }
     },
     async fetchExtraLayersMakers() {
-      if (this.bounds === null || this.zoom < this.minZoomForExtraLayers) {
-        return;
-      }
-
-      this.extraLayers = await Promise.all(
-        this.extraLayers.map(async extraLayer => {
-          try {
-            if (extraLayer.tagKey === 'ff') {
-              const elements = await this.getFallingFruitElements();
-              const markers = elements.filter(element =>
+      if (this.bounds !== null && this.zoom >= this.minZoomForExtraLayers) {
+        this.extraLayers = await Promise.all(
+          this.extraLayers.map(async extraLayer => {
+            try {
+              if (extraLayer.tagKey === 'ff') {
+                const elements = await this.getFallingFruitElements();
+                const markers = elements.filter(element =>
                   (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
-              ).map(element => {
-                return {
-                  latitude: element['lat'],
-                  longitude: element['lon'] || element['lng'],
-                  latLng: latLng(element['lat'], element['lng']),
-                  type: 'ffruit', //element['description'], //'ffruit',
-                  name: element['type_names'][0],
-                  description: element['description'],
-                  id: element['id']
-                }
-              });
-              return {...extraLayer, markers};
-            } else {
-              const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
-              const markers = elements.filter(element =>
+                ).map(element => {
+                  return {
+                    location: new GeolocationCoords(element['lng'], element['lat']),
+                    type: 'ffruit',
+                    name: element['type_names'][0],
+                    description: element['description'],
+                    id: element['id']
+                  }
+                });
+                return {...extraLayer, markers};
+              } else {
+                const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
+                const markers = elements.filter(element =>
                   (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
-              ).map(element => {
-                return {
-                  latitude: element['lat'],
-                  longitude: element['lon'] || element['lng'],
-                  latLng: latLng(element['lat'], element['lon']),
-                  type: element['tags'][extraLayer.tagKey],
-                  name: element['tags']['name'],
-                  id: element['id']
-                }
-              });
-              return {...extraLayer, markers};
+                ).map(element => {
+                  return {
+                    location: new GeolocationCoords(element['lon'], element['lat']),
+                    type: element['tags'][extraLayer.tagKey],
+                    name: element['tags']['name'],
+                    id: element['id']
+                  }
+                });
+                return {...extraLayer, markers};
+              }
+            } catch (error) {
+              console.log(error);
+              return extraLayer;
             }
-          }
-          catch (error) {
-            console.log(error)
-            return extraLayer;
-          }
-        })
-      );
+          })
+        );
+      }
     },
     getExtraMarkerURL(marker) {
       if (marker.type === 'ffruit') {
@@ -433,17 +423,15 @@ export default {
     },
     async getFallingFruitElements() {
       try {
-          const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
-	  const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
-          const ffURL = ffbaseURL + ffcoords
-        return (await axios.get(ffURL,
-            {
-              transformRequest: (data, headers) => {
-                delete headers.common['Authorization'];
-                return data;
-              }
-            })).data;
-
+        const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
+        const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+        const ffURL = ffbaseURL + ffcoords;
+        return (await axios.get(ffURL, {
+          transformRequest: (data, headers) => {
+            delete headers.common['Authorization'];
+            return data;
+          }
+        })).data;
       }
       catch (error) {
         console.log(error);
@@ -469,10 +457,10 @@ export default {
         return []; // may happen if overpass API returns an error
       }
     },
-    async fetchMarkers() {
-      // triggered when bounds changes
+    async boundsUpdated() {
       this.mapLoading = true;
       await this.fetchExtraLayersMakers();
+      await this.fetchItems();
       this.mapLoading = false;
     }
   }
