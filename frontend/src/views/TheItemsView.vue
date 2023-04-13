@@ -197,20 +197,28 @@
                 </b-field>
               </toggle-box>
               <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
-                <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
-                <div class="columns is-mobile mb-0 mt-3">
-                  <div class="column pr-1">
-                      <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                <b-field>
+                  <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
+                </b-field>
+                <b-field>
+                  <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
+                </b-field>
+                <template v-if="useMinCreactiondate">
+                  <div class="columns is-mobile mb-0 mt-3">
+                    <div class="column pr-1">
+                        <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                    </div>
+                    <div class="column pl-1" style="flex: 0 0 auto;">
+                      <b-select v-model="timeUnit" :placeholder="$t('unit')">
+                          <option value="days">{{ $tc('day', 0) }}</option>
+                          <option value="hours">{{ $tc('hour', 0) }}</option>
+                          <option value="minutes">{{ $tc('minute', 0) }}</option>
+                      </b-select>
+                    </div>
                   </div>
-                  <div class="column pl-1" style="flex: 0 0 auto;">
-                    <b-select v-model="timeUnit" :placeholder="$t('unit')">
-                        <option value="days">{{ $tc('day', 0) }}</option>
-                        <option value="hours">{{ $tc('hour', 0) }}</option>
-                        <option value="minutes">{{ $tc('minute', 0) }}</option>
-                    </b-select>
-                  </div>
-                </div>
-                <p>Seuls les éléments créés depuis le <b>{{ formattedDate(minCreationdate) }}</b> seront affichés.</p>
+                  <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                  <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                </template>
               </toggle-box>
             </div>
           </div>
@@ -313,6 +321,7 @@ export default {
 
       items: [],
 
+      useMinCreactiondate: false,
       timeUnit: 'days',
       sliderTimeUnitMemory: {
         'days': 1,
@@ -341,7 +350,7 @@ export default {
         availableUntil: this.searchAvailabilityUntil,
         userLocation: this.searchLocation,
         distancesRadius: this.searchDistancesRadius,
-        minCreationdate: this.searchMinCreationdate
+        minCreationdate: (this.useMinCreactiondate) ? this.searchMinCreationdate : null
       };
     },
     userId() {
@@ -457,8 +466,11 @@ export default {
 
       return minCreationdate;
     },
-    formattedDate(date) {
-      return (moment(date).locale(this.$i18n.locale).format("DD/MM/YYYY HH:MM"));
+    formattedDay(date) {
+      return (moment(date).locale(this.$i18n.locale).format("DD/MM/YYYY"));
+    },
+    formattedHour(date) {
+      return (moment(date).locale(this.$i18n.locale).format("HH:mm"));
     },
     getCategory(category) {
       if (category in categories) {
