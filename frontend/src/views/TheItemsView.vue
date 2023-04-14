@@ -1,7 +1,6 @@
 <template>
   <div id="page-items">
-    <b-loading v-if="loading" :active="true" :is-full-page="false" />
-    <div v-else class="columns">
+    <div class="columns">
       <div class="column">
         <div id="filters">
           <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
@@ -225,7 +224,8 @@
         </div>
       </div>
       <div class="column">
-        <div id="items-list" class="scrollable">
+        <b-loading v-if="loading" :active="true" :is-full-page="false" />
+        <div v-else id="items-list" class="scrollable">
           <header class="columns is-mobile">
             <div class="column">
               <p id="items-match-count">

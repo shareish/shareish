@@ -3,7 +3,7 @@ import re
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView
+from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, UserMapExtraCategory
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -16,16 +16,26 @@ class UserImageSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserMapExtraCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMapExtraCategory
+        fields = [
+            'id', 'user', 'category', 'selected', 'update_date', 'creation_date'
+        ]
+
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
     images = UserImageSerializer(many=True, allow_null=True, default=None)
+    map_ecats = UserMapExtraCategorySerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
-            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images'
+            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
+            'map_ecats'
         ]
 
     def validate(self, data):
@@ -99,7 +109,7 @@ class ItemSerializer(serializers.ModelSerializer):
                 errors['category3'] = "Each category can only be used once."
 
         # Check end date
-        if data.get('startdate') != None and data.get('enddate') != None:
+        if data.get('startdate') is not None and data.get('enddate') is not None:
             if data.get('enddate') <= data.get('startdate'):
                 errors['enddate'] = "The end date can't be earlier or equal to the start date."
 
@@ -110,6 +120,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     def get_hitcount(self, obj):
         return ItemView.objects.filter(item=obj).count()
+
 
 class ItemImageSerializer(serializers.ModelSerializer):
     url = serializers.CharField()

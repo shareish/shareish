@@ -224,86 +224,80 @@
         </div>
       </div>
       <div class="column">
-      <l-map :bounds.sync="bounds" :center.sync="leafletCenter" :zoom.sync="zoom" style="height: 800px; z-index: 1;"
-             @update:bounds="boundsUpdated">
-        <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
-        <l-control class="control-geolocation">
-          <b-button type="is-primary" @click="setCenterAtGeoLocation">
-            <i class="fas fa-street-view"></i>
-          </b-button>
-          <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
-            <i class="fas fa-home"></i>
-          </b-button>
-        </l-control>
-        <l-control position="bottomleft">
-          <div class="control-loading">
-            <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
-          </div>
-          <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
-            {{ $t('too-small-zoom') }}
-          </div>
-        </l-control>
+        <l-map
+            :bounds.sync="bounds"
+            :center.sync="leafletCenter"
+            :zoom.sync="zoom"
+            id="leaflet-map"
+            @update:bounds="boundsUpdated"
+        >
+          <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
+          <l-control class="control-geolocation">
+            <b-button type="is-primary" @click="setCenterAtGeoLocation">
+              <i class="fas fa-street-view"></i>
+            </b-button>
+            <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
+              <i class="fas fa-home"></i>
+            </b-button>
+            <b-button type="is-danger ml-2" @click="openSettingsModal">
+              <i class="fas fa-cog"></i>
+            </b-button>
+          </l-control>
+          <l-control position="bottomleft">
+            <div class="control-loading">
+              <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
+            </div>
+            <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
+              {{ $t('too-small-zoom') }}
+            </div>
+          </l-control>
 
-        <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
-        <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
+          <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
+          <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
 
-        <l-layer-group v-if="zoom >= minZoomToShowElements">
-          <v-marker-cluster :options="markerClusterGroupOptions">
-            <l-marker
-                v-for="item in items"
-                :key="item.id"
-                :ref="'marker-item-' + item.id"
-                :icon="item.icon"
-                :lat-lng="item.location.leafletLatLng"
-            >
-              <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-                <item-map-popup :item="item" />
-              </l-popup>
-            </l-marker>
-          </v-marker-cluster>
-        </l-layer-group>
-        <l-feature-group v-if="zoom >= minZoomToShowElements">
-          <l-layer-group>
-            <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
-              <template v-for="extraLayer in extraLayers">
-                <l-marker
-                    v-for="marker in extraLayer.markers"
-                    :key="marker.id"
-                    :icon="extraLayersIcons[extraLayer.id]"
-                    :lat-lng="marker.location.leafletLatLng"
-                    :visible="extraLayer.visible"
-                >
-                  <l-popup>
-                    <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
-                    <div class="is-grey">{{ $t(extraLayer.slugMarker) }}</div>
-                    <div v-if="marker.description">{{ marker.description }}</div>
-                    <div class="is-grey is-size-7 has-text-right is-italic">
-                      <a :href="getExtraMarkerURL(marker)" target="_blank">
-                          <span>
-                            <i class="fas fa-external-link-alt"></i>
-                          </span>
-                        <!--<span>{{$t('from-osm')}}</span>//-->
-                        <span>{{ $t(getExtraMarkerSourceTransSlug(marker)) }}</span>
-                      </a>
-                    </div>
-                  </l-popup>
-                </l-marker>
-              </template>
+          <l-layer-group v-if="zoom >= minZoomToShowElements">
+            <v-marker-cluster :options="markerClusterGroupOptions">
+              <l-marker
+                  v-for="item in items"
+                  :key="item.id"
+                  :ref="'marker-item-' + item.id"
+                  :icon="item.icon"
+                  :lat-lng="item.location.leafletLatLng"
+              >
+                <l-popup :options="{className:'item-popup', maxWidth: '500'}">
+                  <item-map-popup :item="item" />
+                </l-popup>
+              </l-marker>
             </v-marker-cluster>
           </l-layer-group>
-        </l-feature-group>
-      </l-map>
-      <div class="extra-layers-selector block">
-        <b-checkbox
-            v-for="extraLayer in extraLayers"
-            :key="`${extraLayer.id}-visibility`"
-            v-model="extraLayer.visible"
-            :disabled="zoom < minZoomToShowElements"
-            :type="extraLayer.color"
-        >
-          {{ $t(extraLayer.id) }}
-        </b-checkbox>
-      </div>
+          <l-feature-group v-if="zoom >= minZoomToShowElements">
+            <l-layer-group>
+              <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
+                <template v-for="extraCategory in user.map_ecats">
+                  <l-marker
+                      v-for="marker in extraCategories[extraCategory.category].markers"
+                      :key="marker.id"
+                      :icon="extraCategoriesIcons[extraCategories[extraCategory.category].id]"
+                      :lat-lng="marker.location.leafletLatLng"
+                      :visible="extraCategory.selected"
+                  >
+                    <l-popup>
+                      <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
+                      <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
+                      <div v-if="marker.description">{{ marker.description }}</div>
+                      <div class="is-grey is-size-7 has-text-right is-italic">
+                        <a :href="getMarkerURL(extraCategory.category, marker.id)" target="_blank">
+                          <span><i class="fas fa-external-link-alt"></i></span>
+                          <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                        </a>
+                      </div>
+                    </l-popup>
+                  </l-marker>
+                </template>
+              </v-marker-cluster>
+            </l-layer-group>
+          </l-feature-group>
+        </l-map>
       </div>
     </div>
   </div>
@@ -338,6 +332,7 @@ import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import moment from "moment";
 import {categories} from "@/categories";
+import TheMapSettingsModal from "@/components/TheMapSettingsModal.vue";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -345,8 +340,6 @@ const itemTypeIcons = {
   'RQ': redIcon,
   'EV': eventIcon
 }
-
-const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
   name: 'TheMapView',
@@ -430,90 +423,64 @@ export default {
         chunkedLoading: true,
         maxClusterRadius: 30
       },
-      extraLayers: [
-        {
+      extraCategories: {
+        'BKC': {
           id: 'bookcases',
-          slugMarker: 'bookcase',
           markers: [],
-          visible: true,
-          tagKey: 'amenity',
-          tagValue: 'public_bookcase',
-          color: 'is-bookcase'
+          tagValue: 'public_bookcase'
         },
-        {
+        'DEF': {
           id: 'defibrillators',
-          slugMarker: 'defibrillator',
           markers: [],
-          visible: false,
-          tagKey: 'emergency',
-          tagValue: 'defibrillator',
-          color: 'is-defibrillator'
+          tagValue: 'defibrillator'
         },
-        {
-          id: 'give-boxes',
-          slugMarker: 'give-box',
-          markers: [],
-          visible: true,
-          tagKey: 'amenity',
-          tagValue: 'give_box',
-          color: 'is-dark'
-        },
-        {
-          id: 'food-banks',
-          slugMarker: 'food-bank',
-          markers: [],
-          visible: true,
-          tagKey: 'social_facility',
-          tagValue: 'food_bank',
-          color: 'is-dark'
-        },
-	      {
-          id: 'food-sharings',
-          slugMarker: 'food-sharing',
-          markers: [],
-          visible: true,
-          tagKey: 'amenity',
-          tagValue: 'food_sharing',
-          color: 'is-dark'
-        },
-        {
-          id: 'soup-kitchens',
-          slugMarker: 'soup-kitchen',
-          markers: [],
-          visible: true,
-          tagKey: 'social_facility',
-          tagValue: 'soup_kitchen',
-          color: 'is-dark'
-        },
-        {
+        'DWS': {
           id: 'drinking-water-spots',
-          slugMarker: 'drinking-water-spot',
           markers: [],
-          visible: true,
-          tagKey: 'amenity',
-          tagValue: 'drinking_water',
-          color: 'is-drinking-water'
+          tagValue: 'drinking_water'
         },
-        {
-          id: 'free-shops',
-          slugMarker: 'free-shop',
+        'FDB': {
+          id: 'food-banks',
           markers: [],
-          visible: true,
-          tagKey: 'amenity',
-          tagValue: 'free_shop',
-          color: 'is-warning'
+          tagValue: 'food_bank'
         },
-        {
+        'FDS': {
+          id: 'food-sharings',
+          markers: [],
+          tagValue: 'food_sharing'
+        },
+        'FLF': {
           id: 'falling-fruits',
-          slugMarker: 'falling-fruit',
           markers: [],
-          visible: true,
-          tagKey: 'ff',
-          tagValue: 'ffruit',
-          color: 'is-green'
+          tagValue: 'ffruit'
+        },
+        'FRS': {
+          id: 'free-shops',
+          markers: [],
+          tagValue: 'free_shop'
+        },
+        'GVB': {
+          id: 'give-boxes',
+          markers: [],
+          tagValue: 'give_box'
+        },
+        'SPK':  {
+          id: 'soup-kitchens',
+          markers: [],
+          tagValue: 'soup_kitchen'
         }
-      ],
-      extraLayersIcons: {
+      },
+      extraLayersTagsOverpass: {
+        'public_bookcase': 'amenity',
+        'defibrillator': 'emergency',
+        'give_box': 'amenity',
+        'food_bank': 'social_facility',
+        'food_sharing': 'amenity',
+        'soup_kitchen': 'social_facility',
+        'drinking_water': 'amenity',
+        'free_shop': 'amenity'
+      },
+      extraCategoriesIcons: {
         'bookcases': publicBookcaseIcon,
         'defibrillators': aedIcon,
         'give-boxes': giveBoxIcon,
@@ -527,6 +494,7 @@ export default {
       geoLocationIcon: blueIcon,
       routedItemLocation: null,
       items: [],
+      leafletMapHeight: "1200px",
 
       routedItemError: false,
       timeouts: {}
@@ -548,12 +516,6 @@ export default {
 
     this.leafletCenter = this.preLeafletCenter;
 
-    if (this.itemId !== null && !this.routedItemError) {
-      this.$nextTick(() => {
-        this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
-      });
-    }
-
     this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
     this.refLocationAddress = await this.fetchAddress(this.refLocation);
 
@@ -569,13 +531,15 @@ export default {
 
     this.mapLoading = false;
   },
+  beforeMount() {
+    this.leafletMapHeight = (this.windowHeight - 300) + "px";
+  },
   computed: {
     params() {
       return {
         search: this.searchString,
         types: this.searchTypes,
         categories: this.searchCategories,
-        ordering: this.orderBy,
         onlyNew: (this.onlyUnseen) ? this.onlyUnseen : null,
         availableFrom: this.searchAvailabilityFrom,
         availableUntil: this.searchAvailabilityUntil,
@@ -724,7 +688,7 @@ export default {
     async fetchUser() {
       try {
         const params = {
-          columns: ['ref_location']
+          columns: ['ref_location', 'map_ecats']
         }
         this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
         if (this.user.ref_location !== null)
@@ -775,7 +739,11 @@ export default {
         // Get the position
         try {
           const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              maximumAge: 10000,
+              timeout: 5000,
+              enableHighAccuracy: true
+            });
           });
 
           if (this.geoLocation instanceof GeolocationCoords)
@@ -799,6 +767,17 @@ export default {
       else
         this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
     },
+    openSettingsModal() {
+      this.$buefy.modal.open({
+        parent: this,
+        props: {
+          map_ecats: this.user.map_ecats,
+        },
+        component: TheMapSettingsModal,
+        hasModalCard: true,
+        trapFocus: true
+      });
+    },
     async fetchRoutedItem() {
       try {
         const routedItem = (await axios.get(`/api/v1/items/${this.itemId}`)).data;
@@ -807,12 +786,12 @@ export default {
           this.preLeafletCenter = this.routedItemLocation.leafletLatLng;
         } else {
           this.routedItemError = true;
-          console.log("Routed id location is null");
+          this.snackbarError(this.$t('this-item-doesnt-have-a-location'));
         }
       }
       catch (error) {
         this.routedItemError = true;
-        console.log(error);
+        this.snackbarError(error);
       }
     },
     async fetchItems() {
@@ -821,7 +800,7 @@ export default {
           const params = this.params;
           params['bounds'] = [this.searchBounds[0].toString(), this.searchBounds[1].toString()];
 
-          let items = (await axios.get("/api/v1/actives", {params: params})).data;
+          let items = (await axios.get("/api/v1/actives/", {params: params})).data;
 
           if (items.length > 0) {
             this.items = items.filter(item =>
@@ -843,54 +822,44 @@ export default {
     },
     async fetchExtraLayersMakers() {
       if (this.zoom >= this.minZoomToShowElements) {
-        this.extraLayers = await Promise.all(
-          this.extraLayers.map(async extraLayer => {
-            try {
-              if (extraLayer.tagKey === 'ff') {
-                const elements = await this.getFallingFruitElements();
-                const markers = elements.filter(element =>
-                  (element['id'] != null) && (element['lat'] != null) && (element['lng'] != null)
-                ).map(element => {
-                  return {
-                    location: new GeolocationCoords(element['lng'], element['lat']),
-                    type: 'ffruit',
-                    name: element['type_names'][0],
-                    description: element['description'],
-                    id: element['id']
-                  }
-                });
-                return {...extraLayer, markers};
-              } else {
-                const elements = await this.getOverPassElements(extraLayer.tagKey, extraLayer.tagValue);
-                const markers = elements.filter(element =>
-                  (element['id'] != null) && (element['lat'] != null) && (element['lon'] != null)
-                ).map(element => {
-                  return {
-                    location: new GeolocationCoords(element['lon'], element['lat']),
-                    type: element['tags'][extraLayer.tagKey],
-                    name: element['tags']['name'],
-                    id: element['id']
-                  }
-                });
-                return {...extraLayer, markers};
-              }
-            } catch (error) {
-              console.log(error);
-              return extraLayer;
+        const FFelements = await this.getFallingFruitElements();
+        if (FFelements.length > 0) {
+          this.extraCategories['FLF']['markers'] = FFelements.filter(element =>
+            element['id'] != null && element['lat'] != null && element['lng'] != null
+          ).map(element => {
+            return {
+              id: element['id'],
+              type: 'ffruit',
+              name: element['type_names'][0],
+              description: element['description'],
+              location: new GeolocationCoords(element['lng'], element['lat'])
             }
-          })
-        );
+          });
+        }
+
+        for (const [key, extraCategory] of Object.entries(this.extraCategories)) {
+          const OPelements = await this.getOverPassElements(extraCategory.tagValue);
+          if (OPelements.length > 0) {
+            this.extraCategories[key]['markers'] = OPelements.filter(element =>
+              element['id'] != null && element['lat'] != null && element['lon'] != null
+            ).map(element => {
+              return {
+                id: element['id'],
+                type: extraCategory.tagValue,
+                name: element['tags']['name'],
+                location: new GeolocationCoords(element['lon'], element['lat'])
+              }
+            });
+          }
+        }
       }
     },
-    getExtraMarkerURL(marker) {
-      if (marker.type === 'ffruit') {
-        return "http://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
+    getMarkerURL(category, markerId) {
+      if (category === 'FLF') {
+        return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
       } else {
-        return "https://openstreetmap.org/node/" + marker.id;
+        return "https://openstreetmap.org/node/" + markerId;
       }
-    },
-    getExtraMarkerSourceTransSlug(marker) {
-      return (marker.type === 'ffruit') ? 'from-ff' : 'from-osm';
     },
     async getFallingFruitElements() {
       try {
@@ -906,31 +875,31 @@ export default {
       }
       catch (error) {
         console.log(error);
-        return []; // may happen if fallingfruit API returns an error
+        return [];
       }
     },
-    async getOverPassElements(tagKey, tagValue) {
-      // "amenity"="public_bookcase"; "amenity"="give_box"; "amenity"="food_sharing"; "amenity"="freeshop"; emergency=drinking_water; emergency=defibrillator
-      // social_facility=food_bank
-
-      const overpassQuery = `"${tagKey}"="${tagValue}"`;
-      const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
-      const nodeQuery = `node[${overpassQuery}](${bounds});`;
-      const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
-
-      //const baseURL = 'http://overpass-api.de/api';
-      //const baseURL = 'https://overpass.kumi.systems/api';
-      const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+    async getOverPassElements(tagValue) {
       try {
+        const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
+        const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
+        const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+
+        // http://overpass-api.de/api
+        // https://overpass.kumi.systems/api
+        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       }
       catch (error) {
-        return []; // may happen if overpass API returns an error
+        console.log(error);
+        return [];
       }
     },
     async boundsUpdated() {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
+        this.mapLoading = true;
+
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
         const SECoords = [this.bounds.getSouthEast().lng, this.bounds.getSouthEast().lat];
         if (this.searchBounds === null) {
@@ -939,9 +908,22 @@ export default {
           this.searchBounds[0].update(NWCoords);
           this.searchBounds[1].update(SECoords);
         }
-        await this.fetchMathElements();
-        if (!this.initialItemsLoadDone)
+
+        await this.fetchItems();
+
+        if (!this.initialItemsLoadDone) {
+          if (this.itemId !== null && !this.routedItemError) {
+            this.$nextTick(() => {
+              this.$refs[`marker-item-${this.itemId}`][0].mapObject.openPopup();
+            });
+          }
+
           this.initialItemsLoadDone = true;
+        }
+
+        await this.fetchExtraLayersMakers();
+
+        this.mapLoading = false;
       }, 600);
     },
     async fetchMathElements() {
@@ -949,6 +931,9 @@ export default {
       await this.fetchItems();
       await this.fetchExtraLayersMakers();
       this.mapLoading = false;
+    },
+    windowHeightChanged() {
+      this.leafletMapHeight = (this.windowHeight - 300) + "px";
     }
   }
 }
@@ -1047,8 +1032,10 @@ $filtersWidth: 400px;
   }
 }
 
-.extra-layers-selector {
-  margin-top: 0.75rem;
+#leaflet-map {
+  min-height: 800px;
+  height: v-bind(leafletMapHeight);
+  z-index: 1;
 }
 
 .fa-external-link-alt {
