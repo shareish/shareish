@@ -10,7 +10,8 @@ from django.contrib.auth import get_user_model
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
-    ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend
+    ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
+    ItemMapBoundsFilterBackend
 from .functions import verif_location
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView
 
@@ -38,10 +39,6 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
-    filter_backends = [
-        filters.SearchFilter, filters.OrderingFilter, ItemTypeFilterBackend, ItemCategoryFilterBackend,
-        ActiveItemFilterBackend  # TODO: Remove this filter?
-    ]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
 
@@ -118,10 +115,15 @@ class ActiveItemViewSet(ItemViewSet):
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,
-        ItemMinCreationdateFilterBackend
+        ItemMinCreationdateFilterBackend, ItemMapBoundsFilterBackend
     ]
     search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass
+
+    def paginate_queryset(self, queryset):
+        if 'page' in self.request.query_params:
+             return super().paginate_queryset(queryset)
+        return None
 
 
 class UserItemViewSet(ItemViewSet):

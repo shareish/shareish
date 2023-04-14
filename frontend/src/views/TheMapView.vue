@@ -1,88 +1,311 @@
 <template>
   <div id="page-map">
-    <items-filters
-        @update:selectedType="selectedType = $event"
-        @update:selectedCategory="selectedCategory = $event"
-        @update:searchString="searchString = $event"
-    />
-
-    <l-map :bounds.sync="bounds" :center.sync="leafletCenter" :zoom.sync="zoom" style="height: 800px"
-           @update:bounds="boundsUpdated">
-      <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
-      <l-control class="control-geolocation">
-        <b-button type="is-primary" @click="setCenterAtGeoLocation">
-          <i class="fas fa-street-view"></i>
-        </b-button>
-      </l-control>
-      <l-control position="bottomleft">
-        <div class="control-loading">
-          <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
-        </div>
-        <div v-show="zoom < minZoomForExtraLayers" class="control-zoom-info leaflet-control-attribution">
-          {{ $t('too-small-zoom') }}
-        </div>
-      </l-control>
-
-      <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
-
-      <l-layer-group>
-        <v-marker-cluster :options="markerClusterGroupOptions">
-          <l-marker
-              v-for="item in items"
-              :key="item.id"
-              :ref="'marker-item-' + item.id"
-              :icon="item.icon"
-              :lat-lng="item.location.leafletLatLng"
-          >
-            <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-              <item-map-popup :item="item" />
-            </l-popup>
-          </l-marker>
-        </v-marker-cluster>
-      </l-layer-group>
-      <l-feature-group v-if="zoom >= minZoomForExtraLayers">
-        <l-layer-group>
-          <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
-            <template v-for="extraLayer in extraLayers">
-              <l-marker
-                  v-for="marker in extraLayer.markers"
-                  :key="marker.id"
-                  :icon="extraLayersIcons[extraLayer.id]"
-                  :lat-lng="marker.location.leafletLatLng"
-                  :visible="extraLayer.visible"
-              >
-                <l-popup>
-                  <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
-                  <div class="is-grey">{{ $t(extraLayer.slugMarker) }}</div>
-                  <div v-if="marker.description">{{ marker.description }}</div>
-                  <div class="is-grey is-size-7 has-text-right is-italic">
-                    <a :href="getExtraMarkerURL(marker)" target="_blank">
-                        <span>
-                          <i class="fas fa-external-link-alt"></i>
-                        </span>
-                      <!--<span>{{$t('from-osm')}}</span>//-->
-                      <span>{{ $t(getExtraMarkerSourceTransSlug(marker)) }}</span>
-                    </a>
+    <div class="columns">
+      <div class="column">
+        <div id="filters">
+          <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
+          <div class="list">
+            <div class="search">
+              <template v-if="windowWidth >= 1024">
+                <b-field :label="$t('search')">
+                  <b-input
+                      v-model="searchString"
+                      :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                </b-field>
+              </template>
+              <div v-else class="columns is-mobile">
+                <div class="column pr-2">
+                  <b-field :label="$t('search')">
+                    <b-input
+                        v-model="searchString"
+                        :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                  </b-field>
+                </div>
+                <div class="column pl-1" style="flex-grow: 0; padding-top: calc(24px + 0.5rem + 0.75rem);">
+                  <b-button
+                      type="is-primary"
+                      :outlined="!isMoreFiltersOpened"
+                      @click="isMoreFiltersOpened = !isMoreFiltersOpened">
+                    <template v-if="!isMoreFiltersOpened">
+                      <template v-if="windowWidth >= 400">
+                        {{ $t('show-filters') }}<i class="fas fa-chevron-down ml-2" style="margin-top: -1px; vertical-align: middle;"></i>
+                      </template>
+                      <template v-else>
+                        <i class="fas fa-plus"></i>
+                      </template>
+                    </template>
+                    <template v-else>
+                      <template v-if="windowWidth >= 400">
+                        {{ $t('hide-filters') }}<i class="fas fa-chevron-up ml-2"></i>
+                      </template>
+                      <template v-else>
+                        <i class="fas fa-times"></i>
+                      </template>
+                    </template>
+                  </b-button>
+                </div>
+              </div>
+            </div>
+            <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
+              <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
+                <template v-if="windowWidth >= 768 && windowWidth < 1024">
+                  <div class="columns is-mobile">
+                    <div class="column pr-2">
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                          <span>{{ $t('donation') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                    </div>
+                    <div class="column pr-2 pl-2">
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                          <span>{{ $t('request') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                    </div>
+                    <div class="column pr-2 pl-2">
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                          <span>{{ $t('loan') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                    </div>
+                    <div class="column pl-2">
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                          <span>{{ $t('event') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                    </div>
                   </div>
-                </l-popup>
-              </l-marker>
-            </template>
+                </template>
+                <template v-else>
+                  <b-field class="mb-1">
+                    <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                      <span>{{ $t('donation') }}</span>
+                    </b-checkbox-button>
+                  </b-field>
+                  <b-field class="mb-1">
+                    <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                      <span>{{ $t('request') }}</span>
+                    </b-checkbox-button>
+                  </b-field>
+                  <b-field class="mb-1">
+                    <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                      <span>{{ $t('loan') }}</span>
+                    </b-checkbox-button>
+                  </b-field>
+                  <b-field class="mb-1">
+                    <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                      <span>{{ $t('event') }}</span>
+                    </b-checkbox-button>
+                  </b-field>
+                </template>
+              </toggle-box>
+              <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
+                <div v-if="searchCategories.length > 0" id="selected-categories">
+                  <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
+                  <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
+                    <div class="column name">{{ getCategory(category) }}</div>
+                    <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
+                  </div>
+                </div>
+                <template v-else>
+                  <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
+                </template>
+                <category-selector v-model="selectedCategory" expanded />
+              </toggle-box>
+              <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
+                <b-field :label="$t('from')">
+                  <b-datetimepicker
+                      v-model="searchAvailabilityFrom"
+                      icon="calendar"
+                      :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
+                      icon-right-clickable
+                      @icon-right-click="searchAvailabilityFrom = null"
+                      icon-pack="fas"
+                      :locale="$i18n.locale"
+                  />
+                </b-field>
+                <b-field :label="$t('until')">
+                  <b-datetimepicker
+                      v-model="searchAvailabilityUntil"
+                      icon="calendar"
+                      :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
+                      icon-right-clickable
+                      @icon-right-click="searchAvailabilityUntil = null"
+                      icon-pack="fas"
+                      :locale="$i18n.locale"
+                  />
+                </b-field>
+              </toggle-box>
+              <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
+                <div class="columns is-mobile mb-2">
+                  <div class="column is-one-third pr-1">
+                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'none'"
+                          :outlined="locationTypeChosen !== 'none'"
+                          :disabled="locationTypeChosen !== 'none' && locationLoading"
+                          :loading="locationTypeChosen === 'none' && locationLoading"
+                          type="is-danger"
+                      >
+                        <i class="fas fa-times"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                  <div class="column is-one-third pr-1 pl-1">
+                    <b-tooltip :label="$t('use-geolocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'geoLocation'"
+                          :outlined="locationTypeChosen !== 'geoLocation'"
+                          :disabled="locationTypeChosen !== 'geoLocation' && locationLoading"
+                          :loading="locationTypeChosen === 'geoLocation' && locationLoading"
+                          type="is-primary"
+                      >
+                        <i class="icon fas fa-map-marker-alt"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                  <div class="column is-one-third pl-1">
+                    <b-tooltip :label="$t('use-reflocation')" position="is-top" style="width: 100%;">
+                      <b-button
+                          expanded
+                          @click="locationTypeChosen = 'refLocation'"
+                          :outlined="locationTypeChosen !== 'refLocation'"
+                          :disabled="locationTypeChosen !== 'refLocation' && locationLoading"
+                          :loading="locationTypeChosen === 'refLocation' && locationLoading"
+                          type="is-info"
+                      >
+                        <i class="fas fa-home"></i>
+                      </b-button>
+                    </b-tooltip>
+                  </div>
+                </div>
+                <b-field :label="$t('or-enter-an-address') + ':'">
+                  <b-input v-model="address" :placeholder="$t('address')" />
+                </b-field>
+                <b-field>
+                  <b-switch v-model="restrictDistance" :disabled="searchLocation === null" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
+                </b-field>
+                <b-field :label="$t('radius-from-location') + ':'" v-if="restrictDistance && searchLocation !== null">
+                  <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="distancesRadiusSlider[0]" :max="distancesRadiusSlider[1]" :step="1" indicator :tooltip="false" />
+                </b-field>
+              </toggle-box>
+              <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
+                <b-field>
+                  <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
+                </b-field>
+                <b-field>
+                  <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
+                </b-field>
+                <template v-if="useMinCreactiondate">
+                  <div class="columns is-mobile mb-0 mt-3">
+                    <div class="column pr-1">
+                        <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                    </div>
+                    <div class="column pl-1" style="flex: 0 0 auto;">
+                      <b-select v-model="timeUnit" :placeholder="$t('unit')">
+                          <option value="days">{{ $tc('day', 0) }}</option>
+                          <option value="hours">{{ $tc('hour', 0) }}</option>
+                          <option value="minutes">{{ $tc('minute', 0) }}</option>
+                      </b-select>
+                    </div>
+                  </div>
+                  <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                  <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                </template>
+              </toggle-box>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+      <l-map :bounds.sync="bounds" :center.sync="leafletCenter" :zoom.sync="zoom" style="height: 800px; z-index: 1;"
+             @update:bounds="boundsUpdated">
+        <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
+        <l-control class="control-geolocation">
+          <b-button type="is-primary" @click="setCenterAtGeoLocation">
+            <i class="fas fa-street-view"></i>
+          </b-button>
+          <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
+            <i class="fas fa-home"></i>
+          </b-button>
+        </l-control>
+        <l-control position="bottomleft">
+          <div class="control-loading">
+            <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
+          </div>
+          <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
+            {{ $t('too-small-zoom') }}
+          </div>
+        </l-control>
+
+        <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
+        <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
+
+        <l-layer-group v-if="zoom >= minZoomToShowElements">
+          <v-marker-cluster :options="markerClusterGroupOptions">
+            <l-marker
+                v-for="item in items"
+                :key="item.id"
+                :ref="'marker-item-' + item.id"
+                :icon="item.icon"
+                :lat-lng="item.location.leafletLatLng"
+            >
+              <l-popup :options="{className:'item-popup', maxWidth: '500'}">
+                <item-map-popup :item="item" />
+              </l-popup>
+            </l-marker>
           </v-marker-cluster>
         </l-layer-group>
-      </l-feature-group>
-    </l-map>
-    <div class="extra-layers-selector block">
-      <b-checkbox
-          v-for="extraLayer in extraLayers"
-          :key="`${extraLayer.id}-visibility`"
-          v-model="extraLayer.visible"
-          :disabled="zoom < minZoomForExtraLayers"
-          :type="extraLayer.color"
-      >
-        {{ $t(extraLayer.id) }}
-      </b-checkbox>
+        <l-feature-group v-if="zoom >= minZoomToShowElements">
+          <l-layer-group>
+            <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
+              <template v-for="extraLayer in extraLayers">
+                <l-marker
+                    v-for="marker in extraLayer.markers"
+                    :key="marker.id"
+                    :icon="extraLayersIcons[extraLayer.id]"
+                    :lat-lng="marker.location.leafletLatLng"
+                    :visible="extraLayer.visible"
+                >
+                  <l-popup>
+                    <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
+                    <div class="is-grey">{{ $t(extraLayer.slugMarker) }}</div>
+                    <div v-if="marker.description">{{ marker.description }}</div>
+                    <div class="is-grey is-size-7 has-text-right is-italic">
+                      <a :href="getExtraMarkerURL(marker)" target="_blank">
+                          <span>
+                            <i class="fas fa-external-link-alt"></i>
+                          </span>
+                        <!--<span>{{$t('from-osm')}}</span>//-->
+                        <span>{{ $t(getExtraMarkerSourceTransSlug(marker)) }}</span>
+                      </a>
+                    </div>
+                  </l-popup>
+                </l-marker>
+              </template>
+            </v-marker-cluster>
+          </l-layer-group>
+        </l-feature-group>
+      </l-map>
+      <div class="extra-layers-selector block">
+        <b-checkbox
+            v-for="extraLayer in extraLayers"
+            :key="`${extraLayer.id}-visibility`"
+            v-model="extraLayer.visible"
+            :disabled="zoom < minZoomToShowElements"
+            :type="extraLayer.color"
+        >
+          {{ $t(extraLayer.id) }}
+        </b-checkbox>
+      </div>
+      </div>
     </div>
-
   </div>
 </template>
 
@@ -91,7 +314,6 @@ import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
 import axios from "axios"
-import ItemsFilters from "@/components/ItemsFilters.vue";
 
 import {
   greenIcon,
@@ -105,13 +327,17 @@ import {
   drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
 } from "@/map-icons";
 
-import {latLng} from "leaflet";
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
 import ItemMapPopup from "@/components/ItemMapPopup.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {GeolocationCoords} from "@/functions";
+import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
+import WindowSize from "@/mixins/WindowSize";
+import ToggleBox from "@/components/ToggleBox.vue";
+import CategorySelector from "@/components/CategorySelector.vue";
+import moment from "moment";
+import {categories} from "@/categories";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -124,10 +350,11 @@ const GEOLOCATION_TIMEOUT = 10000;
 
 export default {
   name: 'TheMapView',
-  mixins: [ErrorHandler],
+  mixins: [ErrorHandler, WindowSize],
   components: {
+    CategorySelector,
+    ToggleBox,
     ItemMapPopup,
-    ItemsFilters,
     LMap,
     LTileLayer,
     LControl,
@@ -143,7 +370,48 @@ export default {
       zoom: 14,
       preLeafletCenter: new LatLng(50.6450944, 5.5736112),
       leafletCenter: new LatLng(50.6450944, 5.5736112),
+
       bounds: null,
+      searchBounds: null,
+      searchString: null,
+      searchTypes: [],
+      searchCategories: [],
+      selectedCategory: null,
+      onlyUnseen: false,
+      searchAvailabilityFrom: null,
+      searchAvailabilityUntil: null,
+      searchDistancesRadius: null,
+      searchLocation: null,
+      isMoreFiltersOpened: false,
+      restrictDistance: false,
+      distancesRadiusSlider: [0, 100],
+      distancesRadiusInput: [0, 100],
+      address: "",
+      checkAddress: true,
+      geoLocation: null,
+      refLocation: null,
+      geoLocationAddress: "",
+      refLocationAddress: "",
+      locationTypeChosen: 'geoLocation',
+      locationLoading: false,
+      useMinCreactiondate: false,
+      timeUnit: 'hours',
+      sliderTimeUnitMemory: {
+        'days': 1,
+        'hours': 1,
+        'minutes': 1
+      },
+      sliderTimeUnitMaximums: {
+        'days': 31,
+        'hours': 24,
+        'minutes': 60
+      },
+      sliderTimeUnit: 1,
+      minCreationdate: new Date(),
+      searchMinCreationdate: null,
+      initialItemsLoadDone: false,
+      user: {},
+
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
       tileLayerOptions: {
@@ -156,7 +424,7 @@ export default {
         maxClusterRadius: 25,
         disableClusteringAtZoom: 15
       },
-      minZoomForExtraLayers: 12,
+      minZoomToShowElements: 12,
       extraLayersMarkerClusterGroupOptions: {
         disableClusteringAtZoom: 15,
         chunkedLoading: true,
@@ -256,31 +524,29 @@ export default {
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon
       },
-      geoLocation: null,
       geoLocationIcon: blueIcon,
       routedItemLocation: null,
-      searchString: null,
-      selectedType: null,
-      selectedCategory: null,
       items: [],
 
       routedItemError: false,
+      timeouts: {}
     }
   },
   async created() {
     document.title = `Shareish | ${this.$t('map')}`;
 
     await this.updateGeoLocation();
+    await this.fetchUser();
+
     if (this.geoLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.geoLocation.leafletLatLng;
+    else if (this.refLocation instanceof GeolocationCoords)
+      this.preLeafletCenter = this.refLocation.leafletLatLng;
 
     if (this.itemId !== null)
       await this.fetchRoutedItem();
 
     this.leafletCenter = this.preLeafletCenter;
-
-    await this.fetchExtraLayersMakers();
-    await this.fetchItems();
 
     if (this.itemId !== null && !this.routedItemError) {
       this.$nextTick(() => {
@@ -288,28 +554,221 @@ export default {
       });
     }
 
+    this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
+    this.refLocationAddress = await this.fetchAddress(this.refLocation);
+
+    if (this.locationTypeChosen === 'geoLocation') {
+      this.checkAddress = false;
+      this.address = this.geoLocationAddress;
+      this.searchLocation = this.geoLocation;
+    } else if (this.locationTypeChosen === 'refLocation') {
+      this.checkAddress = false;
+      this.address = this.refLocationAddress;
+      this.searchLocation = this.refLocation;
+    }
+
     this.mapLoading = false;
   },
   computed: {
-    filterParams() {
+    params() {
       return {
-        type: this.selectedType,
-        category: this.selectedCategory,
-        search: this.searchString
+        search: this.searchString,
+        types: this.searchTypes,
+        categories: this.searchCategories,
+        ordering: this.orderBy,
+        onlyNew: (this.onlyUnseen) ? this.onlyUnseen : null,
+        availableFrom: this.searchAvailabilityFrom,
+        availableUntil: this.searchAvailabilityUntil,
+        userLocation: this.searchLocation,
+        distancesRadius: (this.searchLocation instanceof GeolocationCoords) ? this.searchDistancesRadius : null,
+        minCreationdate: this.searchMinCreationdate
       };
     },
     itemId() {
       return (this.$route.query.id) ? Number(this.$route.query.id) : null;
+    },
+    userId() {
+      return Number(this.$store.state.user.id);
+    },
+    sliderTimeUnitMax() {
+      return this.sliderTimeUnitMaximums[this.timeUnit];
     }
   },
   watch: {
-    async filterParams() {
-      this.mapLoading = true;
-      await this.fetchItems();
-      this.mapLoading = false;
+    useMinCreactiondate() {
+      if (this.useMinCreactiondate)
+        this.updateSearchMinCreationdate();
+      else
+        this.searchMinCreationdate = null;
     },
+    timeUnit() {
+      this.sliderTimeUnit = this.sliderTimeUnitMemory[this.timeUnit];
+      this.updateSearchMinCreationdate();
+    },
+    sliderTimeUnit() {
+      this.sliderTimeUnitMemory[this.timeUnit] = this.sliderTimeUnit;
+      this.updateSearchMinCreationdate();
+    },
+    selectedCategory() {
+      if (this.searchCategories.indexOf(this.selectedCategory) === -1)
+        this.searchCategories.push(this.selectedCategory);
+    },
+    locationTypeChosen() {
+      clearTimeout(this.timeouts['locationTypeChosen']);
+      this.locationLoading = true;
+      this.timeouts['locationTypeChosen'] = setTimeout(() => {
+        switch (this.locationTypeChosen) {
+          case 'geoLocation':
+            this.checkAddress = false;
+            this.address = this.geoLocationAddress;
+            this.searchLocation = this.geoLocation;
+            break;
+          case 'refLocation':
+            this.checkAddress = false;
+            this.address = this.refLocationAddress;
+            this.searchLocation = this.refLocation;
+            break;
+          case 'none':
+            this.checkAddress = false;
+            this.address = "";
+            this.searchLocation = null;
+            break;
+        }
+        this.locationLoading = false;
+      }, 600);
+    },
+    address() {
+      if (this.checkAddress) {
+        clearTimeout(this.timeouts['address']);
+        this.timeouts['address'] = setTimeout(() => {
+          this.updateGeolocationFromAddress();
+        }, 1000);
+      } else {
+        this.checkAddress = true;
+      }
+    },
+    restrictDistance() {
+      this.locationLoading = true;
+      clearTimeout(this.timeouts['restrictDistance']);
+      this.timeouts['restrictDistance'] = setTimeout(() => {
+        if (this.restrictDistance)
+          this.searchDistancesRadius = this.distancesRadiusInput;
+        else
+          this.searchDistancesRadius = null;
+        this.locationLoading = false;
+      }, 600);
+    },
+    distancesRadiusInput() {
+      if (this.restrictDistance) {
+        clearTimeout(this.timeouts['distancesRadius']);
+        this.timeouts['distancesRadius'] = setTimeout(() => {
+          this.searchDistancesRadius = this.distancesRadiusInput;
+        }, 600);
+      }
+    },
+    params() {
+      if (this.initialItemsLoadDone)
+        this.fetchMathElements();
+    }
   },
   methods: {
+    ucfirst,
+    lcall,
+    updateSearchMinCreationdate() {
+      this.minCreationdate = this.getMinCreationdate();
+
+      clearTimeout(this.timeouts['searchMinCreationdate']);
+      this.timeouts['searchMinCreationdate'] = setTimeout(() => {
+        this.searchMinCreationdate = this.minCreationdate;
+      }, 600);
+    },
+    getMinCreationdate() {
+      let minCreationdate = new Date();
+
+      switch (this.timeUnit) {
+        case 'days':
+          minCreationdate.setDate(minCreationdate.getDate() - this.sliderTimeUnit);
+          minCreationdate.setHours(0);
+          minCreationdate.setMinutes(0);
+          break;
+        case 'hours':
+          minCreationdate.setHours(minCreationdate.getHours() - this.sliderTimeUnit);
+          minCreationdate.setMinutes(0);
+          break;
+        case 'minutes':
+          minCreationdate.setMinutes(minCreationdate.getMinutes() - this.sliderTimeUnit);
+          break;
+      }
+      minCreationdate.setSeconds(0);
+      minCreationdate.setMilliseconds(0);
+
+      return minCreationdate;
+    },
+    formattedDay(date) {
+      return (moment(date).locale(this.$i18n.locale).format("DD/MM/YYYY"));
+    },
+    formattedHour(date) {
+      return (moment(date).locale(this.$i18n.locale).format("HH:mm"));
+    },
+    getCategory(category) {
+      if (category in categories) {
+        return this.$t(categories[category]['slug']);
+      }
+      return "";
+    },
+    removeCategory(category) {
+      const index = this.searchCategories.indexOf(category);
+      if (index > -1)
+        this.searchCategories.splice(index, 1);
+    },
+    async fetchUser() {
+      try {
+        const params = {
+          columns: ['ref_location']
+        }
+        this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
+        if (this.user.ref_location !== null)
+          this.refLocation = new GeolocationCoords(this.user.ref_location);
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+    },
+    async fetchAddress(location) {
+      if (location instanceof GeolocationCoords) {
+        try {
+          return (await axios.post("/api/v1/address/reverse", location)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
+    async fetchGeolocation(address) {
+      if (address !== null && address !== "") {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          return (await axios.post("/api/v1/address", formData)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
+    async updateGeolocationFromAddress() {
+      if (this.address !== "") {
+        const geolocation = await this.fetchGeolocation(this.address);
+        if (geolocation !== null)
+          this.searchLocation = new GeolocationCoords(geolocation)
+        else
+          this.searchLocation = null;
+      } else {
+        this.searchLocation = null;
+      }
+    },
     async updateGeoLocation() {
       // Has the user activated geolocation?
       if ('geolocation' in navigator) {
@@ -328,13 +787,17 @@ export default {
       }
     },
     async setCenterAtGeoLocation() {
-      if (!this.mapLoading) {
-        await this.updateGeoLocation();
-        if (this.geoLocation instanceof GeolocationCoords)
-          this.leafletCenter = this.geoLocation.leafletLatLng;
-        else
-          this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-      }
+      await this.updateGeoLocation();
+      if (this.geoLocation instanceof GeolocationCoords)
+        this.leafletCenter = this.geoLocation.leafletLatLng;
+      else
+        this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+    },
+    async setCenterAtRefLocation() {
+      if (this.refLocation instanceof GeolocationCoords)
+        this.leafletCenter = this.refLocation.leafletLatLng;
+      else
+        this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
     },
     async fetchRoutedItem() {
       try {
@@ -353,25 +816,33 @@ export default {
       }
     },
     async fetchItems() {
-      try {
-        let items = (await axios.get("/api/v1/items", {params: this.filterParams})).data;
+      if (this.zoom >= this.minZoomToShowElements) {
+        try {
+          const params = this.params;
+          params['bounds'] = [this.searchBounds[0].toString(), this.searchBounds[1].toString()];
 
-        this.items = items.filter(item =>
-            item['location'] !== null
-        ).map(item => {
-          return {
-            ...item,
-            icon: itemTypeIcons[item['type']] || greyIcon,
-            location: new GeolocationCoords(item.location)
-          };
-        });
-      }
-      catch (error) {
-        console.log(error);
+          let items = (await axios.get("/api/v1/actives", {params: params})).data;
+
+          if (items.length > 0) {
+            this.items = items.filter(item =>
+                item['location'] !== null
+            ).map(item => {
+              return {
+                ...item,
+                icon: itemTypeIcons[item['type']] || greyIcon,
+                location: new GeolocationCoords(item.location)
+              };
+            });
+          } else {
+            this.items = [];
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
     async fetchExtraLayersMakers() {
-      if (this.bounds !== null && this.zoom >= this.minZoomForExtraLayers) {
+      if (this.zoom >= this.minZoomToShowElements) {
         this.extraLayers = await Promise.all(
           this.extraLayers.map(async extraLayer => {
             try {
@@ -424,7 +895,7 @@ export default {
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
-        const ffcoords = '&bounds=' + + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+        const ffcoords = '&bounds=' + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
         const ffURL = ffbaseURL + ffcoords;
         return (await axios.get(ffURL, {
           transformRequest: (data, headers) => {
@@ -458,23 +929,126 @@ export default {
       }
     },
     async boundsUpdated() {
+      clearTimeout(this.timeouts['boundsUpdated']);
+      this.timeouts['boundsUpdated'] = setTimeout(async () => {
+        const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
+        const SECoords = [this.bounds.getSouthEast().lng, this.bounds.getSouthEast().lat];
+        if (this.searchBounds === null) {
+          this.searchBounds = [new GeolocationCoords(NWCoords), new GeolocationCoords(SECoords)];
+        } else {
+          this.searchBounds[0].update(NWCoords);
+          this.searchBounds[1].update(SECoords);
+        }
+        await this.fetchMathElements();
+        if (!this.initialItemsLoadDone)
+          this.initialItemsLoadDone = true;
+      }, 600);
+    },
+    async fetchMathElements() {
       this.mapLoading = true;
-      await this.fetchExtraLayersMakers();
       await this.fetchItems();
+      await this.fetchExtraLayersMakers();
       this.mapLoading = false;
     }
   }
 }
 </script>
 
-<style scoped>
-.extra-layers-selector {
-  margin-top: 0.75rem;
+<style lang="scss" scoped>
+$filtersWidth: 400px;
+
+#page-map > .columns > .column:first-child {
+  flex: 0 0 $filtersWidth;
+  max-width: $filtersWidth;
 }
 
->>> .item-popup .leaflet-popup-content,
->>> .item-popup .leaflet-popup-content p {
-  margin: 0;
+#filters {
+  border-radius: 5px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+  max-width: calc(#{$filtersWidth} - 2 * 0.75rem);
+
+  .title {
+    margin-bottom: 0;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .list {
+    padding: 0.75rem;
+    border-radius: 0 0 5px 5px;
+  }
+}
+
+#selected-categories {
+  .selected-category {
+    padding: 0;
+    margin: 0 0 5px 0;
+    font-size: 0.75rem;
+    background-color: white;
+    border-radius: 5px;
+
+    .column.name {
+      flex: 0 0 calc(400px - 0.75rem * 6 - 40px - 2px);
+      padding: 10px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .column.close {
+      flex: 0 0 40px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+
+      i {
+        vertical-align: middle;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0.75rem !important;
+    }
+  }
+}
+
+@media screen and (max-width: 1215px) and (min-width: 1024px) {
+  $filtersWidth: 360px;
+
+  #page-map > .columns > .column:first-child {
+      flex: 0 0 $filtersWidth;
+      max-width: $filtersWidth;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  $filtersWidth: 100%;
+
+  #page-map > .columns {
+    display: block;
+
+    & > .column:first-child {
+      flex: 0 0 $filtersWidth;
+      max-width: $filtersWidth;
+    }
+  }
+
+  #filters {
+    min-width: $filtersWidth;
+
+    .other-filters:not(.is-opened) {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 499px) {
+  #filters {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.extra-layers-selector {
+  margin-top: 0.75rem;
 }
 
 .fa-external-link-alt {

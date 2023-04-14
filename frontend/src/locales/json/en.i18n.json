@@ -329,5 +329,6 @@
   "only-items-created-on": "Only items created on",
   "only-items-created-at": "Only items created at",
   "on-day": "on",
-  "or-later-will-be-showed": "or later will be showed"
+  "or-later-will-be-showed": "or later will be showed",
+  "set-a-reflocation-to-use-feature": "You must set a reference location in your settings to use this feature."
 }
