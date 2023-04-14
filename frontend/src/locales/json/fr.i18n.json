@@ -329,5 +329,6 @@
   "only-items-created-on": "Seuls les éléments créés le",
   "only-items-created-at": "Seuls les éléments créés à",
   "on-day": "le",
-  "or-later-will-be-showed": "ou plus tard seront affichés"
+  "or-later-will-be-showed": "ou plus tard seront affichés",
+  "set-a-reflocation-to-use-feature": "Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité."
 }

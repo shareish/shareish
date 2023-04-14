@@ -190,10 +190,10 @@
                   <b-input v-model="address" :placeholder="$t('address')" />
                 </b-field>
                 <b-field>
-                  <b-switch v-model="restrictDistance" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
+                  <b-switch v-model="restrictDistance" :disabled="searchLocation === null" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
                 </b-field>
-                <b-field :label="$t('radius-from-location') + ':'" v-if="restrictDistance">
-                  <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="0" :max="200" :step="1" indicator :tooltip="false" />
+                <b-field :label="$t('radius-from-location') + ':'" v-if="restrictDistance && searchLocation !== null">
+                  <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="distancesRadiusSlider[0]" :max="distancesRadiusSlider[1]" :step="1" indicator :tooltip="false" />
                 </b-field>
               </toggle-box>
               <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
@@ -206,7 +206,7 @@
                 <template v-if="useMinCreactiondate">
                   <div class="columns is-mobile mb-0 mt-3">
                     <div class="column pr-1">
-                        <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                      <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
                     </div>
                     <div class="column pl-1" style="flex: 0 0 auto;">
                       <b-select v-model="timeUnit" :placeholder="$t('unit')">
@@ -294,22 +294,10 @@ export default {
       searchAvailabilityUntil: null,
       searchDistancesRadius: null,
       searchLocation: null,
-      initialItemsLoadDone: false,
-
-      orderBy: '-creationdate',
-
-      loading: true,
-      itemsLoading: false,
-      page: 1,
-      nbItemsPerPage: 20,
-      loadedAllItems: false,
-      columnsWidthClass: null,
       isMoreFiltersOpened: false,
       restrictDistance: false,
-      distancesRadiusInput: [0, 200],
-      timeouts: {},
-
-      user: {},
+      distancesRadiusSlider: [0, 100],
+      distancesRadiusInput: [0, 100],
       address: "",
       checkAddress: true,
       geoLocation: null,
@@ -318,9 +306,6 @@ export default {
       refLocationAddress: "",
       locationTypeChosen: 'geoLocation',
       locationLoading: false,
-
-      items: [],
-
       useMinCreactiondate: false,
       timeUnit: 'hours',
       sliderTimeUnitMemory: {
@@ -335,7 +320,19 @@ export default {
       },
       sliderTimeUnit: 1,
       minCreationdate: new Date(),
-      searchMinCreationdate: null
+      searchMinCreationdate: null,
+
+      orderBy: '-creationdate',
+      loading: true,
+      itemsLoading: false,
+      initialItemsLoadDone: false,
+      page: 1,
+      nbItemsPerPage: 20,
+      loadedAllItems: false,
+      columnsWidthClass: null,
+      timeouts: {},
+      user: {},
+      items: []
     }
   },
   computed: {
@@ -349,7 +346,7 @@ export default {
         availableFrom: this.searchAvailabilityFrom,
         availableUntil: this.searchAvailabilityUntil,
         userLocation: this.searchLocation,
-        distancesRadius: this.searchDistancesRadius,
+        distancesRadius: (this.searchLocation instanceof GeolocationCoords) ? this.searchDistancesRadius : null,
         minCreationdate: this.searchMinCreationdate
       };
     },
@@ -374,11 +371,6 @@ export default {
     sliderTimeUnit() {
       this.sliderTimeUnitMemory[this.timeUnit] = this.sliderTimeUnit;
       this.updateSearchMinCreationdate();
-    },
-    params() {
-      if (this.initialItemsLoadDone) {
-        this.fetchItems();
-      }
     },
     selectedCategory() {
       if (this.searchCategories.indexOf(this.selectedCategory) === -1)
@@ -436,6 +428,10 @@ export default {
           this.searchDistancesRadius = this.distancesRadiusInput;
         }, 600);
       }
+    },
+    params() {
+      if (this.initialItemsLoadDone)
+        this.fetchItems();
     }
   },
   methods: {
@@ -677,7 +673,6 @@ $filtersWidth: 400px;
     border-radius: 0 0 5px 5px;
   }
 }
-
 
 #selected-categories {
   .selected-category {
