@@ -88,24 +88,15 @@ transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Liv
 vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
 other,Other,Autres
 search-dot,Search...,Recherche...
-bookcases,Public bookcases,Boîtes à livres
-bookcase,Public bookcase,Boîte à livre
-defibrillators,Defibrillators,Défibrillateurs
-defibrillator,Defibrillator,Défibrillateur
-give-boxes,Give boxes,Boîtes à dons
-give-box,Give box,Armoire de partage
-drinking-water-spots,Drinking water spots,Points d'eau potable
-drinking-water-spot,Drinking water spot,Point d'eau potable
-free-shops,Free shops,Magasins gratuits
-free-shop,Free shop,Magasin gratuit
-food-sharings,Food Sharing,Frigos solidaires
-food-sharing,Food Sharing,Frigo solidaire
-food-banks,Food Banks,Banques alimentaires
-food-bank,Food Bank,Banque alimentaire
-soup-kitchens,Soup Kitchens, Soupes populaires
-soup-kitchen,Soup Kitchen, Soupe populaire
-falling-fruits,Falling Fruit, Fruits qui tombent
-falling-fruit,Falling Fruit, Fruits qui tombent
+map_ecat_BKC,Public bookcase|Public bookcases,Boîte à livres|Boîtes à livres
+map_ecat_DEF,Defibrillator|Defibrillators,Défibrillateur|Défibrillateurs
+map_ecat_DWS,Drinking water spot|Drinking water spots,Point d'eau potable|Points d'eau potable
+map_ecat_FDB,Food Bank|Food Banks,Banque alimentaire|Banques alimentaires
+map_ecat_FDS,Food Sharing|Food Sharing,Frigo solidaire|Frigos solidaires
+map_ecat_FLF,Falling fruits|Falling fruits,Fruits qui tombent|Fruits qui tombent
+map_ecat_FRS,Free shop|Free shops,Magasin gratuit|Magasins gratuits
+map_ecat_GVB,Give box|Give boxes,Boîte à dons|Boîtes à dons
+map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
 from-osm,details on OpenStreetMap,détails sur OpenStreetMap
 from-ff,details on Falling Fruit,détails sur Falling Fruit
 by,by,par
@@ -327,3 +318,8 @@ only-items-created-at,Only items created at,Seuls les éléments créés à
 on-day,on,le
 or-later-will-be-showed,or later will be showed,ou plus tard seront affichés
 set-a-reflocation-to-use-feature,You must set a reference location in your settings to use this feature.,Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.
+map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
+define-elements-to-see-on-map,Define what externals elements you want to see on the map.,Définissez quels éléments externes vous souhaitez afficher sur la carte.
+this-item-doesnt-have-a-location,"This item does not have a location, cannot show it on the map.","Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte."
+select-all,Select all,Sélectionner tout
+deselect-all,Deselect all,Déselectionner tout

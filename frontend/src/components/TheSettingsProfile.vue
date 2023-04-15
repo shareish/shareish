@@ -178,7 +178,7 @@ export default {
         events: {updatePictures: this.updatePictures},
         component: TheManageProfilePicturesModal,
         hasModalCard: true,
-        trapFocus: true,
+        trapFocus: true
       });
     },
     windowWidthChanged() {

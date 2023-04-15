@@ -13,7 +13,7 @@ from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, It
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
     ItemMapBoundsFilterBackend
 from .functions import verif_location
-from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView
+from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -60,7 +60,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
             return Response(serializer.data)
         except Item.DoesNotExist:
-            return Response("This item doest not exist.", status=status.HTTP_404_NOT_FOUND)
+            return Response("This item does not exist.", status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['location'])
@@ -156,7 +156,7 @@ class ItemCommentViewSet(viewsets.ModelViewSet):
             item = Item.objects.get(pk=self.kwargs['item_id'])
             serializer.save(user=self.request.user, item=item)
         except Item.DoesNotExist:
-            return Response("This item doest not exist.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("This item does not exist.", status=status.HTTP_400_BAD_REQUEST)
         except Item.MultipleObjectsReturned:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -241,6 +241,19 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, headers=headers)
         return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+    def partial_update(self, request, *args, **kwargs):
+        for map_ecat in request.POST.getlist('map_ecats[]'):
+            map_ecat = json.loads(map_ecat)
+            try:
+                instance = UserMapExtraCategory.objects.get(user=request.user, category=map_ecat['category'])
+                instance.selected = map_ecat['selected']
+                instance.save()
+            except UserMapExtraCategory.DoesNotExist:
+                return Response("A map extra category isn't correctly linked to your account. Can't process to save.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except UserMapExtraCategory.MultipleObjectsReturned:
+                return Response("Multiple occurrences of an map extra category detected on your account. Can't process to save.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_200_OK)
+
 
 class UserImageViewSet(viewsets.ViewSet):
     def create(self, request):
@@ -266,7 +279,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         try:
             item = Item.objects.get(pk=data['item_id'])
         except Item.DoesNotExist:
-            return Response("This item doest not exist.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("This item does not exist.", status=status.HTTP_400_BAD_REQUEST)
         except Item.MultipleObjectsReturned:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

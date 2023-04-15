@@ -158,6 +158,35 @@ class UserImage(models.Model):
         ordering = ['user_id', '-id']
 
 
+class UserMapExtraCategories(models.TextChoices):
+    BOOKCASES = 'BKC', _("Public bookcases")
+    DEFIBRILLATORS = 'DEF', _("Defibrillators")
+    DRINKING_WATER_SPOTS = 'DWS', _("Drinking water spots")
+    FOOD_BANKS = 'FDB', _("Food Banks")
+    FOOD_SHARING = 'FDS', _("Food Sharing")
+    FALLING_FRUITS = 'FLF', _("Falling Fruit")
+    FREE_SHOPS = 'FRS', _("Free shops")
+    GIVE_BOXES = 'GVB', _("Give boxes")
+    SOUP_KITCHENS = 'SPK', _("Soup Kitchens")
+
+
+class UserMapExtraCategory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='map_ecats', on_delete=models.CASCADE)
+    category = models.CharField(max_length=3, choices=UserMapExtraCategories.choices)
+    selected = models.BooleanField(default=True)
+    update_date = models.DateTimeField(auto_now=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['user_id', 'category']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'category'],
+                name='unique__mymap_usermapextracategory__user_category'
+            )
+        ]
+
+
 class Item(models.Model):
     class ItemType(models.TextChoices):
         DONATION = 'DN', _("Donation")
@@ -264,7 +293,7 @@ class ItemView(models.Model):
     class Meta:
         ordering = ['id']
         constraints = [
-            models.UniqueConstraint(fields=['item', 'user'], name='unique__mymap_itemviews__item_user')
+            models.UniqueConstraint(fields=['item', 'user'], name='unique__mymap_itemview__item_user')
         ]
 
 

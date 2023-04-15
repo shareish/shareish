@@ -1,7 +1,6 @@
 <template>
   <div id="page-items">
-    <b-loading v-if="loading" :active="true" :is-full-page="false" />
-    <div v-else class="columns">
+    <div class="columns">
       <div class="column">
         <div id="filters">
           <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
@@ -225,7 +224,8 @@
         </div>
       </div>
       <div class="column">
-        <div id="items-list" class="scrollable">
+        <b-loading v-if="loading" :active="true" :is-full-page="false" />
+        <div v-else id="items-list" class="scrollable">
           <header class="columns is-mobile">
             <div class="column">
               <p id="items-match-count">
@@ -285,16 +285,15 @@ export default {
   components: {CategorySelector, ToggleBox, ItemCard},
   data() {
     return {
+      isMoreFiltersOpened: false,
       searchString: null,
-      searchTypes: [],
+      searchTypes: ['DN', 'LN', 'RQ', 'EV'],
       searchCategories: [],
       selectedCategory: null,
-      onlyUnseen: false,
       searchAvailabilityFrom: null,
       searchAvailabilityUntil: null,
       searchDistancesRadius: null,
       searchLocation: null,
-      isMoreFiltersOpened: false,
       restrictDistance: false,
       distancesRadiusSlider: [0, 100],
       distancesRadiusInput: [0, 100],
@@ -306,6 +305,7 @@ export default {
       refLocationAddress: "",
       locationTypeChosen: 'geoLocation',
       locationLoading: false,
+      onlyUnseen: false,
       useMinCreactiondate: false,
       timeUnit: 'hours',
       sliderTimeUnitMemory: {
