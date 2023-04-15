@@ -288,7 +288,7 @@
   "or": "ou",
   "searched-categories": "Catégories recherchées",
   "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",
-  "filter": "Filtres|Filtre|Filtres",
+  "filter": "Filtre|Filtres",
   "show-only-unseen": "N'afficher que les éléments non-vus",
   "show-filters": "Afficher les filtres",
   "hide-filters": "Masquer les filtres",
@@ -323,9 +323,10 @@
   "or-later-will-be-showed": "ou plus tard seront affichés",
   "set-a-reflocation-to-use-feature": "Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.",
   "map-settings-saved": "Vos paramètres de la carte ont été sauvegardés.",
-  "define-elements-to-see-on-map": "Définissez quels éléments externes vous souhaitez afficher sur la carte.",
+  "define-elements-to-see-on-map": "Définissez quels éléments externes à Shareish vous souhaitez afficher sur la carte.",
   "this-item-doesnt-have-a-location": "Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte.",
   "select-all": "Sélectionner tout",
   "deselect-all": "Déselectionner tout",
-  "open-map-settings": "Ouvrir les paramètres de la carte"
+  "open-map-settings": "Ouvrir les paramètres de la carte",
+  "filter-items": "Filtrer les items"
 }

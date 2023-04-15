@@ -79,7 +79,7 @@
                 <b-button
                     :disabled="itemHasEnded"
                     type="is-primary"
-                    style="width: 100%;"
+                    class="w-100"
                     @click="startConversation"
                 >
                   <i class="far fa-envelope mr-1"></i>
@@ -90,7 +90,7 @@
                 <b-button
                     type="is-primary"
                     outlined
-                    style="width: 100%;"
+                    class="w-100"
                     @click="scrollToComments"
                 >
                   <i class="fas fa-comments mr-1"></i>
