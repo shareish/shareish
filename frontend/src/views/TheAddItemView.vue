@@ -127,9 +127,11 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-button type="is-primary" @click="fetchAddressGeoLoc">
-                  <i class="icon fas fa-map-marker-alt"></i>
-                </b-button>
+                <b-tooltip :label="$t('use-geolocation')" position="is-bottom">
+                  <b-button type="is-primary" @click="fetchAddressGeoLoc">
+                    <i class="fas fa-street-view"></i>
+                  </b-button>
+                </b-tooltip>
                 <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>

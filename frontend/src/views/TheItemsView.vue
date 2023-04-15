@@ -143,7 +143,7 @@
               <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
                 <div class="columns is-mobile mb-2">
                   <div class="column is-one-third pr-1">
-                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" style="width: 100%;">
+                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" type="is-danger" style="width: 100%;">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'none'"
@@ -157,7 +157,7 @@
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pr-1 pl-1">
-                    <b-tooltip :label="$t('use-geolocation')" position="is-top" style="width: 100%;">
+                    <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-primary" style="width: 100%;">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'geoLocation'"
@@ -166,12 +166,12 @@
                           :loading="locationTypeChosen === 'geoLocation' && locationLoading"
                           type="is-primary"
                       >
-                        <i class="icon fas fa-map-marker-alt"></i>
+                        <i class="fas fa-street-view"></i>
                       </b-button>
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pl-1">
-                    <b-tooltip :label="$t('use-reflocation')" position="is-top" style="width: 100%;">
+                    <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-info" style="width: 100%;">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'refLocation'"
@@ -239,7 +239,10 @@
               </p>
             </div>
             <div class="column" style="flex: 0 0 auto; display: inline-flex;">
-              <div class="order-by-label">{{ $t('order-by') }}</div>
+              <div class="order-by-label">
+                <i class="fas fa-sort mr-1"></i>
+                {{ $t('order-by') }}
+              </div>
               <b-field class="wsnw">
                 <b-select expanded v-model="orderBy" class="order-by-select">
                   <option value="-creationdate">{{ $t('recent-first') }}</option>
