@@ -324,5 +324,7 @@
   "set-a-reflocation-to-use-feature": "You must set a reference location in your settings to use this feature.",
   "map-settings-saved": "Your map settings have been saved.",
   "define-elements-to-see-on-map": "Define what externals elements you want to see on the map.",
-  "this-item-doesnt-have-a-location": "This item does not have a location, cannot show it on the map."
+  "this-item-doesnt-have-a-location": "This item does not have a location, cannot show it on the map.",
+  "select-all": "Select all",
+  "deselect-all": "Deselect all"
 }

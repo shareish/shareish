@@ -321,3 +321,5 @@ set-a-reflocation-to-use-feature,You must set a reference location in your setti
 map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
 define-elements-to-see-on-map,Define what externals elements you want to see on the map.,Définissez quels éléments externes vous souhaitez afficher sur la carte.
 this-item-doesnt-have-a-location,"This item does not have a location, cannot show it on the map.","Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte."
+select-all,Select all,Sélectionner tout
+deselect-all,Deselect all,Déselectionner tout

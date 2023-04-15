@@ -8,11 +8,19 @@
     <section class="modal-card-body">
       <h1 class="title is-size-4 mb-2">Overpass & Falling Fruit</h1>
       <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
-      <b-field v-for="(map_ecat, index) in map_ecats_copy" :key="index">
-        <b-checkbox v-model="map_ecat.selected" type="is-primary">
-          {{ $tc('map_ecat_' + map_ecat.category, 0) }}
-        </b-checkbox>
-      </b-field>
+      <div class="buttons mb-4">
+        <b-button type="is-primary" @click="selectAll">{{ $t('select-all') }}</b-button>
+        <b-button type="is-danger" class="ml-1" @click="deselectAll">{{ $t('deselect-all') }}</b-button>
+      </div>
+      <div id="ecats-checkboxes" class="columns is-flex-wrap-wrap">
+        <div v-for="(extraCategory, index) in map_ecats" :key="index" class="column is-half">
+          <b-field>
+            <b-checkbox v-model="ecatsCheckboxes" :native-value="extraCategory.category" type="is-primary">
+              {{ $tc('map_ecat_' + extraCategory.category, 0) }}
+            </b-checkbox>
+          </b-field>
+        </div>
+      </div>
     </section>
     <footer class="modal-card-foot">
       <b-button :label="$t('cancel')" @click="$emit('close')" />
@@ -39,12 +47,14 @@ export default {
     return {
       waitingFormResponse: false,
       loading: false,
-      map_ecats_copy: []
+      ecatsCheckboxes: []
     }
   },
   created() {
-    for (const i in this.map_ecats)
-      this.map_ecats_copy[i] = {...this.map_ecats[i]};
+    for (const i in this.map_ecats) {
+      if (this.map_ecats[i].selected === true)
+        this.ecatsCheckboxes.push(this.map_ecats[i].category)
+    }
   },
   computed: {
     userId() {
@@ -57,8 +67,11 @@ export default {
 
       try {
         const data = new FormData();
-        for (const [index, map_ecat] of Object.entries(this.map_ecats_copy))
-          data.append('map_ecats[]', JSON.stringify({'category': map_ecat.category, 'selected': map_ecat.selected}));
+        for (const [index, extraCategory] of Object.entries(this.map_ecats))
+          data.append('map_ecats[]', JSON.stringify({
+            'category': extraCategory.category,
+            'selected': extraCategory.selected
+          }));
 
         await axios.patch(`/api/v1/webusers/${this.userId}`, data);
 
@@ -71,7 +84,7 @@ export default {
         });
 
         for (const i in this.map_ecats)
-          this.map_ecats[i].selected = this.map_ecats_copy[i].selected;
+          this.map_ecats[i].selected = this.ecatsCheckboxes.includes(this.map_ecats[i].category);
 
         this.$emit('close');
       }
@@ -80,7 +93,16 @@ export default {
       }
 
       this.waitingFormResponse =  false;
-    }
+    },
+    selectAll() {
+      for (const i in this.map_ecats) {
+        if (!this.ecatsCheckboxes.includes(this.map_ecats[i].category))
+          this.ecatsCheckboxes.push(this.map_ecats[i].category);
+      }
+    },
+    deselectAll() {
+      this.ecatsCheckboxes = [];
+    },
   }
 }
 </script>

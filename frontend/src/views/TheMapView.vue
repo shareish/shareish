@@ -631,7 +631,7 @@ export default {
           const params = this.params;
           params['bounds'] = [this.searchBounds[0].toString(), this.searchBounds[1].toString()];
 
-          let items = (await axios.get("/api/v1/actives/", {params: params})).data;
+          const items = (await axios.get("/api/v1/actives/", {params: params})).data;
 
           if (items.length > 0) {
             this.items = items.filter(item =>
