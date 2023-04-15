@@ -164,7 +164,7 @@ class UserMapExtraCategories(models.TextChoices):
     DRINKING_WATER_SPOTS = 'DWS', _("Drinking water spots")
     FOOD_BANKS = 'FDB', _("Food Banks")
     FOOD_SHARING = 'FDS', _("Food Sharing")
-    FALLING_FRUITS = 'FLF', _("Falling Fruit")
+    FALLING_FRUITS = 'FLF', _("Falling fruits")
     FREE_SHOPS = 'FRS', _("Free shops")
     GIVE_BOXES = 'GVB', _("Give boxes")
     SOUP_KITCHENS = 'SPK', _("Soup Kitchens")

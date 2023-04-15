@@ -177,16 +177,22 @@
             @update:bounds="boundsUpdated"
         >
           <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
-          <l-control class="control-geolocation">
-            <b-button type="is-primary" @click="setCenterAtGeoLocation">
-              <i class="fas fa-street-view"></i>
-            </b-button>
-            <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
-              <i class="fas fa-home"></i>
-            </b-button>
-            <b-button type="is-danger ml-2" @click="openSettingsModal">
-              <i class="fas fa-cog"></i>
-            </b-button>
+          <l-control position="topright">
+            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-primary" :delay="1000">
+              <b-button type="is-primary" @click="setCenterAtGeoLocation">
+                <i class="fas fa-street-view"></i>
+              </b-button>
+            </b-tooltip>
+            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" :delay="1000">
+              <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
+                <i class="fas fa-home"></i>
+              </b-button>
+            </b-tooltip>
+            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-danger" :delay="1000">
+              <b-button type="is-danger ml-2" @click="openSettingsModal">
+                <i class="fas fa-cog"></i>
+              </b-button>
+            </b-tooltip>
           </l-control>
           <l-control position="bottomleft">
             <div class="control-loading">

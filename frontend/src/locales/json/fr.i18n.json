@@ -161,7 +161,7 @@
   "help_instagram": "Entrez l'adresse de votre compte Instagram si existant",
   "reflocation": "Adresse de référence",
   "help_ref_location": "Adresse (facultative mais conseillée) pour définir votre voisinage, donc typiquement l'adresse de votre logement. Vous pouvez cliquer sur le bouton de localisation pour la mettre à jour sur base de votre localisation courante. Plus l'adresse est précise, mieux c'est mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier. Cette information n'est pas visible pour les autres utilisateurs et uniquement utilisée lors de l'envoi de notifications par e-mail.",
-  "dwithin_notif": "Rayon (en km) de votre voisinage",
+  "dwithin_notif": "Rayon de notification (en km)",
   "help_dwithin": "Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)",
   "email": "E-mail",
   "help_email": " Entrez votre adresse e-mail (obligatoire, un seul compte par adresse e-mail)",
@@ -326,5 +326,6 @@
   "define-elements-to-see-on-map": "Définissez quels éléments externes vous souhaitez afficher sur la carte.",
   "this-item-doesnt-have-a-location": "Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte.",
   "select-all": "Sélectionner tout",
-  "deselect-all": "Déselectionner tout"
+  "deselect-all": "Déselectionner tout",
+  "open-map-settings": "Ouvrir les paramètres de la carte"
 }

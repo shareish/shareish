@@ -161,7 +161,7 @@
   "help_instagram": "Type the URL of your Instagram account if any",
   "reflocation": "Reference address",
   "help_ref_location": "Address (optional but recommended) to define your neighbordhood, so typically this is your home address.  You can click on the localization button to update it based on your current geolocation. The more precise, the better, but you can discard some details, e.g. you can use either streetname with or without the street number, the city or area name. This information is not visible for others and only used when sending notifications by e-mail.",
-  "dwithin_notif": "Distance (km) of your neighborhood",
+  "dwithin_notif": "Notification radius (in km)",
   "help_dwithin": "Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address)",
   "email": "Email",
   "help_email": "Type your e-mail address (mandatory, one account only per e-mail address)",
@@ -326,5 +326,6 @@
   "define-elements-to-see-on-map": "Define what externals elements you want to see on the map.",
   "this-item-doesnt-have-a-location": "This item does not have a location, cannot show it on the map.",
   "select-all": "Select all",
-  "deselect-all": "Deselect all"
+  "deselect-all": "Deselect all",
+  "open-map-settings": "Open map settings"
 }
