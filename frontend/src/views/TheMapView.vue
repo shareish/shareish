@@ -367,7 +367,7 @@ export default {
       bounds: null,
       searchBounds: null,
       searchString: null,
-      searchTypes: [],
+      searchTypes: ['DN', 'LN', 'RQ', 'EV'],
       searchCategories: [],
       selectedCategory: null,
       onlyUnseen: false,

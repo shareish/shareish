@@ -286,7 +286,7 @@ export default {
   data() {
     return {
       searchString: null,
-      searchTypes: [],
+      searchTypes: ['DN', 'LN', 'RQ', 'EV'],
       searchCategories: [],
       selectedCategory: null,
       onlyUnseen: false,

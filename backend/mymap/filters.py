@@ -6,6 +6,8 @@ from django.contrib.gis.geos import Point, GEOSGeometry, Polygon
 from django.db.models import Q, F
 from rest_framework import filters
 
+from mymap.models import Item
+
 
 class ActiveItemFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -25,8 +27,11 @@ class ItemCategoryFilterBackend(filters.BaseFilterBackend):
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         types = request.query_params.getlist('types[]')
-        if len(types) > 0:
-            return queryset.filter(type__in=types)
+        if len(types) < len(Item.ItemType.choices): # Prevents filtering if all types are selected
+            if len(types) > 0:
+                return queryset.filter(type__in=types)
+            else:
+                return queryset.none()
         return queryset
 
 
