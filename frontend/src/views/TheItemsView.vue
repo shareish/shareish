@@ -285,16 +285,15 @@ export default {
   components: {CategorySelector, ToggleBox, ItemCard},
   data() {
     return {
+      isMoreFiltersOpened: false,
       searchString: null,
       searchTypes: ['DN', 'LN', 'RQ', 'EV'],
       searchCategories: [],
       selectedCategory: null,
-      onlyUnseen: false,
       searchAvailabilityFrom: null,
       searchAvailabilityUntil: null,
       searchDistancesRadius: null,
       searchLocation: null,
-      isMoreFiltersOpened: false,
       restrictDistance: false,
       distancesRadiusSlider: [0, 100],
       distancesRadiusInput: [0, 100],
@@ -306,6 +305,7 @@ export default {
       refLocationAddress: "",
       locationTypeChosen: 'geoLocation',
       locationLoading: false,
+      onlyUnseen: false,
       useMinCreactiondate: false,
       timeUnit: 'hours',
       sliderTimeUnitMemory: {

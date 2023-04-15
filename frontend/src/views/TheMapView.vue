@@ -140,61 +140,6 @@
                   />
                 </b-field>
               </toggle-box>
-              <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
-                <div class="columns is-mobile mb-2">
-                  <div class="column is-one-third pr-1">
-                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" style="width: 100%;">
-                      <b-button
-                          expanded
-                          @click="locationTypeChosen = 'none'"
-                          :outlined="locationTypeChosen !== 'none'"
-                          :disabled="locationTypeChosen !== 'none' && locationLoading"
-                          :loading="locationTypeChosen === 'none' && locationLoading"
-                          type="is-danger"
-                      >
-                        <i class="fas fa-times"></i>
-                      </b-button>
-                    </b-tooltip>
-                  </div>
-                  <div class="column is-one-third pr-1 pl-1">
-                    <b-tooltip :label="$t('use-geolocation')" position="is-top" style="width: 100%;">
-                      <b-button
-                          expanded
-                          @click="locationTypeChosen = 'geoLocation'"
-                          :outlined="locationTypeChosen !== 'geoLocation'"
-                          :disabled="locationTypeChosen !== 'geoLocation' && locationLoading"
-                          :loading="locationTypeChosen === 'geoLocation' && locationLoading"
-                          type="is-primary"
-                      >
-                        <i class="icon fas fa-map-marker-alt"></i>
-                      </b-button>
-                    </b-tooltip>
-                  </div>
-                  <div class="column is-one-third pl-1">
-                    <b-tooltip :label="$t('use-reflocation')" position="is-top" style="width: 100%;">
-                      <b-button
-                          expanded
-                          @click="locationTypeChosen = 'refLocation'"
-                          :outlined="locationTypeChosen !== 'refLocation'"
-                          :disabled="locationTypeChosen !== 'refLocation' && locationLoading"
-                          :loading="locationTypeChosen === 'refLocation' && locationLoading"
-                          type="is-info"
-                      >
-                        <i class="fas fa-home"></i>
-                      </b-button>
-                    </b-tooltip>
-                  </div>
-                </div>
-                <b-field :label="$t('or-enter-an-address') + ':'">
-                  <b-input v-model="address" :placeholder="$t('address')" />
-                </b-field>
-                <b-field>
-                  <b-switch v-model="restrictDistance" :disabled="searchLocation === null" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
-                </b-field>
-                <b-field :label="$t('radius-from-location') + ':'" v-if="restrictDistance && searchLocation !== null">
-                  <b-slider v-model="distancesRadiusInput" class="pr-5 pl-4" :min="distancesRadiusSlider[0]" :max="distancesRadiusSlider[1]" :step="1" indicator :tooltip="false" />
-                </b-field>
-              </toggle-box>
               <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
                 <b-field>
                   <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
@@ -364,29 +309,18 @@ export default {
       preLeafletCenter: new LatLng(50.6450944, 5.5736112),
       leafletCenter: new LatLng(50.6450944, 5.5736112),
 
+      isMoreFiltersOpened: false,
       bounds: null,
       searchBounds: null,
       searchString: null,
       searchTypes: ['DN', 'LN', 'RQ', 'EV'],
       searchCategories: [],
       selectedCategory: null,
-      onlyUnseen: false,
       searchAvailabilityFrom: null,
       searchAvailabilityUntil: null,
-      searchDistancesRadius: null,
-      searchLocation: null,
-      isMoreFiltersOpened: false,
-      restrictDistance: false,
-      distancesRadiusSlider: [0, 100],
-      distancesRadiusInput: [0, 100],
-      address: "",
-      checkAddress: true,
       geoLocation: null,
       refLocation: null,
-      geoLocationAddress: "",
-      refLocationAddress: "",
-      locationTypeChosen: 'geoLocation',
-      locationLoading: false,
+      onlyUnseen: false,
       useMinCreactiondate: false,
       timeUnit: 'hours',
       sliderTimeUnitMemory: {
@@ -516,19 +450,6 @@ export default {
 
     this.leafletCenter = this.preLeafletCenter;
 
-    this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
-    this.refLocationAddress = await this.fetchAddress(this.refLocation);
-
-    if (this.locationTypeChosen === 'geoLocation') {
-      this.checkAddress = false;
-      this.address = this.geoLocationAddress;
-      this.searchLocation = this.geoLocation;
-    } else if (this.locationTypeChosen === 'refLocation') {
-      this.checkAddress = false;
-      this.address = this.refLocationAddress;
-      this.searchLocation = this.refLocation;
-    }
-
     this.mapLoading = false;
   },
   beforeMount() {
@@ -543,8 +464,6 @@ export default {
         onlyNew: (this.onlyUnseen) ? this.onlyUnseen : null,
         availableFrom: this.searchAvailabilityFrom,
         availableUntil: this.searchAvailabilityUntil,
-        userLocation: this.searchLocation,
-        distancesRadius: (this.searchLocation instanceof GeolocationCoords) ? this.searchDistancesRadius : null,
         minCreationdate: this.searchMinCreationdate
       };
     },
@@ -576,59 +495,6 @@ export default {
     selectedCategory() {
       if (this.searchCategories.indexOf(this.selectedCategory) === -1)
         this.searchCategories.push(this.selectedCategory);
-    },
-    locationTypeChosen() {
-      clearTimeout(this.timeouts['locationTypeChosen']);
-      this.locationLoading = true;
-      this.timeouts['locationTypeChosen'] = setTimeout(() => {
-        switch (this.locationTypeChosen) {
-          case 'geoLocation':
-            this.checkAddress = false;
-            this.address = this.geoLocationAddress;
-            this.searchLocation = this.geoLocation;
-            break;
-          case 'refLocation':
-            this.checkAddress = false;
-            this.address = this.refLocationAddress;
-            this.searchLocation = this.refLocation;
-            break;
-          case 'none':
-            this.checkAddress = false;
-            this.address = "";
-            this.searchLocation = null;
-            break;
-        }
-        this.locationLoading = false;
-      }, 600);
-    },
-    address() {
-      if (this.checkAddress) {
-        clearTimeout(this.timeouts['address']);
-        this.timeouts['address'] = setTimeout(() => {
-          this.updateGeolocationFromAddress();
-        }, 1000);
-      } else {
-        this.checkAddress = true;
-      }
-    },
-    restrictDistance() {
-      this.locationLoading = true;
-      clearTimeout(this.timeouts['restrictDistance']);
-      this.timeouts['restrictDistance'] = setTimeout(() => {
-        if (this.restrictDistance)
-          this.searchDistancesRadius = this.distancesRadiusInput;
-        else
-          this.searchDistancesRadius = null;
-        this.locationLoading = false;
-      }, 600);
-    },
-    distancesRadiusInput() {
-      if (this.restrictDistance) {
-        clearTimeout(this.timeouts['distancesRadius']);
-        this.timeouts['distancesRadius'] = setTimeout(() => {
-          this.searchDistancesRadius = this.distancesRadiusInput;
-        }, 600);
-      }
     },
     params() {
       if (this.initialItemsLoadDone)
@@ -696,41 +562,6 @@ export default {
       }
       catch (error) {
         this.snackbarError(error);
-      }
-    },
-    async fetchAddress(location) {
-      if (location instanceof GeolocationCoords) {
-        try {
-          return (await axios.post("/api/v1/address/reverse", location)).data;
-        }
-        catch (error) {
-          this.fullErrorHandling(error);
-        }
-      }
-      return null;
-    },
-    async fetchGeolocation(address) {
-      if (address !== null && address !== "") {
-        try {
-          const formData = new FormData();
-          formData.append('address', address);
-          return (await axios.post("/api/v1/address", formData)).data;
-        }
-        catch (error) {
-          this.fullErrorHandling(error);
-        }
-      }
-      return null;
-    },
-    async updateGeolocationFromAddress() {
-      if (this.address !== "") {
-        const geolocation = await this.fetchGeolocation(this.address);
-        if (geolocation !== null)
-          this.searchLocation = new GeolocationCoords(geolocation)
-        else
-          this.searchLocation = null;
-      } else {
-        this.searchLocation = null;
       }
     },
     async updateGeoLocation() {
