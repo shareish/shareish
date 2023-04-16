@@ -127,8 +127,8 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-tooltip :label="$t('use-geolocation')" position="is-bottom">
-                  <b-button type="is-primary" @click="fetchAddressGeoLoc">
+                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
+                  <b-button type="is-info" @click="fetchAddressGeoLoc">
                     <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
