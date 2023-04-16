@@ -276,7 +276,7 @@ import axios from "axios";
 import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords, lcall, ucfirst} from "@/functions";
+import {GeolocationCoords, isNotEmptyString, lcall, ucfirst} from "@/functions";
 import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import {categories} from "@/categories";
@@ -567,7 +567,7 @@ export default {
       return null;
     },
     async fetchGeolocation(address) {
-      if (address !== null && address !== "") {
+      if (isNotEmptyString(address)) {
         try {
           const formData = new FormData();
           formData.append('address', address);
@@ -580,7 +580,7 @@ export default {
       return null;
     },
     async updateGeolocationFromAddress() {
-      if (this.address !== "") {
+      if (isNotEmptyString(this.address)) {
         const geolocation = await this.fetchGeolocation(this.address);
         if (geolocation !== null)
           this.searchLocation = new GeolocationCoords(geolocation)

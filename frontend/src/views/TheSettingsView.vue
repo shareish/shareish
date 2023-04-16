@@ -83,7 +83,8 @@ export default {
       }
     },
     updateUser(user) {
-      this.user = user;
+      for (const [key, value] in user)
+        this.user[key] = value;
     }
   },
   watch: {

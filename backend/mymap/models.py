@@ -103,6 +103,8 @@ class User(AbstractBaseUser):
         default=10,
         help_text="Enter maximum distance for new item and event notifications"
     )
+    save_item_viewing = models.BooleanField(default=True)
+
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']

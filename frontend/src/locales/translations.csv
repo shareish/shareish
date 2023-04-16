@@ -325,3 +325,8 @@ select-all,Select all,Sélectionner tout
 deselect-all,Deselect all,Déselectionner tout
 open-map-settings,Open map settings,Ouvrir les paramètres de la carte
 filter-items,Filter items,Filtrer les items
+general-information,General information,Informations générales
+save-items-you-see,Save the items you see on Shareish,Sauvegarder les éléments que vous voyez sur Shareish
+help_save-items-you-see,We save the items you see to improve your experience while browsing our website. This helps us understand how you use it and send you better recommendations in our emails notifications!,Nous enregistrons les items que vous visionnez afin d'améliorer votre expérience sur notre site internet. Cela nous aide à comprendre comme vous l'utilisez et à vous proposer de meilleures recommendations dans nos emails de notification!
+yes,Yes,Oui
+no,No,Non

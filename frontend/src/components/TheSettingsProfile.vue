@@ -130,41 +130,46 @@ export default {
         'is-one-quarter': 3,
         'is-one-fifth': 4,
         'is-2': 5
-      }
+      },
+      timeouts: {}
     }
   },
   created() {
     document.title = "Shareish | Settings: Profile";
-    this.internalUser = {...this.user};
+    this.internalUser = {
+      'description': this.user.description,
+      'homepage_url': this.user.homepage_url,
+      'facebook_url': this.user.facebook_url,
+      'instagram_url': this.user.instagram_url
+    };
   },
   methods: {
     async save() {
       this.waitingFormResponse = true;
 
-      let result = await this.$validator.validateAll();
-      if (result) {
-        try {
-          let tempUser = {...this.internalUser}
-          delete tempUser.images;
-          delete tempUser.items;
+      clearTimeout(this.timeouts['save']);
+      this.timeouts['save'] = setTimeout(async () => {
+        let result = await this.$validator.validateAll();
+        if (result) {
+          try {
+            await axios.patch("/api/v1/webusers/me/", this.internalUser);
 
-          this.internalUser = (await axios.patch("/api/v1/webusers/me/", tempUser)).data;
+            this.$buefy.snackbar.open({
+              duration: 5000,
+              type: 'is-success',
+              message: this.$t('notif-success-user-update'),
+              pauseOnHover: true,
+            });
 
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-success',
-            message: this.$t('notif-success-user-update'),
-            pauseOnHover: true,
-          });
-
-          this.$emit('updateUser', this.internalUser);
+            this.$emit('updateUser', this.internalUser);
+          }
+          catch (error) {
+            this.fullErrorHandling(error);
+          }
         }
-        catch (error) {
-          this.fullErrorHandling(error);
-        }
-      }
 
-      this.waitingFormResponse = false;
+        this.waitingFormResponse = false;
+      }, 400);
     },
     updatePictures() {
 

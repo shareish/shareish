@@ -546,12 +546,13 @@ export default {
       this.waitingFormResponse =  true;
 
       try {
-        const data = new FormData();
+        const data = {};
+        data['map_ecats'] = []
         for (const [index, extraCategory] of Object.entries(this.user.map_ecats))
-          data.append('map_ecats[]', JSON.stringify({
+          data['map_ecats'].push({
             'category': extraCategory.category,
             'selected': this.ecatsCheckboxes.includes(extraCategory.category)
-          }));
+          });
 
         await axios.patch(`/api/v1/webusers/${this.userId}/`, data);
 

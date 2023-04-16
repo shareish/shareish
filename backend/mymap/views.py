@@ -50,7 +50,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             instance = Item.objects.get(pk=pk)
             serializer = self.get_serializer(instance)
 
-            if 'view_date' in request.query_params:
+            if 'view_date' in request.query_params and request.user.save_item_viewing:
                 try:
                     ItemView.objects.create(item=instance, user=request.user,
                                             view_date=request.query_params['view_date'])
@@ -224,35 +224,44 @@ class UserViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_instance()
 
-        result = verif_location(request.data['ref_location'])
-        if 'success' in result:
-            request.data['ref_location'] = result['success']
-        else:
-            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
 
-        instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
-        if re.match("^" + instagram_username_regex + "$", request.data['instagram_url']):
-            request.data['instagram_url'] = "https://www.instagram.com/" + request.data['instagram_url'] + "/"
+        if 'map_ecats' in data:
+            for map_ecat in data['map_ecats']:
+                try:
+                    instance = UserMapExtraCategory.objects.get(user=request.user, category=map_ecat['category'])
+                    instance.selected = map_ecat['selected']
+                    instance.save()
+                except UserMapExtraCategory.DoesNotExist:
+                    return Response(
+                        "A map extra category isn't correctly linked to your account. Can't process to save.",
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                except UserMapExtraCategory.MultipleObjectsReturned:
+                    return Response(
+                        "Multiple occurrences of an map extra category detected on your account. Can't process to save.",
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            del data['map_ecats']
+            if len(data) == 0:
+                return Response(status=status.HTTP_200_OK)
 
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if 'ref_location' in data:
+            result = verif_location(data['ref_location'])
+            if 'success' in result:
+                data['ref_location'] = result['success']
+            else:
+                return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+
+        if 'instagram_url' in data:
+            instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
+            if re.match("^" + instagram_username_regex + "$", data['instagram_url']):
+                data['instagram_url'] = "https://www.instagram.com/" + data['instagram_url'] + "/"
+
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        for map_ecat in request.POST.getlist('map_ecats[]'):
-            map_ecat = json.loads(map_ecat)
-            try:
-                instance = UserMapExtraCategory.objects.get(user=request.user, category=map_ecat['category'])
-                instance.selected = map_ecat['selected']
-                instance.save()
-            except UserMapExtraCategory.DoesNotExist:
-                return Response("A map extra category isn't correctly linked to your account. Can't process to save.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            except UserMapExtraCategory.MultipleObjectsReturned:
-                return Response("Multiple occurrences of an map extra category detected on your account. Can't process to save.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(status=status.HTTP_200_OK)
 
 
 class UserImageViewSet(viewsets.ViewSet):
@@ -414,6 +423,7 @@ def user_image(request, userimage_id):
         try:
             user_image = UserImage.objects.get(pk=userimage_id)
             if user_image.user_id == request.user.id:
+                user_image.delete()
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response("You are not the owner of this image.", status=status.HTTP_403_FORBIDDEN)

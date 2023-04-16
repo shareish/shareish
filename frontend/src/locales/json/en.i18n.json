@@ -328,5 +328,10 @@
   "select-all": "Select all",
   "deselect-all": "Deselect all",
   "open-map-settings": "Open map settings",
-  "filter-items": "Filter items"
+  "filter-items": "Filter items",
+  "general-information": "General information",
+  "save-items-you-see": "Save the items you see on Shareish",
+  "help_save-items-you-see": "We save the items you see to improve your experience while browsing our website. This helps us understand how you use it and send you better recommendations in our emails notifications!",
+  "yes": "Yes",
+  "no": "No"
 }

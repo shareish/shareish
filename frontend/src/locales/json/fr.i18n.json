@@ -328,5 +328,10 @@
   "select-all": "Sélectionner tout",
   "deselect-all": "Déselectionner tout",
   "open-map-settings": "Ouvrir les paramètres de la carte",
-  "filter-items": "Filtrer les items"
+  "filter-items": "Filtrer les items",
+  "general-information": "Informations générales",
+  "save-items-you-see": "Sauvegarder les éléments que vous voyez sur Shareish",
+  "help_save-items-you-see": "Nous enregistrons les items que vous visionnez afin d'améliorer votre expérience sur notre site internet. Cela nous aide à comprendre comme vous l'utilisez et à vous proposer de meilleures recommendations dans nos emails de notification!",
+  "yes": "Oui",
+  "no": "Non"
 }
