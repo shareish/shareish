@@ -11,13 +11,13 @@
         <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
         <l-control position="topright">
           <div class="is-flex is-flex-direction-column">
-            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-primary" class="w-100 mt-1">
-              <b-button type="is-primary" @click="setCenterAtGeoLocation" expanded>
+            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-100 mt-1">
+              <b-button type="is-info" @click="setCenterAtGeoLocation" expanded>
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-100 mt-1">
-              <b-button type="is-info" @click="setCenterAtRefLocation" expanded>
+            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-primary" class="w-100 mt-1">
+              <b-button type="is-primary" @click="setCenterAtRefLocation" expanded>
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
@@ -28,7 +28,7 @@
             </b-tooltip>
             <b-tooltip :label="$t('filter-items')" position="is-left" type="is-warning" class="w-100 mt-1">
               <b-button type="is-warning" @click="openFlap('filters')" expanded>
-                <i class="fas fa-sort"></i>
+                <i class="fas fa-filter"></i>
               </b-button>
             </b-tooltip>
           </div>
@@ -92,7 +92,7 @@
         <div class="inner">
           <template v-if="flapSelected === 'settings'">
             <header class="is-flex">
-              <h2 class="title">Overpass & Falling Fruit</h2>
+              <h2 class="title">{{ $t('settings') }}</h2>
               <b-button
                   type="is-dark"
                   outlined
@@ -103,6 +103,7 @@
               </b-button>
             </header>
             <div class="content">
+              <h3 class="title is-size-4 mb-1">Overpass & Falling Fruit</h3>
               <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
               <div class="columns buttons m-0 mb-4">
                 <div class="column p-0 pr-2">
@@ -132,146 +133,146 @@
             </div>
           </template>
           <template v-else-if="flapSelected === 'filters'">
-          <header class="is-flex">
-            <h2 class="title">{{ $tc('filter', 0) }}</h2>
-            <b-button
-                type="is-dark"
-                outlined
-                class="close"
-                @click="closeFlap"
-            >
-              <i class="fas fa-times"></i>
-            </b-button>
-          </header>
-          <div class="content">
-            <div id="filters">
-              <div class="search">
-                <b-field :label="$t('search')">
-                  <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
-                </b-field>
-              </div>
-              <div class="other-filters mt-4">
-                <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
-                  <template v-if="windowWidth >= 768 && windowWidth < 1024">
-                    <div class="columns is-mobile">
-                      <div class="column pr-2">
-                        <b-field class="mb-1">
-                          <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                            <span>{{ $t('donation') }}</span>
-                          </b-checkbox-button>
-                        </b-field>
+            <header class="is-flex">
+              <h2 class="title">{{ $tc('filter', 0) }}</h2>
+              <b-button
+                  type="is-dark"
+                  outlined
+                  class="close"
+                  @click="closeFlap"
+              >
+                <i class="fas fa-times"></i>
+              </b-button>
+            </header>
+            <div class="content">
+              <div id="filters">
+                <div class="search">
+                  <b-field :label="$t('search')">
+                    <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                  </b-field>
+                </div>
+                <div class="other-filters mt-4">
+                  <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
+                    <template v-if="windowWidth >= 768 && windowWidth < 1024">
+                      <div class="columns is-mobile">
+                        <div class="column pr-2">
+                          <b-field class="mb-1">
+                            <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                              <span>{{ $t('donation') }}</span>
+                            </b-checkbox-button>
+                          </b-field>
+                        </div>
+                        <div class="column pr-2 pl-2">
+                          <b-field class="mb-1">
+                            <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                              <span>{{ $t('request') }}</span>
+                            </b-checkbox-button>
+                          </b-field>
+                        </div>
+                        <div class="column pr-2 pl-2">
+                          <b-field class="mb-1">
+                            <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                              <span>{{ $t('loan') }}</span>
+                            </b-checkbox-button>
+                          </b-field>
+                        </div>
+                        <div class="column pl-2">
+                          <b-field class="mb-1">
+                            <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                              <span>{{ $t('event') }}</span>
+                            </b-checkbox-button>
+                          </b-field>
+                        </div>
                       </div>
-                      <div class="column pr-2 pl-2">
-                        <b-field class="mb-1">
-                          <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                            <span>{{ $t('request') }}</span>
-                          </b-checkbox-button>
-                        </b-field>
-                      </div>
-                      <div class="column pr-2 pl-2">
-                        <b-field class="mb-1">
-                          <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                            <span>{{ $t('loan') }}</span>
-                          </b-checkbox-button>
-                        </b-field>
-                      </div>
-                      <div class="column pl-2">
-                        <b-field class="mb-1">
-                          <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                            <span>{{ $t('event') }}</span>
-                          </b-checkbox-button>
-                        </b-field>
+                    </template>
+                    <template v-else>
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                          <span>{{ $t('donation') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                          <span>{{ $t('request') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                          <span>{{ $t('loan') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                      <b-field class="mb-1">
+                        <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                          <span>{{ $t('event') }}</span>
+                        </b-checkbox-button>
+                      </b-field>
+                    </template>
+                  </toggle-box>
+                  <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
+                    <div v-if="searchCategories.length > 0" id="selected-categories">
+                      <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
+                      <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
+                        <div class="column name">{{ getCategory(category) }}</div>
+                        <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
                       </div>
                     </div>
-                  </template>
-                  <template v-else>
-                    <b-field class="mb-1">
-                      <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                        <span>{{ $t('donation') }}</span>
-                      </b-checkbox-button>
+                    <template v-else>
+                      <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
+                    </template>
+                    <category-selector v-model="selectedCategory" expanded />
+                  </toggle-box>
+                  <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
+                    <b-field :label="$t('from')">
+                      <b-datetimepicker
+                          v-model="searchAvailabilityFrom"
+                          icon="calendar"
+                          :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
+                          icon-right-clickable
+                          @icon-right-click="searchAvailabilityFrom = null"
+                          icon-pack="fas"
+                          :locale="$i18n.locale"
+                      />
                     </b-field>
-                    <b-field class="mb-1">
-                      <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                        <span>{{ $t('request') }}</span>
-                      </b-checkbox-button>
+                    <b-field :label="$t('until')">
+                      <b-datetimepicker
+                          v-model="searchAvailabilityUntil"
+                          icon="calendar"
+                          :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
+                          icon-right-clickable
+                          @icon-right-click="searchAvailabilityUntil = null"
+                          icon-pack="fas"
+                          :locale="$i18n.locale"
+                      />
                     </b-field>
-                    <b-field class="mb-1">
-                      <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                        <span>{{ $t('loan') }}</span>
-                      </b-checkbox-button>
+                  </toggle-box>
+                  <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
+                    <b-field>
+                      <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
                     </b-field>
-                    <b-field class="mb-1">
-                      <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                        <span>{{ $t('event') }}</span>
-                      </b-checkbox-button>
+                    <b-field>
+                      <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
                     </b-field>
-                  </template>
-                </toggle-box>
-                <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
-                  <div v-if="searchCategories.length > 0" id="selected-categories">
-                    <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
-                    <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
-                      <div class="column name">{{ getCategory(category) }}</div>
-                      <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
-                    </div>
-                  </div>
-                  <template v-else>
-                    <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
-                  </template>
-                  <category-selector v-model="selectedCategory" expanded />
-                </toggle-box>
-                <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
-                  <b-field :label="$t('from')">
-                    <b-datetimepicker
-                        v-model="searchAvailabilityFrom"
-                        icon="calendar"
-                        :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
-                        icon-right-clickable
-                        @icon-right-click="searchAvailabilityFrom = null"
-                        icon-pack="fas"
-                        :locale="$i18n.locale"
-                    />
-                  </b-field>
-                  <b-field :label="$t('until')">
-                    <b-datetimepicker
-                        v-model="searchAvailabilityUntil"
-                        icon="calendar"
-                        :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
-                        icon-right-clickable
-                        @icon-right-click="searchAvailabilityUntil = null"
-                        icon-pack="fas"
-                        :locale="$i18n.locale"
-                    />
-                  </b-field>
-                </toggle-box>
-                <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
-                  <b-field>
-                    <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
-                  </b-field>
-                  <b-field>
-                    <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
-                  </b-field>
-                  <template v-if="useMinCreactiondate">
-                    <div class="columns is-mobile mb-0 mt-3">
-                      <div class="column pr-1">
-                          <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                    <template v-if="useMinCreactiondate">
+                      <div class="columns is-mobile mb-0 mt-3">
+                        <div class="column pr-1">
+                            <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                        </div>
+                        <div class="column pl-1" style="flex: 0 0 auto;">
+                          <b-select v-model="timeUnit" :placeholder="$t('unit')">
+                              <option value="days">{{ $tc('day', 0) }}</option>
+                              <option value="hours">{{ $tc('hour', 0) }}</option>
+                              <option value="minutes">{{ $tc('minute', 0) }}</option>
+                          </b-select>
+                        </div>
                       </div>
-                      <div class="column pl-1" style="flex: 0 0 auto;">
-                        <b-select v-model="timeUnit" :placeholder="$t('unit')">
-                            <option value="days">{{ $tc('day', 0) }}</option>
-                            <option value="hours">{{ $tc('hour', 0) }}</option>
-                            <option value="minutes">{{ $tc('minute', 0) }}</option>
-                        </b-select>
-                      </div>
-                    </div>
-                    <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
-                    <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
-                  </template>
-                </toggle-box>
+                      <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                      <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                    </template>
+                  </toggle-box>
+                </div>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
         </div>
       </div>
     </div>

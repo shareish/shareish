@@ -157,28 +157,28 @@
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pr-1 pl-1">
-                    <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-primary" class="w-100">
+                    <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-info" class="w-100">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'geoLocation'"
                           :outlined="locationTypeChosen !== 'geoLocation'"
                           :disabled="locationTypeChosen !== 'geoLocation' && locationLoading"
                           :loading="locationTypeChosen === 'geoLocation' && locationLoading"
-                          type="is-primary"
+                          type="is-info"
                       >
                         <i class="fas fa-street-view"></i>
                       </b-button>
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pl-1">
-                    <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-info" class="w-100">
+                    <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-primary" class="w-100">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'refLocation'"
                           :outlined="locationTypeChosen !== 'refLocation'"
                           :disabled="locationTypeChosen !== 'refLocation' && locationLoading"
                           :loading="locationTypeChosen === 'refLocation' && locationLoading"
-                          type="is-info"
+                          type="is-primary"
                       >
                         <i class="fas fa-home"></i>
                       </b-button>
