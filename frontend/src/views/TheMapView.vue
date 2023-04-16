@@ -1,254 +1,278 @@
 <template>
   <div id="page-map">
-    <div class="columns">
-      <div class="column">
-        <div id="filters">
-          <div class="title has-background-primary p-3 is-size-4 has-text-white">{{ $tc('filter', 0) }}</div>
-          <div class="list">
-            <div class="search">
-              <template v-if="windowWidth >= 1024">
-                <b-field :label="$t('search')">
-                  <b-input
-                      v-model="searchString"
-                      :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
-                </b-field>
-              </template>
-              <div v-else class="columns is-mobile">
-                <div class="column pr-2">
-                  <b-field :label="$t('search')">
-                    <b-input
-                        v-model="searchString"
-                        :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
-                  </b-field>
-                </div>
-                <div class="column pl-1" style="flex-grow: 0; padding-top: calc(24px + 0.5rem + 0.75rem);">
-                  <b-button
-                      type="is-primary"
-                      :outlined="!isMoreFiltersOpened"
-                      @click="isMoreFiltersOpened = !isMoreFiltersOpened">
-                    <template v-if="!isMoreFiltersOpened">
-                      <template v-if="windowWidth >= 400">
-                        {{ $t('show-filters') }}<i class="fas fa-chevron-down ml-2" style="margin-top: -1px; vertical-align: middle;"></i>
-                      </template>
-                      <template v-else>
-                        <i class="fas fa-plus"></i>
-                      </template>
-                    </template>
-                    <template v-else>
-                      <template v-if="windowWidth >= 400">
-                        {{ $t('hide-filters') }}<i class="fas fa-chevron-up ml-2"></i>
-                      </template>
-                      <template v-else>
-                        <i class="fas fa-times"></i>
-                      </template>
-                    </template>
-                  </b-button>
-                </div>
-              </div>
-            </div>
-            <div class="other-filters mt-4" :class="{'is-opened': windowWidth >= 1024 || isMoreFiltersOpened}">
-              <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
-                <template v-if="windowWidth >= 768 && windowWidth < 1024">
-                  <div class="columns is-mobile">
-                    <div class="column pr-2">
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                          <span>{{ $t('donation') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                    </div>
-                    <div class="column pr-2 pl-2">
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                          <span>{{ $t('request') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                    </div>
-                    <div class="column pr-2 pl-2">
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                          <span>{{ $t('loan') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                    </div>
-                    <div class="column pl-2">
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                          <span>{{ $t('event') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                    </div>
-                  </div>
-                </template>
-                <template v-else>
-                  <b-field class="mb-1">
-                    <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                      <span>{{ $t('donation') }}</span>
-                    </b-checkbox-button>
-                  </b-field>
-                  <b-field class="mb-1">
-                    <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                      <span>{{ $t('request') }}</span>
-                    </b-checkbox-button>
-                  </b-field>
-                  <b-field class="mb-1">
-                    <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                      <span>{{ $t('loan') }}</span>
-                    </b-checkbox-button>
-                  </b-field>
-                  <b-field class="mb-1">
-                    <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                      <span>{{ $t('event') }}</span>
-                    </b-checkbox-button>
-                  </b-field>
-                </template>
-              </toggle-box>
-              <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
-                <div v-if="searchCategories.length > 0" id="selected-categories">
-                  <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
-                  <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
-                    <div class="column name">{{ getCategory(category) }}</div>
-                    <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
-                  </div>
-                </div>
-                <template v-else>
-                  <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
-                </template>
-                <category-selector v-model="selectedCategory" expanded />
-              </toggle-box>
-              <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
-                <b-field :label="$t('from')">
-                  <b-datetimepicker
-                      v-model="searchAvailabilityFrom"
-                      icon="calendar"
-                      :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
-                      icon-right-clickable
-                      @icon-right-click="searchAvailabilityFrom = null"
-                      icon-pack="fas"
-                      :locale="$i18n.locale"
-                  />
-                </b-field>
-                <b-field :label="$t('until')">
-                  <b-datetimepicker
-                      v-model="searchAvailabilityUntil"
-                      icon="calendar"
-                      :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
-                      icon-right-clickable
-                      @icon-right-click="searchAvailabilityUntil = null"
-                      icon-pack="fas"
-                      :locale="$i18n.locale"
-                  />
-                </b-field>
-              </toggle-box>
-              <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
-                <b-field>
-                  <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
-                </b-field>
-                <b-field>
-                  <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
-                </b-field>
-                <template v-if="useMinCreactiondate">
-                  <div class="columns is-mobile mb-0 mt-3">
-                    <div class="column pr-1">
-                        <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
-                    </div>
-                    <div class="column pl-1" style="flex: 0 0 auto;">
-                      <b-select v-model="timeUnit" :placeholder="$t('unit')">
-                          <option value="days">{{ $tc('day', 0) }}</option>
-                          <option value="hours">{{ $tc('hour', 0) }}</option>
-                          <option value="minutes">{{ $tc('minute', 0) }}</option>
-                      </b-select>
-                    </div>
-                  </div>
-                  <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
-                  <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
-                </template>
-              </toggle-box>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="column">
-        <l-map
-            :bounds.sync="bounds"
-            :center.sync="leafletCenter"
-            :zoom.sync="zoom"
-            id="leaflet-map"
-            @update:bounds="boundsUpdated"
-        >
-          <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
-          <l-control position="topright">
-            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-primary" :delay="1000">
-              <b-button type="is-primary" @click="setCenterAtGeoLocation">
+    <div id="map-surrounding">
+      <l-map
+          :bounds.sync="bounds"
+          :center.sync="leafletCenter"
+          :zoom.sync="zoom"
+          id="leaflet-map"
+          @update:bounds="boundsUpdated"
+      >
+        <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
+        <l-control position="topright">
+          <div class="is-flex is-flex-direction-column">
+            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-primary" class="w-100 mt-1">
+              <b-button type="is-primary" @click="setCenterAtGeoLocation" expanded>
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" :delay="1000">
-              <b-button type="is-info ml-2" @click="setCenterAtRefLocation">
+            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-100 mt-1">
+              <b-button type="is-info" @click="setCenterAtRefLocation" expanded>
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-danger" :delay="1000">
-              <b-button type="is-danger ml-2" @click="openSettingsModal">
+            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-danger" class="w-100 mt-1">
+              <b-button type="is-danger" @click="openFlap('settings')" expanded>
                 <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
-          </l-control>
-          <l-control position="bottomleft">
-            <div class="control-loading">
-              <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
-            </div>
-            <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
-              {{ $t('too-small-zoom') }}
-            </div>
-          </l-control>
+            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-warning" class="w-100 mt-1">
+              <b-button type="is-warning" @click="openFlap('filters')" expanded>
+                <i class="fas fa-sort"></i>
+              </b-button>
+            </b-tooltip>
+          </div>
+        </l-control>
+        <l-control position="bottomleft">
+          <div class="control-loading">
+            <i v-show="mapLoading" class="fas fa-spinner fa-2x fa-pulse"></i>
+          </div>
+          <div v-show="zoom < minZoomToShowElements" class="control-zoom-info leaflet-control-attribution">
+            {{ $t('too-small-zoom') }}
+          </div>
+        </l-control>
 
-          <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
-          <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
+        <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
+        <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
 
-          <l-layer-group v-if="zoom >= minZoomToShowElements">
-            <v-marker-cluster :options="markerClusterGroupOptions">
-              <l-marker
-                  v-for="item in items"
-                  :key="item.id"
-                  :ref="'marker-item-' + item.id"
-                  :icon="item.icon"
-                  :lat-lng="item.location.leafletLatLng"
-              >
-                <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-                  <item-map-popup :item="item" />
-                </l-popup>
-              </l-marker>
+        <l-layer-group v-if="zoom >= minZoomToShowElements">
+          <v-marker-cluster :options="markerClusterGroupOptions">
+            <l-marker
+                v-for="item in items"
+                :key="item.id"
+                :ref="'marker-item-' + item.id"
+                :icon="item.icon"
+                :lat-lng="item.location.leafletLatLng"
+            >
+              <l-popup :options="{className:'item-popup', maxWidth: '500'}">
+                <item-map-popup :item="item" />
+              </l-popup>
+            </l-marker>
+          </v-marker-cluster>
+        </l-layer-group>
+        <l-feature-group v-if="zoom >= minZoomToShowElements">
+          <l-layer-group>
+            <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
+              <template v-for="extraCategory in user.map_ecats">
+                <l-marker
+                    v-for="marker in extraCategories[extraCategory.category].markers"
+                    :key="marker.id"
+                    :icon="extraCategoriesIcons[extraCategories[extraCategory.category].id]"
+                    :lat-lng="marker.location.leafletLatLng"
+                    :visible="extraCategory.selected"
+                >
+                  <l-popup>
+                    <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
+                    <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
+                    <div v-if="marker.description">{{ marker.description }}</div>
+                    <div class="is-grey is-size-7 has-text-right is-italic">
+                      <a :href="getMarkerURL(extraCategory.category, marker.id)" target="_blank">
+                        <span><i class="fas fa-external-link-alt"></i></span>
+                        <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      </a>
+                    </div>
+                  </l-popup>
+                </l-marker>
+              </template>
             </v-marker-cluster>
           </l-layer-group>
-          <l-feature-group v-if="zoom >= minZoomToShowElements">
-            <l-layer-group>
-              <v-marker-cluster :options="extraLayersMarkerClusterGroupOptions">
-                <template v-for="extraCategory in user.map_ecats">
-                  <l-marker
-                      v-for="marker in extraCategories[extraCategory.category].markers"
-                      :key="marker.id"
-                      :icon="extraCategoriesIcons[extraCategories[extraCategory.category].id]"
-                      :lat-lng="marker.location.leafletLatLng"
-                      :visible="extraCategory.selected"
-                  >
-                    <l-popup>
-                      <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
-                      <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
-                      <div v-if="marker.description">{{ marker.description }}</div>
-                      <div class="is-grey is-size-7 has-text-right is-italic">
-                        <a :href="getMarkerURL(extraCategory.category, marker.id)" target="_blank">
-                          <span><i class="fas fa-external-link-alt"></i></span>
-                          <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
-                        </a>
+        </l-feature-group>
+      </l-map>
+      <div id="flap">
+        <div class="inner">
+          <template v-if="flapSelected === 'settings'">
+            <header class="is-flex">
+              <h2 class="title">Overpass & Falling Fruit</h2>
+              <b-button
+                  type="is-dark"
+                  outlined
+                  class="close"
+                  @click="closeFlap"
+              >
+                <i class="fas fa-times"></i>
+              </b-button>
+            </header>
+            <div class="content">
+              <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
+              <div class="columns buttons m-0 mb-4">
+                <div class="column p-0 pr-2">
+                  <b-button expanded type="is-primary" @click="selectAll">{{ $t('select-all') }}</b-button>
+                </div>
+                <div class="column p-0 pl-2">
+                  <b-button expanded type="is-danger" @click="deselectAll">{{ $t('deselect-all') }}</b-button>
+                </div>
+              </div>
+              <div id="ecats-checkboxes" class="columns is-flex-wrap-wrap m-0">
+                <div v-for="(extraCategory, index) in user.map_ecats" :key="index" class="column is-half p-0 pb-2" :class="{'pr-2': index % 2 === 0, 'pl-2': index % 2 !== 0}">
+                  <b-field>
+                    <b-checkbox v-model="ecatsCheckboxes" :native-value="extraCategory.category" type="is-primary">
+                      {{ $tc('map_ecat_' + extraCategory.category, 0) }}
+                    </b-checkbox>
+                  </b-field>
+                </div>
+              </div>
+              <div class="buttons mt-3 is-flex is-justify-content-center">
+                <b-button
+                    :label="$t('save')"
+                    type="is-primary"
+                    :loading="waitingFormResponse"
+                    @click="saveExtraCategories"
+                />
+              </div>
+            </div>
+          </template>
+          <template v-else-if="flapSelected === 'filters'">
+          <header class="is-flex">
+            <h2 class="title">{{ $tc('filter', 0) }}</h2>
+            <b-button
+                type="is-dark"
+                outlined
+                class="close"
+                @click="closeFlap"
+            >
+              <i class="fas fa-times"></i>
+            </b-button>
+          </header>
+          <div class="content">
+            <div id="filters">
+              <div class="search">
+                <b-field :label="$t('search')">
+                  <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
+                </b-field>
+              </div>
+              <div class="other-filters mt-4">
+                <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
+                  <template v-if="windowWidth >= 768 && windowWidth < 1024">
+                    <div class="columns is-mobile">
+                      <div class="column pr-2">
+                        <b-field class="mb-1">
+                          <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                            <span>{{ $t('donation') }}</span>
+                          </b-checkbox-button>
+                        </b-field>
                       </div>
-                    </l-popup>
-                  </l-marker>
-                </template>
-              </v-marker-cluster>
-            </l-layer-group>
-          </l-feature-group>
-        </l-map>
+                      <div class="column pr-2 pl-2">
+                        <b-field class="mb-1">
+                          <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                            <span>{{ $t('request') }}</span>
+                          </b-checkbox-button>
+                        </b-field>
+                      </div>
+                      <div class="column pr-2 pl-2">
+                        <b-field class="mb-1">
+                          <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                            <span>{{ $t('loan') }}</span>
+                          </b-checkbox-button>
+                        </b-field>
+                      </div>
+                      <div class="column pl-2">
+                        <b-field class="mb-1">
+                          <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                            <span>{{ $t('event') }}</span>
+                          </b-checkbox-button>
+                        </b-field>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <b-field class="mb-1">
+                      <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
+                        <span>{{ $t('donation') }}</span>
+                      </b-checkbox-button>
+                    </b-field>
+                    <b-field class="mb-1">
+                      <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
+                        <span>{{ $t('request') }}</span>
+                      </b-checkbox-button>
+                    </b-field>
+                    <b-field class="mb-1">
+                      <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
+                        <span>{{ $t('loan') }}</span>
+                      </b-checkbox-button>
+                    </b-field>
+                    <b-field class="mb-1">
+                      <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
+                        <span>{{ $t('event') }}</span>
+                      </b-checkbox-button>
+                    </b-field>
+                  </template>
+                </toggle-box>
+                <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
+                  <div v-if="searchCategories.length > 0" id="selected-categories">
+                    <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
+                    <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
+                      <div class="column name">{{ getCategory(category) }}</div>
+                      <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
+                    </div>
+                  </div>
+                  <template v-else>
+                    <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
+                  </template>
+                  <category-selector v-model="selectedCategory" expanded />
+                </toggle-box>
+                <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
+                  <b-field :label="$t('from')">
+                    <b-datetimepicker
+                        v-model="searchAvailabilityFrom"
+                        icon="calendar"
+                        :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
+                        icon-right-clickable
+                        @icon-right-click="searchAvailabilityFrom = null"
+                        icon-pack="fas"
+                        :locale="$i18n.locale"
+                    />
+                  </b-field>
+                  <b-field :label="$t('until')">
+                    <b-datetimepicker
+                        v-model="searchAvailabilityUntil"
+                        icon="calendar"
+                        :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
+                        icon-right-clickable
+                        @icon-right-click="searchAvailabilityUntil = null"
+                        icon-pack="fas"
+                        :locale="$i18n.locale"
+                    />
+                  </b-field>
+                </toggle-box>
+                <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
+                  <b-field>
+                    <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
+                  </b-field>
+                  <b-field>
+                    <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
+                  </b-field>
+                  <template v-if="useMinCreactiondate">
+                    <div class="columns is-mobile mb-0 mt-3">
+                      <div class="column pr-1">
+                          <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
+                      </div>
+                      <div class="column pl-1" style="flex: 0 0 auto;">
+                        <b-select v-model="timeUnit" :placeholder="$t('unit')">
+                            <option value="days">{{ $tc('day', 0) }}</option>
+                            <option value="hours">{{ $tc('hour', 0) }}</option>
+                            <option value="minutes">{{ $tc('minute', 0) }}</option>
+                        </b-select>
+                      </div>
+                    </div>
+                    <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                    <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+                  </template>
+                </toggle-box>
+              </div>
+            </div>
+          </div>
+        </template>
+        </div>
       </div>
     </div>
   </div>
@@ -283,7 +307,6 @@ import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import moment from "moment";
 import {categories} from "@/categories";
-import TheMapSettingsModal from "@/components/TheMapSettingsModal.vue";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -314,6 +337,10 @@ export default {
       zoom: 14,
       preLeafletCenter: new LatLng(50.6450944, 5.5736112),
       leafletCenter: new LatLng(50.6450944, 5.5736112),
+      flapOpened: false,
+      flapSelected: null,
+      ecatsCheckboxes: [],
+      waitingFormResponse: false,
 
       isMoreFiltersOpened: false,
       bounds: null,
@@ -446,6 +473,11 @@ export default {
     await this.updateGeoLocation();
     await this.fetchUser();
 
+    for (const i in this.user.map_ecats) {
+      if (this.user.map_ecats[i].selected === true)
+        this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
+    }
+
     if (this.geoLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.geoLocation.leafletLatLng;
     else if (this.refLocation instanceof GeolocationCoords)
@@ -510,6 +542,46 @@ export default {
   methods: {
     ucfirst,
     lcall,
+    async saveExtraCategories() {
+      this.waitingFormResponse =  true;
+
+      try {
+        const data = {};
+        data['map_ecats'] = []
+        for (const [index, extraCategory] of Object.entries(this.user.map_ecats))
+          data['map_ecats'].push({
+            'category': extraCategory.category,
+            'selected': this.ecatsCheckboxes.includes(extraCategory.category)
+          });
+
+        await axios.patch(`/api/v1/webusers/${this.userId}/`, data);
+
+        this.$buefy.snackbar.open({
+          duration: 5000,
+          type: 'is-success',
+          message: this.$t('map-settings-saved'),
+          pauseOnHover: true,
+          queue: false
+        });
+
+        for (const i in this.user.map_ecats)
+          this.user.map_ecats[i].selected = this.ecatsCheckboxes.includes(this.user.map_ecats[i].category);
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+
+      this.waitingFormResponse =  false;
+    },
+    selectAll() {
+      for (const i in this.user.map_ecats) {
+        if (!this.ecatsCheckboxes.includes(this.user.map_ecats[i].category))
+          this.ecatsCheckboxes.push(this.user.map_ecats[i].category);
+      }
+    },
+    deselectAll() {
+      this.ecatsCheckboxes = [];
+    },
     updateSearchMinCreationdate() {
       this.minCreationdate = this.getMinCreationdate();
 
@@ -604,16 +676,23 @@ export default {
       else
         this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
     },
-    openSettingsModal() {
-      this.$buefy.modal.open({
-        parent: this,
-        props: {
-          map_ecats: this.user.map_ecats,
-        },
-        component: TheMapSettingsModal,
-        hasModalCard: true,
-        trapFocus: true
-      });
+    openFlap(name) {
+      this.flapOpened = true;
+      this.flapSelected = name;
+
+      const flap = this.$el.querySelector("#flap");
+      if (name === 'settings') {
+        flap.style.width = "550px";
+      } else if (name === 'filters') {
+        flap.style.width = "450px";
+      }
+      flap.style.left = "calc(100% - " + flap.style.width + " - 2 * 0.5rem)";
+    },
+    closeFlap() {
+      if (this.flapOpened) {
+        const flap = this.$el.querySelector("#flap");
+        flap.style.left = "100%";
+      }
     },
     async fetchRoutedItem() {
       try {
@@ -777,29 +856,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$filtersWidth: 400px;
-
-#page-map > .columns > .column:first-child {
-  flex: 0 0 $filtersWidth;
-  max-width: $filtersWidth;
-}
-
-#filters {
-  border-radius: 5px;
-  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
-  max-width: calc(#{$filtersWidth} - 2 * 0.75rem);
-
-  .title {
-    margin-bottom: 0;
-    border-radius: 5px 5px 0 0;
-  }
-
-  .list {
-    padding: 0.75rem;
-    border-radius: 0 0 5px 5px;
-  }
-}
-
 #selected-categories {
   .selected-category {
     padding: 0;
@@ -809,7 +865,6 @@ $filtersWidth: 400px;
     border-radius: 5px;
 
     .column.name {
-      flex: 0 0 calc(400px - 0.75rem * 6 - 40px - 2px);
       padding: 10px;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -833,42 +888,6 @@ $filtersWidth: 400px;
   }
 }
 
-@media screen and (max-width: 1215px) and (min-width: 1024px) {
-  $filtersWidth: 360px;
-
-  #page-map > .columns > .column:first-child {
-      flex: 0 0 $filtersWidth;
-      max-width: $filtersWidth;
-  }
-}
-
-@media screen and (max-width: 1023px) {
-  $filtersWidth: 100%;
-
-  #page-map > .columns {
-    display: block;
-
-    & > .column:first-child {
-      flex: 0 0 $filtersWidth;
-      max-width: $filtersWidth;
-    }
-  }
-
-  #filters {
-    min-width: $filtersWidth;
-
-    .other-filters:not(.is-opened) {
-      display: none;
-    }
-  }
-}
-
-@media screen and (max-width: 499px) {
-  #filters {
-    margin-bottom: 0.25rem;
-  }
-}
-
 #leaflet-map {
   min-height: 800px;
   height: v-bind(leafletMapHeight);
@@ -882,5 +901,37 @@ $filtersWidth: 400px;
 .control-zoom-info {
   margin-left: -10px;
   margin-bottom: -10px;
+}
+
+#map-surrounding {
+  position: relative;
+  overflow: hidden;
+}
+
+#flap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  margin: 0.5rem;
+  z-index: 1;
+  transition: left 0.25s;
+
+  .inner {
+    padding: 1.25rem;
+    background-color: #fff;
+    overflow: auto;
+    border-radius: 5px;
+
+    .title {
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+    }
+
+    .close {
+      flex: 0 0 auto;
+    }
+  }
 }
 </style>

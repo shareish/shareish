@@ -79,7 +79,7 @@
                 <b-button
                     :disabled="itemHasEnded"
                     type="is-primary"
-                    style="width: 100%;"
+                    class="w-100"
                     @click="startConversation"
                 >
                   <i class="far fa-envelope mr-1"></i>
@@ -90,7 +90,7 @@
                 <b-button
                     type="is-primary"
                     outlined
-                    style="width: 100%;"
+                    class="w-100"
                     @click="scrollToComments"
                 >
                   <i class="fas fa-comments mr-1"></i>
@@ -213,7 +213,7 @@ import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
-import {GeolocationCoords, scrollParentToChild} from "@/functions";
+import {GeolocationCoords, isNotEmptyString, scrollParentToChild} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -260,9 +260,6 @@ export default {
     notAvailableYet() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
-    itemHasNotEndedYet() {
-      return !this.item.enddate || new Date(this.item.enddate) > Date.now();
-    },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     }
@@ -271,6 +268,7 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
+
           const params = {
             'view_date': new Date()
           };
@@ -375,7 +373,7 @@ export default {
       this.textareaRows = commentRows;
     },
     async sendComment() {
-      if (this.commentToSend !== "") {
+      if (isNotEmptyString(this.commentToSend)) {
         this.waitingFormResponse = true;
         try {
           const data = {

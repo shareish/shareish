@@ -67,6 +67,14 @@ export const isNumber = function(n) {
     return isInt(n) || isFloat(n);
 }
 
+export const isString = function (s) {
+  return typeof s === 'string' || s instanceof String;
+}
+
+export const isNotEmptyString = function (s) {
+  return isString(s) && s !== "";
+}
+
 export const ucfirst = function (s) {
   return s[0].toUpperCase() + s.slice(1);
 }

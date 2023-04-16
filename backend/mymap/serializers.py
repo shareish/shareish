@@ -35,24 +35,24 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
-            'map_ecats'
+            'map_ecats', 'save_item_viewing'
         ]
 
     def validate(self, data):
         errors = {}
 
         # Check Facebook url
-        if data.get('facebook_url') != "":
+        if 'facebook_url' in data and isinstance(data['facebook_url'], str) and data['facebook_url'] != "":
             facebook_regex = r"^((http[s]?:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
-            if not re.match(facebook_regex, data.get('facebook_url')):
+            if not re.match(facebook_regex, data['facebook_url']):
                 errors['facebook_url'] = "Facebook profile/url is invalid."
 
         # Check Instagram url
-        if data.get('instagram_url') != "":
+        if 'instagram_url' in data and isinstance(data['instagram_url'], str) and data['instagram_url'] != "":
             instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
-            if not re.match("^" + instagram_username_regex + "$", data.get('instagram_url')):
+            if not re.match("^" + instagram_username_regex + "$", data['instagram_url']):
                 instagram_regex = r"((http[s]?:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "(\/|(\?=.+))?"
-                if not re.match("^" + instagram_regex + "$", data.get('instagram_url')):
+                if not re.match("^" + instagram_regex + "$", data['instagram_url']):
                     errors['instagram_url'] = "Instagram profile/url is invalid."
 
         if len(errors) > 0:

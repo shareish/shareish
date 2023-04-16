@@ -137,7 +137,7 @@
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import {categories} from "@/categories";
-import {scrollParentToChild, rem, isArrEmpty} from "@/functions";
+import {scrollParentToChild, rem, isArrEmpty, isNotEmptyString} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
@@ -381,7 +381,7 @@ export default {
       }
     },
     sendMessage() {
-      if (this.isConversationSelected && this.messageToSend !== "") {
+      if (this.isConversationSelected && isNotEmptyString(this.messageToSend)) {
         this.waitingFormResponse = true;
         try {
           const data = {

@@ -143,7 +143,7 @@
               <toggle-box :title="$t('location')" outlined :title-size="6" class="mt-3">
                 <div class="columns is-mobile mb-2">
                   <div class="column is-one-third pr-1">
-                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" type="is-danger" style="width: 100%;">
+                    <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" type="is-danger" class="w-100">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'none'"
@@ -157,7 +157,7 @@
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pr-1 pl-1">
-                    <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-primary" style="width: 100%;">
+                    <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-primary" class="w-100">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'geoLocation'"
@@ -171,7 +171,7 @@
                     </b-tooltip>
                   </div>
                   <div class="column is-one-third pl-1">
-                    <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-info" style="width: 100%;">
+                    <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-info" class="w-100">
                       <b-button
                           expanded
                           @click="locationTypeChosen = 'refLocation'"
@@ -276,7 +276,7 @@ import axios from "axios";
 import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords, lcall, ucfirst} from "@/functions";
+import {GeolocationCoords, isNotEmptyString, lcall, ucfirst} from "@/functions";
 import ToggleBox from "@/components/ToggleBox.vue";
 import CategorySelector from "@/components/CategorySelector.vue";
 import {categories} from "@/categories";
@@ -567,7 +567,7 @@ export default {
       return null;
     },
     async fetchGeolocation(address) {
-      if (address !== null && address !== "") {
+      if (isNotEmptyString(address)) {
         try {
           const formData = new FormData();
           formData.append('address', address);
@@ -580,7 +580,7 @@ export default {
       return null;
     },
     async updateGeolocationFromAddress() {
-      if (this.address !== "") {
+      if (isNotEmptyString(this.address)) {
         const geolocation = await this.fetchGeolocation(this.address);
         if (geolocation !== null)
           this.searchLocation = new GeolocationCoords(geolocation)
