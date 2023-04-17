@@ -36,7 +36,7 @@ export default {
       }
       if (this.windowWidth !== window.innerWidth) {
         this.windowWidth = window.innerWidth;
-        this.windowSize[1] = window.innerHeight;
+        this.windowSize[1] = window.innerWidth;
         windowSizeChanged = true;
         this.windowWidthChanged();
       }

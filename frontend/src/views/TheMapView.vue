@@ -90,7 +90,7 @@
       </l-map>
       <div id="flap">
         <div class="inner">
-          <template v-if="flapSelected === 'settings'">
+          <div v-if="flapSelected === 'settings'" class="settings">
             <header class="is-flex">
               <h2 class="title">{{ $t('settings') }}</h2>
               <b-button
@@ -105,7 +105,7 @@
             <div class="content">
               <h3 class="title is-size-4 mb-1">Overpass & Falling Fruit</h3>
               <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
-              <div class="columns buttons m-0 mb-4">
+              <div class="columns is-mobile buttons m-0 mb-4">
                 <div class="column p-0 pr-2">
                   <b-button expanded type="is-primary" @click="selectAll">{{ $t('select-all') }}</b-button>
                 </div>
@@ -131,8 +131,8 @@
                 />
               </div>
             </div>
-          </template>
-          <template v-else-if="flapSelected === 'filters'">
+          </div>
+          <div v-else-if="flapSelected === 'filters'" class="filters">
             <header class="is-flex">
               <h2 class="title">{{ $tc('filter', 0) }}</h2>
               <b-button
@@ -272,7 +272,7 @@
                 </div>
               </div>
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </div>
@@ -462,7 +462,7 @@ export default {
       geoLocationIcon: blueIcon,
       routedItemLocation: null,
       items: [],
-      leafletMapHeight: "1200px",
+      leafletMapHeight: "800px",
 
       routedItemError: false,
       timeouts: {}
@@ -492,7 +492,10 @@ export default {
     this.mapLoading = false;
   },
   beforeMount() {
-    this.leafletMapHeight = (this.windowHeight - 300) + "px";
+    if (this.windowWidth > 1024)
+      this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 3rem)`;
+    else
+      this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 1.5rem)`;
   },
   computed: {
     params() {
@@ -682,12 +685,17 @@ export default {
       this.flapSelected = name;
 
       const flap = this.$el.querySelector("#flap");
-      if (name === 'settings') {
-        flap.style.width = "550px";
-      } else if (name === 'filters') {
-        flap.style.width = "450px";
+      if (this.windowWidth < 700) {
+        flap.style.width = "calc(100% - 2 * .5rem)";
+        flap.style.left = "0.5rem";
+      } else {
+        if (this.flapSelected === 'settings') {
+          flap.style.width = "550px";
+        } else if (this.flapSelected === 'filters') {
+          flap.style.width = "450px";
+        }
+        flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
       }
-      flap.style.left = "calc(100% - " + flap.style.width + " - 2 * 0.5rem)";
     },
     closeFlap() {
       if (this.flapOpened) {
@@ -849,14 +857,42 @@ export default {
       await this.fetchExtraLayersMakers();
       this.mapLoading = false;
     },
-    windowHeightChanged() {
-      this.leafletMapHeight = (this.windowHeight - 300) + "px";
+    windowSizeChanged() {
+      if (this.windowWidth > 1024) {
+        this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 3rem)`;
+      } else {
+        this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 1.5rem)`;
+
+        if (this.flapOpened) {
+          if (this.windowWidth < 700) {
+            const flap = this.$el.querySelector("#flap");
+            flap.style.width = "calc(100% - 2 * 0.5rem)";
+            flap.style.left = "0.5rem";
+          } else {
+            if (this.flapSelected === 'settings') {
+              flap.style.width = "550px";
+            } else if (this.flapSelected === 'filters') {
+              flap.style.width = "450px";
+            }
+            flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
+          }
+        }
+      }
     }
   }
 }
 </script>
 
+<style>
+@media screen and (max-width: 1023px) {
+  #wrapper > .section {
+    padding: 1.5rem !important;
+  }
+}
+</style>
+
 <style lang="scss" scoped>
+
 #selected-categories {
   .selected-category {
     padding: 0;
@@ -890,7 +926,6 @@ export default {
 }
 
 #leaflet-map {
-  min-height: 800px;
   height: v-bind(leafletMapHeight);
   z-index: 1;
 }
@@ -911,10 +946,9 @@ export default {
 
 #flap {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
   left: 100%;
-  margin: 0.5rem;
   z-index: 1;
   transition: left 0.25s;
 
@@ -923,15 +957,27 @@ export default {
     background-color: #fff;
     overflow: auto;
     border-radius: 5px;
+    max-height: 100%;
 
     .title {
       width: 100%;
-      height: 40px;
       line-height: 40px;
     }
 
     .close {
       flex: 0 0 auto;
+    }
+
+    & > .settings {
+      .content {
+        .columns {
+          display: block;
+
+          & > .column {
+            padding: 0 0 0.5rem 0 !important;
+          }
+        }
+      }
     }
   }
 }
