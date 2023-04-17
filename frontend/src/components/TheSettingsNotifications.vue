@@ -12,10 +12,12 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-button type="is-primary" @click="fetchAddressGeoLoc">
-                  <i class="icon fas fa-map-marker-alt"></i>
-                </b-button>
-                <b-input v-model="internalUser['ref_location']" class="is-expanded ml-2" name="ref_location" type="text" />
+                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
+                  <b-button type="is-info" @click="fetchAddressGeoLoc">
+                    <i class="fas fa-street-view"></i>
+                  </b-button>
+                </b-tooltip>
+                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -106,6 +108,7 @@
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
+import {GeolocationCoords, isNotEmptyString} from "@/functions";
 
 export default {
   name: 'TheSettingsNotifications',
@@ -124,12 +127,14 @@ export default {
       loading: true,
       geoLocation: null,
       internalUser: null,
+      address: "",
       radioGroups: {
         'notif_conversations': String,
         'notif_events': String,
         'notif_items': String
       },
-      waitingFormResponse: false
+      waitingFormResponse: false,
+      timeouts: {}
     }
   },
   async created() {
@@ -137,20 +142,29 @@ export default {
 
     document.title = 'Shareish | Settings: Notifications';
 
-    this.internalUser = {...this.user};
+    this.internalUser = {
+      'dwithin_notifications': this.user.dwithin_notifications,
+      'mail_notif_freq_conversations': this.user.mail_notif_freq_conversations,
+      'mail_notif_freq_events': this.user.mail_notif_freq_events,
+      'mail_notif_freq_items': this.user.mail_notif_freq_items
+    };
+    if (this.user.ref_location !== null) {
+      this.internalUser.ref_location = new GeolocationCoords(this.user.ref_location);
+      this.address = await this.fetchAddress(this.internalUser.ref_location);
+    } else {
+      this.internalUser.ref_location = null;
+    }
 
     this.radioGroups.notif_conversations = this.internalUser.mail_notif_freq_conversations;
     this.radioGroups.notif_events = this.internalUser.mail_notif_freq_events;
     this.radioGroups.notif_items = this.internalUser.mail_notif_freq_items;
-
-    this.fetchAddress(this.internalUser.ref_location);
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
-          this.geoLocation = position;
+          this.geoLocation = new GeolocationCoords(position);
         },
         null,
         {
@@ -165,55 +179,76 @@ export default {
   },
   methods: {
     async fetchAddressGeoLoc() {
-      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoLocation !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
-        this.fetchAddress(geoLocPoint);
-      } else {
+      if (this.geoLocation instanceof GeolocationCoords)
+        this.address = await this.fetchAddress(this.geoLocation);
+      else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-      }
     },
     async fetchAddress(location) {
-      if (location !== null) {
+      if (location instanceof GeolocationCoords) {
         try {
-          this.internalUser.ref_location = (await axios.post("/api/v1/address/", location)).data;
-        } catch (error) {
+          return (await axios.post("/api/v1/address/reverse", location)).data;
+        }
+        catch (error) {
           this.fullErrorHandling(error);
         }
       }
+      return null
+    },
+    async fetchGeolocation(address) {
+      if (isNotEmptyString(address)) {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          return (await axios.post("/api/v1/address", formData)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
     },
     async save() {
       this.waitingFormResponse = true;
 
-      let result = await this.$validator.validateAll();
-      if (result) {
-        try {
-          this.internalUser.mail_notif_freq_conversations = this.radioGroups.notif_conversations;
-          this.internalUser.mail_notif_freq_events = this.radioGroups.notif_events;
-          this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
+      clearTimeout(this.timeouts['save']);
+      this.timeouts['save'] = setTimeout(async () => {
+        let result = await this.$validator.validateAll();
+        if (result) {
+          try {
+            if (isNotEmptyString(this.address)) {
+              const newRefLocation = await this.fetchGeolocation(this.address);
+              if (newRefLocation !== null) {
+                this.internalUser.ref_location = new GeolocationCoords(newRefLocation);
+                this.address = await this.fetchAddress(this.internalUser.ref_location);
+              } else {
+                this.internalUser.ref_location = null;
+              }
+            } else {
+              this.internalUser.ref_location = null;
+            }
 
-          let tempUser = {...this.internalUser}
-          delete tempUser.images;
-          delete tempUser.items;
+            this.internalUser.mail_notif_freq_conversations = this.radioGroups.notif_conversations;
+            this.internalUser.mail_notif_freq_events = this.radioGroups.notif_events;
+            this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
 
-          this.internalUser = (await axios.patch("/api/v1/webusers/me/", tempUser)).data;
+            await axios.patch("/api/v1/webusers/me/", this.internalUser);
+            this.$emit('updateUser', this.internalUser);
 
-          this.$buefy.snackbar.open({
-            duration: 5000,
-            type: 'is-success',
-            message: this.$t('notif-success-user-update'),
-            pauseOnHover: true,
-          });
-
-          this.$emit('updateUser', this.internalUser);
-
-          this.fetchAddress(this.internalUser.ref_location);
-        } catch (error) {
-          this.fullErrorHandling(error);
+            this.$buefy.snackbar.open({
+              duration: 5000,
+              type: 'is-success',
+              message: this.$t('notif-success-user-update'),
+              pauseOnHover: true,
+            });
+          }
+          catch (error) {
+            this.fullErrorHandling(error);
+          }
         }
-      }
 
-      this.waitingFormResponse = false;
+        this.waitingFormResponse = false;
+      }, 400);
     }
   },
   computed: {

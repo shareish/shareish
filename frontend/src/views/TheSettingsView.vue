@@ -54,7 +54,6 @@ export default {
     return {
       loading: true,
       user: null,
-      geoLocation: null,
       currentView: null,
       possibleViews: ['profile', 'account', 'notifications']
     }
@@ -72,22 +71,6 @@ export default {
 
     await this.fetchUser();
 
-    // Has the user activated geolocation?
-    if ('geolocation' in navigator) {
-      // Get the position
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          this.geoLocation = position;
-        },
-        null,
-        {
-          maximumAge: 10000,
-          timeout: 5000,
-          enableHighAccuracy: true
-        }
-      );
-    }
-
     this.loading = false;
   },
   methods: {
@@ -100,7 +83,8 @@ export default {
       }
     },
     updateUser(user) {
-      this.user = user;
+      for (const [key, value] in user)
+        this.user[key] = value;
     }
   },
   watch: {

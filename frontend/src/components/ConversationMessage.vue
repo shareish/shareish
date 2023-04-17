@@ -80,7 +80,8 @@ export default {
       try {
         await axios.delete(`/api/v1/conversations/messages/${this.message.id}`);
         this.$emit('deleted');
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     },

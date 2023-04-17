@@ -127,10 +127,12 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-button type="is-primary" @click="fetchAddressGeoLoc">
-                  <i class="icon fas fa-map-marker-alt"></i>
-                </b-button>
-                <b-input v-model="location" class="is-expanded ml-2" name="ref_location" type="text" />
+                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
+                  <b-button type="is-info" @click="fetchAddressGeoLoc">
+                    <i class="fas fa-street-view"></i>
+                  </b-button>
+                </b-tooltip>
+                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -202,6 +204,7 @@ import CategorySelector from "@/components/CategorySelector.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
+import {GeolocationCoords} from "@/functions";
 
 export default {
   name: 'TheAddItemView',
@@ -234,7 +237,7 @@ export default {
       category1: '',
       category2: '',
       category3: '',
-      location: "",
+      address: "",
       startdate: null,
       enddate: null,
       isRecurrent: false,
@@ -251,7 +254,7 @@ export default {
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
-          this.geoLocation = position;
+          this.geoLocation = new GeolocationCoords(position);
         },
         null,
         {
@@ -308,8 +311,9 @@ export default {
       if (this.isRecurrentItemUsed) {
         try {
           this.recurrentItem = (await axios.get(`/api/v1/recurrents/${this.recurrentItemId}`)).data;
-          this.setFieldFromRecurrentItem();
-        } catch (error) {
+          await this.setFieldFromRecurrentItem();
+        }
+        catch (error) {
           this.snackbarError(error);
           await this.$router.push("/add-item");
         }
@@ -330,31 +334,30 @@ export default {
           for (const i in images) {
             this.images.push({"filename": images[i].name, 'predictions': [], 'preview': images[i].base64_url, 'probability': 0});
           }
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
 
-        this.fetchAddress(this.recurrentItem.location);
+        this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
     async fetchAddressGeoLoc() {
-      // We need to transform this.geoloc to SRID=4326;POINT (50.695118 5.0868788)
-      if (this.geoLocation !== null) {
-        let geoLocPoint = "SRID=4326;POINT (" + this.geoLocation.coords.latitude + " " + this.geoLocation.coords.longitude + ")";
-        this.fetchAddress(geoLocPoint);
-      } else {
+      if (this.geoLocation !== null)
+        this.address = await this.fetchAddress(this.geoLocation);
+      else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-      }
     },
     async fetchAddress(location) {
-      if (location !== null) {
+      if (location instanceof GeolocationCoords) {
         try {
-          this.location = (await axios.post("/api/v1/address/", location)).data;
+          return (await axios.post("/api/v1/address/reverse", location)).data;
         }
         catch (error) {
           this.fullErrorHandling(error);
         }
       }
+      return null;
     },
     async processImage(file) {
       this.loading = true;
@@ -469,7 +472,7 @@ export default {
             category2: this.category2,
             category3: this.category3,
             description: this.description,
-            location: this.location,
+            location: this.address,
             is_recurrent: this.isRecurrent,
             startdate: startDate,
             enddate: endDate,

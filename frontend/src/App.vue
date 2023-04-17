@@ -102,6 +102,10 @@ export default {
   white-space: pre-wrap;
 }
 
+.wsnw {
+  white-space: nowrap;
+}
+
 .v-align-center {
   position: relative;
 

@@ -7,7 +7,6 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-from django.template.defaulttags import register
 
 from mail_templated import EmailMessage
 

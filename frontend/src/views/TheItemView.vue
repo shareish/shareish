@@ -79,7 +79,7 @@
                 <b-button
                     :disabled="itemHasEnded"
                     type="is-primary"
-                    style="width: 100%;"
+                    class="w-100"
                     @click="startConversation"
                 >
                   <i class="far fa-envelope mr-1"></i>
@@ -90,7 +90,7 @@
                 <b-button
                     type="is-primary"
                     outlined
-                    style="width: 100%;"
+                    class="w-100"
                     @click="scrollToComments"
                 >
                   <i class="fas fa-bullhorn mr-1"></i>
@@ -212,8 +212,7 @@ import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
-import {scrollParentToChild} from "@/functions";
-import {formattedDate, formattedDateFromNow} from "@/functions";
+import {GeolocationCoords, isNotEmptyString, scrollParentToChild, formattedDate, formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -260,9 +259,6 @@ export default {
     notAvailableYet() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     },
-    itemHasNotEndedYet() {
-      return !this.item.enddate || new Date(this.item.enddate) > Date.now();
-    },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
     }
@@ -271,31 +267,38 @@ export default {
     async fetchItem() {
       if (!this.redirection) {
         try {
-          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`)).data;
-          await axios.get(`/api/v1/items/${this.itemId}/increase_hitcount`);
-        } catch (error) {
+
+          const params = {
+            'view_date': new Date()
+          };
+          this.item = (await axios.get(`/api/v1/${this.apiURI}/${this.itemId}/`, {params: params})).data;
+        }
+        catch (error) {
           this.snackbarError(error);
           this.redirection = true;
           await this.$router.push("/items");
         }
       }
     },
-    async fetchAddress() {
+    async fetchAddress(location) {
       if (!this.redirection) {
-        if (this.item.location !== null) {
+        if (location instanceof GeolocationCoords) {
           try {
-            this.address = (await axios.post("/api/v1/address/", this.item.location)).data;
-          } catch (error) {
+            return (await axios.post("/api/v1/address/reverse", location)).data;
+          }
+          catch (error) {
             this.snackbarError(error);
           }
         }
       }
+      return null;
     },
     async fetchUser() {
       if (!this.redirection) {
         try {
           this.user = (await axios.get(`/api/v1/webusers/${this.userId}/`)).data;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
       }
@@ -304,7 +307,8 @@ export default {
       if (!this.redirection) {
         try {
           this.comments = (await axios.get(`/api/v1/items/${this.itemId}/comments/`)).data;
-        } catch (error) {
+        }
+        catch (error) {
           this.snackbarError(error);
         }
       }
@@ -318,7 +322,8 @@ export default {
         }
         const id = (await axios.post("/api/v1/conversations/", data)).data;
         await this.$router.push(`/conversations/${id}`);
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     },
@@ -343,7 +348,8 @@ export default {
           pauseOnHover: true,
         });
         await this.$router.push("/items");
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));
       }
     },
@@ -362,7 +368,7 @@ export default {
       this.textareaRows = commentRows;
     },
     async sendComment() {
-      if (this.commentToSend !== "") {
+      if (isNotEmptyString(this.commentToSend)) {
         this.waitingFormResponse = true;
         try {
           const data = {
@@ -402,10 +408,11 @@ export default {
   async mounted() {
     this.loading = true;
     await this.fetchItem();
-    await this.fetchAddress();
+    document.title = `Shareish | ${this.item.name}`;
+    if (this.item.location !== null)
+      this.address = await this.fetchAddress(new GeolocationCoords(this.item.location));
     await this.fetchUser();
     await this.fetchComments();
-    document.title = `Shareish | ${this.item.name}`;
     this.loading = false;
   }
 };

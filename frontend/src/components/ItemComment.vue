@@ -59,7 +59,8 @@ export default {
       try {
         await axios.delete(`/api/v1/items/${this.comment.item.id}/comments/${this.comment.id}`);
         this.$emit('deleted');
-      } catch (error) {
+      }
+      catch (error) {
         this.snackbarError(error);
       }
     }

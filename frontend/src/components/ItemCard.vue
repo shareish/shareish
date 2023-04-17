@@ -45,6 +45,10 @@
       </div>
       <div v-if="!recurrentList" class="content">
         <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}</small>
+          <small v-if="notAvailableYet">
+            {{ $t('available') }}
+            {{ formattedDateFromNow(item.startdate) }}
+          </small>
         <small class="is-block" v-if="item.enddate">
           <template v-if="!itemHasEnded">
             {{ $t('ends') }}
@@ -54,7 +58,7 @@
           </template>
           {{ formattedDateFromNow(item.enddate, $i18n.locale) }}
         </small>
-        <small class="is-block" v-if="item.location && this.geoLocation">{{ ucfirst($t('at')) }} &#177; {{ getDistanceFromCoords().toFixed(2) }} km</small>
+        <small class="is-block" v-if="itemLocation && userLocation">{{ ucfirst($t('at')) }} &#177; {{ userLocation.distanceTo(itemLocation).toFixed(2) }} km</small>
       </div>
       <span v-for="category in itemCategories" :key="category.slug" class="icon-text">
         <span class="icon"><i :class="category.icon"></i></span>
@@ -71,7 +75,7 @@
 import ItemTypeTag from "@/components/ItemTypeTag";
 import {categories} from '@/categories';
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {formattedDateFromNow, ucfirst} from "@/functions";
+import {GeolocationCoords, formattedDateFromNow, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -85,33 +89,25 @@ export default {
     recurrentList: {
       type: Boolean,
       default: false
+    },
+    userLocation: {
+      type: Object,
+      required: false
     }
   },
   data() {
     return {
-      geoLocation: null,
+      itemLocation: null,
       linkOnClick: ""
     }
   },
   created() {
-    // Has the user activated geolocation?
-    if ('geolocation' in navigator) {
-      // Get the position
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          this.geoLocation = position;
-        },
-        null,
-        {
-          maximumAge: 10000,
-          timeout: 5000,
-          enableHighAccuracy: true
-        }
-      );
-    }
     const addItemFromLink = {name: 'addItemFrom', params: {id: this.item.id}};
     const itemLink = {name: 'item', params: {id: this.item.id}};
     this.linkOnClick = !this.recurrentList ? itemLink : addItemFromLink;
+
+    if (this.item.location !== null)
+      this.itemLocation = new GeolocationCoords(this.item.location);
   },
   computed: {
     itemCategories() {
@@ -126,6 +122,9 @@ export default {
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
+    },
+    notAvailableYet() {
+      return this.item.startdate && new Date(this.item.startdate) > Date.now();
     }
   },
   methods: {

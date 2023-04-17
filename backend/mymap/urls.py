@@ -3,13 +3,13 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 from .views import (
-    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MapNameAndDescriptionViewSet, MessageViewSet,
+    ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MessageViewSet,
     RecurrentItemViewSet, UserImageViewSet, UserItemViewSet, UserViewSet, ItemCommentViewSet
 )
 
 router = DefaultRouter()
 router.register("items", ItemViewSet, basename='items')
-router.register("items/(?P<item_id>\d+)/comments", ItemCommentViewSet, basename='items_comments')
+router.register(r'items/(?P<item_id>\d+)/comments', ItemCommentViewSet, basename='items_comments')
 router.register("images", ItemImageViewSet, basename='images')
 router.register("webusers", UserViewSet, basename='webusers')
 router.register("conversations", ConversationViewSet, basename='conversations')
@@ -19,20 +19,15 @@ router.register("recurrents", RecurrentItemViewSet, basename='recurrents')
 router.register("actives", ActiveItemViewSet, basename='actives')
 router.register("user_items", UserItemViewSet, basename='user_items')
 router.register("user_image", UserImageViewSet, basename='user_image')
-router.register("mapnd", MapNameAndDescriptionViewSet, basename='mapnd')
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("requestFilter/", views.searchItemFilter, name='search_item_filter'),
-    path("address/", views.getAddress, name='get_address'),
-    path("requestItems/", views.searchItems, name='search_items'),
-    path("predictClass/", views.predictClass, name='predict_class'),
-    path("notifications/", views.getNotifications, name='notifications'),
-    path("items/<int:item_id>/has_images", views.itemHasImage, name='item_has_images'),
-    path("items/<int:item_id>/images/first", views.getItemFirstImage, name='get_item_first_image'),
-    path("items/<int:item_id>/increase_hitcount", views.increaseHitcountItem, name='increase_item_hitcount'),
-    path("items/images/<int:itemimage_id>", views.getItemImage, name='get_item_image'),
-    path("users/images/<int:userimage_id>", views.userImage, name='user_image'),
-    path("users/images/<int:userimage_id>/base64", views.getUserImageBase64, name='get_user_image_base64'),
-    path("items/<int:item_id>/images/base64", views.getItemImagesBase64, name='get_item_images_base64'),
+    path("address", views.get_address, name='get_address'),
+    path("address/reverse", views.get_address_reverse, name='get_address'),
+    path("predictClass/", views.predict_class, name='predict_class'),
+    path("notifications/", views.get_notifications, name='notifications'),
+    path("items/images/<int:itemimage_id>", views.get_item_image, name='get_item_image'),
+    path("users/images/<int:userimage_id>", views.user_image, name='user_image'),
+    path("users/images/<int:userimage_id>/base64", views.get_user_image_base64, name='get_user_image_base64'),
+    path("items/<int:item_id>/images/base64", views.get_item_images_base64, name='get_item_images_base64'),
 ]

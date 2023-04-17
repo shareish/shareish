@@ -3,7 +3,7 @@ import re
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment
+from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, UserMapExtraCategory
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -16,39 +16,62 @@ class UserImageSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserMapExtraCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMapExtraCategory
+        fields = [
+            'id', 'user', 'category', 'selected', 'update_date', 'creation_date'
+        ]
+
+
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
     images = UserImageSerializer(many=True, allow_null=True, default=None)
+    map_ecats = UserMapExtraCategorySerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
-            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images'
+            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
+            'map_ecats', 'save_item_viewing'
         ]
 
     def validate(self, data):
         errors = {}
 
         # Check Facebook url
-        if data.get('facebook_url') != "":
+        if 'facebook_url' in data and isinstance(data['facebook_url'], str) and data['facebook_url'] != "":
             facebook_regex = r"^((http[s]?:\/\/)|(www\.))(www\.)?facebook\.com\/.*$"
-            if not re.match(facebook_regex, data.get('facebook_url')):
+            if not re.match(facebook_regex, data['facebook_url']):
                 errors['facebook_url'] = "Facebook profile/url is invalid."
 
         # Check Instagram url
-        if data.get('instagram_url') != "":
+        if 'instagram_url' in data and isinstance(data['instagram_url'], str) and data['instagram_url'] != "":
             instagram_username_regex = r"([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)"
-            if not re.match("^" + instagram_username_regex + "$", data.get('instagram_url')):
+            if not re.match("^" + instagram_username_regex + "$", data['instagram_url']):
                 instagram_regex = r"((http[s]?:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "(\/|(\?=.+))?"
-                if not re.match("^" + instagram_regex + "$", data.get('instagram_url')):
+                if not re.match("^" + instagram_regex + "$", data['instagram_url']):
                     errors['instagram_url'] = "Instagram profile/url is invalid."
 
         if len(errors) > 0:
             raise serializers.ValidationError(errors)
 
         return data
+
+    def to_representation(self, obj):
+        rep = super(UserSerializer, self).to_representation(obj)
+        new_rep = rep.copy()
+
+        if 'request' in self.context:
+            columns = self.context['request'].query_params.getlist('columns[]')
+            if len(columns) > 0:
+                for column in rep:
+                    if column not in columns:
+                        new_rep.pop(column)
+
+        return new_rep
 
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
@@ -61,11 +84,12 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
     user = UserSerializer(allow_null=True, default=None)
+    hitcount = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
         fields = [
-            'id', 'name', 'description', 'location', 'in_progress', 'is_recurrent', 'creationdate', 'startdate',
+            'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate',
             'enddate', 'type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
         ]
 
@@ -85,7 +109,7 @@ class ItemSerializer(serializers.ModelSerializer):
                 errors['category3'] = "Each category can only be used once."
 
         # Check end date
-        if data.get('startdate') != None and data.get('enddate') != None:
+        if data.get('startdate') is not None and data.get('enddate') is not None:
             if data.get('enddate') <= data.get('startdate'):
                 errors['enddate'] = "The end date can't be earlier or equal to the start date."
 
@@ -93,6 +117,9 @@ class ItemSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return data
+
+    def get_hitcount(self, obj):
+        return ItemView.objects.filter(item=obj).count()
 
 
 class ItemImageSerializer(serializers.ModelSerializer):

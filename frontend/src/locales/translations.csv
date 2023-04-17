@@ -47,6 +47,7 @@ contact,Contact,Contact
 about-us,About us,À propos
 what-are-you-looking-for,What are you looking for?,Que cherchez-vous?
 item-type,Type,Type
+type,Types|Type|Types,Types|Type|Types
 help_add_item,"An element can be of several types (request for good or service, offer for good or service, loan offer, event) but the encoding form is identical. If you want to encode data on public roads such as a public bookcase or a source of drinking water, it is best to use other existing tools for that, see our FAQ on the home page","Un élément peut être de plusieurs types (demande de bien ou service, offre de bien ou service, offre de prêt, évènement) mais le formulaire d'encodage est identique. Si vous voulez encoder une donnée sur la voie publique comme une boîte à livres ou une source d'eau potable, il est préférable d'utiliser les outils prévus pour, voir la FAQ en page d'accueil"
 help_item_type,"Select the item type: a Request when you are looking for something (a good, or a service), Donation for an offer (a good you want to give, or skills you can provide), Loan for a good you can loan, Event for a free and solidarity event","Choisissez le type de l'élément: Requête pour une demande (d'un bien que vous cherchez ou d'un service que vous sollicitez), Don pour une offre (d'un bien que vous voulez donner ou d'un talent dont vous voulez faire profiter quelqu'un), Prêt pour un bien que vous pouvez prêter, Évènement pour un évènement gratuit et solidaire"
 help_item_ihaveimage,"Choose this option if you are able to upload an image that represents the item you want to add (e.g. a picture of a book). It will help others to identify what is your item. Also, the image will be analyzed by an AI algorithm that will try to fill some of the fields to describe your items to ease encoding (e.g. the author and title of the book in the Description field)","Choisissez cette option si vous avez une image qui peut représenter votre élément (par exemple la couverture d'un livre) qui aidera les utilisateurs à mieux identifier votre élement. Aussi, cette image sera utilisée par une intelligence artificielle pour pré-remplir certaines informations pour vous faciliter l'encodage (p.ex. l'auteur et le titre du livre dans le champ Description)"
@@ -61,7 +62,7 @@ events,Events,Évènements
 loan,Loan,Prêt
 loans,Loans,Prêts
 all,All,Tous
-category,Category,Catégorie
+category,Categories|Category|Categories,Catégories|Catégorie|Catégories
 food,Food and Supplies,Aliments et provisions
 animals,Pets and Animals,Animaux de compagnie et animaux
 aee,Arts and Culture and Entertainments,"Arts, culture et divertissements"
@@ -87,24 +88,15 @@ transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Liv
 vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
 other,Other,Autres
 search-dot,Search...,Recherche...
-bookcases,Public bookcases,Boîtes à livres
-bookcase,Public bookcase,Boîte à livre
-defibrillators,Defibrillators,Défibrillateurs
-defibrillator,Defibrillator,Défibrillateur
-give-boxes,Give boxes,Boîtes à dons
-give-box,Give box,Armoire de partage
-drinking-water-spots,Drinking water spots,Points d'eau potable
-drinking-water-spot,Drinking water spot,Point d'eau potable
-free-shops,Free shops,Magasins gratuits
-free-shop,Free shop,Magasin gratuit
-food-sharings,Food Sharing,Frigos solidaires
-food-sharing,Food Sharing,Frigo solidaire
-food-banks,Food Banks,Banques alimentaires
-food-bank,Food Bank,Banque alimentaire
-soup-kitchens,Soup Kitchens, Soupes populaires
-soup-kitchen,Soup Kitchen, Soupe populaire
-falling-fruits,Falling Fruit, Fruits qui tombent
-falling-fruit,Falling Fruit, Fruits qui tombent
+map_ecat_BKC,Public bookcase|Public bookcases,Boîte à livres|Boîtes à livres
+map_ecat_DEF,Defibrillator|Defibrillators,Défibrillateur|Défibrillateurs
+map_ecat_DWS,Drinking water spot|Drinking water spots,Point d'eau potable|Points d'eau potable
+map_ecat_FDB,Food Bank|Food Banks,Banque alimentaire|Banques alimentaires
+map_ecat_FDS,Food Sharing|Food Sharing,Frigo solidaire|Frigos solidaires
+map_ecat_FLF,Falling fruits|Falling fruits,Fruits qui tombent|Fruits qui tombent
+map_ecat_FRS,Free shop|Free shops,Magasin gratuit|Magasins gratuits
+map_ecat_GVB,Give box|Give boxes,Boîte à dons|Boîtes à dons
+map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
 from-osm,details on OpenStreetMap,détails sur OpenStreetMap
 from-ff,details on Falling Fruit,détails sur Falling Fruit
 by,by,par
@@ -169,7 +161,7 @@ instagram-link,Instagram profile,Profil Instagram
 help_instagram,Type the URL of your Instagram account if any,"Entrez l'adresse de votre compte Instagram si existant"
 reflocation,Reference address,Adresse de référence
 help_ref_location,"Address (optional but recommended) to define your neighbordhood, so typically this is your home address.  You can click on the localization button to update it based on your current geolocation. The more precise, the better, but you can discard some details, e.g. you can use either streetname with or without the street number, the city or area name. This information is not visible for others and only used when sending notifications by e-mail.","Adresse (facultative mais conseillée) pour définir votre voisinage, donc typiquement l'adresse de votre logement. Vous pouvez cliquer sur le bouton de localisation pour la mettre à jour sur base de votre localisation courante. Plus l'adresse est précise, mieux c'est mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier. Cette information n'est pas visible pour les autres utilisateurs et uniquement utilisée lors de l'envoi de notifications par e-mail."
-dwithin_notif,Distance (km) of your neighborhood,Rayon (en km) de votre voisinage
+dwithin_notif,Notification radius (in km),Rayon de notification (en km)
 help_dwithin,Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address),Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)
 email,Email,E-mail
 help_email,"Type your e-mail address (mandatory, one account only per e-mail address)", "Entrez votre adresse e-mail (obligatoire, un seul compte par adresse e-mail)"
@@ -195,10 +187,12 @@ post-message,Send message,Envoyer le message
 notif-error-send-message,An error prevented your message to be sent,Une erreur a empêché votre message d'être envoyé
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
-location,Location,Lieu
+location,Location,Localisation
 no-address,No address provided,Pas d'adresse renseignée
 item-availability-from,From,À partir du
 item-availability-until,Until,Jusqu'au
+from,From,À partir du
+until,Until,Jusqu'au
 delete,Delete,Supprimer
 intro-DN-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
 intro-RQ-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
@@ -284,7 +278,59 @@ notif-error-post-comment,An error prevented your comment to be posted,Une erreur
 delete-comment,Delete comment,Supprimer le commentaire
 delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
 comment-deleted,Comment deleted!,Commentaire supprimé!
+leave-a-comment,Leave a comment,Laisser un commentaire
+author,Author,Auteur
+or,or,ou
+searched-categories,Search categories,Catégories recherchées
+no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
+filter,Filter|Filters,Filtre|Filtres
+show-only-unseen,Show only unseen items,N'afficher que les éléments non-vus
+show-filters,Show filters,Afficher les filtres
+hide-filters,Hide filters,Masquer les filtres
+creationdate,Publication date,Date de publication
+startdate,Start date,Date de début
+enddate,End date,Date de fin
+distance,Distance,Distance
+use-geolocation,Use geolocation,Utiliser la géolocalisation
+use-reflocation,Use reference location,Utiliser la localisation de référence
+dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
+or-enter-an-address,Or enter an address,Ou entrez une adresse
+radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
+restrict-distance,Restrict distance,Restreindre la distance
+order-by,Order by,Trier par
+recent-first,Recents first,Récents en premier
+order-by-availability-startdate,Availability (starting date),Disponibilité (date de début)
+order-by-availability-enddate,Availability (ending date),Disponibilité (date de fin)
+closest-distance,Distance (closest),Distance (les plus proches)
+available,Available,Disponible
+corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
+found,found.,trouvé.|trouvés.
+item,item|items,élément|élements
+publication,Publication,Publication
+unit,Unit,Unité
+day,days|day|days,jours|jour|jours
+hour,hours|hour|hours,heures|heure|heures
+minute,minutes|minute|minutes,minutes|minute|minutes
+filter-items-creationdate,Filter items created after a certain date,Filtrer les items créés après une certaine date
+only-items-created-on,Only items created on,Seuls les éléments créés le
+only-items-created-at,Only items created at,Seuls les éléments créés à
+on-day,on,le
+or-later-will-be-showed,or later will be showed,ou plus tard seront affichés
+set-a-reflocation-to-use-feature,You must set a reference location in your settings to use this feature.,Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.
+map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
+define-elements-to-see-on-map,Define what externals elements from Shareish you want to see on the map.,Définissez quels éléments externes à Shareish vous souhaitez afficher sur la carte.
+this-item-doesnt-have-a-location,"This item does not have a location, cannot show it on the map.","Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte."
+select-all,Select all,Sélectionner tout
+deselect-all,Deselect all,Déselectionner tout
+open-map-settings,Open map settings,Ouvrir les paramètres de la carte
+filter-items,Filter items,Filtrer les items
+general-information,General information,Informations générales
+save-items-you-see,Save the items you see on Shareish,Sauvegarder les éléments que vous voyez sur Shareish
+help_save-items-you-see,We save the items you see to improve your experience while browsing our website. This helps us understand how you use it and send you better recommendations in our emails notifications!,Nous enregistrons les items que vous visionnez afin d'améliorer votre expérience sur notre site internet. Cela nous aide à comprendre comme vous l'utilisez et à vous proposer de meilleures recommendations dans nos emails de notification!
+yes,Yes,Oui
+no,No,Non
 send-private-message,Message,Contacter
 leave-comment,Comment,Commenter
 with,with,avec
 start-of-the-conversation,Start of the conversation,Début de la conversation
+

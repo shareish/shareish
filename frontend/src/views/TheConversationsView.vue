@@ -169,7 +169,7 @@
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import {categories} from "@/categories";
-import {scrollParentToChild, rem, isArrEmpty} from "@/functions";
+import {scrollParentToChild, rem, isArrEmpty, isNotEmptyString} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
@@ -401,7 +401,7 @@ export default {
     },
     scrollLastMessageIntoView(messageIndex = "last", position = "bottom", offset = rem(0.75)) {
       if (this.messages.length > 0) {
-        this.$nextTick(function () {
+        this.$nextTick(() => {
           const parent = this.$el.querySelector("#messages");
           const childSelector = (messageIndex === "last") ? "last-child" : "nth-child(" + (messageIndex + 1) + ")";
           const child = this.$el.querySelector("#messages article:" + childSelector);
@@ -453,7 +453,7 @@ export default {
       }
     },
     sendMessage() {
-      if (this.isConversationSelected && this.messageToSend !== "") {
+      if (this.isConversationSelected && isNotEmptyString(this.messageToSend)) {
         this.waitingFormResponse = true;
         try {
           const data = {

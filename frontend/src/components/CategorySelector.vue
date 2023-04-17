@@ -34,7 +34,7 @@ export default {
   computed: {
     label() {
       let category_number = (this.number) ? " " + this.number : "";
-      return this.$t('category') + category_number;
+      return this.$tc('category', 1) + category_number;
     },
     categories() {
       return Object.values(categories);

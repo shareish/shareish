@@ -15,3 +15,4 @@ class Migration(migrations.Migration):
             options={'ordering': ['conversation_id', '-date']},
         ),
     ]
+

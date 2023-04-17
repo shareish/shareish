@@ -9,10 +9,12 @@ def forwards_func(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     Conversation.objects.using(db_alias).update(starter=F('buyer_id'))
 
+
 def reverse_func(apps, schema_editor):
     Conversation = apps.get_model("mymap", "Conversation")
     db_alias = schema_editor.connection.alias
     Conversation.objects.using(db_alias).update(buyer=F('starter_id'))
+
 
 class Migration(migrations.Migration):
 

@@ -103,6 +103,8 @@ class User(AbstractBaseUser):
         default=10,
         help_text="Enter maximum distance for new item and event notifications"
     )
+    save_item_viewing = models.BooleanField(default=True)
+
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
@@ -158,6 +160,35 @@ class UserImage(models.Model):
         ordering = ['user_id', '-id']
 
 
+class UserMapExtraCategories(models.TextChoices):
+    BOOKCASES = 'BKC', _("Public bookcases")
+    DEFIBRILLATORS = 'DEF', _("Defibrillators")
+    DRINKING_WATER_SPOTS = 'DWS', _("Drinking water spots")
+    FOOD_BANKS = 'FDB', _("Food Banks")
+    FOOD_SHARING = 'FDS', _("Food Sharing")
+    FALLING_FRUITS = 'FLF', _("Falling fruits")
+    FREE_SHOPS = 'FRS', _("Free shops")
+    GIVE_BOXES = 'GVB', _("Give boxes")
+    SOUP_KITCHENS = 'SPK', _("Soup Kitchens")
+
+
+class UserMapExtraCategory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='map_ecats', on_delete=models.CASCADE)
+    category = models.CharField(max_length=3, choices=UserMapExtraCategories.choices)
+    selected = models.BooleanField(default=True)
+    update_date = models.DateTimeField(auto_now=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['user_id', 'category']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'category'],
+                name='unique__mymap_usermapextracategory__user_category'
+            )
+        ]
+
+
 class Item(models.Model):
     class ItemType(models.TextChoices):
         DONATION = 'DN', _("Donation")
@@ -197,9 +228,7 @@ class Item(models.Model):
     creationdate = models.DateTimeField(auto_now_add=True)
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
-    in_progress = models.BooleanField(default=True, db_index=True)
     is_recurrent = models.BooleanField(default=False)
-    hitcount = models.IntegerField(verbose_name="Hit Count", default=0)
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
@@ -257,6 +286,19 @@ class ItemComment(models.Model):
         ordering = ['-creationdate']
 
 
+class ItemView(models.Model):
+    item = models.ForeignKey(Item, related_name='item_views', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.CASCADE)
+    view_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(fields=['item', 'user'], name='unique__mymap_itemview__item_user')
+        ]
+
+
 class Conversation(models.Model):
     starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
                                 on_delete=models.CASCADE, null=True)
@@ -271,7 +313,7 @@ class Message(models.Model):
     content = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE, null=True)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE, null=True)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
 
     class Meta:
