@@ -44,7 +44,7 @@
         </div>
       </div>
       <div v-if="!recurrentList" class="content">
-        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate) }}</small>
+        <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}</small>
           <small v-if="notAvailableYet">
             {{ $t('available') }}
             {{ formattedDateFromNow(item.startdate) }}
@@ -56,7 +56,7 @@
           <template v-else>
             {{ $t('ended') }}
           </template>
-          {{ formattedDateFromNow(item.enddate) }}
+          {{ formattedDateFromNow(item.enddate, $i18n.locale) }}
         </small>
         <small class="is-block" v-if="itemLocation && userLocation">{{ ucfirst($t('at')) }} &#177; {{ userLocation.distanceTo(itemLocation).toFixed(2) }} km</small>
       </div>
@@ -73,10 +73,9 @@
 
 <script>
 import ItemTypeTag from "@/components/ItemTypeTag";
-import moment from "moment/moment";
 import {categories} from '@/categories';
 import ErrorHandler from "@/mixins/ErrorHandler";
-import {GeolocationCoords, ucfirst} from "@/functions";
+import {GeolocationCoords, formattedDateFromNow, ucfirst} from "@/functions";
 
 export default {
   name: 'ItemCard',
@@ -130,8 +129,23 @@ export default {
   },
   methods: {
     ucfirst,
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
+    formattedDateFromNow,
+    deg2rad(deg) {
+      return deg * (Math.PI / 180)
+    },
+    getDistanceFromCoords() {
+      let latLong = this.item['location'].slice(17, -1).split(' ');
+      let lat2 = latLong[0];
+      let lon2 = latLong[1];
+      let R = 6371; // Radius of the earth in km
+      let dLat = this.deg2rad(lat2 - this.geoLocation.coords.latitude);  // deg2rad below
+      let dLon = this.deg2rad(lon2 - this.geoLocation.coords.longitude);
+      let a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(this.deg2rad(this.geoLocation.coords.latitude)) * Math.cos(this.deg2rad(lat2)) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance in km
     }
   }
 };

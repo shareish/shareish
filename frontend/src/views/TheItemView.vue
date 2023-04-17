@@ -63,7 +63,7 @@
             <item-type-tag :type="item.type" />
             &middot;
             {{ $t("published") }}
-            {{ formattedDateFromNow(item.creationdate) }}
+            {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
             &middot;
             <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
           </h5>
@@ -83,7 +83,7 @@
                     @click="startConversation"
                 >
                   <i class="far fa-envelope mr-1"></i>
-                  {{ $t('start-conversation') }}
+                  {{ $t('send-private-message') }} {{ item.user.first_name }}
                 </b-button>
               </div>
               <div class="column is-half">
@@ -93,8 +93,8 @@
                     class="w-100"
                     @click="scrollToComments"
                 >
-                  <i class="fas fa-comments mr-1"></i>
-                  {{ $t('leave-a-comment') }}
+                  <i class="fas fa-bullhorn mr-1"></i>
+                  {{ $t('leave-comment') }}
                 </b-button>
               </div>
             </div>
@@ -146,13 +146,13 @@
             <template v-if="isOwner || itemHasEnded || notAvailableYet">
               <span>
                 {{ $t('item-availability-from') }}
-                {{ formattedDate(item.startdate) }} ({{ formattedDateFromNow(item.startdate) }})
+                {{ formattedDate(item.startdate, $i18n.locale) }} ({{ formattedDateFromNow(item.startdate, $i18n.locale) }})
               </span><br />
             </template>
             <template v-if="item.enddate">
               <span>
                 {{ $t('item-availability-until') }}
-                {{ formattedDate(item.enddate) }} ({{ formattedDateFromNow(item.enddate) }})
+                {{ formattedDate(item.enddate, $i18n.locale) }} ({{ formattedDateFromNow(item.enddate, $i18n.locale) }})
               </span>
             </template>
           </article>
@@ -207,13 +207,12 @@
 
 <script>
 import axios from "axios";
-import moment from "moment";
 import {categories} from "@/categories";
 import ItemTypeTag from "@/components/ItemTypeTag.vue";
 import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
-import {GeolocationCoords, isNotEmptyString, scrollParentToChild} from "@/functions";
+import {GeolocationCoords, isNotEmptyString, scrollParentToChild, formattedDate, formattedDateFromNow} from "@/functions";
 
 export default {
   name: 'TheItemView',
@@ -314,12 +313,8 @@ export default {
         }
       }
     },
-    formattedDate(date) {
-      return (moment(date).locale(this.$i18n.locale).format("LLLL"));
-    },
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
+    formattedDate,
     async startConversation() {
       try {
         const data = {

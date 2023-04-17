@@ -198,7 +198,6 @@
   "from": "À partir du",
   "until": "Jusqu'au",
   "delete": "Supprimer",
-  "start-conversation": "Lancer une conversation",
   "intro-DN-first-message": "Bonjour, merci pour votre proposition de don. Je suis intéressé pour ...",
   "intro-RQ-first-message": "Bonjour, je pense pouvoir répondre à votre demande. Je peux ...",
   "intro-LN-first-message": "Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ...",
@@ -333,5 +332,9 @@
   "save-items-you-see": "Sauvegarder les éléments que vous voyez sur Shareish",
   "help_save-items-you-see": "Nous enregistrons les items que vous visionnez afin d'améliorer votre expérience sur notre site internet. Cela nous aide à comprendre comme vous l'utilisez et à vous proposer de meilleures recommendations dans nos emails de notification!",
   "yes": "Oui",
-  "no": "Non"
+  "no": "Non",
+  "send-private-message": "Contacter",
+  "leave-comment": "Commenter",
+  "with": "avec",
+  "start-of-the-conversation": "Début de la conversation"
 }

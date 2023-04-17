@@ -19,7 +19,7 @@ from rest_framework import filters, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
-from .pagination import ActivePaginationClass
+from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
     UserImageSerializer, ItemCommentSerializer
@@ -316,6 +316,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
+    pagination_class = MessagePaginationClass
 
     def get_queryset(self):
         if 'conversation_id' in self.kwargs:
@@ -323,6 +324,14 @@ class MessageViewSet(viewsets.ModelViewSet):
             return Message.objects.filter(conversation=conversation)
         else:
             return Message.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.user.id == request.user.id:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response("You can't delete a message that do not belongs to you.", status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['POST'])

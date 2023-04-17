@@ -170,7 +170,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_last_message(self, obj):
         request = self.context.get('request')
         if request is not None:
-            last_message = Message.objects.filter(conversation=obj).last()
+            last_message = Message.objects.filter(conversation=obj).first()
             if last_message is not None:
                 return last_message.content
         return None

@@ -10,7 +10,7 @@
     <div class="media-content">
       <p class="content wbbw wspw has-background-white-ter">{{ comment.content }}</p>
       <p class="options has-text-grey">
-        {{ formattedDateFromNow(comment.creationdate) }} &middot;
+        {{ formattedDateFromNow(comment.creationdate, $i18n.locale) }} &middot;
         <template v-if="isFromSelf">
           <span class="delete-comment has-text-danger" @click="clickDeleteComment">Delete</span>
         </template>
@@ -22,6 +22,7 @@
 <script>
 import moment from "moment/moment";
 import axios from "axios";
+import {formattedDateFromNow} from "@/functions";
 
 export default {
   name: "ItemComment",
@@ -42,13 +43,11 @@ export default {
     }
   },
   methods: {
-    formattedDateFromNow(date) {
-      return moment(date).locale(this.$i18n.locale).fromNow();
-    },
+    formattedDateFromNow,
     clickDeleteComment() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-comment'),
-        comment: this.$t('delete-comment-confirmation'),
+        message: this.$t('delete-comment-confirmation'),
         confirmText: this.$t('delete'),
         cancelText: this.$t('cancel'),
         type: 'is-danger',

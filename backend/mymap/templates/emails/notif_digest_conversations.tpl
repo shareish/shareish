@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block text %}
-    Dear {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),{{ text|linebreaks }}
+    Dear {{ user.first_name }} {{ user.last_name }} (@{{ user.username }}),{{ text|linebreaks }}
     {{ text|linebreaks }}
     Some people are waiting for your answer on Shareish mutual aid platform.{{ text|linebreaks }}
     {{ text|linebreaks }}
@@ -45,7 +45,7 @@
         margin-right: 0;
     }
     </style>
-    <p>Dear {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),</p>
+    <p>Dear {{ user.first_name }} {{ user.last_name }} (@{{ user.username }}),</p>
     <p>Some people are waiting for your answer on Shareish mutual aid platform.</p>
     <p>You have {{ n }} unread message{% if n != 1 %}s{% endif %} available in the <a href='{{ app_url }}/conversations'>conversations tab</a>.</p>
     <ul>

@@ -198,7 +198,6 @@
   "from": "From",
   "until": "Until",
   "delete": "Delete",
-  "start-conversation": "Start conversation",
   "intro-DN-first-message": "Hello, thank you for your donation proposal. I am interested for ...",
   "intro-RQ-first-message": "Hello, I think I can answer your request. I can ...",
   "intro-LN-first-message": "Hello, thank you for your loan proposal. I am interested for ...",
@@ -333,5 +332,9 @@
   "save-items-you-see": "Save the items you see on Shareish",
   "help_save-items-you-see": "We save the items you see to improve your experience while browsing our website. This helps us understand how you use it and send you better recommendations in our emails notifications!",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "send-private-message": "Message",
+  "leave-comment": "Comment",
+  "with": "with",
+  "start-of-the-conversation": "Start of the conversation"
 }

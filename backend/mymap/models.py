@@ -317,4 +317,4 @@ class Message(models.Model):
     seen = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['date']
+        ordering = ['conversation_id', '-date']

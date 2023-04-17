@@ -67,8 +67,14 @@
               </div>
             </div>
             <div class="column">
-              <p class="title mb-1">{{ conversation.item.name }}</p>
-              <p class="subtitle mt-1">{{ conversation.last_message }}</p>
+              <p class="conversation-name"><strong>{{ conversation.item.name }}</strong></p>
+              <p class="conversation-receiver mb-1">
+                {{ $t('with') }}
+                <span class="has-text-primary">
+                  @{{ conversation.receiver.username }}
+                </span>
+              </p>
+              <p class="conversation-last_message mt-1">{{ conversation.last_message }}</p>
             </div>
           </router-link>
         </div>
@@ -89,10 +95,19 @@
               </div>
               <div class="level-item">
                 <template v-if="windowWidth > 768">
-                  Chatting with <strong class="ml-1">{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                  Chatting with
+                  <strong class="ml-1">
+                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
+                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
+                    </router-link>
+                  </strong>
                 </template>
                 <template v-else>
-                  <strong>{{ receiver.first_name }} {{ receiver.last_name }}</strong>
+                  <strong>
+                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
+                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
+                    </router-link>
+                  </strong>
                 </template>
               </div>
             </div>
@@ -100,8 +115,25 @@
           <div id="item">
             <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
           </div>
-          <div id="messages" ref="messages">
-            <conversation-message v-for="(message, index) in messages" :key="index" :message="message" :receiver="userId" @deleted="removeMessage(index)" />
+          <div id="messages" ref="messages" class="pt-4">
+            <div class="messages-header has-text-centered mb-4">
+              <template v-if="allMessagesLoaded">
+                <p class="has-text-grey has-text-centered" style="height: 40px; line-height: 40px;">{{ $t('start-of-the-conversation') }}</p>
+              </template>
+              <template v-else>
+                <b-button v-if="!allMessagesLoaded" :loading="messagesLoading" @click="loadMessages">
+                  {{ $t('button-load-more') }}
+                </b-button>
+              </template>
+            </div>
+            <conversation-message
+                v-for="(message, index) in messages"
+                :key="index"
+                :message="message"
+                :receiver="userId"
+                :show-side="messageShowSide(index)"
+                @deleted="deletedEmitted(index)"
+            />
           </div>
           <div id="write">
             <div class="columns is-mobile">
@@ -141,6 +173,7 @@ import {scrollParentToChild, rem, isArrEmpty, isNotEmptyString} from "@/function
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
+import _ from "lodash";
 
 const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
 
@@ -152,6 +185,7 @@ export default {
     return {
       loading: true,
       conversations: [],
+      conversationsTextarea: {},
       selected: -1,
       messages: [],
       messageToSend: "",
@@ -164,7 +198,10 @@ export default {
       canChangeCategory: true,
       timeouts: {},
       itemCardHorizontalHeight: 70,
-      isMobile: false
+      isMobile: false,
+      allMessagesLoaded: false,
+      messagesSection: 1,
+      messagesLoading: false
     }
   },
   watch: {
@@ -182,11 +219,18 @@ export default {
     selectedCategory() {
       if (this.canChangeCategory) {
         this.canChangeCategory = false;
-        this.fetchConversations();
-        setTimeout(() => {
-          this.canChangeCategory = true;
-        }, 500);
+        this.closeConversation();
+        this.fetchConversations().then(() => {
+          this.selected = this.getIConversation(this.conversationId);
+          this.openConversation();
+          setTimeout(() => {
+            this.canChangeCategory = true;
+          }, 500);
+        });
       }
+    },
+    messageToSend() {
+      this.conversationsTextarea[this.activeConversation.id] = this.messageToSend;
     }
   },
   computed: {
@@ -201,14 +245,6 @@ export default {
     },
     userId() {
       return Number(this.$store.state.user.id);
-    },
-    receiver() {
-      if (this.isConversationSelected) {
-        let ids = [this.activeConversation.item.user.id, this.activeConversation.starter.id];
-        ids.splice(ids.indexOf(this.userId), 1);
-        return (this.activeConversation.starter.id === ids[0]) ? this.activeConversation.starter : this.activeConversation.item.user;
-      }
-      return {};
     },
     webSocketHost() {
       let host = axios.defaults.baseURL;
@@ -226,14 +262,22 @@ export default {
         try {
           document.title = `Shareish | ${this.activeConversation.item.name}`;
 
-          this.messages = (await axios.get(`/api/v1/conversations/${this.activeConversation.id}/messages/`)).data;
-          if (this.messages.length === 0)
-            this.messageToSend = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
-          else
-            this.goToLastMessage();
+          await this.loadMessages(false);
+
+          if (this.conversationsTextarea[this.activeConversation.id] === undefined) {
+            if (this.messages.length === 0)
+               this.conversationsTextarea[this.activeConversation.id] = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
+            else
+              this.conversationsTextarea[this.activeConversation.id] = "";
+          }
+          this.messageToSend = this.conversationsTextarea[this.activeConversation.id];
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
+
+          this.$nextTick(function () {
+            document.getElementById('messages').addEventListener('scroll', this.scrollHandler);
+          });
         }
         catch (error) {
           this.snackbarError(error);
@@ -242,7 +286,12 @@ export default {
       }
     },
     closeConversation() {
-      this.messages = [];
+      if (this.messages.length > 0) {
+        const messages = document.getElementById('messages');
+        if (messages)
+          messages.removeEventListener('scroll', this.scrollHandler);
+        this.messages = [];
+      }
       if (this.ws)
         this.ws.close();
     },
@@ -269,7 +318,7 @@ export default {
       this.textareaRows = messageRows;
     },
     shiftEnterPressed() {
-      this.messageToSend += "\n";
+      this.conversationsTextarea[this.activeConversation.id] += "\n";
       this.checkRows();
     },
     async fetchConversations() {
@@ -284,11 +333,16 @@ export default {
           let image = categories[conversation.item.category1]['image-placeholder'];
           if (conversation.item.images.length > 0)
             image = conversation.item.images[0];
+          let ids = [conversation.item.user.id, conversation.starter.id];
+          ids.splice(ids.indexOf(this.userId), 1);
+          const receiver = (ids[0] === conversation.starter.id) ? conversation.starter : conversation.item.user;
           return {
             ...conversation,
-            image: image
+            image: image,
+            receiver: receiver
           };
         });
+
         if (this.unableToFetchConversations) {
           this.$buefy.snackbar.open({
             duration: 5000,
@@ -309,8 +363,8 @@ export default {
       clearTimeout(this.timeouts['conversations']);
       this.timeouts['conversations'] = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
     },
-    async setMessagesAsSeen() {
-      if (this.isConversationSelected && this.activeConversation.unread_messages > 0 && this.messages.length > 0) {
+    async setMessagesAsSeen(force = false) {
+      if (this.isConversationSelected && (this.activeConversation.unread_messages > 0 || force) && this.messages.length > 0) {
         try {
           const data = {
             'conversation_id': this.activeConversation.id,
@@ -319,7 +373,7 @@ export default {
           const newUnreadMessages = Number((await axios.post("/api/v1/notifications/", data)).data);
           this.$store.state.notifications = newUnreadMessages;
 
-          this.activeConversation.unread_messages = newUnreadMessages;
+          this.conversations[this.selected].unread_messages = newUnreadMessages;
 
           // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
           // could not be the real last message and this.conversation.unread_messages could be greater than 0
@@ -345,12 +399,13 @@ export default {
       }
       return -1;
     },
-    goToLastMessage() {
+    scrollLastMessageIntoView(messageIndex = "last", position = "bottom", offset = rem(0.75)) {
       if (this.messages.length > 0) {
         this.$nextTick(() => {
           const parent = this.$el.querySelector("#messages");
-          const child = this.$el.querySelector("#messages article:last-child");
-          scrollParentToChild(parent, child);
+          const childSelector = (messageIndex === "last") ? "last-child" : "nth-child(" + (messageIndex + 1) + ")";
+          const child = this.$el.querySelector("#messages article:" + childSelector);
+          scrollParentToChild(parent, child, position, offset);
         });
       }
     },
@@ -358,21 +413,38 @@ export default {
       if (this.isConversationSelected) {
         try {
           this.ws = new WebSocket(`${this.webSocketHost}/ws/${this.activeConversation.id}/`);
-          this.ws.onopen = () => {
-            console.log("Websocket connected.");
-          };
           this.ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
-            if (data.content) {
-              this.messages.push(data);
-              this.goToLastMessage();
-              this.updateCurrentConversation(data.content);
-              this.activeConversation.unread_messages += 1;
-              this.setMessagesAsSeen();
+            if (data.type === 'new_message') {
+              const newMessage = JSON.parse(data['content']);
+              this.messages.push(newMessage);
+              this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
+              this.updateCurrentConversation(newMessage.content);
+              this.setMessagesAsSeen(true);
+            } else if (data.type === 'message_deleted') {
+              const id = Number(data['content']);
+              let messageIndex = -1;
+              for (let i in this.messages) {
+                if (this.messages[i].id === id) {
+                  messageIndex = Number(i);
+                  break;
+                }
+              }
+              if (messageIndex >= 0) {
+                if (this.messages[messageIndex].user_id === this.userId) {
+                  this.$buefy.snackbar.open({
+                    duration: 5000,
+                    type: 'is-success',
+                    message: this.$t('message-removed'),
+                    pauseOnHover: true,
+                    position: 'is-bottom-right'
+                  });
+                }
+                this.messages.splice(messageIndex, 1);
+                if (this.isConversationSelected && messageIndex === this.messages.length)
+                  this.conversations[this.selected].last_message = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
+              }
             }
-            this.ws.addEventListener('close', () => {
-              console.log("Websocket has been closed.");
-            });
           });
         }
         catch (error) {
@@ -385,10 +457,13 @@ export default {
         this.waitingFormResponse = true;
         try {
           const data = {
-            'content': this.messageToSend,
-            'conversation_id': this.activeConversation.id,
-            'user_id': this.$store.state.user.id,
-            'date': new Date()
+            'type': 'new_message',
+            'content': {
+              'content': this.messageToSend,
+              'conversation_id': this.activeConversation.id,
+              'user_id': this.$store.state.user.id,
+              'date': new Date()
+            }
           };
           this.ws.send(JSON.stringify(data));
 
@@ -398,7 +473,8 @@ export default {
             this.waitingFormResponse = false;
           }, 500);
 
-          this.messageToSend = "";
+          this.conversationsTextarea[this.activeConversation.id] = "";
+          this.messageToSend = this.conversationsTextarea[this.activeConversation.id]
 
           this.checkRows();
         }
@@ -413,21 +489,72 @@ export default {
         const conversationToPoke = this.conversations.splice(this.selected, 1)[0];
         this.conversations.unshift(conversationToPoke);
         this.selected = 0;
-        this.activeConversation.last_message = newMessage;
+        this.conversations[this.selected].last_message = newMessage;
       }
     },
-    removeMessage(index) {
-      this.messages.splice(index, 1);
-      if (this.isConversationSelected && index === this.messages.length) {
-        this.activeConversation.last_message = (this.messages.length > 0) ? this.messages[this.messages.length - 1].content : "";
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-success',
-          message: this.$t('message-deleted'),
-          pauseOnHover: true,
-          position: 'is-bottom-right'
-        });
+    deletedEmitted(index) {
+      const data = {
+        'type': 'message_deleted',
+        'content': {
+          'id': this.messages[index].id
+        }
+      };
+      this.ws.send(JSON.stringify(data));
+    },
+    messageShowSide(index) {
+      if (index === this.messages.length - 1) {
+        // Message is the last one
+        return true;
+      } else if (index < this.messages.length - 1) {
+        if (this.messages[index].user_id !== this.messages[index + 1].user_id) {
+          // Next message is from different user
+          return true;
+        } else {
+          // Next message if from same user
+          const messageTimestamp = new Date(this.messages[index].date).getTime();
+          const nextMessageTimestamp = new Date(this.messages[index + 1].date).getTime();
+          if (nextMessageTimestamp - messageTimestamp >= 10 * 60 * 1000)
+            return true;
+        }
       }
+      return false;
+    },
+    scrollHandler: _.debounce(async function () {
+      const scrollBlock = document.getElementById('messages');
+      if (scrollBlock.scrollTop <= 80 && !this.allMessagesLoaded)
+        await this.loadMessages();
+    }, 100),
+    async loadMessages(append = true) {
+      this.messagesLoading = true;
+
+      if (!append) {
+        this.messagesSection = 1;
+        this.allMessagesLoaded = false;
+        this.messages = [];
+      }
+
+      try {
+        const data = (await axios.get(`/api/v1/conversations/${this.activeConversation.id}/messages/`, {params: {page: this.messagesSection}})).data;
+        for (let i in data.results)
+          this.messages.unshift(data.results[i]);
+        this.messagesSection += 1;
+
+        if (data.next === null)
+          this.allMessagesLoaded = true;
+
+        if (!append)
+          this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
+        else
+          // length +1 because there is always 1 element at the top of the messages list (loader/start of conv msg)
+          this.scrollLastMessageIntoView(data.results.length + 1, "top", 0);
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
+
+      setTimeout(() => {
+        this.messagesLoading = false;
+      }, 400);
     }
   },
   async mounted() {
@@ -435,14 +562,13 @@ export default {
     await this.fetchConversations();
     if (this.conversationId) {
       this.selected = this.getIConversation(this.conversationId);
-      this.openConversation();
+      await this.openConversation();
     }
     this.loading = false;
   },
   destroyed() {
     for (let i in this.timeouts)
       clearTimeout(this.timeouts[i]);
-    this.selected = -1;
     this.closeConversation();
   }
 };
@@ -454,7 +580,7 @@ export default {
 }
 
 $boxHeight: 750px;
-$conversationsWidth: 425px;
+$conversationsWidth: 424px + 1px;
 $conversationImageSize: 100px;
 $searchNFiltersHeight: 40px + 2 * rem(0.75) + 1px;
 $conversationWithHeight: 40px + 2 * rem(0.75) + 1px;
@@ -501,6 +627,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 #conversations {
   overflow-y: scroll;
   height: $boxHeight - $searchNFiltersHeight;
+  width: $conversationsWidth - 1px;
   padding: 0.75rem;
 
   .conversation {
@@ -541,21 +668,23 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 
     & > .column:last-child {
       padding-left: 0.5rem;
-      margin-top: 5px;
+      margin-top: 2px;
+      width: calc(100% - 100px);
 
-      .title {
+      p {
+        text-overflow: ellipsis;
+        white-space: nowrap;
         overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        font-size: 1rem !important;
+        color: black;
       }
-
-      .subtitle {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+      p.conversation-name {
+        font-size: 1.25rem !important;
+      }
+      p.conversation-receiver {
+        font-size: 0.75rem !important;
+        font-style: italic;
+      }
+      p.conversation-last_message {
         font-size: 0.875rem !important;
       }
     }
@@ -591,11 +720,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
     // $boxHeight - $itemHeight - base textarea height - 2 * outer padding
     height: $boxHeight - $conversationWithHeight - $itemHeight - 48px - (2 * rem(0.75));
     overflow-y: scroll;
-    overscroll-behavior: none;
     display: flex;
     flex-direction: column;
 
-    article:first-child {
+    *:first-child {
       margin-top: auto !important;
     }
   }
@@ -627,7 +755,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
         flex: 0 0 80px;
       }
       & > .column:last-child {
-        margin-top: 2px;
+        margin-top: 0;
         padding-left: 0;
 
         .title {
@@ -643,6 +771,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 }
 
 @media screen and (max-width: 1215px) and (min-width: 901px) {
+  #conversations {
+    width: 324px;
+  }
+
   #page-conversations > .columns > .column:first-child {
     flex: 0 0 325px;
   }
@@ -652,6 +784,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
 }
 
 @media screen and (max-width: 900px) {
+  #conversations {
+    width: 100%;
+  }
+
   #page-conversations.conversation-opened > .columns > .column:first-child {
     border-right: 0;
   }
@@ -668,6 +804,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   #page-conversations:not(.conversation-opened) > .columns > .column {
     &:first-child {
       flex: 1 1 auto;
+      max-width: 100%;
     }
     &:last-child {
       display: none;
