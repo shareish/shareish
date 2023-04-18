@@ -740,36 +740,51 @@ export default {
     },
     async fetchExtraLayersMakers() {
       if (this.zoom >= this.minZoomToShowElements) {
-        const FFelements = await this.getFallingFruitElements();
-        if (FFelements.length > 0) {
-          this.extraCategories['FLF']['markers'] = FFelements.filter(element =>
-            element['id'] != null && element['lat'] != null && element['lng'] != null
-          ).map(element => {
-            return {
-              id: element['id'],
-              type: 'ffruit',
-              name: element['type_names'][0],
-              description: element['description'],
-              location: new GeolocationCoords(element['lng'], element['lat'])
-            }
-          });
-        }
+        const elements = await Promise.all([
+          this.getFallingFruitElements(),
+          this.getOverPassElements('public_bookcase'),
+          this.getOverPassElements('defibrillator'),
+          this.getOverPassElements('give_box'),
+          this.getOverPassElements('food_bank'),
+          this.getOverPassElements('food_sharing'),
+          this.getOverPassElements('soup_kitchen'),
+          this.getOverPassElements('drinking_water'),
+          this.getOverPassElements('free_shop'),
+        ]);
 
-        for (const [key, extraCategory] of Object.entries(this.extraCategories)) {
-          const OPelements = await this.getOverPassElements(extraCategory.tagValue);
-          if (OPelements.length > 0) {
-            this.extraCategories[key]['markers'] = OPelements.filter(element =>
-              element['id'] != null && element['lat'] != null && element['lon'] != null
+        const tmpExtraCategories = {...this.extraCategories};
+
+        for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
+          if (key === 'FLF') {
+            tmpExtraCategories['FLF']['markers'] = elements[0].filter(element =>
+              element['id'] != null && element['lat'] != null && element['lng'] != null
             ).map(element => {
               return {
                 id: element['id'],
-                type: extraCategory.tagValue,
-                name: element['tags']['name'],
-                location: new GeolocationCoords(element['lon'], element['lat'])
+                type: 'ffruit',
+                name: element['type_names'][0],
+                description: element['description'],
+                location: new GeolocationCoords(element['lng'], element['lat'])
               }
             });
+          } else {
+            const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
+            if (opKey !== -1) {
+              tmpExtraCategories[key]['markers'] = elements[opKey + 1].filter(element =>
+                element['id'] != null && element['lat'] != null && element['lon'] != null
+              ).map(element => {
+                return {
+                  id: element['id'],
+                  type: extraCategory.tagValue,
+                  name: element['tags']['name'],
+                  location: new GeolocationCoords(element['lon'], element['lat'])
+                }
+              });
+            }
           }
         }
+
+        this.extraCategories = tmpExtraCategories;
       }
     },
     getMarkerURL(category, markerId) {
