@@ -113,7 +113,7 @@
                   <b-button expanded type="is-danger" @click="deselectAll">{{ $t('deselect-all') }}</b-button>
                 </div>
               </div>
-              <div id="ecats-checkboxes" class="columns is-flex-wrap-wrap m-0">
+              <div id="ecats-checkboxes" class="columns is-mobile is-flex-wrap-wrap m-0">
                 <div v-for="(extraCategory, index) in user.map_ecats" :key="index" class="column is-half p-0 pb-2" :class="{'pr-2': index % 2 === 0, 'pl-2': index % 2 !== 0}">
                   <b-field>
                     <b-checkbox v-model="ecatsCheckboxes" :native-value="extraCategory.category" type="is-primary">
@@ -462,7 +462,6 @@ export default {
       geoLocationIcon: blueIcon,
       routedItemLocation: null,
       items: [],
-      leafletMapHeight: "800px",
 
       routedItemError: false,
       timeouts: {}
@@ -490,12 +489,6 @@ export default {
     this.leafletCenter = this.preLeafletCenter;
 
     this.mapLoading = false;
-  },
-  beforeMount() {
-    if (this.windowWidth > 1024)
-      this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 3rem)`;
-    else
-      this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 1.5rem)`;
   },
   computed: {
     params() {
@@ -858,24 +851,18 @@ export default {
       this.mapLoading = false;
     },
     windowSizeChanged() {
-      if (this.windowWidth > 1024) {
-        this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 3rem)`;
-      } else {
-        this.leafletMapHeight = `calc(${this.windowHeight}px - 52px - 2 * 1.5rem)`;
-
-        if (this.flapOpened) {
-          if (this.windowWidth < 700) {
-            const flap = this.$el.querySelector("#flap");
-            flap.style.width = "calc(100% - 2 * 0.5rem)";
-            flap.style.left = "0.5rem";
-          } else {
-            if (this.flapSelected === 'settings') {
-              flap.style.width = "550px";
-            } else if (this.flapSelected === 'filters') {
-              flap.style.width = "450px";
-            }
-            flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
+      if (this.flapOpened) {
+        if (this.windowWidth < 700) {
+          const flap = this.$el.querySelector("#flap");
+          flap.style.width = "calc(100% - 2 * 0.5rem)";
+          flap.style.left = "0.5rem";
+        } else {
+          if (this.flapSelected === 'settings') {
+            flap.style.width = "550px";
+          } else if (this.flapSelected === 'filters') {
+            flap.style.width = "450px";
           }
+          flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
     }
@@ -926,7 +913,7 @@ export default {
 }
 
 #leaflet-map {
-  height: v-bind(leafletMapHeight);
+  height: calc(100vh - 52px - 2 * 3rem);
   z-index: 1;
 }
 
@@ -967,17 +954,21 @@ export default {
     .close {
       flex: 0 0 auto;
     }
+  }
+}
 
-    & > .settings {
-      .content {
-        .columns {
-          display: block;
+@media screen and (max-width: 1024px) {
+  #leaflet-map {
+    height: calc(100vh - 52px - 2 * 1.5rem);
+  }
+}
 
-          & > .column {
-            padding: 0 0 0.5rem 0 !important;
-          }
-        }
-      }
+@media screen and (max-width: 700px) {
+  #flap .inner .settings .content .columns {
+    display: block;
+
+    & > .column {
+      padding: 0 0 0.5rem 0 !important;
     }
   }
 }
