@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
-    UserImageSerializer, ItemCommentSerializer
+    UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -272,6 +272,11 @@ class UserImageViewSet(viewsets.ViewSet):
         new_image.save()
         serialized_image = UserImageSerializer(new_image)
         return Response(serialized_image.data, status=status.HTTP_201_CREATED)
+
+
+class UserMapExtraCategoriesViewSet(viewsets.ModelViewSet):
+    serializer_class = UserMapExtraCategorySerializer
+    queryset = UserMapExtraCategory.objects.all()
 
 
 class ConversationViewSet(viewsets.ModelViewSet):

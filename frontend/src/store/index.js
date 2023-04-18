@@ -1,5 +1,5 @@
-import Vuex from 'vuex';
-import Vue from 'vue';
+import Vuex from "vuex";
+import Vue from "vue";
 import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
@@ -12,44 +12,39 @@ export default new Vuex.Store({
             id: null
         },
         isAuthenticated: false,
-        token: '',
+        itemsFilters: {},
+        token: null,
         notifications: 0,
     },
     getters: {},
     mutations: {
         initializeStore(state) {
-            if (localStorage.getItem('token')) {
-                state.token = localStorage.getItem('token')
-                state.isAuthenticated = true
-            } else {
-                state.token = ''
-                state.isAuthenticated = false
-            }
-            if (localStorage.getItem('user_id')) {
-                state.user.id = Number(localStorage.getItem('user_id'));
-            } else {
-                state.user.id = null
-            }
+            this.commit('setToken', localStorage.getItem('token'));
+            this.commit('setUserID', localStorage.getItem('user_id'));
         },
-
         setToken(state, token) {
-            state.token = token
-            state.isAuthenticated = true
+            if (token) {
+                state.token = token;
+                state.isAuthenticated = true;
+            } else {
+                this.commit('removeToken');
+            }
         },
-
         removeToken(state) {
-            state.token = ''
-            state.isAuthenticated = false
+            state.token = null;
+            state.isAuthenticated = false;
         },
-
         setUserID(state, id) {
-            state.user.id = id
+            state.user.id = id;
         },
-
         removeUserID(state) {
-            state.user.id = ''
+            state.user.id = null;
         },
+        setItemsFilters(state, itemsFilters) {
+            for (const [key, value] of Object.entries(itemsFilters))
+                state.itemsFilters[key] = value;
+        }
     },
     actions: {},
     modules: {}
-})
+});

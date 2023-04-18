@@ -52,8 +52,12 @@ export const isDictEmpty = function (dict) {
   return isDict(dict) && Object.keys(dict).length === 0;
 }
 
-export const isArrEmpty = function (arr) {
+export const isEmptyArray = function (arr) {
   return isArr(arr) && arr.length === 0;
+}
+
+export const isNotEmptyArray = function (arr) {
+  return isArr(arr) && arr.length !== 0;
 }
 
 export const isInt = function(n) {
@@ -72,8 +76,12 @@ export const isString = function (s) {
   return typeof s === 'string' || s instanceof String;
 }
 
+export const isEmptyString = function (s) {
+  return isString(s) && s.length === 0;
+}
+
 export const isNotEmptyString = function (s) {
-  return isString(s) && s !== "";
+  return isString(s) && s.length !== 0;
 }
 
 export const ucfirst = function (s) {

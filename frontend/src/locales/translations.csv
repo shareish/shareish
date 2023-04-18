@@ -299,9 +299,15 @@ radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
 restrict-distance,Restrict distance,Restreindre la distance
 order-by,Order by,Trier par
 recent-first,Recents first,Récents en premier
-order-by-availability-startdate,Availability (starting date),Disponibilité (date de début)
-order-by-availability-enddate,Availability (ending date),Disponibilité (date de fin)
-closest-distance,Distance (closest),Distance (les plus proches)
+oldest-first,Oldest first,Anciens en premier
+closest-first,Closest first,Les plus proches en premier
+furthest-first,Furthest first,Les plus lointains en premier
+availability-startdate,Availability (starting date),Disponibilité (date de début)
+starting-soon-first,Starting soon first,Commencent bientôt en premier
+starting-late-first,Starting late first,Commencent tard en premier
+ending-soon-first,Ending soon first,Finissent bientôt en premier
+ending-late-first,Ending late first,Finissent tard en premier
+availability-enddate,Availability (ending date),Disponibilité (date de fin)
 available,Available,Disponible
 corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
 found,found.,trouvé.|trouvés.

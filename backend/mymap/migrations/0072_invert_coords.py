@@ -3,7 +3,7 @@
 from django.contrib.gis.geos import Point
 from django.db import migrations
 
-from backend.mymap.models import Item, User
+from mymap.models import Item, User
 
 
 def reverse_coords():

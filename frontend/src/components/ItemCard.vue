@@ -47,7 +47,7 @@
         <small class="is-block">{{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}</small>
           <small v-if="notAvailableYet">
             {{ $t('available') }}
-            {{ formattedDateFromNow(item.startdate) }}
+            {{ formattedDateFromNow(item.startdate, $i18n.locale) }}
           </small>
         <small class="is-block" v-if="item.enddate">
           <template v-if="!itemHasEnded">
