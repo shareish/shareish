@@ -984,6 +984,7 @@ export default {
     display: block;
 
     & > .column {
+      width: 100%;
       padding: 0 0 0.5rem 0 !important;
     }
   }
