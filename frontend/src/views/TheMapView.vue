@@ -16,18 +16,18 @@
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-primary" class="w-100 mt-1">
-              <b-button type="is-primary" @click="setCenterAtRefLocation" expanded>
+            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-100 mt-1">
+              <b-button type="is-info" @click="setCenterAtRefLocation" expanded>
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-danger" class="w-100 mt-1">
-              <b-button type="is-danger" @click="openFlap('settings')" expanded>
+            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-100 mt-1">
+              <b-button type="is-primary" @click="openFlap('settings')" expanded>
                 <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-warning" class="w-100 mt-1">
-              <b-button type="is-warning" @click="openFlap('filters')" expanded>
+            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-primary" class="w-100 mt-1">
+              <b-button type="is-primary" @click="openFlap('filters')" expanded>
                 <i class="fas fa-filter"></i>
               </b-button>
             </b-tooltip>
@@ -103,7 +103,7 @@
               </b-button>
             </header>
             <div class="content">
-              <h3 class="title is-size-4 mb-1">Overpass & Falling Fruit</h3>
+              <h3 class="title is-size-4 mb-1">OpenStreetMap & Falling Fruit</h3>
               <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
               <div class="columns is-mobile buttons m-0 mb-4">
                 <div class="column p-0 pr-2">

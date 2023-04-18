@@ -318,7 +318,7 @@ on-day,on,le
 or-later-will-be-showed,or later will be showed,ou plus tard seront affichés
 set-a-reflocation-to-use-feature,You must set a reference location in your settings to use this feature.,Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.
 map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
-define-elements-to-see-on-map,Define what externals elements from Shareish you want to see on the map.,Définissez quels éléments externes à Shareish vous souhaitez afficher sur la carte.
+define-elements-to-see-on-map,Define what public elements (external from Shareish) you want to see on the map.,Définissez quels éléments publics (externes à Shareish) vous souhaitez afficher sur la carte.
 this-item-doesnt-have-a-location,"This item does not have a location, cannot show it on the map.","Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte."
 select-all,Select all,Sélectionner tout
 deselect-all,Deselect all,Déselectionner tout
