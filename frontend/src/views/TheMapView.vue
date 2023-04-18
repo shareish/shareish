@@ -117,6 +117,7 @@
                 <div v-for="(extraCategory, index) in user.map_ecats" :key="index" class="column is-half p-0 pb-2" :class="{'pr-2': index % 2 === 0, 'pl-2': index % 2 !== 0}">
                   <b-field>
                     <b-checkbox v-model="ecatsCheckboxes" :native-value="extraCategory.category" type="is-primary">
+                      <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; vertical-align: middle;" class="mr-1">
                       {{ $tc('map_ecat_' + extraCategory.category, 0) }}
                     </b-checkbox>
                   </b-field>
