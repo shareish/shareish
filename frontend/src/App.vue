@@ -9,11 +9,10 @@
         <div class="columns">
           <div class="column">
             <h6 class="title is-4 mb-4">Shareish</h6>
+	    <a href="https://www.montefiore.uliege.be/"><img src="./assets/montefiore_institute.svg" alt="Montefiore Institute, ULiège"></a>
             <address class="custom-flex-column">
-              <span>XXX Anonymous</span>
-              <span>XXX Anonymous</span>
-              <span>XXX Anonymous</span>
-              <span>XXX Anonymous (for Review)</span>
+              <span>Developers: Adrien Guilliams, Ulysse Rubens, Florent Banneux, Pierre Chapeau, Raphaël Marée</span>
+	      <span>Project supervision: <a href="https://people.montefiore.uliege.be/maree/">Raphaël Marée</a></span>
             </address>
           </div>
           <div class="column">
@@ -21,11 +20,12 @@
               {{ $t('useful-links') }}
             </h6>
             <div class="custom-flex-column">
-              <router-link :to="{name: 'about'}">{{ $t('about-us') }}</router-link>
+              <!--<router-link :to="{name: 'about'}">{{ $t('about-us') }}</router-link>
               <router-link :to="{name: 'account'}">{{ $t('account') }}</router-link>
-              <router-link :to="{name: 'map'}">{{ $t('map') }}</router-link>
-              <a href="https://github.com/anonymous">
-                <img alt="https://github.com/anonymous" src="./assets/GitHub-Mark-32px.png">
+              <router-link :to="{name: 'map'}">{{ $t('map') }}</router-link>//-->
+	      Scientific paper @ Communities & Technologies 2023
+              <a href="https://github.com/shareish"> Open source code on <img alt="https://github.com/shareish" src="./assets/GitHub-Mark-32px.png"> 
+                
               </a>
             </div>
           </div>
