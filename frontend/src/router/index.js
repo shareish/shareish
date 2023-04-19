@@ -24,19 +24,26 @@ const routes = [
     {
         path: "/",
         name: 'home',
-        component: TheHomeView
+        component: TheHomeView,
+        meta: {
+            layout: 'no-navbar'
+        }
     },
     {
         path: "/about",
         name: 'about',
-        component: TheAboutView
+        component: TheAboutView,
+        meta: {
+            layout: 'default'
+        }
     },
     {
         path: "/sign-up",
         name: 'signup',
         component: TheSignUpView,
         meta: {
-            loginForbidden: true
+            loginForbidden: true,
+            layout: 'default'
         }
     },
     {
@@ -44,30 +51,41 @@ const routes = [
         name: 'login',
         component: TheLoginView,
         meta: {
-            loginForbidden: true
+            loginForbidden: true,
+            layout: 'default'
         }
     },
     {
         path: "/reset-password",
         name: 'resetPassword',
-        component: TheResetPasswordView
+        component: TheResetPasswordView,
+        meta: {
+            layout: 'default'
+        }
     },
     {
         path: "/reset-password/confirm/:uid/:token",
         name: 'resetPasswordConfirm',
-        component: TheResetPasswordConfirmView
+        component: TheResetPasswordConfirmView,
+        meta: {
+            layout: 'default'
+        }
     },
     {
         path: "/activate/:uid/:token",
         name: 'activateEmailToken',
-        component: TheActivateView
+        component: TheActivateView,
+        meta: {
+            layout: 'default'
+        }
     },
     {
         path: "/activate",
         name: 'activateEmail',
         component: TheActivateView,
         meta: {
-            loginForbidden: true
+            loginForbidden: true,
+            layout: 'default'
         }
     },
     {
@@ -75,7 +93,8 @@ const routes = [
         name: 'map',
         component: TheMapView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -83,7 +102,8 @@ const routes = [
         name: 'account',
         component: TheAccountView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -91,7 +111,8 @@ const routes = [
         name: 'profile',
         component: TheProfileView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -99,7 +120,8 @@ const routes = [
         name: 'items',
         component: TheItemsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -107,7 +129,8 @@ const routes = [
         name: 'item',
         component: TheItemView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -115,7 +138,8 @@ const routes = [
         name: 'addItem',
         component: TheAddItemView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -123,7 +147,8 @@ const routes = [
         name: 'addItemFrom',
         component: TheAddItemView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -131,7 +156,8 @@ const routes = [
         name: 'addItemFromRecurrents',
         component: TheAddItemFromRecurrentsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -139,7 +165,8 @@ const routes = [
         name: 'editItem',
         component: TheEditItemView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -147,7 +174,8 @@ const routes = [
         name: 'conversations',
         component: TheConversationsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -155,7 +183,8 @@ const routes = [
         name: 'conversation',
         component: TheConversationsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -163,7 +192,8 @@ const routes = [
         name: 'settings',
         component: TheSettingsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
     {
@@ -171,7 +201,8 @@ const routes = [
         name: 'settingsTab',
         component: TheSettingsView,
         meta: {
-            requireLogin: true
+            requireLogin: true,
+            layout: 'default'
         }
     },
 
