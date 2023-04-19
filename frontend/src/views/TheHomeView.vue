@@ -138,7 +138,7 @@ export default {
 @import "@/assets/styles/colors.scss";
 
 #map-preview {
-  background-image: url(../assets/mapview.png);
+  background-image: url(../assets/mapview.jpg);
   background-position: calc(50% + 150px) -50px;
   padding-top: 200px;
   image-rendering: pixelated;
