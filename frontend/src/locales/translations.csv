@@ -284,7 +284,7 @@ or,or,ou
 searched-categories,Search categories,Catégories recherchées
 no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!
 filter,Filter|Filters,Filtre|Filtres
-show-only-unseen,Show only unseen items,N'afficher que les éléments non-vus
+show-only-unseen,Unseen items only,Uniquement les éléments non-vus
 show-filters,Show filters,Afficher les filtres
 hide-filters,Hide filters,Masquer les filtres
 creationdate,Publication date,Date de publication
@@ -311,11 +311,11 @@ unit,Unit,Unité
 day,days|day|days,jours|jour|jours
 hour,hours|hour|hours,heures|heure|heures
 minute,minutes|minute|minutes,minutes|minute|minutes
-filter-items-creationdate,Filter items created after a certain date,Filtrer les items créés après une certaine date
-only-items-created-on,Only items created on,Seuls les éléments créés le
-only-items-created-at,Only items created at,Seuls les éléments créés à
+filter-items-creationdate,Recent items only,Uniquement les éléments récents
+only-items-created-on,Only items created since,Seuls les éléments créés depuis le
 on-day,on,le
-or-later-will-be-showed,or later will be showed,ou plus tard seront affichés
+created-at,at,à
+will-be-showed, will be shown, seront affichés
 set-a-reflocation-to-use-feature,You must set a reference location in your settings to use this feature.,Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.
 map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
 define-elements-to-see-on-map,Define what public elements (external from Shareish) you want to see on the map.,Définissez quels éléments publics (externes à Shareish) vous souhaitez afficher sur la carte.
@@ -334,7 +334,7 @@ leave-comment,Comment,Commenter
 with,with,avec
 start-of-the-conversation,Start of the conversation,Début de la conversation
 how-does-it-work,How does it work?,Comment ça marche?
-slogan,"Start share, and cherish.","Partagez, chérissez."
+slogan,"Start to share, and cherish.","Partagez, chérissez."
 join-shareish-now,Join Shareish now!,Rejoignez Shareish dès maintenant!
-enter-shareish,Continue on shareish,Continuer sur Shareish
-what-is-shareish,What is Shareish?,Qu'est-ce que Shareish ?
+enter-shareish,Continue on Shareish,Continuer sur Shareish
+what-is-shareish,What is Shareish?,Qu'est-ce que Shareish?
