@@ -9,6 +9,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.geos import Point
+from djoser.signals import user_registered
 
 
 def get_random_string(length):
@@ -243,6 +244,13 @@ class Item(models.Model):
 
     class Meta:
         ordering = ['-id']
+
+
+def user_created(sender, user, request, **kwargs):
+    for category in UserMapExtraCategories:
+        UserMapExtraCategory.objects.create(user=user, category=category)
+
+user_registered.connect(user_created)
 
 
 class ItemImage(models.Model):
