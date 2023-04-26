@@ -27,7 +27,7 @@ class ItemCategoryFilterBackend(filters.BaseFilterBackend):
 class ItemTypeFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         types = request.query_params.getlist('types[]')
-        if len(types) < len(Item.ItemType.choices): # Prevents filtering if all types are selected
+        if len(types) < len(Item.ItemType.choices):  # Prevents filtering if all types are selected
             if len(types) > 0:
                 return queryset.filter(type__in=types)
             else:
@@ -48,16 +48,16 @@ class ItemAvailabilityFilterBackend(filters.BaseFilterBackend):
         avf = request.query_params.get('availableFrom')
         avu = request.query_params.get('availableUntil')
 
-        includeAfterAVF = (request.query_params.get('includeAfterAvailableFrom') == 'true')
-        includeBeforeAVU = (request.query_params.get('includeBeforeAvailableUntil') == 'true')
+        include_after_avf = (request.query_params.get('includeAfterAvailableFrom') == 'true')
+        include_before_avu = (request.query_params.get('includeBeforeAvailableUntil') == 'true')
 
         if avf:
-            if includeAfterAVF:
+            if include_after_avf:
                 queryset = queryset.filter((Q(enddate__gt=avf) | Q(enddate__isnull=True)))
             else:
                 queryset = queryset.filter(Q(startdate__lt=avf) & (Q(enddate__gt=avf) | Q(enddate__isnull=True)))
         if avu:
-            if includeBeforeAVU:
+            if include_before_avu:
                 queryset = queryset.filter(startdate__lt=avu)
             else:
                 queryset = queryset.filter(Q(startdate__lt=avu) & (Q(enddate__gt=avu) | Q(enddate__isnull=True)))
@@ -102,13 +102,13 @@ class ItemMapBoundsFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         bounds = request.query_params.getlist('bounds[]')
         if len(bounds) > 0:
-            NW = GEOSGeometry(bounds[0])
-            SE = GEOSGeometry(bounds[1])
+            nw = GEOSGeometry(bounds[0])
+            se = GEOSGeometry(bounds[1])
 
-            longitude_min=NW.coords[0]
-            longitude_max=SE.coords[0]
-            latitude_min=SE.coords[1]
-            latitude_max=NW.coords[1]
+            longitude_min = nw.coords[0]
+            longitude_max = se.coords[0]
+            latitude_min = se.coords[1]
+            latitude_max = nw.coords[1]
 
             diff_longitude = abs(longitude_max - longitude_min)
             diff_latitude = abs(latitude_max - latitude_min)
@@ -138,11 +138,11 @@ class ConversationContentFilterBackend(filters.BaseFilterBackend):
 
 class ConversationSelectedCategoryFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        selectedCategory = request.query_params.get('selectedCategory')
-        if selectedCategory is not None:
-            if selectedCategory == 'asked':
-                return queryset.filter(starter=request.user)
-            elif selectedCategory == 'yours':
+        selected_category = request.query_params.get('selectedCategory')
+        if selected_category is not None:
+            if selected_category == 'asked':
+                return queryset.exclude(item__user=request.user)
+            elif selected_category == 'yours':
                 return queryset.filter(item__user=request.user)
         return queryset
 

@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 
 from .serializers import MessageSerializer
-from .models import Conversation, Message
+from .models import Conversation, Message, ConversationUser
 
 User = get_user_model()
 from asgiref.sync import sync_to_async
@@ -38,10 +38,11 @@ class ConversationConsumer(AsyncWebsocketConsumer):
                     content['conversation_id'],
                     content['date']
                 )
-                response = json.dumps({
-                    'type': 'new_message',
-                    'content': message
-                })
+                if message is not None:
+                    response = json.dumps({
+                        'type': 'new_message',
+                        'content': message
+                    })
         elif type == 'message_deleted':
             response = json.dumps({
                 'type': 'message_deleted',
@@ -63,6 +64,19 @@ class ConversationConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def save_message(self, content, user_id, conversation_id, date):
+        try:
+            conversation = Conversation.objects.get(pk=conversation_id)
+        except Conversation.DoesNotExist:
+            print("INTERNAL ERROR: Conversation not found during conversation message saving.")
+            return None
+        except Conversation.DoesNotExist:
+            print("INTERNAL ERROR: Multiple conversation found during conversation message saving.")
+            return None
+
+        if not conversation.users.filter(user=user_id).exists():
+            print("INTERNAL ERROR: User is not member of this conversation.")
+            return None
+
         notify_with_email = False
         last_message_from_sender = Message.objects.filter(conversation_id=conversation_id, user_id=user_id).order_by("date").last()
         if last_message_from_sender is not None:
@@ -77,14 +91,18 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         if notify_with_email:
             from .mail import send_mail_notif_new_message_received
 
-            conversation = Conversation.objects.get(pk=conversation_id)
-            if conversation.starter_id == user_id:
-                receiver = conversation.item.user
-                sender = conversation.starter
-            else:
-                receiver = conversation.starter
-                sender = conversation.item.user
-            send_mail_notif_new_message_received(conversation, content, sender, receiver)
+            try:
+                sender = User.objects.get(pk=user_id)
+            except User.DoesNotExist:
+                print("INTERNAL ERROR: Sender not found during conversation message saving.")
+                return None
+            except User.MultipleObjectsReturned:
+                print("INTERNAL ERROR: Multiple sender found during conversation message saving.")
+                return None
+
+            receivers = ConversationUser.objects.filter(conversation=conversation).exclude(user=sender)
+            for receiver in receivers:
+                send_mail_notif_new_message_received(conversation, content, sender, receiver.user)
 
         message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)
         Conversation.objects.filter(pk=conversation_id).update(lastmessagedate=datetime.now(timezone.utc))

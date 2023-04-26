@@ -13,7 +13,8 @@ from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, It
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
     ItemMapBoundsFilterBackend
 from .functions import verif_location
-from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory
+from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
+    ConversationUser
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -285,10 +286,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
     filter_backends = [ConversationContentFilterBackend, ConversationSelectedCategoryFilterBackend]
 
     def get_queryset(self):
-        starter = self.request.user
-        return Conversation.objects.filter(Q(starter=starter) | Q(item__user=starter))
+        return Conversation.objects.filter(users__user=self.request.user)
 
     def create(self, request, *args, **kwargs):
+
         data = request.data
         try:
             item = Item.objects.get(pk=data['item_id'])
@@ -300,24 +301,40 @@ class ConversationViewSet(viewsets.ModelViewSet):
         if item.user_id == request.user.id:
             return Response("You cannot start a conversation on an item you own.", status=status.HTTP_403_FORBIDDEN)
 
-        try:
-            conversation = Conversation.objects.get(
-                starter_id=request.user.id,
-                item=item
-            )
-            serializer = ConversationSerializer(conversation, many=False)
-            return Response(serializer.data['id'], status=status.HTTP_200_OK)
-        except Conversation.DoesNotExist:
-            if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
-                return Response("You cannot start a conversation on this item, it has already ended.",
-                                status=status.HTTP_400_BAD_REQUEST)
-            starter = User.objects.get(pk=request.user.id)
+        item_conversations_containing_user = Conversation.objects.filter(users__user=request.user, item=item)
+        if len(item_conversations_containing_user) > 0:
+            # User is part of at least one conversation for this item
+            item_conversations_containing_user_still_valid = item_conversations_containing_user.filter(users__user=item.user)
+            if len(item_conversations_containing_user_still_valid) == 0:
+                # None of the conversations selected above still have both the current user and the item owner in it
+                # Create a new conversation with the item owner for this item
+                return self.create_conversation(item, [request.user, item.user])
+            elif len(item_conversations_containing_user_still_valid) == 1:
+                # Normal existing conversation case, one conversation is still valid for the combo user/item owner/item
+                # Return the conversation id straightforward
+                return Response(item_conversations_containing_user_still_valid.first().id, status=status.HTTP_200_OK)
+            else:
+                # Shouldn't happen, more than one conversation for the combo user/item owner/item
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            # User is not member of any conversations for this item
+            # Create a new conversation with the item owner for this item
+            return self.create_conversation(item, [request.user, item.user])
 
-            conversation = Conversation.objects.create(starter=starter, item=item)
-            return Response(conversation.id, status=status.HTTP_201_CREATED)
-        except Conversation.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    @staticmethod
+    def create_conversation(item, users):
+        # Verify that the item is still active
+        if item.enddate is not None and item.enddate < datetime.now(timezone.utc):
+            return Response("You cannot start a conversation on this item, it has already ended.", status=status.HTTP_400_BAD_REQUEST)
 
+        # Create the conversation
+        conversation = Conversation.objects.create(item=item)
+
+        # Add users to the conversation
+        for user in users:
+            ConversationUser.objects.create(conversation=conversation, user=user)
+
+        return Response(conversation.id, status=status.HTTP_201_CREATED)
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
@@ -387,20 +404,17 @@ def predict_class(request):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def get_notifications(request):
-    def _get_unread_messages(user):
-        return Message.objects.filter(
-            ~Q(user=user), Q(seen=False),
-            Q(conversation__starter=user) | Q(conversation__item__user=user)
-        ).count()
-
     user = request.user
 
     if request.method == 'GET':
-        return Response(_get_unread_messages(user), status=status.HTTP_200_OK)
+        conversation_unread_messages_count = Message.objects.filter(
+            ~Q(user=user), Q(seen=False), Q(conversation__users__user=user)
+        ).count()
+        return Response(conversation_unread_messages_count, status=status.HTTP_200_OK)
     elif request.method == 'POST':
         try:
             conversation = Conversation.objects.get(pk=request.data['conversation_id'])
-            if conversation.starter != user and conversation.item.user != user:
+            if not conversation.users.filter(user=user).exists():
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
             # Set all messages sent by other user as seen by current user for this conversation
@@ -421,12 +435,14 @@ def get_notifications(request):
             return Response(conversation_unread_messages_count, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        except Conversation.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET', 'DELETE'])
 @permission_classes([AllowAny])
-def user_image(request, userimage_id):
+def get_userimage(request, userimage_id):
     if request.method == 'GET':
         try:
             image = UserImage.objects.get(pk=userimage_id)
@@ -443,43 +459,14 @@ def user_image(request, userimage_id):
                 return Response("You are not the owner of this image.", status=status.HTTP_403_FORBIDDEN)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        except UserImage.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_item_image(request, itemimage_id):
-    if request.method == 'GET':
-        try:
-            image = ItemImage.objects.get(pk=itemimage_id)
-            return FileResponse(open(image.path, 'rb'))
-        except ItemImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_item_images_base64(request, item_id):
-    if request.method == 'GET':
-        try:
-            item_images = ItemImage.objects.filter(item_id=item_id)
-            images = []
-            for item_image in item_images:
-                images.append({
-                    "name": str(item_image.image.name),
-                    "base64_url": "data:image/png;base64," + str(
-                        base64.b64encode(item_image.image.file.read()).decode("utf-8"))
-                })
-            return Response(json.dumps(images), status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_user_image_base64(request, userimage_id):
+def get_userimage_base64(request, userimage_id):
     if request.method == 'GET':
         try:
             userimage = UserImage.objects.get(pk=userimage_id)
@@ -491,4 +478,34 @@ def get_user_image_base64(request, userimage_id):
             return Response(json.dumps(response), status=status.HTTP_200_OK)
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_itemimage(request, itemimage_id):
+    if request.method == 'GET':
+        try:
+            image = ItemImage.objects.get(pk=itemimage_id)
+            return FileResponse(open(image.path, 'rb'))
+        except ItemImage.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except ItemImage.MultipleObjectsReturned:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_item_images_base64(request, item_id):
+    if request.method == 'GET':
+        item_images = ItemImage.objects.filter(item_id=item_id)
+        images = []
+        for item_image in item_images:
+            images.append({
+                "name": str(item_image.image.name),
+                "base64_url": "data:image/png;base64," + str(
+                    base64.b64encode(item_image.image.file.read()).decode("utf-8"))
+            })
+        return Response(json.dumps(images), status=status.HTTP_200_OK)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -308,13 +308,19 @@ class ItemView(models.Model):
 
 
 class Conversation(models.Model):
-    starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
-                                on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, related_name='conversations', on_delete=models.CASCADE, null=True)
     lastmessagedate = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-lastmessagedate']
+
+
+class ConversationUser(models.Model):
+    conversation = models.ForeignKey(Conversation, related_name='users', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_link', on_delete=models.CASCADE)
+    joining_date = models.DateTimeField(default=timezone.now)
+    updated_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(default=timezone.now)
 
 
 class Message(models.Model):

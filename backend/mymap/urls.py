@@ -19,17 +19,17 @@ router.register("conversations/messages", MessageViewSet, basename='messages')
 router.register("recurrents", RecurrentItemViewSet, basename='recurrents')
 router.register("actives", ActiveItemViewSet, basename='actives')
 router.register("user_items", UserItemViewSet, basename='user_items')
-router.register("user_image", UserImageViewSet, basename='user_image')
+router.register("user_images", UserImageViewSet, basename='user_images')
 router.register("map_ecats", UserMapExtraCategoriesViewSet, basename='map_ecats')
 
 urlpatterns = [
     path("", include(router.urls)),
     path("address", views.get_address, name='get_address'),
-    path("address/reverse", views.get_address_reverse, name='get_address'),
+    path("address/reverse", views.get_address_reverse, name='get_address_reverse'),
     path("predictClass/", views.predict_class, name='predict_class'),
     path("notifications/", views.get_notifications, name='notifications'),
-    path("items/images/<int:itemimage_id>", views.get_item_image, name='get_item_image'),
-    path("users/images/<int:userimage_id>", views.user_image, name='user_image'),
-    path("users/images/<int:userimage_id>/base64", views.get_user_image_base64, name='get_user_image_base64'),
+    path("users/images/<int:userimage_id>", views.get_userimage, name='get_userimage'),
+    path("users/images/<int:userimage_id>/base64", views.get_userimage_base64, name='get_userimage_base64'),
+    path("items/images/<int:itemimage_id>", views.get_itemimage, name='get_itemimage'),
     path("items/<int:item_id>/images/base64", views.get_item_images_base64, name='get_item_images_base64'),
 ]

@@ -1,6 +1,7 @@
 import Vuex from "vuex";
 import Vue from "vue";
 import createPersistedState from "vuex-persistedstate";
+import {isInt} from "@/functions";
 
 Vue.use(Vuex);
 
@@ -8,7 +9,6 @@ export default new Vuex.Store({
     plugins: [createPersistedState()],
     state: {
         user: {
-            email: null,
             id: null
         },
         isAuthenticated: false,
@@ -20,7 +20,7 @@ export default new Vuex.Store({
     mutations: {
         initializeStore(state) {
             this.commit('setToken', localStorage.getItem('token'));
-            this.commit('setUserID', localStorage.getItem('user_id'));
+            this.commit('setUserID', Number(localStorage.getItem('user_id')));
         },
         setToken(state, token) {
             if (token) {
@@ -35,7 +35,7 @@ export default new Vuex.Store({
             state.isAuthenticated = false;
         },
         setUserID(state, id) {
-            state.user.id = id;
+            state.user.id = (isInt(id)) ? id : null;
         },
         removeUserID(state) {
             state.user.id = null;

@@ -244,7 +244,7 @@ export default {
       return (this.$route.query.kind === 'recurrent') ? 'recurrents' : 'items';
     },
     isOwner() {
-      return this.$store.state.user.id === this.user.id;
+      return this.$store.state.user.id === this.userId;
     },
     itemCategories() {
       let itemCategories = [];
