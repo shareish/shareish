@@ -68,16 +68,11 @@ import ItemCard from "@/components/ItemCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
 import {
-  GeolocationCoords, isArr,
-  isNotEmptyArray,
+  GeolocationCoords,
   isNotEmptyString,
   lcall,
   ucfirst
 } from "@/functions";
-import ToggleBox from "@/components/ToggleBox.vue";
-import CategorySelector from "@/components/CategorySelector.vue";
-import {categories} from "@/categories";
-import moment from "moment/moment";
 import ItemFilters from "@/components/ItemFilters.vue";
 
 export default {
