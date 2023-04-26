@@ -78,8 +78,8 @@ export const aedIcon = new L.Icon({
 });
 
 export const giveBoxIcon = new L.Icon({
-  iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Fridge_icon_2.png',
-  //Tommaso.sansone91, CC BY-SA 4.0
+  iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Box-archive-solid.svg',
+  // author: Font Awesome
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [20, 31],
   iconAnchor: [12, 31],
