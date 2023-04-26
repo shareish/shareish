@@ -4,14 +4,13 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-from mymap.models import UserMapExtraCategories
-
 
 def forwards_func(apps, schema_editor):
     UserMapExtraCategory = apps.get_model("mymap", "UserMapExtraCategory")
+    UserMapExtraCategories = apps.get_model("mymap", "UserMapExtraCategories")
     User = apps.get_model("mymap", "User")
     db_alias = schema_editor.connection.alias
-    users = User.objects.all()
+    users = User.objects.using(db_alias).all()
     for user in users:
         for category in UserMapExtraCategories:
             UserMapExtraCategory.objects.using(db_alias).create(user=user, category=category)

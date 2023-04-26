@@ -3,17 +3,19 @@
 from django.contrib.gis.geos import Point
 from django.db import migrations
 
-from mymap.models import Item, User
 
+def reverse_coords(apps, schema_editor):
+    Item = apps.get_model("mymap", "Item")
+    User = apps.get_model("mymap", "User")
+    db_alias = schema_editor.connection.alias
 
-def reverse_coords():
-    items = Item.objects.filter(location__isnull=False)
+    items = Item.objects.using(db_alias).filter(location__isnull=False)
     for item in items:
         pt = item.location
         item.location = Point(pt.y, pt.x, srid=4326)
         item.save()
 
-    users = User.objects.filter(ref_location__isnull=False)
+    users = User.objects.using(db_alias).filter(ref_location__isnull=False)
     for user in users:
         pt = user.ref_location
         user.ref_location = Point(pt.y, pt.x, srid=4326)
@@ -21,11 +23,11 @@ def reverse_coords():
 
 
 def forwards_func(apps, schema_editor):
-    reverse_coords()
+    reverse_coords(apps, schema_editor)
 
 
 def reverse_func(apps, schema_editor):
-    reverse_coords()
+    reverse_coords(apps, schema_editor)
 
 
 class Migration(migrations.Migration):
