@@ -221,8 +221,8 @@
                     </b-select>
                   </div>
                 </div>
-                <p v-if="input_timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
-                <p v-else>{{ $t('only-items-created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('on-day') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('or-later-will-be-showed') }}.</p>
+		<p v-if="input_timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('will-be-showed') }}.</p>
+		<p v-else>{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('will-be-showed') }}.</p>
               </template>
             </toggle-box>
           </div>
