@@ -21,7 +21,7 @@
           </b-carousel-item>
         </template>
       </b-carousel>
-      <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+      <div class="views_count tag">{{ item.views_count }}<i class="far fa-eye"></i></div>
     </div>
     <div class="card-content">
       <div class="media">
@@ -156,14 +156,14 @@ export default {
   position: relative;
 }
 
-.card-image .hitcount {
+.card-image .views_count {
   position: absolute;
   right: 10px;
   bottom: 10px;
   font-weight: bold;
 }
 
-.card-image .hitcount i {
+.card-image .views_count i {
   margin-left: 4px;
 }
 

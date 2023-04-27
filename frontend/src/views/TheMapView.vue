@@ -88,9 +88,9 @@
           </l-layer-group>
         </l-feature-group>
       </l-map>
-      <div id="flap">
-        <div class="inner">
-          <div v-if="flapSelected === 'settings'" class="settings">
+      <div id="flaps">
+        <div class="flap settings">
+          <div class="inner">
             <header class="is-flex">
               <h2 class="title">{{ $t('settings') }}</h2>
               <b-button
@@ -123,17 +123,11 @@
                   </b-field>
                 </div>
               </div>
-              <div class="buttons mt-3 is-flex is-justify-content-center">
-                <b-button
-                    :label="$t('save')"
-                    type="is-primary"
-                    :loading="waitingFormResponse"
-                    @click="saveExtraCategories"
-                />
-              </div>
             </div>
           </div>
-          <div v-else-if="flapSelected === 'filters'" class="filters">
+        </div>
+        <div class="flap filters">
+          <div class="inner">
             <header class="is-flex">
               <h2 class="title">{{ $tc('filter', 0) }}</h2>
               <b-button
@@ -146,132 +140,13 @@
               </b-button>
             </header>
             <div class="content">
-              <div id="filters">
-                <div class="search">
-                  <b-field :label="$t('search')">
-                    <b-input v-model="searchString" :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
-                  </b-field>
-                </div>
-                <div class="other-filters mt-4">
-                  <toggle-box :title="$tc('type', 0)" outlined :title-size="6" class="mt-3">
-                    <template v-if="windowWidth >= 768 && windowWidth < 1024">
-                      <div class="columns is-mobile">
-                        <div class="column pr-2">
-                          <b-field class="mb-1">
-                            <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                              <span>{{ $t('donation') }}</span>
-                            </b-checkbox-button>
-                          </b-field>
-                        </div>
-                        <div class="column pr-2 pl-2">
-                          <b-field class="mb-1">
-                            <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                              <span>{{ $t('request') }}</span>
-                            </b-checkbox-button>
-                          </b-field>
-                        </div>
-                        <div class="column pr-2 pl-2">
-                          <b-field class="mb-1">
-                            <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                              <span>{{ $t('loan') }}</span>
-                            </b-checkbox-button>
-                          </b-field>
-                        </div>
-                        <div class="column pl-2">
-                          <b-field class="mb-1">
-                            <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                              <span>{{ $t('event') }}</span>
-                            </b-checkbox-button>
-                          </b-field>
-                        </div>
-                      </div>
-                    </template>
-                    <template v-else>
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="DN" type="is-success">
-                          <span>{{ $t('donation') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="RQ" type="is-danger">
-                          <span>{{ $t('request') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="LN" type="is-warning">
-                          <span>{{ $t('loan') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                      <b-field class="mb-1">
-                        <b-checkbox-button v-model="searchTypes" native-value="EV" type="is-purple">
-                          <span>{{ $t('event') }}</span>
-                        </b-checkbox-button>
-                      </b-field>
-                    </template>
-                  </toggle-box>
-                  <toggle-box :title="$tc('category', 0)" outlined :title-size="6" class="mt-3">
-                    <div v-if="searchCategories.length > 0" id="selected-categories">
-                      <p class="has-text-weight-bold mb-2">{{ $t('searched-categories') }}:</p>
-                      <div v-for="category in searchCategories" :key="category" class="selected-category columns is-mobile">
-                        <div class="column name">{{ getCategory(category) }}</div>
-                        <div class="column close" @click="removeCategory(category)"><i class="fas fa-times-circle"></i></div>
-                      </div>
-                    </div>
-                    <template v-else>
-                      <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
-                    </template>
-                    <category-selector v-model="selectedCategory" expanded />
-                  </toggle-box>
-                  <toggle-box :title="$t('availability')" outlined :title-size="6" class="mt-3">
-                    <b-field :label="$t('from')">
-                      <b-datetimepicker
-                          v-model="searchAvailabilityFrom"
-                          icon="calendar"
-                          :icon-right="searchAvailabilityFrom ? 'close-circle' : ''"
-                          icon-right-clickable
-                          @icon-right-click="searchAvailabilityFrom = null"
-                          icon-pack="fas"
-                          :locale="$i18n.locale"
-                      />
-                    </b-field>
-                    <b-field :label="$t('until')">
-                      <b-datetimepicker
-                          v-model="searchAvailabilityUntil"
-                          icon="calendar"
-                          :icon-right="searchAvailabilityUntil ? 'close-circle' : ''"
-                          icon-right-clickable
-                          @icon-right-click="searchAvailabilityUntil = null"
-                          icon-pack="fas"
-                          :locale="$i18n.locale"
-                      />
-                    </b-field>
-                  </toggle-box>
-                  <toggle-box :title="$t('publication')" outlined :title-size="6" class="mt-3">
-                    <b-field>
-                      <b-switch v-model="onlyUnseen" type="is-primary">{{ $t('show-only-unseen') }}</b-switch>
-                    </b-field>
-                    <b-field>
-                      <b-switch v-model="useMinCreactiondate" type="is-primary">{{ $t('filter-items-creationdate') }}</b-switch>
-                    </b-field>
-                    <template v-if="useMinCreactiondate">
-                      <div class="columns is-mobile mb-0 mt-3">
-                        <div class="column pr-1">
-                            <b-slider v-model="sliderTimeUnit" class="pr-5 pl-4" :min="1" :max="sliderTimeUnitMax" :step="1" indicator :tooltip="false" />
-                        </div>
-                        <div class="column pl-1" style="flex: 0 0 auto;">
-                          <b-select v-model="timeUnit" :placeholder="$t('unit')">
-                              <option value="days">{{ $tc('day', 0) }}</option>
-                              <option value="hours">{{ $tc('hour', 0) }}</option>
-                              <option value="minutes">{{ $tc('minute', 0) }}</option>
-                          </b-select>
-                        </div>
-                      </div>
-                      <p v-if="timeUnit === 'days'">{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('will-be-showed') }}.</p>
-                      <p v-else>{{ $t('only-items-created-on') }} <b>{{ formattedDay(minCreationdate) }}</b> {{ $t('created-at') }} <b>{{ formattedHour(minCreationdate) }}</b> {{ $t('will-be-showed') }}.</p>
-                    </template>
-                  </toggle-box>
-                </div>
-              </div>
+              <items-filters
+                @fieldsUpdated="itemFiltersUpdated"
+                rewrite-url-page-name="map"
+                :limited-vertical-space="false"
+                :locationFilter="false"
+                :boxed="false"
+              />
             </div>
           </div>
         </div>
@@ -305,10 +180,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
-import ToggleBox from "@/components/ToggleBox.vue";
-import CategorySelector from "@/components/CategorySelector.vue";
-import moment from "moment";
-import {categories} from "@/categories";
+import ItemsFilters from "@/components/ItemsFilters.vue";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -321,8 +193,7 @@ export default {
   name: 'TheMapView',
   mixins: [ErrorHandler, WindowSize],
   components: {
-    CategorySelector,
-    ToggleBox,
+    ItemsFilters,
     ItemMapPopup,
     LMap,
     LTileLayer,
@@ -344,33 +215,13 @@ export default {
       ecatsCheckboxes: [],
       waitingFormResponse: false,
 
-      isMoreFiltersOpened: false,
       bounds: null,
       searchBounds: null,
-      searchString: null,
-      searchTypes: ['DN', 'LN', 'RQ', 'EV'],
-      searchCategories: [],
-      selectedCategory: null,
-      searchAvailabilityFrom: null,
-      searchAvailabilityUntil: null,
       geoLocation: null,
       refLocation: null,
-      onlyUnseen: false,
-      useMinCreactiondate: false,
-      timeUnit: 'hours',
-      sliderTimeUnitMemory: {
-        'days': 1,
-        'hours': 1,
-        'minutes': 1
-      },
-      sliderTimeUnitMaximums: {
-        'days': 31,
-        'hours': 24,
-        'minutes': 60
-      },
-      sliderTimeUnit: 1,
-      minCreationdate: new Date(),
-      searchMinCreationdate: null,
+      filteredQueryValues: {},
+      builtURLParams: {},
+
       initialItemsLoadDone: false,
       user: {},
 
@@ -492,84 +343,60 @@ export default {
     this.mapLoading = false;
   },
   computed: {
-    params() {
-      return {
-        search: this.searchString,
-        types: this.searchTypes,
-        categories: this.searchCategories,
-        onlyNew: (this.onlyUnseen) ? this.onlyUnseen : null,
-        availableFrom: this.searchAvailabilityFrom,
-        availableUntil: this.searchAvailabilityUntil,
-        minCreationdate: this.searchMinCreationdate
-      };
-    },
     itemId() {
       return (this.$route.query.id) ? Number(this.$route.query.id) : null;
     },
     userId() {
       return Number(this.$store.state.user.id);
     },
-    sliderTimeUnitMax() {
-      return this.sliderTimeUnitMaximums[this.timeUnit];
-    }
   },
   watch: {
-    useMinCreactiondate() {
-      if (this.useMinCreactiondate)
-        this.updateSearchMinCreationdate();
-      else
-        this.searchMinCreationdate = null;
-    },
-    timeUnit() {
-      this.sliderTimeUnit = this.sliderTimeUnitMemory[this.timeUnit];
-      this.updateSearchMinCreationdate();
-    },
-    sliderTimeUnit() {
-      this.sliderTimeUnitMemory[this.timeUnit] = this.sliderTimeUnit;
-      this.updateSearchMinCreationdate();
-    },
-    selectedCategory() {
-      if (this.searchCategories.indexOf(this.selectedCategory) === -1)
-        this.searchCategories.push(this.selectedCategory);
-    },
-    params() {
-      if (this.initialItemsLoadDone)
-        this.fetchMathElements();
+    ecatsCheckboxes() {
+      this.ecatsCheckboxesUpdated();
     }
   },
   methods: {
     ucfirst,
     lcall,
-    async saveExtraCategories() {
-      this.waitingFormResponse =  true;
-
-      try {
-        const data = {};
-        data['map_ecats'] = []
-        for (const [index, extraCategory] of Object.entries(this.user.map_ecats))
-          data['map_ecats'].push({
-            'category': extraCategory.category,
-            'selected': this.ecatsCheckboxes.includes(extraCategory.category)
-          });
-
-        await axios.patch(`/api/v1/webusers/${this.userId}/`, data);
-
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-success',
-          message: this.$t('map-settings-saved'),
-          pauseOnHover: true,
-          queue: false
-        });
-
-        for (const i in this.user.map_ecats)
-          this.user.map_ecats[i].selected = this.ecatsCheckboxes.includes(this.user.map_ecats[i].category);
+    async ecatsCheckboxesUpdated() {
+      for (const i in this.user.map_ecats) {
+        const checkboxSelected = this.ecatsCheckboxes.includes(this.user.map_ecats[i].category);
+        if (this.user.map_ecats[i].selected !== checkboxSelected) {
+          try {
+            await axios.patch(`/api/v1/map_ecats/${this.user.map_ecats[i].id}/`, {selected: checkboxSelected});
+            this.user.map_ecats[i].selected = checkboxSelected;
+          }
+          catch (error) {
+            this.snackbarError(error);
+          }
+        }
       }
-      catch (error) {
-        this.snackbarError(error);
-      }
+    },
+    rewriteURL() {
+      clearTimeout(this.timeouts['rewriteURL']);
+      this.timeouts['rewriteURL'] = setTimeout(async () => {
+        try {
+          await this.$router.push({name: 'map', query: this.builtURLParams});
+        } catch (error) {
+          console.log("Redirected on same URL.");
+        }
+      }, 100);
+    },
+    itemFiltersUpdated(filteredQueryValues, builtURLParams) {
+      this.builtURLParams = {...builtURLParams};
+      this.rewriteURL();
 
-      this.waitingFormResponse =  false;
+      this.$store.commit('setItemsFilters', {
+        builtURLParams: this.builtURLParams,
+        keysToKeep: ['dr', 'lt', 'ordering', 'us']
+      });
+
+      clearTimeout(this.timeouts['itemFiltersUpdated']);
+      this.timeouts['itemFiltersUpdated'] = setTimeout(() => {
+        this.filteredQueryValues = filteredQueryValues;
+
+        this.fetchItems(false);
+      }, 600);
     },
     selectAll() {
       for (const i in this.user.map_ecats) {
@@ -580,59 +407,13 @@ export default {
     deselectAll() {
       this.ecatsCheckboxes = [];
     },
-    updateSearchMinCreationdate() {
-      this.minCreationdate = this.getMinCreationdate();
-
-      clearTimeout(this.timeouts['searchMinCreationdate']);
-      this.timeouts['searchMinCreationdate'] = setTimeout(() => {
-        this.searchMinCreationdate = this.minCreationdate;
-      }, 600);
-    },
-    getMinCreationdate() {
-      let minCreationdate = new Date();
-
-      switch (this.timeUnit) {
-        case 'days':
-          minCreationdate.setDate(minCreationdate.getDate() - this.sliderTimeUnit);
-          minCreationdate.setHours(0);
-          minCreationdate.setMinutes(0);
-          break;
-        case 'hours':
-          minCreationdate.setHours(minCreationdate.getHours() - this.sliderTimeUnit);
-          minCreationdate.setMinutes(0);
-          break;
-        case 'minutes':
-          minCreationdate.setMinutes(minCreationdate.getMinutes() - this.sliderTimeUnit);
-          break;
-      }
-      minCreationdate.setSeconds(0);
-      minCreationdate.setMilliseconds(0);
-
-      return minCreationdate;
-    },
-    formattedDay(date) {
-      return (moment(date).locale(this.$i18n.locale).format("DD/MM/YYYY"));
-    },
-    formattedHour(date) {
-      return (moment(date).locale(this.$i18n.locale).format("HH:mm"));
-    },
-    getCategory(category) {
-      if (category in categories) {
-        return this.$t(categories[category]['slug']);
-      }
-      return "";
-    },
-    removeCategory(category) {
-      const index = this.searchCategories.indexOf(category);
-      if (index > -1)
-        this.searchCategories.splice(index, 1);
-    },
     async fetchUser() {
       try {
         const params = {
           columns: ['ref_location', 'map_ecats']
         }
-        this.user = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data;
+        this.user = (await axios.get(`api/v1/webusers/${this.userId}/`, {params: params})).data;
+
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);
       }
@@ -678,7 +459,7 @@ export default {
       this.flapOpened = true;
       this.flapSelected = name;
 
-      const flap = this.$el.querySelector("#flap");
+      const flap = this.$el.querySelector(`#flaps .${this.flapSelected}`);
       if (this.windowWidth < 700) {
         flap.style.width = "calc(100% - 2 * .5rem)";
         flap.style.left = "0.5rem";
@@ -693,8 +474,10 @@ export default {
     },
     closeFlap() {
       if (this.flapOpened) {
-        const flap = this.$el.querySelector("#flap");
+        const flap = this.$el.querySelector(`#flaps .${this.flapSelected}`);
         flap.style.left = "100%";
+        this.flapSelected = null;
+        this.flapOpened = false;
       }
     },
     async fetchRoutedItem() {
@@ -714,9 +497,9 @@ export default {
       }
     },
     async fetchItems() {
-      if (this.zoom >= this.minZoomToShowElements) {
+      if (this.zoom >= this.minZoomToShowElements && this.searchBounds != null) {
         try {
-          const params = this.params;
+          const params = {...this.filteredQueryValues};
           params['bounds'] = [this.searchBounds[0].toString(), this.searchBounds[1].toString()];
 
           const items = (await axios.get("/api/v1/actives/", {params: params})).data;
@@ -843,7 +626,7 @@ export default {
           this.searchBounds[1].update(SECoords);
         }
 
-        await this.fetchItems();
+        await this.fetchItems(this.filteredQueryValues);
 
         if (!this.initialItemsLoadDone) {
           if (this.itemId !== null && !this.routedItemError) {
@@ -862,14 +645,14 @@ export default {
     },
     async fetchMathElements() {
       this.mapLoading = true;
-      await this.fetchItems();
+      await this.fetchItems(this.filteredQueryValues);
       await this.fetchExtraLayersMakers();
       this.mapLoading = false;
     },
     windowSizeChanged() {
       if (this.flapOpened) {
+        const flap = this.$el.querySelector(`#flaps .${this.flapSelected}`);
         if (this.windowWidth < 700) {
-          const flap = this.$el.querySelector("#flap");
           flap.style.width = "calc(100% - 2 * 0.5rem)";
           flap.style.left = "0.5rem";
         } else {
@@ -947,7 +730,7 @@ export default {
   overflow: hidden;
 }
 
-#flap {
+#flaps .flap {
   position: absolute;
   top: 0.5rem;
   bottom: 0.5rem;
@@ -980,7 +763,7 @@ export default {
 }
 
 @media screen and (max-width: 700px) {
-  #flap .inner .settings .content .columns {
+  #flaps .flap .inner .settings .content .columns {
     display: block;
 
     & > .column {

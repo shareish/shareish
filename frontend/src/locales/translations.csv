@@ -291,6 +291,8 @@ creationdate,Publication date,Date de publication
 startdate,Start date,Date de début
 enddate,End date,Date de fin
 distance,Distance,Distance
+comments_count,Comments count,Nombre de commentaires
+views_count,Views count,Nombre de vues
 use-geolocation,Use geolocation,Utiliser la géolocalisation
 use-reflocation,Use reference location,Utiliser la localisation de référence
 dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
@@ -299,9 +301,17 @@ radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
 restrict-distance,Restrict distance,Restreindre la distance
 order-by,Order by,Trier par
 recent-first,Recents first,Récents en premier
-order-by-availability-startdate,Availability (starting date),Disponibilité (date de début)
-order-by-availability-enddate,Availability (ending date),Disponibilité (date de fin)
-closest-distance,Distance (closest),Distance (les plus proches)
+oldest-first,Oldest first,Anciens en premier
+closest-first,Closest first,Les plus proches en premier
+furthest-first,Furthest first,Les plus lointains en premier
+starting-soon-first,Starting soon first,Commencent bientôt en premier
+starting-late-first,Starting late first,Commencent tard en premier
+ending-soon-first,Ending soon first,Finissent bientôt en premier
+ending-late-first,Ending late first,Finissent tard en premier
+most-commented,Most commented,Les plus commentés
+least-commented,Least commented,Les moins commentés
+most-viewed,Most viewed,Les plus vus
+least-viewed,Least viewed,Les moins vus
 available,Available,Disponible
 corresponding-to-search,matches your search.|match your search.,correspond à votre recherche.|correspondent à votre recherche.
 found,found.,trouvé.|trouvés.
@@ -338,3 +348,6 @@ slogan,"Start to share, and cherish.","Partagez, chérissez."
 join-shareish-now,Join Shareish now!,Rejoignez Shareish dès maintenant!
 enter-shareish,Continue on Shareish,Continuer sur Shareish
 what-is-shareish,What is Shareish?,Qu'est-ce que Shareish?
+only-items-created-at,Only items created at,Seuls les éléments créé à
+on-day,on,le
+or-later-will-be-showed,or later will be showed,ou après seront affichés

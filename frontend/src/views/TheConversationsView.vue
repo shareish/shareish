@@ -169,7 +169,7 @@
 import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import {categories} from "@/categories";
-import {scrollParentToChild, rem, isArrEmpty, isNotEmptyString} from "@/functions";
+import {scrollParentToChild, rem, isEmptyArray, isNotEmptyString} from "@/functions";
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
@@ -391,7 +391,7 @@ export default {
       }
     },
     getIConversation(conversationId) {
-      if (!isArrEmpty(this.conversations)) {
+      if (!isEmptyArray(this.conversations)) {
         for (let i in this.conversations) {
           if (this.conversations[i].id === conversationId)
             return Number(i);

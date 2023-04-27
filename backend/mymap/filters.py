@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point, GEOSGeometry, Polygon
@@ -37,25 +37,31 @@ class ItemTypeFilterBackend(filters.BaseFilterBackend):
 
 class ItemViewFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        only_new = request.query_params.get('onlyNew') == "true"
+        only_new = request.query_params.get('onlyUnseen') == "true"
         if only_new:
-            return queryset.exclude(item_views__user=request.user)
+            return queryset.exclude(views__user=request.user)
         return queryset
 
 
 class ItemAvailabilityFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        available_from = request.query_params.get('availableFrom')
-        available_until = request.query_params.get('availableUntil')
+        avf = request.query_params.get('availableFrom')
+        avu = request.query_params.get('availableUntil')
 
-        if available_from:
-            if available_until:
-                queryset = queryset.filter((Q(startdate__gte=available_from) & Q(startdate__lte=available_until)) | (Q(startdate__lt=available_from) & Q(enddate__isnull=True)))
-                queryset = queryset.filter((Q(enddate__gte=available_from) & Q(enddate__lte=available_until)) | Q(enddate__isnull=True))
+        includeAfterAVF = (request.query_params.get('includeAfterAvailableFrom') == 'true')
+        includeBeforeAVU = (request.query_params.get('includeBeforeAvailableUntil') == 'true')
+
+        if avf:
+            if includeAfterAVF:
+                queryset = queryset.filter((Q(enddate__gt=avf) | Q(enddate__isnull=True)))
             else:
-                queryset = queryset.filter(Q(enddate__gte=available_from) | (Q(startdate__lt=available_from) & Q(enddate__isnull=True)))
-        elif available_until:
-            queryset = queryset.filter(Q(enddate__lte=available_until) | (Q(startdate__gte=datetime.now(timezone.utc)) & Q(enddate__isnull=True)))
+                queryset = queryset.filter(Q(startdate__lt=avf) & (Q(enddate__gt=avf) | Q(enddate__isnull=True)))
+        if avu:
+            if includeBeforeAVU:
+                queryset = queryset.filter(startdate__lt=avu)
+            else:
+                queryset = queryset.filter(Q(startdate__lt=avu) & (Q(enddate__gt=avu) | Q(enddate__isnull=True)))
+
         return queryset
 
 
@@ -68,7 +74,7 @@ class ItemLocationFilterBackend(filters.BaseFilterBackend):
             user_location = Point(user_location['longitude'], user_location['latitude'], srid=4326)
             queryset = queryset.annotate(distance=Distance("location", user_location))
 
-            if len(distances_radius) > 0:
+            if len(distances_radius) == 2:
                 distances_radius = [int(distance) for distance in distances_radius]
                 min_distance = min(distances_radius) * 1000
                 max_distance = max(distances_radius) * 1000
