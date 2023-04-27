@@ -2,7 +2,7 @@
   <div id="page-items">
     <div class="columns">
       <div class="column">
-        <item-filters
+        <items-filters
             @fieldsUpdated="itemFiltersUpdated"
             rewrite-url-page-name="items"
             :limited-vertical-space="windowWidth < 1024"
@@ -75,12 +75,12 @@ import {
   lcall,
   ucfirst
 } from "@/functions";
-import ItemFilters from "@/components/ItemFilters.vue";
+import ItemsFilters from "@/components/ItemsFilters.vue";
 
 export default {
   name: 'TheItemsView',
   mixins: [ErrorHandler, WindowSize],
-  components: {ItemFilters, ItemCard},
+  components: {ItemsFilters, ItemCard},
   data() {
     return {
       userLocation: null,
@@ -195,9 +195,6 @@ export default {
       this.input_orderByDirection = '-';
     }
 
-    this.builtURLParams['ordering'] = this.ordering;
-    this.$store.commit('setItemsFilters', this.builtURLParams);
-
     window.addEventListener('scroll', this.scrollHandler);
   },
   async mounted() {
@@ -221,7 +218,7 @@ export default {
     },
     ordering() {
       this.builtURLParams['ordering'] = this.ordering;
-      this.$store.commit('setItemsFilters', this.builtURLParams);
+      this.$store.commit('setItemsFilters', {builtURLParams: this.builtURLParams});
       this.rewriteURL();
       if (this.firstItemsLoaded)
         this.fetchItems(false);
@@ -249,7 +246,7 @@ export default {
       this.builtURLParams = {...builtURLParams, ordering: this.ordering};
       this.rewriteURL();
 
-      this.$store.commit('setItemsFilters', this.builtURLParams);
+      this.$store.commit('setItemsFilters', {builtURLParams: this.builtURLParams});
 
       clearTimeout(this.timeouts['itemFiltersUpdated']);
       this.timeouts['itemFiltersUpdated'] = setTimeout(() => {

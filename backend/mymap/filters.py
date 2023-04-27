@@ -39,7 +39,7 @@ class ItemViewFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         only_new = request.query_params.get('onlyUnseen') == "true"
         if only_new:
-            return queryset.exclude(item_views__user=request.user)
+            return queryset.exclude(views__user=request.user)
         return queryset
 
 

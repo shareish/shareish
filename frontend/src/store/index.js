@@ -1,6 +1,7 @@
 import Vuex from "vuex";
 import Vue from "vue";
 import createPersistedState from "vuex-persistedstate";
+import {isDict} from "@/functions";
 
 Vue.use(Vuex);
 
@@ -40,9 +41,19 @@ export default new Vuex.Store({
         removeUserID(state) {
             state.user.id = null;
         },
-        setItemsFilters(state, itemsFilters) {
-            for (const [key, value] of Object.entries(itemsFilters))
-                state.itemsFilters[key] = value;
+        setItemsFilters(state, {builtURLParams, keysToKeep = []}) {
+            if (isDict(state.itemsFilters)) {
+                const toKeep = {};
+                for (const key of keysToKeep) {
+                    if (key in state.itemsFilters)
+                        toKeep[key] = state.itemsFilters[key];
+                }
+                state.itemsFilters = builtURLParams;
+                for (const [key, value] of Object.entries(toKeep))
+                    state.itemsFilters[key] = value;
+            } else {
+                state.itemsFilters = builtURLParams;
+            }
         }
     },
     actions: {},
