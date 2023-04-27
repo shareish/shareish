@@ -34,6 +34,8 @@
                   <option value="startdate">{{ $t('startdate') }}</option>
                   <option value="enddate">{{ $t('enddate') }}</option>
                   <option value="distance">{{ $t('distance') }}</option>
+                  <option value="comments_count">{{ $t('comments_count') }}</option>
+                  <option value="views_count">{{ $t('views_count') }}</option>
                 </b-select>
               </b-field>
               <b-field class="wsnw ml-1 is-small">
@@ -123,6 +125,26 @@ export default {
           {
             'direction': '-',
             'label': 'furthest-first'
+          }
+        ],
+        'comments_count': [
+          {
+            'direction': '-',
+            'label': 'most-commented'
+          },
+          {
+            'direction': '',
+            'label': 'least-commented'
+          }
+        ],
+        'views_count': [
+          {
+            'direction': '-',
+            'label': 'most-viewed'
+          },
+          {
+            'direction': '',
+            'label': 'least-viewed'
           }
         ]
       },
