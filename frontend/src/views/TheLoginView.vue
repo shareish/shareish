@@ -57,9 +57,9 @@ export default {
         this.$store.commit('setToken', token);
         localStorage.setItem("token", token);
 
-        const user = (await axios.get("api/v1/users/me/")).data;
-        this.$store.commit('setUserID', user['id']);
-        localStorage.setItem("user_id", user['id']);
+        const user_id = Number((await axios.get("api/v1/users/me/")).data.id);
+        this.$store.commit('setUserID', user_id);
+        localStorage.setItem("user_id", user_id);
 
         await this.$router.push('/map');
       }
