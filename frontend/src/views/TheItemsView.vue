@@ -264,10 +264,12 @@ export default {
       }, 600);
     },
     scrollHandler: _.debounce(function () {
-      let scrollBlock = document.getElementById('wrapper');
-      let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
-      if (bottom && !this.loadedAllItems)
-        this.fetchItems(true);
+      if (!this.loadedAllItems && this.firstItemsLoaded) {
+        const scrollBlock = document.getElementById('wrapper');
+        const bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
+        if (bottom)
+          this.fetchItems(true);
+      }
     }, 100),
     async fetchItems(append = false) {
       this.lastQueryDatetime = new Date();
