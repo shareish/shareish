@@ -71,7 +71,7 @@
               <p class="conversation-receiver mb-1">
                 {{ $t('with') }}
                 <span class="has-text-primary">
-                  @{{ conversation.receiver.username }}
+                  @{{ conversation.receivers.map(receiver => receiver.user.username).join(', @')  }}
                 </span>
               </p>
               <p class="conversation-last_message mt-1">{{ conversation.last_message }}</p>
@@ -94,21 +94,26 @@
                 </b-button>
               </div>
               <div class="level-item">
-                <template v-if="windowWidth > 768">
-                  Chatting with
-                  <strong class="ml-1">
-                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
-                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
-                    </router-link>
-                  </strong>
+                <template v-if="activeConversation.receivers.length === 1">
+                  <p v-if="windowWidth > 768">
+                    Chatting with
+                    <strong class="ml-1">
+                      <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
+                        {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
+                      </router-link>
+                    </strong>
+                  </p>
+                  <p v-else>
+                    <strong>
+                      <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
+                        {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
+                      </router-link>
+                    </strong>
+                  </p>
                 </template>
-                <template v-else>
-                  <strong>
-                    <router-link :to="{name: 'profile', params: {id: activeConversation.receiver.id}}">
-                      {{ activeConversation.receiver.first_name }} {{ activeConversation.receiver.last_name }}
-                    </router-link>
-                  </strong>
-                </template>
+                <p v-else>
+                  <strong>Group chat</strong>
+                </p>
               </div>
             </div>
           </div>
@@ -175,7 +180,7 @@ import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
 import _ from "lodash";
 
-const CONVERSATION_LIST_REFRESH_INTERVAL = 15000;
+const CONVERSATIONS_REFRESH_INTERVAL = 15000;
 
 export default {
   name: 'TheConversationsView',
@@ -322,24 +327,34 @@ export default {
       this.checkRows();
     },
     async fetchConversations() {
+      clearTimeout(this.timeouts['conversations']);
       try {
         const filters = {
           search: this.search,
           selectedCategory: this.selectedCategory
         };
         const conversations = (await axios.get("/api/v1/conversations/", {params: filters})).data;
+
         this.$store.state.notifications = Number((await axios.get("/api/v1/notifications/")).data);
+
         this.conversations = conversations.map(conversation => {
           let image = categories[conversation.item.category1]['image-placeholder'];
+
           if (conversation.item.images.length > 0)
             image = conversation.item.images[0];
-          let ids = [conversation.item.user.id, conversation.starter.id];
-          ids.splice(ids.indexOf(this.userId), 1);
-          const receiver = (ids[0] === conversation.starter.id) ? conversation.starter : conversation.item.user;
+
+          let conversation_users = [...conversation.users];
+          for (const [i, conversation_user] of conversation_users.entries()) {
+            if (conversation_user.user.id === this.userId) {
+              conversation_users.splice(i, 1);
+              break;
+            }
+          }
+
           return {
             ...conversation,
             image: image,
-            receiver: receiver
+            receivers: conversation_users
           };
         });
 
@@ -360,8 +375,7 @@ export default {
           this.snackbarError(error);
         }
       }
-      clearTimeout(this.timeouts['conversations']);
-      this.timeouts['conversations'] = setTimeout(this.fetchConversations, CONVERSATION_LIST_REFRESH_INTERVAL);
+      this.timeouts['conversations'] = setTimeout(this.fetchConversations, CONVERSATIONS_REFRESH_INTERVAL);
     },
     async setMessagesAsSeen(force = false) {
       if (this.isConversationSelected && (this.activeConversation.unread_messages > 0 || force) && this.messages.length > 0) {
@@ -435,7 +449,7 @@ export default {
                   this.$buefy.snackbar.open({
                     duration: 5000,
                     type: 'is-success',
-                    message: this.$t('message-removed'),
+                    message: this.$t('message-deleted'),
                     pauseOnHover: true,
                     position: 'is-bottom-right'
                   });

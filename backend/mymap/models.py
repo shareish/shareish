@@ -82,7 +82,7 @@ class User(AbstractBaseUser):
     homepage_url = models.URLField(blank=True, default="")
     facebook_url = models.URLField(blank=True, default="")
     instagram_url = models.URLField(blank=True, default="")
-    ref_location = models.PointField(blank=True, geography=True, null=True, default=Point(0.0, 0.0))
+    ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_freq_conversations = models.CharField(
         max_length=1,
@@ -237,7 +237,7 @@ class Item(models.Model):
     category2 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
     category3 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.name + " : " + self.description + " (" + self.category1 + ")"
@@ -296,7 +296,7 @@ class ItemComment(models.Model):
 
 class ItemView(models.Model):
     item = models.ForeignKey(Item, related_name='views', on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.SET_NULL, null=True)
     view_date = models.DateTimeField(default=timezone.now)
     creation_date = models.DateTimeField(auto_now_add=True)
 
@@ -308,19 +308,25 @@ class ItemView(models.Model):
 
 
 class Conversation(models.Model):
-    starter = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_starter',
-                                on_delete=models.CASCADE, null=True)
-    item = models.ForeignKey(Item, related_name='conversations', on_delete=models.CASCADE, null=True)
+    item = models.ForeignKey(Item, related_name='conversations', on_delete=models.SET_NULL, null=True)
     lastmessagedate = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-lastmessagedate']
 
 
+class ConversationUser(models.Model):
+    conversation = models.ForeignKey(Conversation, related_name='users', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='conversations_link', on_delete=models.CASCADE)
+    joining_date = models.DateTimeField(default=timezone.now)
+    updated_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(default=timezone.now)
+
+
 class Message(models.Model):
     content = models.TextField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE, null=True)
-    conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.SET_NULL, null=True)
+    conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
 

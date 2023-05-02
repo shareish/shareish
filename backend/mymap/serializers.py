@@ -3,7 +3,8 @@ import re
 from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 from rest_framework import serializers
 
-from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, UserMapExtraCategory
+from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, \
+    UserMapExtraCategory, ConversationUser
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -163,17 +164,26 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ConversationUserSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = ConversationUser
+        fields = [
+            'id', 'conversation_id', 'user_id', 'joining_date', 'updated_date', 'created_date', 'user'
+        ]
+
+
 class ConversationSerializer(serializers.ModelSerializer):
     unread_messages = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
-    starter = UserSerializer()
     item = ItemSerializer()
+    users = ConversationUserSerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'item_id', 'starter_id', 'lastmessagedate', 'unread_messages', 'last_message',
-            'starter', 'item'
+            'id', 'item_id', 'lastmessagedate', 'unread_messages', 'last_message', 'item', 'users'
         ]
 
     def get_unread_messages(self, obj):

@@ -164,7 +164,7 @@ export default {
         const tempFile = new File([blob], this.filename);
         data.append('image', tempFile);
 
-        const image = (await axios.post("/api/v1/user_image/", data)).data;
+        const image = (await axios.post("/api/v1/user_images/", data)).data;
         this.user.images.unshift(image);
         this.changesNotSaved = false;
         this.$emit('close');
