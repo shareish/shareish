@@ -21,7 +21,10 @@
           </b-carousel-item>
         </template>
       </b-carousel>
-      <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+      <div class="stats">
+        <div v-if="item.comments_count > 0" class="tag mr-2">{{ item.comments_count }}<i class="fas fa-comments"></i></div>
+        <div class="tag">{{ item.views_count }}<i class="far fa-eye"></i></div>
+      </div>
     </div>
     <div class="card-content">
       <div class="media">
@@ -151,38 +154,41 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .card-image {
   position: relative;
+
+  .stats {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-weight: bold;
+    display: inline-flex;
+
+    i {
+      margin-left: 4px;
+    }
+  }
 }
 
-.card-image .hitcount {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  font-weight: bold;
-}
+.media-content {
+  .title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 
-.card-image .hitcount i {
-  margin-left: 4px;
-}
+    a {
+      color: #4a4a4a !important;
+    }
+  }
 
-.media-content .title {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.media-content .title a {
-  color: #4a4a4a !important;
-}
-
-.media-content .description {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
+  .description {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
 }
 
 .icon-text span {

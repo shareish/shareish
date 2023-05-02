@@ -41,7 +41,7 @@ export const rem = function (number) {
 }
 
 export const isDict = function (dict) {
-  return Object.keys(dict).length === 0;
+  return typeof dict === 'object' && dict.constructor === Object;
 }
 
 export const isArr = function (arr) {

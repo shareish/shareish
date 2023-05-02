@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timezone
 
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import FileResponse, JsonResponse, QueryDict
 from django.contrib.auth import get_user_model
 
@@ -38,7 +38,7 @@ locator = Nominatim(user_agent='shareish')
 
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
-    queryset = Item.objects.all()
+    queryset = Item.objects.all().annotate(comments_count=Count('comments'), views_count=Count('views'))
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'

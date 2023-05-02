@@ -14,7 +14,7 @@
             </a>
             <address class="custom-flex-column mt-2">
               <span class="mb-2">Developers: Adrien Guilliams, Ulysse Rubens, Florent Banneux, Pierre Chapeau, Raphaël Marée</span>
-	            <span>Project supervision: <a href="https://people.montefiore.uliege.be/maree/">Raphaël Marée</a></span>
+	            <span>Project coordination: <a href="https://people.montefiore.uliege.be/maree/">Raphaël Marée</a></span>
             </address>
           </div>
           <div class="column">
