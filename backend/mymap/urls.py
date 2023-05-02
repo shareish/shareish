@@ -32,4 +32,5 @@ urlpatterns = [
     path("users/images/<int:userimage_id>/base64", views.get_userimage_base64, name='get_userimage_base64'),
     path("items/images/<int:itemimage_id>", views.get_itemimage, name='get_itemimage'),
     path("items/<int:item_id>/images/base64", views.get_item_images_base64, name='get_item_images_base64'),
+    path("conversations/items/<int:item_id>/close-all", views.close_all_conversations_from_item, name='close_all_conversations_from_item'),
 ]

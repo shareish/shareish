@@ -347,5 +347,12 @@
   "slogan": "Partagez, chérissez.",
   "join-shareish-now": "Rejoignez Shareish dès maintenant!",
   "enter-shareish": "Continuer sur Shareish",
-  "what-is-shareish": "Qu'est-ce que Shareish?"
+  "what-is-shareish": "Qu'est-ce que Shareish?",
+  "confirm": "Confirmer",
+  "close-all-conv-from-item": "Fermer toutes les conversations liées à cet élément",
+  "close-all-conv-from-item-reversible": "Les conversations fermées peuvent toujours être réouvertes plus tard.",
+  "item-linked-to-conv-unavailable-delted": "L'élément lié à cette conversation n'est plus disponible ou a été supprimé.",
+  "item-unavailable": "Élément indisponible",
+  "write-your-message": "Écrivez votre message",
+  "this-conv-is-closed-textarea": "Cette conversation est fermée, vous ne pouvez pas envoyer de message."
 }

@@ -344,3 +344,10 @@ slogan,"Start to share, and cherish.","Partagez, chérissez."
 join-shareish-now,Join Shareish now!,Rejoignez Shareish dès maintenant!
 enter-shareish,Continue on Shareish,Continuer sur Shareish
 what-is-shareish,What is Shareish?,Qu'est-ce que Shareish?
+confirm,Confirm,Confirmer
+close-all-conv-from-item,Close all conversation from this item,Fermer toutes les conversations liées à cet élément
+close-all-conv-from-item-reversible,Conversations closed can still be re-opened later on.,Les conversations fermées peuvent toujours être réouvertes plus tard.
+item-linked-to-conv-unavailable-delted,The item linked to this conversation is unavailable or has been deleted.,L'élément lié à cette conversation n'est plus disponible ou a été supprimé.
+item-unavailable,Item unavailable,Élément indisponible
+write-your-message,Write your message,Écrivez votre message
+this-conv-is-closed-textarea,"This conversation is closed, you cannot send a message.","Cette conversation est fermée, vous ne pouvez pas envoyer de message."

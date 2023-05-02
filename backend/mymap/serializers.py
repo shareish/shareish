@@ -168,7 +168,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = [
-            'id', 'item_id', 'lastmessagedate', 'unread_messages', 'last_message', 'item', 'users'
+            'id', 'item_id', 'is_closed', 'lastmessagedate', 'unread_messages', 'last_message', 'item', 'users'
         ]
 
     def get_unread_messages(self, obj):

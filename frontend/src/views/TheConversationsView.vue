@@ -67,7 +67,14 @@
               </div>
             </div>
             <div class="column">
-              <p class="conversation-name"><strong>{{ conversation.item.name }}</strong></p>
+              <p class="conversation-name">
+                <template v-if="conversation.item !== null">
+                  <strong>{{ conversation.item.name }}</strong>
+                </template>
+                <template v-else>
+                  <small class="has-text-grey is-italic">{{ $t('item-unavailable') }}</small>
+                </template>
+              </p>
               <p class="conversation-receiver mb-1">
                 {{ $t('with') }}
                 <span class="has-text-primary">
@@ -118,7 +125,13 @@
             </div>
           </div>
           <div id="item">
-            <item-card-horizontal :item="activeConversation.item" :height="itemCardHorizontalHeight" />
+            <item-card-horizontal
+                v-if="activeConversation.item !== null"
+                :item="activeConversation.item"
+                :height="itemCardHorizontalHeight" />
+            <div v-else class="v-align-center" style="height: 100%;">
+              <p class="has-text-centered" style="left: 0; right: 0;">{{ $t('item-linked-to-conv-unavailable-delted') }}</p>
+            </div>
           </div>
           <div id="messages" ref="messages" class="pt-4">
             <div class="messages-header has-text-centered mb-4">
@@ -146,8 +159,9 @@
                 <textarea
                     v-model="messageToSend"
                     class="textarea"
-                    placeholder="Write your message"
+                    :placeholder="$t(!activeConversation.is_closed ? 'write-your-message' : 'this-conv-is-closed-textarea')"
                     :rows="textareaRows"
+                    :disabled="activeConversation.is_closed"
                     @input="checkRows"
                     @keydown.enter.exact.prevent="sendMessage"
                     @keydown.enter.shift.exact.prevent="shiftEnterPressed"
@@ -157,6 +171,7 @@
                 <b-button
                     type="is-primary"
                     @click="sendMessage"
+                    :disabled="activeConversation.is_closed"
                     :loading="waitingFormResponse"
                 >
                   <i class="fas fa-paper-plane"></i>
@@ -265,12 +280,15 @@ export default {
     async openConversation() {
       if (this.isConversationSelected) {
         try {
-          document.title = `Shareish | ${this.activeConversation.item.name}`;
+          if (this.activeConversation.item !== null)
+            document.title = `Shareish | ${this.activeConversation.item.name}`;
+          else
+            document.title = `Shareish | Conversation`;
 
           await this.loadMessages(false);
 
           if (this.conversationsTextarea[this.activeConversation.id] === undefined) {
-            if (this.messages.length === 0)
+            if (this.messages.length === 0 && this.activeConversation.item !== null)
                this.conversationsTextarea[this.activeConversation.id] = this.$t('intro-' + this.activeConversation.item.type + '-first-message');
             else
               this.conversationsTextarea[this.activeConversation.id] = "";
@@ -323,7 +341,7 @@ export default {
       this.textareaRows = messageRows;
     },
     shiftEnterPressed() {
-      this.conversationsTextarea[this.activeConversation.id] += "\n";
+      this.messageToSend += "\n";
       this.checkRows();
     },
     async fetchConversations() {
@@ -338,10 +356,13 @@ export default {
         this.$store.state.notifications = Number((await axios.get("/api/v1/notifications/")).data);
 
         this.conversations = conversations.map(conversation => {
-          let image = categories[conversation.item.category1]['image-placeholder'];
+          let image = "https://placehold.co/96x96";
+          if (conversation.item !== null) {
+            image = categories[conversation.item.category1]['image-placeholder'];
 
-          if (conversation.item.images.length > 0)
-            image = conversation.item.images[0];
+            if (conversation.item.images.length > 0)
+              image = conversation.item.images[0];
+          }
 
           let conversation_users = [...conversation.users];
           for (const [i, conversation_user] of conversation_users.entries()) {

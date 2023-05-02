@@ -347,5 +347,12 @@
   "slogan": "Start to share, and cherish.",
   "join-shareish-now": "Join Shareish now!",
   "enter-shareish": "Continue on Shareish",
-  "what-is-shareish": "What is Shareish?"
+  "what-is-shareish": "What is Shareish?",
+  "confirm": "Confirm",
+  "close-all-conv-from-item": "Close all conversation from this item",
+  "close-all-conv-from-item-reversible": "Conversations closed can still be re-opened later on.",
+  "item-linked-to-conv-unavailable-delted": "The item linked to this conversation is unavailable or has been deleted.",
+  "item-unavailable": "Item unavailable",
+  "write-your-message": "Write your message",
+  "this-conv-is-closed-textarea": "This conversation is closed, you cannot send a message."
 }
