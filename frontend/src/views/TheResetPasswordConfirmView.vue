@@ -55,7 +55,7 @@ export default {
           message: this.$t('notif-success-password-reset'),
           pauseOnHover: true
         });
-        await this.$router.push('/login');
+        await this.$router.push('/log-in');
       }
       catch (error) {
         this.snackbarError(this.$t('notif-error-reset-password'));

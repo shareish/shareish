@@ -49,7 +49,7 @@ export default {
           message: this.$t('notif-success-password-reset-sent'),
           pauseOnHover: true
         });
-        await this.$router.push('/login');
+        await this.$router.push('/log-in');
       }
       catch (error) {
         this.snackbarError(this.$t('notif-error-password-reset-sent'));
