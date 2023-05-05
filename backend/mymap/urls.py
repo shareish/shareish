@@ -1,11 +1,11 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from . import views
 from .views import (
     ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MessageViewSet,
     RecurrentItemViewSet, UserImageViewSet, UserItemViewSet, UserViewSet, ItemCommentViewSet,
-    UserMapExtraCategoriesViewSet
+    UserMapExtraCategoriesViewSet, CustomLogin
 )
 
 router = DefaultRouter()
@@ -33,4 +33,9 @@ urlpatterns = [
     path("items/images/<int:itemimage_id>", views.get_itemimage, name='get_itemimage'),
     path("items/<int:item_id>/images/base64", views.get_item_images_base64, name='get_item_images_base64'),
     path("conversations/items/<int:item_id>/close-all", views.close_all_conversations_from_item, name='close_all_conversations_from_item'),
+    path("users/<int:user_id>/disable", views.disable_user, name='disable_user'),
+    path("auth/login/", CustomLogin.as_view(), name='custom_login'),
+    path("recover-account/", views.recover_account, name='recover_account'),
+    re_path(r'^recover-account/check/(?P<token>[a-zA-Z0-9\-_]+)/$', views.recover_account_check_token, name='recover_account_check_token'),
+    re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)/$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
 ]

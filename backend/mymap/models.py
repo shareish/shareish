@@ -1,4 +1,5 @@
 import random
+import secrets
 import string
 from datetime import date
 
@@ -105,6 +106,7 @@ class User(AbstractBaseUser):
         help_text="Enter maximum distance for new item and event notifications"
     )
     save_item_viewing = models.BooleanField(default=True)
+    is_disabled = models.BooleanField(default=False)
 
     objects = MyUserManager()
     USERNAME_FIELD = 'email'
@@ -223,6 +225,11 @@ class Item(models.Model):
         VEHICLE = 'VE', _("Vehicles and Means of transport")
         OTHER = 'OT', _("Other")
 
+    class Visibility(models.TextChoices):
+        PUBLIC = 'PB', _("Public")
+        UNLISTED = 'UL', _("Unlisted")
+        PRIVATE = 'PR', _("Private")
+
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
     location = models.PointField(blank=True, geography=True, null=True)
@@ -233,9 +240,11 @@ class Item(models.Model):
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 
-    category1 = models.CharField(max_length=2, choices=Categories.choices, default='OT')
+    category1 = models.CharField(max_length=2, choices=Categories.choices, default=Categories.OTHER)
     category2 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
     category3 = models.CharField(max_length=2, choices=Categories.choices, default="", blank=True)
+
+    visibility = models.CharField(max_length=2, choices=Visibility.choices, default=Visibility.PUBLIC)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE)
 
@@ -333,3 +342,36 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['conversation_id', '-date']
+
+
+class Token(models.Model):
+    class TokenActions(models.TextChoices):
+        RECOVER_ACCOUNT = 'recover_account'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=40)
+    action = models.CharField(max_length=50, choices=TokenActions.choices)
+    used_at = models.DateTimeField(default=None, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @staticmethod
+    def create_token(user, action):
+        if action in Token.TokenActions.values:
+            # Generate a token 54 chars long and trim it to 40
+            # Trim is used as a security here, token_urlsafe(30) should generate a token 40 chars long but \
+            # I can't confirm that, so I decided to take some margin
+            generated_token = secrets.token_urlsafe(40)[:40]
+
+            # Create a new entry if no rows matches user, action and is not used
+            token, created = Token.objects.get_or_create(user=user, action=action, used_at=None, defaults={
+                'token': generated_token
+            })
+            return token
+        return False
+
+    def is_expired(self):
+        """
+        Returns True if the token has expired, False otherwise.
+        """
+        return self.created_at < timezone.now() - timezone.timedelta(hours=24)

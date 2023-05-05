@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
-            'map_ecats', 'save_item_viewing'
+            'map_ecats', 'save_item_viewing', 'is_disabled'
         ]
 
     def validate(self, data):
@@ -90,8 +90,8 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = [
-            'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate',
-            'enddate', 'type', 'category1', 'category2', 'category3', 'user_id', 'images', 'hitcount', 'user'
+            'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate', 'enddate', 'type',
+            'category1', 'category2', 'category3', 'visibility', 'user_id', 'images', 'hitcount', 'user'
         ]
 
     def validate(self, data):

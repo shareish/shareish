@@ -4,7 +4,10 @@ export default {
     message_v0sDM7: null
   }),
   methods: {
-    snackbarError(error, replace = true) {
+    snackbarError(error, options = {}) {
+      const replace = 'replace' in options ? options['replace'] : true;
+      const showErrorCode = 'showErrorCode' in options ? options['showErrorCode'] : true;
+
       if (this.isFromAxios(error)) {
         // Error received from Axios
         if (error.code === 'ERR_NETWORK') {
@@ -21,6 +24,8 @@ export default {
                 this.message_v0sDM7 = data.message;
               } else if (this._keyInDictIsString('error', data)) {
                 this.message_v0sDM7 = data.error;
+              } else if (this._keyInDictIsString('key', data)) {
+                this.message_v0sDM7 = this.$t('error_keys__' + data.key);
               } else if (this._keyInDictIsString('detail', data)) {
                 this.message_v0sDM7 = data.detail;
               } else {
@@ -47,7 +52,7 @@ export default {
 
       // Building error message
       let snackbarMessage = "";
-      if (this.code_t48xGa != null)
+      if (this.code_t48xGa != null && showErrorCode)
         snackbarMessage += `Error ${this.code_t48xGa}: `;
       snackbarMessage += (this.message_v0sDM7 != null) ? this.message_v0sDM7 : "No message provided.";
 
@@ -72,12 +77,20 @@ export default {
             this.snackbarError(`(${key}) ${value}`);
           } else if (Array.isArray(value)) {
             for (const message of value)
-              this.snackbarError(`(${key}) ${message}`, false);
+              this.snackbarError(`(${key}) ${message}`, {'replace': false});
           }
         }
       } else {
         this.snackbarError(error);
       }
+    },
+    isKeyedError(error) {
+      return this.isFromAxios(error) && error.code !== 'ERR_NETWORK' && typeof error.response.data !== 'string' && this._keyInDictIsString('key', error.response.data);
+    },
+    getErrorKey(error) {
+      if (this.isKeyedError(error))
+        return error.response.data.key;
+      return null;
     },
     _reset() {
       this.code_t48xGa = null;

@@ -1,20 +1,24 @@
 import base64
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 
 from django.db import IntegrityError
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse, QueryDict
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from rest_framework.authtoken.models import Token as RestToken
+from rest_framework.authtoken.views import ObtainAuthToken
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
     ItemMapBoundsFilterBackend
 from .functions import verif_location
+from .mail import send_mail_recover_account
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
-    ConversationUser
+    ConversationUser, Token
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -356,6 +360,32 @@ class MessageViewSet(viewsets.ModelViewSet):
         return Response("You can't delete a message that do not belongs to you.", status=status.HTTP_403_FORBIDDEN)
 
 
+class CustomLogin(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        if 'authValue' in request.data and 'password' in request.data:
+            auth_value = request.data['authValue']
+            try:
+                user = User.objects.get(email=auth_value)
+            except User.DoesNotExist:
+                try:
+                    user = User.objects.get(username=auth_value)
+                except User.DoesNotExist:
+                    return Response("This account doesn't exists.", status=status.HTTP_400_BAD_REQUEST)
+
+            if user.is_active:
+                if not user.is_disabled:
+                    if user.check_password(request.data['password']):
+                        token, created = RestToken.objects.get_or_create(user=user)
+                        return Response({
+                            'token': token.key,
+                            'id': user.pk
+                        })
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'key': 'WRONG_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['POST'])
 def get_address_reverse(request):
     if request.method == 'POST':
@@ -522,3 +552,134 @@ def close_all_conversations_from_item(request, item_id):
         else:
             return Response("You are not the owner of this item.", status=status.HTTP_403_FORBIDDEN)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def disable_user(request, user_id):
+    if request.method == 'POST':
+        if user_id == request.user.id:
+            if 'visibility' in request.data and 'password' in request.data:
+                if request.data['visibility'] == 'unlisted':
+                    visibility = Item.Visibility.UNLISTED
+                elif request.data['visibility'] == 'private':
+                    visibility = Item.Visibility.PRIVATE
+                else:
+                    return Response("Items visilibity must be unlisted or private.", status=status.HTTP_400_BAD_REQUEST)
+
+                if not request.user.check_password(request.data['password']):
+                    return Response("Wrong password.", status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    user = User.objects.get(pk=request.user.id)
+                except User.DoesNotExist:
+                    return Response("User doesn't exist.", status=status.HTTP_403_FORBIDDEN)
+
+                user.is_disabled = True
+                user.save()
+                Item.objects.filter(user=request.user).update(visibility=visibility)
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("You are not the owner of this item.", status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def recover_account(request):
+    if request.method == 'POST':
+        if 'accountValue' in request.data:
+            auth_value = request.data['accountValue']
+
+            # Fetch the user based on the auth value
+            try:
+                user = User.objects.get(email=auth_value)
+            except User.DoesNotExist:
+                try:
+                    user = User.objects.get(username=auth_value)
+                except User.DoesNotExist:
+                    return Response("This account doesn't exists.", status=status.HTTP_400_BAD_REQUEST)
+
+            # Generate and store a recover account token for the user
+            token = Token.create_token(user, Token.TokenActions.RECOVER_ACCOUNT)
+
+            # Send the user an email containing a link to recover its account
+            send_mail_recover_account(user, token.token)
+
+            return Response(user.email, status=status.HTTP_201_CREATED)
+        return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def recover_account_check_token(request, token):
+    if request.method == 'GET':
+        if len(token) == 40:
+            try:
+                token = Token.objects.get(token=token)
+                if token.action == Token.TokenActions.RECOVER_ACCOUNT:
+                    return Response(token.user.email, status=status.HTTP_200_OK)
+                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+            except Token.DoesNotExist:
+                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+        return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def recover_account_confirm_token(request, token):
+    if request.method == 'GET':
+        if len(token) == 40:
+            try:
+                token = Token.objects.get(token=token)
+                if token.action == Token.TokenActions.RECOVER_ACCOUNT:
+                    try:
+                        user = User.objects.get(pk=token.user.id)
+                    except User.DoesNotExist:
+                        return Response("User doesn't exist.", status=status.HTTP_403_FORBIDDEN)
+
+                    # Recover the user account
+                    user.is_disabled = False
+                    user.save()
+
+                    # Mark the token as used
+                    token.used_at = timezone.now()
+                    token.save()
+
+                    return Response({'email': user.email, 'username': user.username}, status=status.HTTP_200_OK)
+                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+            except Token.DoesNotExist:
+                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+        return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+# def unlock_account_confirm(request, token):
+#     # Retrieve the user associated with the token
+#     token_obj = Token.objects.filter(key=token).first()
+#     user = token_obj.user
+#
+#     # Check if the unlock token is valid
+#     unlock_token = TokenModel.objects.filter(
+#         user=user,
+#         token=token,
+#         action='unlock_account',
+#         created_at__gt=timezone.now() - timezone.timedelta(hours=24) # Token is valid for 24 hours
+#     ).first()
+#
+#     if unlock_token:
+#         # Token is valid
+#         # Unlock the user's account
+#         user.is_locked = False
+#         user.save()
+#         unlock_token.delete()
+#
+#         return redirect('unlock_success')
+#     else:
+#         # Token is invalid or has expired
+#         # Display an error message
+#         return render(request, 'unlock_error.html')

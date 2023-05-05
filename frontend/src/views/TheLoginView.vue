@@ -3,11 +3,14 @@
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('log-in') }}</h1>
       <div class="field">
-        <label>{{ $t('email') }}</label>
+        <label>{{ $t('email-or-username') }}</label>
         <div class="control">
-          <input v-model="email" class="input" name="email" type="email">
+          <input v-model="authValue" class="input" name="authValue" type="text">
         </div>
       </div>
+      <b-message v-if="showDisabledAccountLink" title="Account disabled" type="is-warning">
+        {{ $t('help_login-disabled-account') }} <router-link :to="{name: 'recoverAccount'}">{{ $t('click-here') }}</router-link>.
+      </b-message>
       <div class="field">
         <label>{{ $t('password') }}</label>
         <div class="control">
@@ -33,12 +36,13 @@ export default {
   mixins: [ErrorHandler],
   data() {
     return {
-      email: '',
+      authValue: '',
       password: '',
-      waitingFormResponse: false
+      waitingFormResponse: false,
+      showDisabledAccountLink: false
     }
   },
-  mounted() {
+  created() {
     document.title = `Shareish | ${this.$t('log-in')}`;
   },
   methods: {
@@ -46,25 +50,29 @@ export default {
       this.waitingFormResponse = true;
 
       const formData = {
-        email: this.email,
+        authValue: this.authValue,
         password: this.password
       }
 
       try {
-        const response = await axios.post("/api/v1/token/login/", formData);
-        const token = response.data.auth_token;
-        axios.defaults.headers.common["Authorization"] = "Token " + token;
-        this.$store.commit('setToken', token);
-        localStorage.setItem("token", token);
+        const auth = (await axios.post("/api/v1/auth/login/", formData)).data;
 
-        const user_id = (await axios.get("api/v1/users/me/")).data.id;
-        this.$store.commit('setUserID', user_id);
-        localStorage.setItem("user_id", user_id);
+        axios.defaults.headers.common["Authorization"] = "Token " + auth['token'];
+        this.$store.commit('setToken', auth['token']);
+        localStorage.setItem("token", auth['token']);
+
+        this.$store.commit('setUserID', auth['id']);
+        localStorage.setItem("user_id", auth['id']);
 
         await this.$router.push('/map');
       }
       catch (error) {
-        this.snackbarError(this.$t('notif-error-user-login'));
+        if (this.isKeyedError(error)) {
+          const key = this.getErrorKey(error);
+          if (key === 'DISABLED_ACCOUNT')
+            this.showDisabledAccountLink = true;
+        }
+        this.snackbarError(error, {'showErrorCode': false});
       }
 
       this.waitingFormResponse = false;

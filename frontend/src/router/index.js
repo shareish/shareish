@@ -19,6 +19,7 @@ import TheAboutView from "@/views/TheAboutView.vue";
 import TheAddItemFromRecurrentsView from "@/views/TheAddItemFromRecurrentsView.vue";
 import TheEditItemView from "@/views/TheEditItemView.vue";
 import TheConversationsView from "@/views/TheConversationsView.vue";
+import TheRecoverAccountView from "@/views/TheRecoverAccountView.vue";
 
 const routes = [
     {
@@ -202,6 +203,22 @@ const routes = [
         component: TheSettingsView,
         meta: {
             requireLogin: true,
+            layout: 'default'
+        }
+    },
+    {
+        path: "/recover-account",
+        name: 'recoverAccount',
+        component: TheRecoverAccountView,
+        meta: {
+            layout: 'default'
+        }
+    },
+    {
+        path: "/recover-account/:token",
+        name: 'recoverAccountToken',
+        component: TheRecoverAccountView,
+        meta: {
             layout: 'default'
         }
     },

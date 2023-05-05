@@ -194,6 +194,7 @@ item-availability-until,Until,Jusqu'au
 from,From,À partir du
 until,Until,Jusqu'au
 delete,Delete,Supprimer
+disable,Disable,Désactiver
 intro-DN-first-message,"Hello, thank you for your donation proposal. I am interested for ...","Bonjour, merci pour votre proposition de don. Je suis intéressé pour ..."
 intro-RQ-first-message,"Hello, I think I can answer your request. I can ...","Bonjour, je pense pouvoir répondre à votre demande. Je peux ..."
 intro-LN-first-message,"Hello, thank you for your loan proposal. I am interested for ...","Bonjour, merci pour votre proposition de prêt. Je suis intéressé pour ..."
@@ -351,3 +352,27 @@ item-linked-to-conv-unavailable-delted,The item linked to this conversation is u
 item-unavailable,Item unavailable,Élément indisponible
 write-your-message,Write your message,Écrivez votre message
 this-conv-is-closed-textarea,"This conversation is closed, you cannot send a message.","Cette conversation est fermée, vous ne pouvez pas envoyer de message."
+advanced-options,Advanced options,Options avancées
+disable-your-account,Disable your account,Désactiver votre compte
+help_disable-your-account,This is a temporary action. You can still recover your account whenever you want.,Cette action est temporaire. Vous pourrez toujours récupérer votre compte plus tard si vous le souhaitez.
+delete-your-account,Delete your account,Supprimer votre compte
+help_delete-your-account,This is a permanent action. You won't be able to recover your account once it's deleted.,Cette action est permanente. Vous ne pourrez plus récupérer votre compte une fois celui-ci supprimé.
+more-info,More info,Plus d'info
+unlisted-item-explanation,Unlisted items are no longer listed on Shareish but can still be accessed by users who possess the link of the item. The sending of a message to the item publisher is still possible.,Les éléments non-listés ne sont plus listés sur Shareish mais sont toujours accessibles par les utilisateurs qui possèdent le lien de l'élément. L'envoi d'un message au publicateur de l'élément est toujours possible.
+private-item-explanation,Private items are no longer listed on Shareish nor can be accessed by any users except the published himself.,Les éléments privés ne sont plus listés sur Shareish et ne sont plus accessibles par aucun utilisateur excepté le publicateur de ce dernier.
+email-or-username,Email or username,E-mail ou nom d'utilisateur
+error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
+error_keys__DISABLED_ACCOUNT,This account is disabled.,Ce compte est désactivé.
+error_keys__NOT_VALIDATED_YET,This account is not validated yet.,Ce compte n'est pas encore validé.
+error_keys__WRONG_FIELDS,Values received are not valid (internal error).,Les valeurs reçues ne sont pas valides (erreur interne).
+help_login-disabled-account,"This account has been disabled and is not accessible anymore. If you want to recover it, please","Ce compte a été désactivé et n'est plus accessible. Si vous souhaitez le récupérer,"
+click-here,click here,cliquez-ici
+recover-account,Recover your account,Récupérer votre compte
+recover,Recover,Récupérer
+help_recover-account,Recovering your account back will make it accessible again. Here is what will change:,Récupérer votre compte le rendra accessible à nouveau. Voici ce que cela implique:
+continue-recover-account,"If you still want to recover your account, please enter your account's email address or your username below.","Si vous souhaitez toujours récupérer votre compte, veuillez entrer l'adresse e-mail de votre compte ou votre nom d'utilisateur ci-dessous."
+notif-success-email-recover-account,An email was just sent to your email address {email} containing the recover link of your account.,Un e-mail vient tout juste d'être envoyé à votre adresse e-mail {email} contenant le lien de récupération de votre compte.
+help_confirm-recover,"By clicking on the button below you confirm that you want to recover your account <b>{email}</b> and make it accessible again on Shareish.","En cliquant sur le bouton ci-dessous vous confirmez que vous souhaitez récupérer votre compte <b>{email}</b> ainsi que le rendre accessible à nouveau sur Shareish."
+confirm-recover,Validate recover,Valider la récupération
+notif-success-account-recovering,Your account {email} ({username}) has been successfully recovered. You can now access it again.,Votre compte {email} ({username}) a été récupéré avec succès. Vous pouvez à nouveau y accéder.
+notif-success-account-disabling,Your account have been successfully disabled.,Votre compte a bien été désactivé.

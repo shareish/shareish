@@ -1,5 +1,21 @@
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import moment from "moment";
+import axios from "axios";
+import ErrorHandler from "@/mixins/ErrorHandler";
+
+export async function logout(instance) {
+  try {
+    await axios.post("/api/v1/token/logout/");
+    axios.defaults.headers.common["Authorization"] = "";
+    localStorage.removeItem("token");
+    instance.$store.commit('removeToken');
+    instance.$store.commit('removeUserID');
+    await instance.$router.push("/log-in");
+  }
+  catch (error) {
+    ErrorHandler.methods.snackbarError(error);
+  }
+}
 
 export const scrollParentToChild = function(parent, child, position = "top", offset = 0) {
   if (typeof parent === 'object' && typeof child === 'object' && parent !== null && child !== null) {

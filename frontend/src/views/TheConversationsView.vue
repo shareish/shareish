@@ -609,7 +609,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @function rem($size) {
   @return $size * 16px;
 }
