@@ -1,3 +1,4 @@
+import json
 import random
 import secrets
 import string
@@ -9,7 +10,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib.gis.geos import Point
 from djoser.signals import user_registered
 
 
@@ -304,7 +304,7 @@ class ItemComment(models.Model):
 
 
 class ItemView(models.Model):
-    item = models.ForeignKey(Item, related_name='item_views', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, related_name='views', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.SET_NULL, null=True)
     view_date = models.DateTimeField(default=timezone.now)
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -335,7 +335,7 @@ class ConversationUser(models.Model):
 
 class Message(models.Model):
     content = models.TextField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
@@ -347,16 +347,44 @@ class Message(models.Model):
 class Token(models.Model):
     class TokenActions(models.TextChoices):
         RECOVER_ACCOUNT = 'recover_account'
+        DELETE_ACCOUNT = 'delete_account'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=40)
     action = models.CharField(max_length=50, choices=TokenActions.choices)
-    used_at = models.DateTimeField(default=None, null=True)
+    used_at = models.DateTimeField(null=True)
+    lifespan = models.DurationField(null=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     @staticmethod
-    def create_token(user, action):
+    def check_token(token, action = None):
+        """
+        Check if the token is still valid (exists, not used, not expired) for the said action
+        """
+        if isinstance(token, str):
+            if (isinstance(action, str) or action == None):
+                if len(token) == 40:
+                    try:
+                        token = Token.objects.get(token=token)
+                        if token.action != action:
+                            return {'error': 'TOKEN_ACTION_DOESNT_MATCH'}
+                        if not token.is_used():
+                            if not token.is_expired():
+                                return {'success': token}
+                            return {'error': 'TOKEN_EXPIRED'}
+                        return {'error': 'TOKEN_ALREADY_USED'}
+                    except Token.DoesNotExist:
+                        return {'error': 'TOKEN_DOESNT_EXIST'}
+                return {'error': 'TOKEN_LENGTH_INVALID'}
+            return {'error': 'TOKEN_ACTION_BAD_FORMAT'}
+        return {'error': 'TOKEN_BAD_FORMAT'}
+
+    @staticmethod
+    def get_or_create(user, action):
+        """
+        Create a new token if no token is already pending for the passed action, otherwise retrieve it, and return it
+        """
         if action in Token.TokenActions.values:
             # Generate a token 54 chars long and trim it to 40
             # Trim is used as a security here, token_urlsafe(30) should generate a token 40 chars long but \
@@ -374,4 +402,34 @@ class Token(models.Model):
         """
         Returns True if the token has expired, False otherwise.
         """
-        return self.created_at < timezone.now() - timezone.timedelta(hours=24)
+        if self.lifespan is None:
+            return False
+
+        expiration_time = self.created_at + self.lifespan
+        return expiration_time <= timezone.now()
+
+    def is_used(self):
+        """
+        Returns True if the token has been used, False otherwise.
+        """
+        return self.used_at is not None
+
+    def use(self):
+        """
+        Use the current token if it is not already
+        """
+        if not self.is_used():
+            self.used_at = timezone.now()
+            self.save()
+
+
+class ScheduledAccountDeletion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    request_date = models.DateTimeField(default=timezone.now)
+    interval = models.DurationField()
+
+    def is_due(self):
+        """
+        Returns True if the scheduled account deletion is due, False otherwise.
+        """
+        return self.request_date + self.interval < timezone.now()

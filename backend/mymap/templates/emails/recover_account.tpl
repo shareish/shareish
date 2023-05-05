@@ -14,7 +14,7 @@
     {{ text|linebreaks }}
     If you did not make this request, you can safely ignore this email. Your account is safe and secure, and no unauthorized parties have gained access to your account or password.{{ text|linebreaks }}
     {{ text|linebreaks }}
-    Thank you,{{ text|linebreaks }}
+    Best regards,{{ text|linebreaks }}
     The Shareish team.
 {% endblock %}
 
@@ -39,5 +39,5 @@
     <p>We have received a request to recover your account. If you made this request, please click the link below to recover your account:</p>
     <p><a href="{{ recover_account_token_url }}">{{ recover_account_token_url }}</a></p>
     <p>If you did not make this request, you can safely ignore this email. Your account is safe and secure, and no unauthorized parties have gained access to your account or password.</p>
-    <p>Thank you,<br>The Shareish team.</p>
+    <p>Best regards,<br>The Shareish team.</p>
 {% endblock %}

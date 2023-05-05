@@ -361,18 +361,42 @@ more-info,More info,Plus d'info
 unlisted-item-explanation,Unlisted items are no longer listed on Shareish but can still be accessed by users who possess the link of the item. The sending of a message to the item publisher is still possible.,Les éléments non-listés ne sont plus listés sur Shareish mais sont toujours accessibles par les utilisateurs qui possèdent le lien de l'élément. L'envoi d'un message au publicateur de l'élément est toujours possible.
 private-item-explanation,Private items are no longer listed on Shareish nor can be accessed by any users except the published himself.,Les éléments privés ne sont plus listés sur Shareish et ne sont plus accessibles par aucun utilisateur excepté le publicateur de ce dernier.
 email-or-username,Email or username,E-mail ou nom d'utilisateur
-error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
-error_keys__DISABLED_ACCOUNT,This account is disabled.,Ce compte est désactivé.
-error_keys__NOT_VALIDATED_YET,This account is not validated yet.,Ce compte n'est pas encore validé.
-error_keys__WRONG_FIELDS,Values received are not valid (internal error).,Les valeurs reçues ne sont pas valides (erreur interne).
 help_login-disabled-account,"This account has been disabled and is not accessible anymore. If you want to recover it, please","Ce compte a été désactivé et n'est plus accessible. Si vous souhaitez le récupérer,"
 click-here,click here,cliquez-ici
 recover-account,Recover your account,Récupérer votre compte
 recover,Recover,Récupérer
 help_recover-account,Recovering your account back will make it accessible again. Here is what will change:,Récupérer votre compte le rendra accessible à nouveau. Voici ce que cela implique:
 continue-recover-account,"If you still want to recover your account, please enter your account's email address or your username below.","Si vous souhaitez toujours récupérer votre compte, veuillez entrer l'adresse e-mail de votre compte ou votre nom d'utilisateur ci-dessous."
-notif-success-email-recover-account,An email was just sent to your email address {email} containing the recover link of your account.,Un e-mail vient tout juste d'être envoyé à votre adresse e-mail {email} contenant le lien de récupération de votre compte.
-help_confirm-recover,"By clicking on the button below you confirm that you want to recover your account <b>{email}</b> and make it accessible again on Shareish.","En cliquant sur le bouton ci-dessous vous confirmez que vous souhaitez récupérer votre compte <b>{email}</b> ainsi que le rendre accessible à nouveau sur Shareish."
-confirm-recover,Validate recover,Valider la récupération
+notif-success-email-recover-account,An email containing a recovery link has been sent to the address associated to this account.,Un e-mail contenant un lien de récupération a été envoyé à l'adresse associée à ce compte.
+help_confirm-recover,"By clicking on the button below you confirm that you want to recover your account <b>{email} (@{username})</b> and make it accessible again on Shareish.","En cliquant sur le bouton ci-dessous vous confirmez que vous souhaitez récupérer votre compte <b>{email} (@{username})</b> ainsi que le rendre accessible à nouveau sur Shareish."
+confirm-recover,Confirm recover,Confirmer la récupération
 notif-success-account-recovering,Your account {email} ({username}) has been successfully recovered. You can now access it again.,Votre compte {email} ({username}) a été récupéré avec succès. Vous pouvez à nouveau y accéder.
 notif-success-account-disabling,Your account have been successfully disabled.,Votre compte a bien été désactivé.
+send-confirmation-email,Send the confirmation email,Envoyer l'e-mail de confirmation
+if-still-want-to-x-your-account-password,"If you still want to {x} your account, please enter your password:","Si vous souhaitez toujours {x} votre compte, veuillez entrer votre mot de passe:"
+danger-warning-delete-account,"But once this 30 days delay is over, you won't ever be able to recover your data or your account.","Mais une fois ce délais de 30 jours dépassé, vous ne pourrez plus jamais récupérer vos données ou votre compte."
+about-to-x-your-account,You are about to {x} your account.,Vous êtes sur le point de {x} votre compte.
+as-security-email-confirmation-delete,"As a security, a link will be sent to your email address to confirm your choice.","Pour plus de sécurité, un lien sera envoyé à votre adresse e-amil pour confirmer votre choix."
+if-delete-choice-confirmed-no-recover,"Once confirmed, we will keep your data saved for 30 days in case you change your mind in order for you to be able to recover your account if necessary.","Une fois confirmé, nous garderons vos données pendant 30 jours au cas où vous changeriez d'avis afin que vous puissiez réactiver votre compte si nécessaire."
+notif-success-account-deletion-process-link-sent,A confirmation link to delete your account has been sent to your email address.,Un lien de confirmation permettant la suppression de votre compte a été envoyé à votre adresse e-mail.
+account-recovering,Account recovering,Récupération de compte
+this-page-doesnt-exist,This page doesn't exist,Cette page n'existe pas
+to-get-back-to-home,To get back the home page,Pour retourner à la page d'accueil
+start-account-deletion-process,Start your account deletion process,Lancer la procédure de suppression de votre compte
+help_start-account-deletion-process,"By clicking on the button below you confirm that you want to start the process of deleting your account <b>{email} (@{username})</b>. Process that will delete all your data and your account in 30 days.","En cliquant sur le bouton ci-dessous vous confirmez que vous souhaitez lancer la procédure de suppression de votre compte <b>{email} (@{username})</b>. Procédure qui supprimera toutes vos données ainsi que votre compte."
+confirm-deletion,Confirm deletion,Confirmer la suppression
+unknown-user,Unknown user,Utilisateur inconnu
+
+error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
+error_keys__DISABLED_ACCOUNT,This account is disabled.,Ce compte est désactivé.
+error_keys__NOT_VALIDATED_YET,This account is not validated yet.,Ce compte n'est pas encore validé.
+error_keys__WRONG_FIELDS,Values received are not valid (internal error).,Les valeurs reçues ne sont pas valides (erreur interne).
+error_keys__USER_DOESNT_EXIST,This user doesn't exist.,Cet utilisateur n'existe pas.
+error_keys__TOKEN_ACTION_DOESNT_MATCH,Token action does not match.,L'action du token ne correspond pas.
+error_keys__TOKEN_EXPIRED,Token is expired.,Le token est expiré.
+error_keys__TOKEN_ALREADY_USED,Token is already used.,Le token a déjà été utilisé.
+error_keys__TOKEN_DOESNT_EXIST,Token doesn't exist.,Ce token n'existe pas.
+error_keys__TOKEN_LENGTH_INVALID,Token length is invalid.,La longueur du token est invalide.
+error_keys__TOKEN_BAD_FORMAT,Token has a bad format.,Le token a un mauvais format.
+error_keys__TOKEN_ACTION_BAD_FORMAT,Token action has a bad format.,L'action du token a un mauvais format.
+

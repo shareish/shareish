@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 import os
 
@@ -231,3 +231,5 @@ DJOSER = {
         'user_update': 'mymap.serializers.UserSerializer',
     },
 }
+
+INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)

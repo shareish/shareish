@@ -77,9 +77,10 @@
               </p>
               <p class="conversation-receiver mb-1">
                 {{ $t('with') }}
-                <span class="has-text-primary">
+                <span v-if="conversation.receivers.length > 0" class="has-text-primary">
                   @{{ conversation.receivers.map(receiver => receiver.user.username).join(', @')  }}
                 </span>
+                <span v-else class="has-text-primary">{{ $t('unknown-user') }}</span>
               </p>
               <p class="conversation-last_message mt-1">{{ conversation.last_message }}</p>
             </div>
@@ -101,26 +102,19 @@
                 </b-button>
               </div>
               <div class="level-item">
-                <template v-if="activeConversation.receivers.length === 1">
-                  <p v-if="windowWidth > 768">
-                    Chatting with
-                    <strong class="ml-1">
-                      <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
-                        {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
-                      </router-link>
-                    </strong>
-                  </p>
-                  <p v-else>
-                    <strong>
-                      <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
-                        {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
-                      </router-link>
-                    </strong>
-                  </p>
-                </template>
-                <p v-else>
-                  <strong>Group chat</strong>
+                <p v-if="activeConversation.receivers.length === 1">
+                  <template v-if="windowWidth > 768">Chatting with </template>
+                  <strong>
+                    <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
+                      {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
+                    </router-link>
+                  </strong>
                 </p>
+                <p v-else-if="activeConversation.receivers.length === 0">
+                  <template v-if="windowWidth > 768">Chatting with </template>
+                  <strong>{{ $t('unknown-user') }}</strong>
+                </p>
+                <p v-else><strong>Group chat</strong></p>
               </div>
             </div>
           </div>

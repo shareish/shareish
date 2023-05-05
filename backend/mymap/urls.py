@@ -34,8 +34,10 @@ urlpatterns = [
     path("items/<int:item_id>/images/base64", views.get_item_images_base64, name='get_item_images_base64'),
     path("conversations/items/<int:item_id>/close-all", views.close_all_conversations_from_item, name='close_all_conversations_from_item'),
     path("users/<int:user_id>/disable", views.disable_user, name='disable_user'),
+    path("users/<int:user_id>/send-delete-confirmation", views.user_send_delete_confirmation, name='user_send_delete_confirmation'),
     path("auth/login/", CustomLogin.as_view(), name='custom_login'),
+    re_path(r'^tokens/(?P<token>[a-zA-Z0-9\-_]+)/check$', views.check_token, name='check_token'),
     path("recover-account/", views.recover_account, name='recover_account'),
-    re_path(r'^recover-account/check/(?P<token>[a-zA-Z0-9\-_]+)/$', views.recover_account_check_token, name='recover_account_check_token'),
-    re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)/$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
+    re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
+    re_path(r'^delete-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.delete_account_confirm_token, name='delete_account_confirm_token'),
 ]

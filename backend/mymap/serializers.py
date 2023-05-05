@@ -4,7 +4,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from rest_framework import serializers
 
 from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, \
-    UserMapExtraCategory, ConversationUser
+    UserMapExtraCategory, ConversationUser, Token, ScheduledAccountDeletion
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -204,4 +204,24 @@ class ItemCommentSerializer(serializers.ModelSerializer):
         model = ItemComment
         fields = [
             'id', 'content', 'creationdate', 'item_id', 'user_id', 'item', 'user'
+        ]
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = Token
+        fields = [
+            'id', 'user_id', 'token', 'action', 'used_at', 'lifespan', 'updated_at', 'created_at', 'user'
+        ]
+
+
+class ScheduledAccountDeletionSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = ScheduledAccountDeletion
+        fields = [
+            'id', 'interval', 'request_date', 'user', 'user_id', 'is_due'
         ]

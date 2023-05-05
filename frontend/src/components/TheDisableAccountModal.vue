@@ -6,7 +6,7 @@
       <button class="delete" type="button" @click="$emit('close')" />
     </header>
     <section class="modal-card-body">
-      <p class="mb-5">You are about to disable your account.</p>
+      <p class="mb-5 has-text-centered is-size-5"><strong class="has-text-danger">{{ $t('about-to-x-your-account', {x: lcall($t('disable'))}) }}</strong></p>
       <p class="label mb-1">Here is what will happen on confirmation:</p>
       <ul class="mb-5">
         <li>Your items will be set as unlisted or private (see differences below) and therefore not visible on Shareish anymore;</li>
@@ -31,12 +31,12 @@
           </b-radio-button>
       </b-field>
       <p class="mb-5"><small>{{ visibilityExplanation }}</small></p>
-      <p class="label mb-2">If you still want to disable your account, please enter your password:</p>
+      <p class="mb-2">{{ $t('if-still-want-to-x-your-account-password', {x: lcall($t('disable'))}) }}</p>
       <b-input type="password" v-model="password" password-reveal />
     </section>
     <footer class="modal-card-foot">
       <b-button :label="$t('cancel')" @click="$emit('close')" />
-      <b-button :label="$t('confirm')" type="is-danger" :loading="waitingFormResponse" @click="disable" />
+      <b-button :label="$t('send-confirmation-email')" type="is-danger" :loading="waitingFormResponse" @click="sendDisableConfirmation" />
     </footer>
   </div>
 </template>
@@ -44,7 +44,7 @@
 <script>
 import ErrorHandler from "@/mixins/ErrorHandler";
 import axios from "axios";
-import {logout} from "@/functions";
+import {lcall, logout} from "@/functions";
 
 export default {
   name: 'TheDisableAccountModal',
@@ -66,7 +66,8 @@ export default {
     }
   },
   methods: {
-    async disable() {
+    lcall,
+    async sendDisableConfirmation() {
       this.waitingFormResponse =  true;
 
       try {

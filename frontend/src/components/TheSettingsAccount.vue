@@ -100,6 +100,7 @@
 import axios from 'axios';
 import ErrorHandler from "@/mixins/ErrorHandler";
 import TheDisableAccountModal from "@/components/TheDisableAccountModal.vue";
+import TheDeleteAccountModal from "@/components/TheDeleteAccountModal.vue";
 
 export default {
   name: 'TheSettingsAccount',

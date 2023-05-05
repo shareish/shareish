@@ -7,7 +7,6 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-from django.urls import reverse
 
 from mail_templated import EmailMessage
 
@@ -302,6 +301,27 @@ def send_mail_recover_account(user, token):
 
     delivered = connection.send_messages(to_send)
     print("Successfully delivered {}/{} email to recover an account".format(delivered, len(to_send)))
+
+
+def send_mail_start_delete_account_process(user, token):
+    connection = mail.get_connection(fail_silently=True)
+    to_send = []
+
+    context = {
+        "user": user,
+        "delete_account_token_url": settings.APP_URL + "/delete-account/" + token,
+    }
+
+    email = EmailMessage('emails/start_delete_account_process.tpl', context, settings.EMAIL_HOST_USER, [user.email],
+                         connection=connection)
+
+    if not email.is_rendered:
+        email.render()
+
+    to_send.append(email)
+
+    delivered = connection.send_messages(to_send)
+    print("Successfully delivered {}/{} email to start a delete account process".format(delivered, len(to_send)))
 
 
 # To be scheduled

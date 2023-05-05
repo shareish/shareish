@@ -1,10 +1,11 @@
 from django.apps import AppConfig
-
 from geopy.geocoders import Nominatim
-locator = Nominatim(user_agent="shareish")
-LOCATION_PREFIX = "SRID=4326;POINT"
 from rest_framework.response import Response
 from rest_framework import status
+
+locator = Nominatim(user_agent="shareish")
+LOCATION_PREFIX = "SRID=4326;POINT"
+
 
 class MymapConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -15,16 +16,6 @@ class MymapConfig(AppConfig):
         from django.conf import settings
         from djoser.compat import get_user_email
 
-        def perform_update_old(self, serializer):
-            super(UserViewSet, self).perform_update(serializer)
-            user = serializer.instance
-            # should we send activation email after update?
-            if settings.DJOSER['SEND_ACTIVATION_EMAIL'] and not user.is_active:
-                context = {"user": user}
-                to = [get_user_email(user)]
-                settings.EMAIL.activation(self.request, context).send(to)
-
-                
         def perform_update(self, serializer):
             request = self.request
             user = self.request.user
@@ -69,3 +60,7 @@ class MymapConfig(AppConfig):
         # Start mail scheduler
         from .mail import start_mail_scheduler
         start_mail_scheduler()
+
+        from .scheduler import start_scheduler
+        start_scheduler()
+

@@ -3,6 +3,7 @@ import json
 import re
 from datetime import datetime
 
+from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse, QueryDict
@@ -16,9 +17,9 @@ from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, It
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
     ItemMapBoundsFilterBackend
 from .functions import verif_location
-from .mail import send_mail_recover_account
+from .mail import send_mail_recover_account, send_mail_start_delete_account_process
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
-    ConversationUser, Token
+    ConversationUser, Token, ScheduledAccountDeletion
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -27,7 +28,7 @@ from rest_framework.response import Response
 from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
-    UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer
+    UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer, TokenSerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -340,6 +341,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
         return Response(conversation.id, status=status.HTTP_201_CREATED)
 
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     pagination_class = MessagePaginationClass
@@ -570,11 +572,7 @@ def disable_user(request, user_id):
                 if not request.user.check_password(request.data['password']):
                     return Response("Wrong password.", status=status.HTTP_400_BAD_REQUEST)
 
-                try:
-                    user = User.objects.get(pk=request.user.id)
-                except User.DoesNotExist:
-                    return Response("User doesn't exist.", status=status.HTTP_403_FORBIDDEN)
-
+                user = request.user
                 user.is_disabled = True
                 user.save()
                 Item.objects.filter(user=request.user).update(visibility=visibility)
@@ -582,13 +580,69 @@ def disable_user(request, user_id):
             else:
                 return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response("You are not the owner of this item.", status=status.HTTP_403_FORBIDDEN)
+            return Response("You are not the owner of this account.", status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def user_send_delete_confirmation(request, user_id):
+    if request.method == 'POST':
+        if user_id == request.user.id:
+            if 'password' in request.data:
+                if not request.user.check_password(request.data['password']):
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    user = User.objects.get(pk=request.user.id)
+                except User.DoesNotExist:
+                    return JsonResponse({'key': 'USER_DOESNT_EXIST'}, status=status.HTTP_403_FORBIDDEN)
+
+                # Generate and store a delete_account token for the user
+                token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
+
+                # Send the user an email containing a link to start the deletion process of its account
+                send_mail_start_delete_account_process(user, token.token)
+
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("You are not the owner of this account.", status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_token(request, token):
+    if request.method == 'GET':
+        check = Token.check_token(token, request.GET.get('action'))
+        if 'success' in check:
+            token = check['success']
+
+            tk_serializer = TokenSerializer(instance=token)
+            serialized_token = tk_serializer.data
+            return JsonResponse(serialized_token, status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def recover_account(request):
+    """
+    Form received when a user clicked on the recover button from the /recover-account page
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
     if request.method == 'POST':
         if 'accountValue' in request.data:
             auth_value = request.data['accountValue']
@@ -602,8 +656,8 @@ def recover_account(request):
                 except User.DoesNotExist:
                     return Response("This account doesn't exists.", status=status.HTTP_400_BAD_REQUEST)
 
-            # Generate and store a recover account token for the user
-            token = Token.create_token(user, Token.TokenActions.RECOVER_ACCOUNT)
+            # Generate and store a recover_account token for the user
+            token = Token.get_or_create(user, Token.TokenActions.RECOVER_ACCOUNT)
 
             # Send the user an email containing a link to recover its account
             send_mail_recover_account(user, token.token)
@@ -615,46 +669,83 @@ def recover_account(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def recover_account_check_token(request, token):
+def recover_account_confirm_token(request, token):
+    """
+    Apply the action of recovering an account based on a token
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :param token: The token required to apply the account recovering
+    :type token: str
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
     if request.method == 'GET':
-        if len(token) == 40:
-            try:
-                token = Token.objects.get(token=token)
-                if token.action == Token.TokenActions.RECOVER_ACCOUNT:
-                    return Response(token.user.email, status=status.HTTP_200_OK)
-                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
-            except Token.DoesNotExist:
-                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
-        return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+        check = Token.check_token(token, 'recover_account')
+        if 'success' in check:
+            token = check['success']
+
+            # Recover the user account
+            user = token.user
+            user.is_disabled = False
+            user.save()
+
+            # Use the token
+            token.use()
+
+            # Remove the user from the deletion scheduling if it was present
+            ScheduledAccountDeletion.objects.filter(user=user).delete()
+
+            return Response(status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def recover_account_confirm_token(request, token):
+def delete_account_confirm_token(request, token):
+    """
+    Start the process of account deleting
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :param token: The token required to start the process
+    :type token: str
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
     if request.method == 'GET':
-        if len(token) == 40:
-            try:
-                token = Token.objects.get(token=token)
-                if token.action == Token.TokenActions.RECOVER_ACCOUNT:
-                    try:
-                        user = User.objects.get(pk=token.user.id)
-                    except User.DoesNotExist:
-                        return Response("User doesn't exist.", status=status.HTTP_403_FORBIDDEN)
+        check = Token.check_token(token, 'delete_account')
+        if 'success' in check:
+            token = check['success']
 
-                    # Recover the user account
-                    user.is_disabled = False
-                    user.save()
+            # Disable the user account
+            user = token.user
+            user.is_disabled = True
+            user.save()
 
-                    # Mark the token as used
-                    token.used_at = timezone.now()
-                    token.save()
+            # Make all his items private
+            # Forced to private as the process is of account deletion is more restrictive
+            Item.objects.filter(user=user).update(visibility=Item.Visibility.PRIVATE)
 
-                    return Response({'email': user.email, 'username': user.username}, status=status.HTTP_200_OK)
-                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
-            except Token.DoesNotExist:
-                return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
-        return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
+            # Use the token
+            token.use()
+
+            # Add the user inside the deletion scheduling system
+            ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
+
+            return Response(status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
