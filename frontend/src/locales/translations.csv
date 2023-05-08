@@ -249,10 +249,10 @@ no-thanks,"No, thanks.",Non merci.
 want-an-other-recurrent,"You are using item <strong>#{n}</strong>. Want to use an other one?","Vous utilisez l'élément #{n}. Voulez-vous en utiliser un autre?"
 reset,Reset,Réinitialiser
 profile-picture,Profile picture|Profile pictures,Photo de profil|Photos de profil
-remove,Remove,Retirer
+remove,Remove,Supprimer
 removing-picture,Removing picture,Retirer l'image
-removing-picture-confirmation,"Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.","Êtes-vous sûr de vouloir <b>retirer</b> cette image de votre profil? Cette action ne peut pas être annulée."
-upload-a-new-one,Upload a new one,Transférer pour changer
+removing-picture-confirmation,"Are you sure you want to <b>remove</b> this picture from your profile? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> cette image de votre profil? Cette action ne peut pas être annulée."
+upload-a-new-one,Upload a new picture,Transférer une nouvelle photo
 current-profile-picture,Current profile picture,Photo de profil actuelle
 other-profile-pictures,Other profile pictures,Autres photos de profil
 info-already-uploaded-profile-pictures,"If you have already uploaded profile pictures in the past, you can look through them and <b>select one as your current profile picture</b>. Just click on it!","Si vous avez déjà transféré des photos de profil dans le passé, vous pouvez y jeter un oeil et en <b>sélectionner une comme nouvelle photo de profil</b>. Il suffit de cliquer dessus!"
@@ -264,7 +264,7 @@ and-n-more,And {n} more,Et {n} de plus
 picture-removed,Picture removed!,Image retirée!
 aware-changes-not-saved,Aware! Your new profile picture needs to be saved!,Attention! Votre nouvelle photo de profil doit être sauvegardée!
 image-already-profile-picture,This image is already your profile picture!,Cette image est déjà votre photo de profil!
-view-real-profile,View real profile,Voir le profil réel
+view-real-profile,View public profile,Voir le profil public
 search,Search,Recherche
 click-to-view-on-map,Click to view on map,Cliquer pour voir sur la carte
 delete-message,Delete message,Supprimer le message
@@ -336,7 +336,7 @@ open-map-settings,Open map settings,Ouvrir les paramètres de la carte
 filter-items,Filter items,Filtrer les items
 general-information,General information,Informations générales
 save-items-you-see,Save the items you see on Shareish,Sauvegarder les éléments que vous voyez sur Shareish
-help_save-items-you-see,We save the items you see to improve your experience while browsing our website. This helps us understand how you use it and send you better recommendations in our emails notifications!,Nous enregistrons les items que vous visionnez afin d'améliorer votre expérience sur notre site internet. Cela nous aide à comprendre comme vous l'utilisez et à vous proposer de meilleures recommendations dans nos emails de notification!
+help_save-items-you-see,We save the items you see to enable later filtering on the website and in e-mail notifications,Nous enregistrons les items que vous visionnez afin de permettre de les filtrer ultérieurement sur le site ou dans les notifications envoyées par e-mail.
 yes,Yes,Oui
 no,No,Non
 send-private-message,Message,Contacter
