@@ -372,7 +372,7 @@ class CustomLogin(ObtainAuthToken):
                 try:
                     user = User.objects.get(username=auth_value)
                 except User.DoesNotExist:
-                    return Response("This account doesn't exists.", status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
 
             if user.is_active:
                 if not user.is_disabled:
@@ -385,7 +385,7 @@ class CustomLogin(ObtainAuthToken):
                     return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
                 return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'key': 'WRONG_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -482,17 +482,19 @@ def get_userimage(request, userimage_id):
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
-        try:
-            user_image = UserImage.objects.get(pk=userimage_id)
-            if user_image.user_id == request.user.id:
-                user_image.delete()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response("You are not the owner of this image.", status=status.HTTP_403_FORBIDDEN)
-        except UserImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except UserImage.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if request.user.is_authenticated:
+            try:
+                user_image = UserImage.objects.get(pk=userimage_id)
+                if user_image.user_id == request.user.id:
+                    user_image.delete()
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    return Response({'key': 'NOT_IMAGE_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+            except UserImage.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            except UserImage.MultipleObjectsReturned:
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'key': 'MUST_BE_AUTHENTICATED'}, status=status.HTTP_403_FORBIDDEN)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -544,7 +546,7 @@ def get_item_images_base64(request, item_id):
 
 
 @api_view(['PATCH'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def close_all_conversations_from_item(request, item_id):
     if request.method == 'PATCH':
         item = Item.objects.get(pk=item_id)
@@ -557,46 +559,62 @@ def close_all_conversations_from_item(request, item_id):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def disable_user(request, user_id):
     if request.method == 'POST':
-        if user_id == request.user.id:
-            if 'visibility' in request.data and 'password' in request.data:
-                if request.data['visibility'] == 'unlisted':
-                    visibility = Item.Visibility.UNLISTED
-                elif request.data['visibility'] == 'private':
-                    visibility = Item.Visibility.PRIVATE
+        if 'visibility' in request.data and 'password' in request.data:
+            if user_id == request.user.id or request.user.is_staff:
+                # Retrieve the user to modify
+                try:
+                    user = User.objects.get(pk=user_id)
+                except User.DoesNotExist:
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Verify that the password entered is correct
+                if not user.check_password(request.data['password']):
+                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if not user.is_disabled:
+                    # Check if the visibility is accepted
+                    if request.data['visibility'] == 'unlisted':
+                        visibility = Item.Visibility.UNLISTED
+                    elif request.data['visibility'] == 'private':
+                        visibility = Item.Visibility.PRIVATE
+                    else:
+                        return Response({'key': 'ITEM_VISIBILITY_MUST_BE_UL_OR_PR'}, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Disable the user
+                    user.is_disabled = True
+                    user.save()
+
+                    # Update all its item visibility
+                    Item.objects.filter(user=user).update(visibility=visibility)
+
+                    return Response(status=status.HTTP_200_OK)
                 else:
-                    return Response("Items visilibity must be unlisted or private.", status=status.HTTP_400_BAD_REQUEST)
-
-                if not request.user.check_password(request.data['password']):
-                    return Response("Wrong password.", status=status.HTTP_400_BAD_REQUEST)
-
-                user = request.user
-                user.is_disabled = True
-                user.save()
-                Item.objects.filter(user=request.user).update(visibility=visibility)
-                return Response(status=status.HTTP_200_OK)
+                    return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
         else:
-            return Response("You are not the owner of this account.", status=status.HTTP_403_FORBIDDEN)
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def user_send_delete_confirmation(request, user_id):
     if request.method == 'POST':
-        if user_id == request.user.id:
-            if 'password' in request.data:
-                if not request.user.check_password(request.data['password']):
-                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
-
+        if 'password' in request.data:
+            if user_id == request.user.id or request.user.is_staff:
+                # Retrieve the user to contact
                 try:
-                    user = User.objects.get(pk=request.user.id)
+                    user = User.objects.get(pk=user_id)
                 except User.DoesNotExist:
-                    return JsonResponse({'key': 'USER_DOESNT_EXIST'}, status=status.HTTP_403_FORBIDDEN)
+                    return JsonResponse({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Verify that the password entered is correct
+                if not user.check_password(request.data['password']):
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate and store a delete_account token for the user
                 token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
@@ -606,9 +624,9 @@ def user_send_delete_confirmation(request, user_id):
 
                 return Response(status=status.HTTP_200_OK)
             else:
-                return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
         else:
-            return Response("You are not the owner of this account.", status=status.HTTP_403_FORBIDDEN)
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -654,16 +672,18 @@ def recover_account(request):
                 try:
                     user = User.objects.get(username=auth_value)
                 except User.DoesNotExist:
-                    return Response("This account doesn't exists.", status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Generate and store a recover_account token for the user
-            token = Token.get_or_create(user, Token.TokenActions.RECOVER_ACCOUNT)
+            if user.is_disabled:
+                # Generate and store a recover_account token for the user
+                token = Token.get_or_create(user, Token.TokenActions.RECOVER_ACCOUNT)
 
-            # Send the user an email containing a link to recover its account
-            send_mail_recover_account(user, token.token)
+                # Send the user an email containing a link to recover its account
+                send_mail_recover_account(user, token.token)
 
-            return Response(user.email, status=status.HTTP_201_CREATED)
-        return Response("Missing fields.", status=status.HTTP_400_BAD_REQUEST)
+                return Response(user.email, status=status.HTTP_201_CREATED)
+            return Response({'key': 'ACCOUNT_NOT_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -684,16 +704,19 @@ def recover_account_confirm_token(request, token):
         check = Token.check_token(token, 'recover_account')
         if 'success' in check:
             token = check['success']
-
-            # Recover the user account
             user = token.user
+
+            # Here we don't check whether the account is disabled or not to prevent any error that may have
+            # occurred. We still do all the checks to prevent undesired account deletion.
+
+            # Recover the account
             user.is_disabled = False
             user.save()
 
             # Use the token
             token.use()
 
-            # Remove the user from the deletion scheduling if it was present
+            # Remove the account from the deletion scheduling if it was present
             ScheduledAccountDeletion.objects.filter(user=user).delete()
 
             return Response(status=status.HTTP_200_OK)
@@ -747,30 +770,3 @@ def delete_account_confirm_token(request, token):
             else:
                 return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-# def unlock_account_confirm(request, token):
-#     # Retrieve the user associated with the token
-#     token_obj = Token.objects.filter(key=token).first()
-#     user = token_obj.user
-#
-#     # Check if the unlock token is valid
-#     unlock_token = TokenModel.objects.filter(
-#         user=user,
-#         token=token,
-#         action='unlock_account',
-#         created_at__gt=timezone.now() - timezone.timedelta(hours=24) # Token is valid for 24 hours
-#     ).first()
-#
-#     if unlock_token:
-#         # Token is valid
-#         # Unlock the user's account
-#         user.is_locked = False
-#         user.save()
-#         unlock_token.delete()
-#
-#         return redirect('unlock_success')
-#     else:
-#         # Token is invalid or has expired
-#         # Display an error message
-#         return render(request, 'unlock_error.html')

@@ -387,16 +387,20 @@ help_start-account-deletion-process,"By clicking on the button below you confirm
 confirm-deletion,Confirm deletion,Confirmer la suppression
 unknown-user,Unknown user,Utilisateur inconnu
 
-error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
+error_keys__ACCOUNT_DOESNT_EXIST,This account doesn't exists.,Ce compte n'existe pas.
+error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.
 error_keys__DISABLED_ACCOUNT,This account is disabled.,Ce compte est désactivé.
+error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
+error_keys__ITEM_VISIBILITY_MUST_BE_UL_OR_PR,Items visilibity must be &quot;unlisted&quot; or &quot;private&quot;.,La visibilité des items doit être &quot;non-listé&quot; ou &quot;privé&quot;.
+error_keys__MISSING_INTERNAL_FIELDS,Missing internals fields.,Champs internes manquants.
+error_keys__MUST_BE_AUTHENTICATED,You must be authenticated to do this action.,Vous devez être authentifié pour réaliser cette action.
+error_keys__NOT_ACCOUNT_OWNER,You are not the owner of this account.,Vous n'êtes pas le propriétaire de ce compte.
+error_keys__NOT_IMAGE_OWNER,You are not the owner of this image.,Vous n'êtes pas le propriétaire de cette image.
 error_keys__NOT_VALIDATED_YET,This account is not validated yet.,Ce compte n'est pas encore validé.
-error_keys__WRONG_FIELDS,Values received are not valid (internal error).,Les valeurs reçues ne sont pas valides (erreur interne).
-error_keys__USER_DOESNT_EXIST,This user doesn't exist.,Cet utilisateur n'existe pas.
 error_keys__TOKEN_ACTION_DOESNT_MATCH,Token action does not match.,L'action du token ne correspond pas.
-error_keys__TOKEN_EXPIRED,Token is expired.,Le token est expiré.
-error_keys__TOKEN_ALREADY_USED,Token is already used.,Le token a déjà été utilisé.
-error_keys__TOKEN_DOESNT_EXIST,Token doesn't exist.,Ce token n'existe pas.
-error_keys__TOKEN_LENGTH_INVALID,Token length is invalid.,La longueur du token est invalide.
-error_keys__TOKEN_BAD_FORMAT,Token has a bad format.,Le token a un mauvais format.
 error_keys__TOKEN_ACTION_BAD_FORMAT,Token action has a bad format.,L'action du token a un mauvais format.
-
+error_keys__TOKEN_ALREADY_USED,Token is already used.,Le token a déjà été utilisé.
+error_keys__TOKEN_BAD_FORMAT,Token has a bad format.,Le token a un mauvais format.
+error_keys__TOKEN_DOESNT_EXIST,Token doesn't exist.,Ce token n'existe pas.
+error_keys__TOKEN_EXPIRED,Token is expired.,Le token est expiré.
+error_keys__TOKEN_LENGTH_INVALID,Token length is invalid.,La longueur du token est invalide.
