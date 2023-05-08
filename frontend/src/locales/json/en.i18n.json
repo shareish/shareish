@@ -382,7 +382,7 @@
   "as-security-email-confirmation-delete": "As a security, a link will be sent to your email address to confirm your choice.",
   "if-delete-choice-confirmed-no-recover": "Once confirmed, we will keep your data saved for 30 days in case you change your mind in order for you to be able to recover your account if necessary.",
   "notif-success-account-deletion-process-link-sent": "A confirmation link to delete your account has been sent to your email address.",
-  "notif-success-start-account-deletion-process": "The deletion process has successfully start for you account. If you ever want to recover it before the due date, please try to log back in to your account and follow the instructions.",
+  "notif-success-start-account-deletion-process": "The deletion process has successfully started for you account. If you ever want to recover it before the due date, please try to log back in to your account and follow the instructions.",
   "account-recovering": "Account recovering",
   "this-page-doesnt-exist": "This page doesn't exist",
   "to-get-back-to-home": "To get back the home page",

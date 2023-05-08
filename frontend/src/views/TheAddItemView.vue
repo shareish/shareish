@@ -281,7 +281,7 @@ export default {
       startdate: null,
       enddate: null,
       isRecurrent: false,
-      visibility: 'PU',
+      visibility: 'PB',
 
       geoLocation: null,
       waitingFormResponse: false
