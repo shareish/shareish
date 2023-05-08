@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 from django.conf import settings
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.http import FileResponse, JsonResponse, QueryDict
 from django.contrib.auth import get_user_model
@@ -583,14 +583,26 @@ def disable_user(request, user_id):
                     else:
                         return Response({'key': 'ITEM_VISIBILITY_MUST_BE_UL_OR_PR'}, status=status.HTTP_400_BAD_REQUEST)
 
-                    # Disable the user
-                    user.is_disabled = True
-                    user.save()
+                    try:
+                        with transaction.atomic():
+                            # Disable the user
+                            user.is_disabled = True
+                            user.save()
 
-                    # Update all its item visibility
-                    Item.objects.filter(user=user).update(visibility=visibility)
+                            # Update all its item visibility
+                            Item.objects.filter(user=user).update(visibility=visibility)
 
-                    return Response(status=status.HTTP_200_OK)
+                            # Closing 1to1 conversations where user was part of
+                            conversations_user = ConversationUser.objects.filter(user=user, conversation__max_users=2)
+                            for conversation_user in conversations_user:
+                                conversation_to_close = conversation_user.conversation
+                                conversation_to_close.is_closed = True
+                                conversation_to_close.save()
+
+                            return Response(status=status.HTTP_200_OK)
+                    except Exception as e:
+                        print(e)
+                        return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
                     return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
             else:

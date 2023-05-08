@@ -393,6 +393,7 @@
   "error_keys__ACCOUNT_DOESNT_EXIST": "Ce compte n'existe pas.",
   "error_keys__ACCOUNT_ALREADY_DISABLED": "Ce compte déjà désactivé.",
   "error_keys__DISABLED_ACCOUNT": "Ce compte est désactivé.",
+  "error_keys__INTERNAL_ERROR": "Erreur interne.",
   "error_keys__INVALID_PASSWORD": "Le mot de passe est incorrect.",
   "error_keys__ITEM_VISIBILITY_MUST_BE_UL_OR_PR": "La visibilité des items doit être &quot;non-listé&quot; ou &quot;privé&quot;.",
   "error_keys__MISSING_INTERNAL_FIELDS": "Champs internes manquants.",

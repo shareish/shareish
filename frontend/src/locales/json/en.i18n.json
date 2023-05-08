@@ -393,6 +393,7 @@
   "error_keys__ACCOUNT_DOESNT_EXIST": "This account doesn't exists.",
   "error_keys__ACCOUNT_ALREADY_DISABLED": "This account is already disabled.",
   "error_keys__DISABLED_ACCOUNT": "This account is disabled.",
+  "error_keys__INTERNAL_ERROR": "Internal error.",
   "error_keys__INVALID_PASSWORD": "The password is incorrect.",
   "error_keys__ITEM_VISIBILITY_MUST_BE_UL_OR_PR": "Items visilibity must be &quot;unlisted&quot; or &quot;private&quot;.",
   "error_keys__MISSING_INTERNAL_FIELDS": "Missing internals fields.",

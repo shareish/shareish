@@ -77,6 +77,10 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             print("INTERNAL ERROR: User is not member of this conversation.")
             return None
 
+        if conversation.is_closed:
+            print("This conversation is closed")
+            return None
+
         notify_with_email = False
         last_message_from_sender = Message.objects.filter(conversation_id=conversation_id, user_id=user_id).order_by("date").last()
         if last_message_from_sender is not None:
