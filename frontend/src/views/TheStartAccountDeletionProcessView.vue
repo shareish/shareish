@@ -59,7 +59,7 @@ export default {
         this.$buefy.snackbar.open({
           duration: 9000,
           type: 'is-success',
-          message: this.$t('notif-success-account-recovering', {email: this.token.user.email, username: this.token.user.username}),
+          message: this.$t('notif-success-start-account-deletion-process', {email: this.token.user.email, username: this.token.user.username}),
           pauseOnHover: true,
         });
 

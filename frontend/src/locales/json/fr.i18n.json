@@ -384,6 +384,7 @@
   "as-security-email-confirmation-delete": "Pour plus de sécurité, un lien sera envoyé à votre adresse e-amil pour confirmer votre choix.",
   "if-delete-choice-confirmed-no-recover": "Une fois confirmé, nous garderons vos données pendant 30 jours au cas où vous changeriez d'avis afin que vous puissiez réactiver votre compte si nécessaire.",
   "notif-success-account-deletion-process-link-sent": "Un lien de confirmation permettant la suppression de votre compte a été envoyé à votre adresse e-mail.",
+  "notif-success-start-account-deletion-process": "Le processus de suppresion de votre compte a bien démarré. Si vous souhaitez récupérer votre compte avant la date butoir, veuillez tenter de vous reconnecter à votre compte et suivre les instructions.",
   "account-recovering": "Récupération de compte",
   "this-page-doesnt-exist": "Cette page n'existe pas",
   "to-get-back-to-home": "Pour retourner à la page d'accueil",
