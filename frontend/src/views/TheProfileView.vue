@@ -47,6 +47,7 @@ export default {
       }
       catch (error) {
         this.snackbarError(error);
+        await this.$router.push("/map");
       }
     },
     async fetchItems() {

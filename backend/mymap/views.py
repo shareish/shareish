@@ -15,7 +15,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
-    ItemMapBoundsFilterBackend
+    ItemMapBoundsFilterBackend, UserDisabledFilterBackend
 from .functions import verif_location
 from .mail import send_mail_recover_account, send_mail_start_delete_account_process
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
@@ -193,6 +193,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+    filter_backends = [UserDisabledFilterBackend]
 
     def get_instance(self):
         return self.request.user
@@ -600,8 +601,7 @@ def disable_user(request, user_id):
                                 conversation_to_close.save()
 
                             return Response(status=status.HTTP_200_OK)
-                    except Exception as e:
-                        print(e)
+                    except:
                         return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
                     return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
@@ -721,17 +721,21 @@ def recover_account_confirm_token(request, token):
             # Here we don't check whether the account is disabled or not to prevent any error that may have
             # occurred. We still do all the checks to prevent undesired account deletion.
 
-            # Recover the account
-            user.is_disabled = False
-            user.save()
+            try:
+                with transaction.atomic():
+                    # Recover the account
+                    user.is_disabled = False
+                    user.save()
 
-            # Use the token
-            token.use()
+                    # Use the token
+                    token.use()
 
-            # Remove the account from the deletion scheduling if it was present
-            ScheduledAccountDeletion.objects.filter(user=user).delete()
+                    # Remove the account from the deletion scheduling if it was present
+                    ScheduledAccountDeletion.objects.filter(user=user).delete()
 
-            return Response(status=status.HTTP_200_OK)
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             error_key = check['error']
             if error_key == 'TOKEN_DOESNT_EXIST':
@@ -758,23 +762,27 @@ def delete_account_confirm_token(request, token):
         check = Token.check_token(token, 'delete_account')
         if 'success' in check:
             token = check['success']
-
-            # Disable the user account
             user = token.user
-            user.is_disabled = True
-            user.save()
 
-            # Make all his items private
-            # Forced to private as the process is of account deletion is more restrictive
-            Item.objects.filter(user=user).update(visibility=Item.Visibility.PRIVATE)
+            try:
+                with transaction.atomic():
+                    # Disable the user account
+                    user.is_disabled = True
+                    user.save()
 
-            # Use the token
-            token.use()
+                    # Make all his items private
+                    # Forced to private as the process is of account deletion is more restrictive
+                    Item.objects.filter(user=user).update(visibility=Item.Visibility.PRIVATE)
 
-            # Add the user inside the deletion scheduling system
-            ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
+                    # Use the token
+                    token.use()
 
-            return Response(status=status.HTTP_200_OK)
+                    # Add the user inside the deletion scheduling system
+                    ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
+
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             error_key = check['error']
             if error_key == 'TOKEN_DOESNT_EXIST':

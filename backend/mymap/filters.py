@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Point, GEOSGeometry, Polygon
 from django.db.models import Q, F
 from rest_framework import filters
 
-from mymap.models import Item
+from .models import Item
 
 
 class ActiveItemFilterBackend(filters.BaseFilterBackend):
@@ -153,3 +153,10 @@ class UserItemFilterBackend(filters.BaseFilterBackend):
         if user is not None and user != "":
             return queryset.filter(user_id=int(user))
         return queryset.filter(user=request.user)
+
+
+class UserDisabledFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if request.user.is_authenticated and request.user.is_staff:
+            return queryset
+        return queryset.filter(is_disabled=False)
