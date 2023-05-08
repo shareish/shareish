@@ -57,9 +57,9 @@ export default {
       try {
         const auth = (await axios.post("/api/v1/auth/login/", formData)).data;
 
-        axios.defaults.headers.common["Authorization"] = "Token " + auth['urlToken'];
-        this.$store.commit('setToken', auth['urlToken']);
-        localStorage.setItem("token", auth['urlToken']);
+        axios.defaults.headers.common["Authorization"] = "Token " + auth['token'];
+        this.$store.commit('setToken', auth['token']);
+        localStorage.setItem("token", auth['token']);
 
         this.$store.commit('setUserID', auth['id']);
         localStorage.setItem("user_id", auth['id']);
