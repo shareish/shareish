@@ -11,6 +11,9 @@
       <b-message v-if="showDisabledAccountLink" title="Account disabled" type="is-warning">
         {{ $t('help_login-disabled-account') }} <router-link :to="{name: 'recoverAccount'}">{{ $t('click-here') }}</router-link>.
       </b-message>
+      <b-message v-if="showScheduledDeletionAccountLink" title="Account scheduled for deletion" type="is-danger">
+        <span v-html="$t('help_login-scheduled-deletion-account', {x: daysBeforeDeletion})" /> <router-link :to="{name: 'recoverAccount'}">{{ $t('click-here') }}</router-link>.
+      </b-message>
       <div class="field">
         <label>{{ $t('password') }}</label>
         <div class="control">
@@ -39,7 +42,9 @@ export default {
       authValue: '',
       password: '',
       waitingFormResponse: false,
-      showDisabledAccountLink: false
+      showDisabledAccountLink: false,
+      showScheduledDeletionAccountLink: false,
+      daysBeforeDeletion: 0
     }
   },
   created() {
@@ -69,8 +74,13 @@ export default {
       catch (error) {
         if (this.isKeyedError(error)) {
           const key = this.getErrorKey(error);
-          if (key === 'DISABLED_ACCOUNT')
+          console.log(key);
+          if (key === 'DISABLED_ACCOUNT') {
             this.showDisabledAccountLink = true;
+          } else if (key === 'SCHEDULED_DELETION_ACCOUNT') {
+            this.showScheduledDeletionAccountLink = true;
+            this.daysBeforeDeletion = Number(error.response.data.days_left);
+          }
         }
         this.snackbarError(error, {'showErrorCode': false});
       }

@@ -384,7 +384,17 @@ class CustomLogin(ObtainAuthToken):
                             'id': user.pk
                         })
                     return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
-                return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    try:
+                        schedule = ScheduledAccountDeletion.objects.get(user=user)
+                        if schedule.due_date() > timezone.now():
+                            days_left = (schedule.due_date() - timezone.now()).days
+                        else:
+                            days_left = 0
+                        return Response({'key': 'SCHEDULED_DELETION_ACCOUNT', 'days_left': days_left}, status=status.HTTP_400_BAD_REQUEST)
+                    except Exception as e:
+                        print(e)
+                        return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

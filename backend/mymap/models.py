@@ -429,8 +429,14 @@ class ScheduledAccountDeletion(models.Model):
     request_date = models.DateTimeField(default=timezone.now)
     interval = models.DurationField()
 
+    def due_date(self):
+        """
+        Returns True if the scheduled account deletion is due, False otherwise.
+        """
+        return self.request_date + self.interval
+
     def is_due(self):
         """
         Returns True if the scheduled account deletion is due, False otherwise.
         """
-        return self.request_date + self.interval < timezone.now()
+        return self.due_date() < timezone.now()
