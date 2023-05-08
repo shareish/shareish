@@ -64,9 +64,12 @@ class ItemViewSet(viewsets.ModelViewSet):
                     # Item already viewed
                     pass
 
+            if instance.visibility == Item.Visibility.PRIVATE and request.user != instance.user and not request.user.is_staff:
+                return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
             return Response(serializer.data)
         except Item.DoesNotExist:
-            return Response("This item does not exist.", status=status.HTTP_404_NOT_FOUND)
+            return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['location'])
@@ -118,6 +121,7 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
+    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC)
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,

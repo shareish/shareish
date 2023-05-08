@@ -63,7 +63,7 @@
             </div>
             <div class="column">
               <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
-                <template #label>{{ $t('item-type') }}
+                <template #label>{{ $t('type') }}
                   <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
@@ -160,15 +160,55 @@
               </b-field>
             </div>
           </div>
-          <div class="columns">
-          <div class="column">
-          <b-checkbox v-model="internalItem.is_recurrent">
-            <strong>{{ $t('save-as-recurrent-item') }}</strong>
-            <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
-              <i class="icon far fa-question-circle"></i>
-            </b-tooltip>
-          </b-checkbox>
-          </div>
+          <div class="level">
+            <div class="level-left">
+              <b-checkbox v-model="internalItem.isRecurrent">
+                <strong>{{ $t('save-as-recurrent-item') }}</strong>
+                <b-tooltip :label="$t('help_item_recurrent')" multilined position="is-top">
+                  <i class="icon far fa-question-circle"></i>
+                </b-tooltip>
+              </b-checkbox>
+            </div>
+            <div class="level-right">
+              <b-dropdown v-model="internalItem.visibility" aria-role="list" position="is-top-left">
+                <template v-if="internalItem.visibility === 'PB'" #trigger>
+                  <b-button :label="$t('item_visibility__PB')" type="is-primary" icon-left="globe-europe" icon-right="menu-down" />
+                </template>
+                <template v-else-if="internalItem.visibility === 'UL'" #trigger>
+                  <b-button :label="$t('item_visibility__UL')" type="is-primary" icon-left="eye-slash" icon-right="menu-down" />
+                </template>
+                <template v-else-if="internalItem.visibility === 'PR'" #trigger>
+                  <b-button :label="$t('item_visibility__PR')" type="is-primary" icon-left="lock" icon-right="menu-down" />
+                </template>
+                <b-dropdown-item value="PB" aria-role="listitem">
+                  <div class="media">
+                    <b-icon class="media-left" pack="fas" icon="globe-europe" size="is-medium"></b-icon>
+                    <div class="media-content">
+                      <h3>{{ $t('item_visibility__PB') }}</h3>
+                      <small>Visible for everyone can see</small>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item value="UL" aria-role="listitem">
+                  <div class="media">
+                    <b-icon class="media-left" pack="fas" icon="eye-slash" size="is-medium"></b-icon>
+                    <div class="media-content">
+                      <h3>{{ $t('item_visibility__UL') }}</h3>
+                      <small>Visible for people you will share it with</small>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+                <b-dropdown-item value="PR" aria-role="listitem">
+                  <div class="media">
+                    <b-icon class="media-left" pack="fas" icon="lock" size="is-medium"></b-icon>
+                    <div class="media-content">
+                      <h3>{{ $t('item_visibility__PR') }}</h3>
+                      <small>Only visible to you</small>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </div>
           </div>
         </div>
         <div class="container has-text-centered mt-5">
@@ -385,7 +425,8 @@ export default {
             location: this.address,
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
-            enddate: endDate
+            enddate: endDate,
+            visibility: this.internalItem.visibility
           })).data;
 
           if (this.images['files'].length > 0) {

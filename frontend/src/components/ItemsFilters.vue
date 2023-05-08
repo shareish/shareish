@@ -9,7 +9,7 @@
                @input="debounceSearchString">
       </b-input>
     </b-field>
-    <b-field :label="$t('item-type')">
+    <b-field :label="$t('type')">
       <b-select v-model="selectedType">
         <option :value="null">{{ $t('all') }}</option>
         <option value="RQ">{{ $t('request') }}</option>
