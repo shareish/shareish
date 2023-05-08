@@ -319,6 +319,7 @@ class ItemView(models.Model):
 class Conversation(models.Model):
     item = models.ForeignKey(Item, related_name='conversations', on_delete=models.SET_NULL, null=True)
     is_closed = models.BooleanField(default=False)
+    max_users = models.PositiveIntegerField(default=2)
     lastmessagedate = models.DateTimeField(auto_now_add=True)
 
     class Meta:
