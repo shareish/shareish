@@ -27,6 +27,7 @@ urlpatterns = [
     path("address", views.get_address, name='get_address'),
     path("address/reverse", views.get_address_reverse, name='get_address_reverse'),
     path("predictClass/", views.predict_class, name='predict_class'),
+    path("analyze/", views.analyze, name='analyze'),
     path("notifications/", views.get_notifications, name='notifications'),
     path("users/images/<int:userimage_id>", views.get_userimage, name='get_userimage'),
     path("users/images/<int:userimage_id>/base64", views.get_userimage_base64, name='get_userimage_base64'),

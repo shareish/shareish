@@ -401,6 +401,17 @@ def predict_class(request):
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
+@api_view(['POST'])
+def analyze(request):
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        if image:
+            response = yourfunction(image)
+            return JsonResponse(reponse, status=status.HTTP_200_OK, safe=False)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def get_notifications(request):

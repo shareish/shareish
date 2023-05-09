@@ -375,30 +375,32 @@ export default {
       try {
         let data = new FormData();
         data.append('image', file);
-        const response = (await axios.post("/api/v1/predictClass/", data)).data;
-        const probabilities = response['probabilities'];
-        this.images[position]['predictions'] = probabilities;
-
-        for (let i in probabilities) {
-          let found = false;
-          for (let j in this.probabilities) {
-            if (this.probabilities[j]['class'] === probabilities[i]['class']) {
-              this.probabilities[j]['probability'] += probabilities[i]['probability'];
-              found = true;
-              break;
-            }
-          }
-          if (!found)
-              this.probabilities.push({...probabilities[i]});
-        }
-
-        this.sortPredictions();
-        this.refreshSuggestedNames();
-
-        this.description += response['detected_text']
-
-        if (this.probabilities[0])
-          this.category1 = this.probabilities[0]['category'];
+        // const response = (await axios.post("/api/v1/predictClass/", data)).data;
+        const response = (await axios.post("/api/v1/analyze/", data)).data;
+        console.log(response);
+        // const probabilities = response['probabilities'];
+        // this.images[position]['predictions'] = probabilities;
+        //
+        // for (let i in probabilities) {
+        //   let found = false;
+        //   for (let j in this.probabilities) {
+        //     if (this.probabilities[j]['class'] === probabilities[i]['class']) {
+        //       this.probabilities[j]['probability'] += probabilities[i]['probability'];
+        //       found = true;
+        //       break;
+        //     }
+        //   }
+        //   if (!found)
+        //       this.probabilities.push({...probabilities[i]});
+        // }
+        //
+        // this.sortPredictions();
+        // this.refreshSuggestedNames();
+        //
+        // this.description += response['detected_text']
+        //
+        // if (this.probabilities[0])
+        //   this.category1 = this.probabilities[0]['category'];
       }
       catch (error) {
         this.snackbarError(error);
