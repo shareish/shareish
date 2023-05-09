@@ -140,7 +140,7 @@
               </b-button>
             </header>
             <div class="content">
-              <item-filters
+              <items-filters
                 @fieldsUpdated="itemFiltersUpdated"
                 rewrite-url-page-name="map"
                 :limited-vertical-space="false"
@@ -180,7 +180,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
-import ItemFilters from "@/components/ItemFilters.vue";
+import ItemsFilters from "@/components/ItemsFilters.vue";
 
 const itemTypeIcons = {
   'DN': greenIcon,
@@ -193,7 +193,7 @@ export default {
   name: 'TheMapView',
   mixins: [ErrorHandler, WindowSize],
   components: {
-    ItemFilters,
+    ItemsFilters,
     ItemMapPopup,
     LMap,
     LTileLayer,
@@ -386,7 +386,10 @@ export default {
       this.builtURLParams = {...builtURLParams};
       this.rewriteURL();
 
-      this.$store.commit('setItemsFilters', this.builtURLParams);
+      this.$store.commit('setItemsFilters', {
+        builtURLParams: this.builtURLParams,
+        keysToKeep: ['dr', 'lt', 'ordering', 'us']
+      });
 
       clearTimeout(this.timeouts['itemFiltersUpdated']);
       this.timeouts['itemFiltersUpdated'] = setTimeout(() => {

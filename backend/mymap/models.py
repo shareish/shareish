@@ -295,7 +295,7 @@ class ItemComment(models.Model):
 
 
 class ItemView(models.Model):
-    item = models.ForeignKey(Item, related_name='item_views', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, related_name='views', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='item_views', on_delete=models.SET_NULL, null=True)
     view_date = models.DateTimeField(default=timezone.now)
     creation_date = models.DateTimeField(auto_now_add=True)

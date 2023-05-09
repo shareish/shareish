@@ -2,7 +2,7 @@
   <div id="page-items">
     <div class="columns">
       <div class="column">
-        <item-filters
+        <items-filters
             @fieldsUpdated="itemFiltersUpdated"
             rewrite-url-page-name="items"
             :limited-vertical-space="windowWidth < 1024"
@@ -34,6 +34,8 @@
                   <option value="startdate">{{ $t('startdate') }}</option>
                   <option value="enddate">{{ $t('enddate') }}</option>
                   <option value="distance">{{ $t('distance') }}</option>
+                  <option value="comments_count">{{ $t('comments_count') }}</option>
+                  <option value="views_count">{{ $t('views_count') }}</option>
                 </b-select>
               </b-field>
               <b-field class="wsnw ml-1 is-small">
@@ -73,12 +75,12 @@ import {
   lcall,
   ucfirst
 } from "@/functions";
-import ItemFilters from "@/components/ItemFilters.vue";
+import ItemsFilters from "@/components/ItemsFilters.vue";
 
 export default {
   name: 'TheItemsView',
   mixins: [ErrorHandler, WindowSize],
-  components: {ItemFilters, ItemCard},
+  components: {ItemsFilters, ItemCard},
   data() {
     return {
       userLocation: null,
@@ -123,6 +125,26 @@ export default {
           {
             'direction': '-',
             'label': 'furthest-first'
+          }
+        ],
+        'comments_count': [
+          {
+            'direction': '-',
+            'label': 'most-commented'
+          },
+          {
+            'direction': '',
+            'label': 'least-commented'
+          }
+        ],
+        'views_count': [
+          {
+            'direction': '-',
+            'label': 'most-viewed'
+          },
+          {
+            'direction': '',
+            'label': 'least-viewed'
           }
         ]
       },
@@ -173,9 +195,6 @@ export default {
       this.input_orderByDirection = '-';
     }
 
-    this.builtURLParams['ordering'] = this.ordering;
-    this.$store.commit('setItemsFilters', this.builtURLParams);
-
     window.addEventListener('scroll', this.scrollHandler);
   },
   async mounted() {
@@ -199,7 +218,7 @@ export default {
     },
     ordering() {
       this.builtURLParams['ordering'] = this.ordering;
-      this.$store.commit('setItemsFilters', this.builtURLParams);
+      this.$store.commit('setItemsFilters', {builtURLParams: this.builtURLParams});
       this.rewriteURL();
       if (this.firstItemsLoaded)
         this.fetchItems(false);
@@ -227,7 +246,7 @@ export default {
       this.builtURLParams = {...builtURLParams, ordering: this.ordering};
       this.rewriteURL();
 
-      this.$store.commit('setItemsFilters', this.builtURLParams);
+      this.$store.commit('setItemsFilters', {builtURLParams: this.builtURLParams});
 
       clearTimeout(this.timeouts['itemFiltersUpdated']);
       this.timeouts['itemFiltersUpdated'] = setTimeout(() => {
@@ -245,10 +264,12 @@ export default {
       }, 600);
     },
     scrollHandler: _.debounce(function () {
-      let scrollBlock = document.getElementById('wrapper');
-      let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
-      if (bottom && !this.loadedAllItems)
-        this.fetchItems(true);
+      if (!this.loadedAllItems && this.firstItemsLoaded) {
+        const scrollBlock = document.getElementById('wrapper');
+        const bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight >= scrollBlock.scrollHeight);
+        if (bottom)
+          this.fetchItems(true);
+      }
     }, 100),
     async fetchItems(append = false) {
       this.lastQueryDatetime = new Date();

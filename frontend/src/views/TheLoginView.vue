@@ -57,7 +57,7 @@ export default {
         this.$store.commit('setToken', token);
         localStorage.setItem("token", token);
 
-        const user_id = (await axios.get("api/v1/users/me/")).data.id;
+        const user_id = Number((await axios.get("api/v1/users/me/")).data.id);
         this.$store.commit('setUserID', user_id);
         localStorage.setItem("user_id", user_id);
 

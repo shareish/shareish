@@ -24,9 +24,9 @@
               </div>
               <p class="subtitle">
                 {{ $t('published') }} {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
-                <template v-if="showHitcount">
+                <template v-if="showViewsCount">
                   &middot;
-                  <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
+                  <i class="far fa-eye"></i>{{ item.views_count }} {{ $t('views') }}
                 </template>
               </p>
             </div>
@@ -64,7 +64,7 @@ export default {
       required: false,
       default: 100
     },
-    showHitcount: {
+    showViewsCount: {
       type: Boolean,
       required: false,
       default: false
