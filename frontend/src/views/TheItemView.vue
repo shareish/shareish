@@ -2,6 +2,25 @@
   <div id="page-item" class="max-width-is-max-container">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
+      <b-modal v-model="isDeleteItemActive" :width="500">
+        <div class="card">
+          <div class="modal-card" style="width: auto">
+            <header class="modal-card-head">
+              <p class="modal-card-title">{{ $t('delete-item') }}</p>
+              <button type="button" class="delete" @click="isDeleteItemActive = false"/>
+            </header>
+            <section class="modal-card-body">
+              <p v-html="$t('delete-item-confirmation')" class="mb-5" />
+              <b-switch v-model="closeAllConversationsOnItemDelete" :rounded="false" type="is-primary">{{ $t('close-all-conv-from-item') }}</b-switch>
+              <p class="mt-4">{{ $t('close-all-conv-from-item-reversible') }}</p>
+            </section>
+            <footer class="modal-card-foot">
+              <b-button :label="$t('cancel')" @click="isDeleteItemActive = false" />
+              <b-button :label="$t('confirm')" type="is-danger" @click="deleteItem" />
+            </footer>
+          </div>
+        </div>
+      </b-modal>
       <article v-if="itemHasEnded" class="message is-warning">
         <div class="message-header">{{ $t('warning') }}</div>
         <div class="message-body">
@@ -105,7 +124,7 @@
                 <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
               </div>
               <div class="column is-half">
-                <b-button type="is-danger" class="w-100" @click="clickDeleteItem">{{ $t('delete') }}</b-button>
+                <b-button type="is-danger" class="w-100" @click="isDeleteItemActive = true">{{ $t('delete') }}</b-button>
               </div>
             </div>
           </template>
@@ -228,6 +247,8 @@ export default {
       commentToSend: "",
       textareaRows: 1,
       waitingFormResponse: false,
+      isDeleteItemActive: false,
+      closeAllConversationsOnItemDelete: false,
 
       redirection: false,
       loading: true
@@ -327,20 +348,12 @@ export default {
         this.snackbarError(error);
       }
     },
-    clickDeleteItem() {
-      this.$buefy.dialog.confirm({
-        title: this.$t('delete-item'),
-        message: this.$t('delete-item-confirmation'),
-        confirmText: this.$t('delete'),
-        cancelText: this.$t('cancel'),
-        type: 'is-danger',
-        hasIcon: true,
-        onConfirm: () => this.deleteItem()
-      });
-    },
     async deleteItem() {
       try {
+        if (this.closeAllConversationsOnItemDelete)
+          await axios.patch(`/api/v1/conversations/items/${this.item.id}/close-all`);
         await axios.delete(`/api/v1/items/${this.item.id}/`);
+        this.isDeleteItemActive = false;
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',

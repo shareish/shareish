@@ -509,3 +509,16 @@ def get_item_images_base64(request, item_id):
             })
         return Response(json.dumps(images), status=status.HTTP_200_OK)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def close_all_conversations_from_item(request, item_id):
+    if request.method == 'PATCH':
+        item = Item.objects.get(pk=item_id)
+        if item.user_id == request.user.id:
+            Conversation.objects.filter(item_id=item_id).update(is_closed=True)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response("You are not the owner of this item.", status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
