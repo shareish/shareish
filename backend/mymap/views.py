@@ -382,6 +382,11 @@ class CustomLogin(ObtainAuthToken):
             if user.is_active:
                 if not user.is_disabled:
                     if user.check_password(request.data['password']):
+                        # Update user's last login date
+                        user.last_login = timezone.now()
+                        user.save()
+
+                        # Generate auth token
                         token, created = RestToken.objects.get_or_create(user=user)
                         return Response({
                             'token': token.key,
