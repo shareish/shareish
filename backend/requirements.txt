@@ -18,3 +18,9 @@ geopy==2.2.0
 numpy==1.18.5
 psycopg2==2.9.3
 pytesseract==0.3.10
+lmdb==1.4.0
+natsort==8.2.0
+opencv_python_headless==4.5.5.64
+scikit_image==0.19.2
+six==1.16.0
+pyzbar==0.1.9

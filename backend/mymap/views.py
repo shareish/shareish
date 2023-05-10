@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+
 from datetime import datetime, timezone
 
 from django.db import IntegrityError
@@ -28,7 +29,9 @@ from .serializers import (
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .ai import findClass
+from .ai import findClass, BarcodePicture, RegularPicture, BookPicture
+
+
 
 from geopy.geocoders import Nominatim
 
@@ -402,12 +405,24 @@ def predict_class(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def analyze(request):
     if request.method == 'POST':
         image = request.FILES.get('image')
         if image:
-            response = yourfunction(image)
-            return JsonResponse(reponse, status=status.HTTP_200_OK, safe=False)
+            # all 3 function return 1 if a Barcode, book, or text is found 0 if not
+            # Metadata is a dictionary with the information found ex  {"title": title, "author": author, "ISBN": ISBN, "text": text}
+            
+            #IsBarcode, BookMetaData = BarcodePicture(image)
+            
+            #IsBook, BookMetaData = BookPicture(image)
+
+            #IsText, TextMetaData = TextPicture(image)
+
+
+            
+
+            return JsonResponse(0, status=status.HTTP_200_OK, safe=False)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

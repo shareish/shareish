@@ -7,6 +7,9 @@ import json
 from PIL import Image
 from matplotlib import pyplot as plt
 from torchvision import models, transforms
+from pyzbar.pyzbar import decode
+import requests
+from CRAFT.CRAFT_shareish import CRAFT_txt
 
 model = torch.hub.load(
     'pytorch/vision:v0.10.0', 'mobilenet_v3_large',
@@ -96,6 +99,72 @@ def findClass(filename):
 
     return response
 
+def BarcodePicture(image):
+
+    image = Image.open(image)
+    decodedObjects = decode(image)
+
+    for obj in decodedObjects:
+        if obj.type == "EAN13" or obj.type == "EAN10":
+            ISBN = obj.data.decode("utf-8")
+
+
+            url = "https://openlibrary.org/api/books?bibkeys=ISBN:" + ISBN + "&format=json&jscmd=data"
+            
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+                for obj in data:
+                    title = data[obj]["title"]
+                    author = data[obj]["authors"][0]["name"]
+
+                MetaData = {"title": title, "author": author, "ISBN": ISBN}
+
+                # Only return the first book type ISBN recognised
+                return 1, MetaData
+
+
+    return 0, 0
+
+def BookPicture(image):
+
+    response = findClass(image)
+
+    for obj in response["probabilities"]:
+        if obj["class"] == "book_jacket" or 1==1:# for testing because hardly recognises book_jacket
+            response, confidenceScore = CRAFT_txt(image)
+            # response is a tab of words, add them all together with a space
+            
+            if response == []:
+                return 0, 0
+            else:
+                response = " ".join(response)
+                
+                # query openlibrary for the book in the same form as https://openlibrary.org/search.json?q=the+lord+of+the+rings
+                url = "https://openlibrary.org/search.json?q=" + response.replace(" ", "+")
+
+                response = requests.get(url) # is quite bad at recognising the books
+                if response.json()["numFound"] != 0:
+                    print("Book found")
+                    response = response.json()["docs"][0] # only the first result is returned
+                    title = response["title"]
+                    author = response["author_name"][0]
+                    ISBN = response["isbn"][0]
+
+                metaData = {"title": title, "author": author, "ISBN": ISBN}
+                
+                return 1, metaData
+    return 0, 0
+
+def RegularPicture(image):
+    response, confidenceScore = CRAFT_txt(image)
+    if response == []:
+        return 0, 0
+    else:
+        metaData = {"text": response}
+        return 1, metaData
+    return 0, 0
 
 # These two functions are implemented to plot the save the figures on files
 # and to write the results on a tabular in a latex document
