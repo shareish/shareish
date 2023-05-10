@@ -114,7 +114,6 @@ def BarcodePicture(image):
             response = requests.get(url)
             if response.status_code == 200:
                 data = response.json()
-                print(data)
                 for obj in data:
                     title = data[obj]["title"]
                     author = data[obj]["authors"][0]["name"]
@@ -132,7 +131,7 @@ def BookPicture(image):
     response = findClass(image)
 
     for obj in response["probabilities"]:
-        if obj["class"] == "book_jacket" or 1==1:# for testing because hardly recognises book_jacket
+        if obj["class"] == "book_jacket" or obj["class"] == "comic_book" or 1==1:# for testing because hardly recognises book_jacket or comic_book
             response, confidenceScore = CRAFT_txt(image)
             # response is a tab of words, add them all together with a space
             
@@ -146,7 +145,6 @@ def BookPicture(image):
 
                 response = requests.get(url) # is quite bad at recognising the books
                 if response.json()["numFound"] != 0:
-                    print("Book found")
                     response = response.json()["docs"][0] # only the first result is returned
                     title = response["title"]
                     author = response["author_name"][0]

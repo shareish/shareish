@@ -417,12 +417,26 @@ def analyze(request):
             
             #IsBook, BookMetaData = BookPicture(image)
 
-            #IsText, TextMetaData = TextPicture(image)
+            #IsText, TextMetaData = RegularPicture(image)
+
+            IsBarcode, BookMetaData = BarcodePicture(image) # 1 if barcode of book is found and has correctly found it, 0 if not, and the metadata of the book
+            if IsBarcode == 1:
+                # did not include the findClass function because it cannot recognise barcode
+                return JsonResponse(BookMetaData, status=status.HTTP_200_OK, safe=False)
+            else: 
+                IsBook, BookMetaData = BookPicture(image)
+                if IsBook == 1:
+                    response = [BookMetaData,findClass(image)]
+                    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+                else: 
+                    IsText, TextMetaData = RegularPicture(image)
+                    if IsText == 1:
+                        response = [TextMetaData,findClass(image)]
+                        return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+                    else:
+                        return JsonResponse(findClass(image), status=status.HTTP_200_OK, safe=False)
 
 
-            
-
-            return JsonResponse(0, status=status.HTTP_200_OK, safe=False)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
