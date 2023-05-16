@@ -124,11 +124,11 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'XXXXXXXXXXXXXXX'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'noreply.shareish@gmail.com'
+EMAIL_HOST_USER = 'noreply@shareish.org'
 EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX'
-
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True
 
 MEDIA_ROOT = BASE_DIR / "mediafiles"
