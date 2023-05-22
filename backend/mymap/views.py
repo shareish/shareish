@@ -64,8 +64,12 @@ class ItemViewSet(viewsets.ModelViewSet):
                     # Item already viewed
                     pass
 
-            if instance.visibility == Item.Visibility.PRIVATE and request.user != instance.user and not request.user.is_staff:
+            if instance.visibility == Item.Visibility.DRAFT and request.user != instance.user and not request.user.is_staff:
                 return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+            if instance.is_closed:
+                if instance.user != request.user:
+                    return Response({'key': 'ITEM_IS_CLOSED'}, status=status.HTTP_403_FORBIDDEN)
 
             return Response(serializer.data)
         except Item.DoesNotExist:
@@ -99,18 +103,32 @@ class ItemViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
 
-        result = verif_location(request.data['location'])
-        if 'success' in result:
-            request.data['location'] = result['success']
-        else:
-            return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
+        if instance.user != request.user:
+            result = verif_location(request.data['location'])
+            if 'success' in result:
+                request.data['location'] = result['success']
+            else:
+                return Response(result['error'], status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if serializer.is_valid():
-            self.perform_update(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, headers=headers)
-        return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            if serializer.is_valid():
+                self.perform_update(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, headers=headers)
+            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'key': 'NOT_ITEM_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.user == request.user:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'key': 'NOT_ITEM_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 class RecurrentItemViewSet(ItemViewSet):
@@ -121,7 +139,7 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
-    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC)
+    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC, closed_reason="")
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,
@@ -152,12 +170,18 @@ class ItemCommentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if 'item_id' in self.kwargs:
-            serializer = self.get_serializer(data=request.data)
-            if serializer.is_valid():
-                self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
-                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                item = Item.objects.get(pk=self.kwargs['item_id'])
+                if not item.is_closed:
+                    serializer = self.get_serializer(data=request.data)
+                    if serializer.is_valid():
+                        self.perform_create(serializer)
+                        headers = self.get_success_headers(serializer.data)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+                    return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                return Response("You cannot post a comment on a closed item.", status=status.HTTP_403_FORBIDDEN)
+            except Item.DoesNotExist:
+                return Response("This item does not exist.", status=status.HTTP_404_NOT_FOUND)
         else:
             return Response("You must provide and item id to post a comment.", status=status.HTTP_400_BAD_REQUEST)
 
@@ -166,9 +190,7 @@ class ItemCommentViewSet(viewsets.ModelViewSet):
             item = Item.objects.get(pk=self.kwargs['item_id'])
             serializer.save(user=self.request.user, item=item)
         except Item.DoesNotExist:
-            return Response("This item does not exist.", status=status.HTTP_400_BAD_REQUEST)
-        except Item.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response("This item does not exist.", status=status.HTTP_404_NOT_FOUND)
 
 
 class ItemImageViewSet(viewsets.ViewSet):
@@ -305,11 +327,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
             item = Item.objects.get(pk=data['item_id'])
         except Item.DoesNotExist:
             return Response("This item does not exist.", status=status.HTTP_400_BAD_REQUEST)
-        except Item.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if item.user_id == request.user.id:
             return Response("You cannot start a conversation on an item you own.", status=status.HTTP_403_FORBIDDEN)
+
+        if item.is_closed:
+            return Response("You cannot start a conversation on a closed item.", status=status.HTTP_403_FORBIDDEN)
 
         item_conversations_containing_user = Conversation.objects.filter(users__user=request.user, item=item)
         if len(item_conversations_containing_user) > 0:
@@ -487,8 +510,6 @@ def get_notifications(request):
             return Response(conversation_unread_messages_count, status=status.HTTP_200_OK)
         except Conversation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except Conversation.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -512,8 +533,6 @@ def get_userimage(request, userimage_id):
                     return Response({'key': 'NOT_IMAGE_OWNER'}, status=status.HTTP_403_FORBIDDEN)
             except UserImage.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            except UserImage.MultipleObjectsReturned:
-                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'key': 'MUST_BE_AUTHENTICATED'}, status=status.HTTP_403_FORBIDDEN)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -544,8 +563,6 @@ def get_itemimage(request, itemimage_id):
             return FileResponse(open(image.path, 'rb'))
         except ItemImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except ItemImage.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -582,7 +599,7 @@ def close_all_conversations_from_item(request, item_id):
 @permission_classes([IsAuthenticated])
 def disable_user(request, user_id):
     if request.method == 'POST':
-        if 'visibility' in request.data and 'password' in request.data:
+        if 'password' in request.data:
             if user_id == request.user.id or request.user.is_staff:
                 # Retrieve the user to modify
                 try:
@@ -595,22 +612,11 @@ def disable_user(request, user_id):
                     return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 if not user.is_disabled:
-                    # Check if the visibility is accepted
-                    if request.data['visibility'] == 'unlisted':
-                        visibility = Item.Visibility.UNLISTED
-                    elif request.data['visibility'] == 'private':
-                        visibility = Item.Visibility.PRIVATE
-                    else:
-                        return Response({'key': 'ITEM_VISIBILITY_MUST_BE_UL_OR_PR'}, status=status.HTTP_400_BAD_REQUEST)
-
                     try:
                         with transaction.atomic():
                             # Disable the user
                             user.is_disabled = True
                             user.save()
-
-                            # Update all its item visibility
-                            Item.objects.filter(user=user).update(visibility=visibility)
 
                             # Closing 1to1 conversations where user was part of
                             conversations_user = ConversationUser.objects.filter(user=user, conversation__max_users=2)
@@ -789,10 +795,6 @@ def delete_account_confirm_token(request, token):
                     user.is_disabled = True
                     user.save()
 
-                    # Make all his items private
-                    # Forced to private as the process is of account deletion is more restrictive
-                    Item.objects.filter(user=user).update(visibility=Item.Visibility.PRIVATE)
-
                     # Use the token
                     token.use()
 
@@ -808,4 +810,29 @@ def delete_account_confirm_token(request, token):
                 return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def close_item(request, item_id):
+    if request.method == 'POST':
+        if 'reason' in request.data:
+            reason = request.data['reason']
+            if reason in Item.ClosedReason.values:
+                try:
+                    item = Item.objects.get(pk=item_id)
+
+                    if item.user_id != request.user.id:
+                        return Response("You cannot close an item you do not own.", status=status.HTTP_403_FORBIDDEN)
+
+                    item.closed_reason = reason
+                    item.save()
+                    return Response(status=status.HTTP_200_OK)
+                except Item.DoesNotExist:
+                    return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': 'ITEM_CLOSING_REASON_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

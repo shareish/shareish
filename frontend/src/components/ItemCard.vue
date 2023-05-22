@@ -22,6 +22,8 @@
         </template>
       </b-carousel>
       <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
+      <div v-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
+      <div v-else class="closed is-danger tag"><i class="fas fa-lock mr-1"></i>{{ $t('clotured') }}</div>
     </div>
     <div class="card-content">
       <div class="media">
@@ -151,41 +153,51 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .card-image {
   position: relative;
+
+  .hitcount, .visibility, .closed {
+    position: absolute;
+    font-weight: bold;
+  }
+
+  .hitcount {
+    right: 10px;
+    bottom: 10px;
+
+    i {
+      margin-left: 4px;
+    }
+  }
+
+  .visibility, .closed {
+    top: 10px;
+    left: 10px;
+  }
 }
 
-.card-image .hitcount {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  font-weight: bold;
-}
+.media-content {
+  .title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 
-.card-image .hitcount i {
-  margin-left: 4px;
-}
+    a {
+      color: #4a4a4a !important;
+    }
+  }
 
-.media-content .title {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
+  .description {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
 
-.media-content .title a {
-  color: #4a4a4a !important;
-}
-
-.media-content .description {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-}
-
-.icon-text span {
-  margin-right: 0.5rem;
+  .icon-text span {
+    margin-right: 0.5rem;
+  }
 }
 </style>

@@ -239,7 +239,7 @@ export default {
               duration: 5000,
               type: 'is-success',
               message: this.$t('notif-success-user-update'),
-              pauseOnHover: true,
+              pauseOnHover: true
             });
           }
           catch (error) {

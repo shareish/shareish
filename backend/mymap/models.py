@@ -133,6 +133,13 @@ class User(AbstractBaseUser):
         ordering = ['-id']
 
 
+def user_created(sender, user, request, **kwargs):
+    for category in UserMapExtraCategories:
+        UserMapExtraCategory.objects.create(user=user, category=category)
+
+user_registered.connect(user_created)
+
+
 class UserImage(models.Model):
     image = models.ImageField(upload_to='users_images')
     user = models.ForeignKey(User, related_name='images', on_delete=models.CASCADE)
@@ -228,7 +235,13 @@ class Item(models.Model):
     class Visibility(models.TextChoices):
         PUBLIC = 'PB', _("Public")
         UNLISTED = 'UL', _("Unlisted")
-        PRIVATE = 'PR', _("Private")
+        DRAFT = 'DR', _("Draft")
+
+    class ClosedReason(models.TextChoices):
+        ON = 'ON', _("On Shareish")
+        OUTSIDE = 'OUT', _("Outside Shareish")
+        NOT = 'NOT', _("Not resolved")
+        OTHER = 'OTH', _("Other")
 
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
@@ -246,20 +259,19 @@ class Item(models.Model):
 
     visibility = models.CharField(max_length=2, choices=Visibility.choices, default=Visibility.PUBLIC)
 
+    closed_reason = models.CharField(max_length=3, choices=ClosedReason.choices, default="", blank=True)
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE)
+
+    @property
+    def is_closed(self):
+        return self.closed_reason != ""
 
     def __str__(self) -> str:
         return self.name + " : " + self.description + " (" + self.category1 + ")"
 
     class Meta:
         ordering = ['-id']
-
-
-def user_created(sender, user, request, **kwargs):
-    for category in UserMapExtraCategories:
-        UserMapExtraCategory.objects.create(user=user, category=category)
-
-user_registered.connect(user_created)
 
 
 class ItemImage(models.Model):
