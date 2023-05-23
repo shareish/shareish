@@ -54,7 +54,7 @@ export default {
       let snackbarMessage = "";
       if (this.code_t48xGa != null && showErrorCode)
         snackbarMessage += `Error ${this.code_t48xGa}: `;
-      snackbarMessage += (this.message_v0sDM7 != null) ? this.message_v0sDM7 : "No message provided.";
+      snackbarMessage += (this.message_v0sDM7 !== "") ? this.message_v0sDM7 : "No message provided.";
 
       // Displaying the error
       this.$buefy.snackbar.open({

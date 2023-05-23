@@ -100,9 +100,6 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             except User.DoesNotExist:
                 print("INTERNAL ERROR: Sender not found during conversation message saving.")
                 return None
-            except User.MultipleObjectsReturned:
-                print("INTERNAL ERROR: Multiple sender found during conversation message saving.")
-                return None
 
             receivers = ConversationUser.objects.filter(conversation=conversation).exclude(user=sender)
             for receiver in receivers:

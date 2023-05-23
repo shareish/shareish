@@ -5,7 +5,7 @@
       <template v-if="!urlToken">
         <p class="mb-1">{{ $t('help_recover-account') }}</p>
         <ul class="mb-5">
-          <li>All your items will stay unlisted or private. You will need to make them public if you want them to be seen again.</li>
+          <li>Your items will be visible again on Shareish.</li>
           <li>Users on Shareish will be able to message you;</li>
           <li>Your profile will be visible;</li>
           <li>We will start sending you email notifications again.</li>
@@ -72,7 +72,7 @@ export default {
           duration: 9000,
           type: 'is-success',
           message: this.$t('notif-success-email-recover-account', {email}),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
 
         await this.$router.push("/log-in");
@@ -107,7 +107,7 @@ export default {
           duration: 9000,
           type: 'is-success',
           message: this.$t('notif-success-account-recovering', {email: this.token.user.email, username: this.token.user.username}),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
 
         await this.$router.push("/log-in");

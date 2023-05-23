@@ -67,7 +67,7 @@ export default {
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-account-deletion-process-link-sent'),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
       }
       catch (error) {

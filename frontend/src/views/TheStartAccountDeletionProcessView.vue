@@ -60,7 +60,7 @@ export default {
           duration: 9000,
           type: 'is-success',
           message: this.$t('notif-success-start-account-deletion-process', {email: this.token.user.email, username: this.token.user.username}),
-          pauseOnHover: true,
+          pauseOnHover: true
         });
 
         await logout(this);

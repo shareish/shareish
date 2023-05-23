@@ -21,6 +21,10 @@
           </b-carousel-item>
         </template>
       </b-carousel>
+      <div class="top-left">
+        <div v-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
+        <div v-else class="closed is-danger tag"><i class="fas fa-lock mr-1"></i>{{ $t('clotured') }}</div>
+      </div>
       <div class="stats">
         <div v-if="item.comments_count > 0" class="tag mr-2">{{ item.comments_count }}<i class="fas fa-comments"></i></div>
         <div class="tag">{{ item.views_count }}<i class="far fa-eye"></i></div>
@@ -158,11 +162,19 @@ export default {
 .card-image {
   position: relative;
 
-  .stats {
+  .top-left, .stats {
     position: absolute;
+    font-weight: bold;
+  }
+
+  .top-left {
+    top: 10px;
+    left: 10px;
+  }
+
+  .stats {
     bottom: 10px;
     right: 10px;
-    font-weight: bold;
     display: inline-flex;
 
     i {
@@ -189,9 +201,9 @@ export default {
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
   }
-}
 
-.icon-text span {
-  margin-right: 0.5rem;
+  .icon-text span {
+    margin-right: 0.5rem;
+  }
 }
 </style>

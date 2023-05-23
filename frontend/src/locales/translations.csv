@@ -361,8 +361,6 @@ help_disable-your-account,This is a temporary action. You can still recover your
 delete-your-account,Delete your account,Supprimer votre compte
 help_delete-your-account,This is a permanent action. You won't be able to recover your account once it's deleted.,Cette action est permanente. Vous ne pourrez plus récupérer votre compte une fois celui-ci supprimé.
 more-info,More info,Plus d'info
-unlisted-item-explanation,Unlisted items are no longer listed on Shareish but can still be accessed by users who possess the link of the item. The sending of a message to the item publisher is still possible.,Les éléments non-listés ne sont plus listés sur Shareish mais sont toujours accessibles par les utilisateurs qui possèdent le lien de l'élément. L'envoi d'un message au publicateur de l'élément est toujours possible.
-private-item-explanation,Private items are no longer listed on Shareish nor can be accessed by any users except the published himself.,Les éléments privés ne sont plus listés sur Shareish et ne sont plus accessibles par aucun utilisateur excepté le publicateur de ce dernier.
 email-or-username,Email or username,E-mail ou nom d'utilisateur
 help_login-disabled-account,"This account has been disabled and is not accessible anymore. If you want to recover it, please","Ce compte a été désactivé et n'est plus accessible. Si vous souhaitez le récupérer,"
 help_login-scheduled-deletion-account,"This account is scheduled for deletion and is not accessible anymore. There is <b>{x} day(s)</b> remaining before it gets deleted. If you want to recover it, please","Ce compte est programmé en vue d'une suppression et n'est plus accessible. Il reste <b>{x} jours</b> avant qu'il ne soit supprimé. Si vous souhaitez le récupérer,"
@@ -392,25 +390,55 @@ help_start-account-deletion-process,"By clicking on the button below you confirm
 confirm-deletion,Confirm deletion,Confirmer la suppression
 unknown-user,Unknown user,Utilisateur inconnu
 item_visibility__PB,Public,Public
-item_visibility__PB_help,Visible for everyone,Visible par tout le monde
 item_visibility__UL,Unlisted,Non-listé
-item_visibility__UL_help,Only visible for people you will share it with,Uniquement visible par les personnes à qui vous le partagerez
-item_visibility__PR,Private,Privé
-item_visibility__PR_help,Only visible to you,Uniquement visible par vous
+item_visibility__DR,Draft,Brouillon
+help_item_visibility__PB,Visible for everyone,Visible par tout le monde
+help_item_visibility__UL,Only visible for people you will share it with,Uniquement visible par les personnes à qui vous le partagerez
+help_item_visibility__DR,Only visible to you,Uniquement visible par vous
 visibility,Visibility,Visibilité
-help_item_visibility,"The item visibility helps you decide who can see your item. You can choose between public (everyone), unlisted (people you will share the item with) or private (only you).","La visibilité de l'élément vous permet de définir qui pourra voir cet élément. Vous pouvez choisir entre public (tout le monde), non-listé (seulement ceux à qui vous partagerez l'item) et privé (seulement vous)."
+update-status,Update status,Mettre à jour l'état
+validate,Validate,Valider
+update-item-status,Update item status,Mettre à jour l'état de l'item
+cloturer-the-item,Close the item,Clôturer l'élément
+confirm-cloturer,Confirm closing,Confirmer la clôture
+cloturer,Close,Clôturer
+clotured,Closed,Clôturé
+modify,Modify,Modifier
+help_item-close,"By continuing, you will mark this item as closed. It won't be listed on Shareish anymore. You can use this option when your item has been donated, resolved, received or is now unavailable.","En poursuivant, vous marquerez cet item comme cloturé. Il ne sera plus listé sur Shareish. Vous pouvez utiliser cette option lorsque votre élément a été donné, résolu, obtenu ou n'est plus disponible."
+why-item-close,Why do you want to close this item?,Pourquoi voulez-vous clôturer cet élément?
+close-option-DN-on-shareish,I donated this item on Shareish,J'ai donné cet élément via Shareish
+close-option-RQ-on-shareish,I received this item on Shareish,J'ai reçu cet élément via Shareish
+close-option-LN-on-shareish,I lent this item on Shareish,J'ai prêté cet élément via Shareish
+close-option-EV-on-shareish,Shareish contributed to the organization of this event,Shareish a contribué à la tenue de cet événement
+close-option-DN-outside-shareish,I donated this item outside of Shareish,J'ai donné cet élément en dehors de Shareish
+close-option-RQ-outside-shareish,I received this item outside of Shareish,J'ai reçu cet élément en dehors de Shareish
+close-option-LN-outside-shareish,I lent this item outside of Shareish,J'ai prêté cet élément en dehors de Shareish
+close-option-EV-outside-shareish,Shareish did not contributed to the organization of this event,Shareish n'a pas contribué à la tenue de cet événement
+close-option-DN-not,I didn't donated it,Je ne l'ai pas donné
+close-option-RQ-not,I don't need it anymore,Je n'en ai plus besoin
+close-option-LN-not,I didn't lent it,Je ne l'ai pas prêté
+close-option-EV-not,The event did not take place,L'événement n'a pas eu lieu
+close-option-other,Other,Autre
+definitive-deletion,Definitive deletion,Suppression définitive
+help_definitive-deletion,"If you want to definitively delete this item, you can do so by clicking on the button below. This will completely delete the item from the Shareish platform.<br /><br />Please, understand that this <b>cannot be undone</b> and that <b>the deletion is permanent</b>. If you want to keep your item on the platform but don't want the others users to see, you can do so by marking it as <b>closed</b> or <b>private</b>.","Si vous souhaitez supprimer définitivement cet élément, vous pouvez le faire en cliquant sur le bouton ci-dessous. Cela supprimera complètement l'élément de la plateforme Shareish.<br /><br />S'il vous plaît, faites attention que cela est irréversible et que la suppression est permanante. Si vous souhaitez concerver votre élément sur la plateforme mais qu'il ne soit tout simplement pluas accessible des autres utilisateurs, vous pouvez le faire en le marquant comme <b>clôturé</b> ou <b>privé</b>."
+warning-item-is-closed,You have marked this item has closed.,Vous avez marqué cet élément comme clôturé.
+notif-success-item-definitive-deletion,The item has been successfully permanently deleted.,L'élément a bien été supprimé définitivement.
+notif-success-item-close,The item has been successfully marked as closed.,L'élément a bien été marqué comme clôturé.
 
-error_keys__ACCOUNT_DOESNT_EXIST,This account doesn't exist.,Ce compte n'existe pas.
 error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.
+error_keys__ACCOUNT_DOESNT_EXIST,This account doesn't exist.,Ce compte n'existe pas.
+error_keys__ACCOUNT_NOT_DISABLED,This account is not disabled.,Ce compte n'est pas désactivé.
 error_keys__DISABLED_ACCOUNT,This account is disabled.,Ce compte est désactivé.
 error_keys__INTERNAL_ERROR,Internal error.,Erreur interne.
 error_keys__INVALID_PASSWORD,The password is incorrect.,Le mot de passe est incorrect.
+error_keys__ITEM_CLOSING_REASON_DOESNT_EXIST,This item closing reason doesn't exist.,La raison de clôture de l'élément n'existe pas.
 error_keys__ITEM_DOESNT_EXIST,This item doesn't exist.,Cet élément n'existe pas.
-error_keys__ITEM_VISIBILITY_MUST_BE_UL_OR_PR,Items visilibity must be &quot;unlisted&quot; or &quot;private&quot;.,La visibilité des items doit être &quot;non-listé&quot; ou &quot;privé&quot;.
+error_keys__ITEM_IS_CLOSED,This item is closed.,Cet élément est clôturé.
 error_keys__MISSING_INTERNAL_FIELDS,Missing internals fields.,Champs internes manquants.
 error_keys__MUST_BE_AUTHENTICATED,You must be authenticated to do this action.,Vous devez être authentifié pour réaliser cette action.
 error_keys__NOT_ACCOUNT_OWNER,You are not the owner of this account.,Vous n'êtes pas le propriétaire de ce compte.
 error_keys__NOT_IMAGE_OWNER,You are not the owner of this image.,Vous n'êtes pas le propriétaire de cette image.
+error_keys__NOT_ITEM_OWNER,You are not the owner of this item.,Vous n'êtes pas le propriétaire de cet élément.
 error_keys__NOT_VALIDATED_YET,This account is not validated yet.,Ce compte n'est pas encore validé.
 error_keys__SCHEDULED_DELETION_ACCOUNT,This account is scheduled for deletion and will be deleted soon.,Ce compte est programmé en vue d'une suppression et sera supprimé prochainement.
 error_keys__TOKEN_ACTION_DOESNT_MATCH,Token action does not match.,L'action du token ne correspond pas.

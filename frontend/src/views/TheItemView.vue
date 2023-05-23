@@ -2,26 +2,11 @@
   <div id="page-item" class="max-width-is-max-container">
     <b-loading v-if="loading" :active="true" :is-full-page="false" />
     <template v-else>
-      <b-modal v-model="isDeleteItemActive" :width="500">
-        <div class="card">
-          <div class="modal-card" style="width: auto">
-            <header class="modal-card-head">
-              <p class="modal-card-title">{{ $t('delete-item') }}</p>
-              <button type="button" class="delete" @click="isDeleteItemActive = false"/>
-            </header>
-            <section class="modal-card-body">
-              <p v-html="$t('delete-item-confirmation')" class="mb-5" />
-              <b-switch v-model="closeAllConversationsOnItemDelete" :rounded="false" type="is-primary">{{ $t('close-all-conv-from-item') }}</b-switch>
-              <p class="mt-4">{{ $t('close-all-conv-from-item-reversible') }}</p>
-            </section>
-            <footer class="modal-card-foot">
-              <b-button :label="$t('cancel')" @click="isDeleteItemActive = false" />
-              <b-button :label="$t('confirm')" type="is-danger" @click="deleteItem" />
-            </footer>
-          </div>
-        </div>
-      </b-modal>
-      <article v-if="itemHasEnded" class="message is-warning">
+      <article v-if="item.is_closed" class="message is-warning">
+        <div class="message-header">{{ $t('warning') }}</div>
+        <div class="message-body">{{ $t('warning-item-is-closed') }}</div>
+      </article>
+      <article v-else-if="itemHasEnded" class="message is-warning">
         <div class="message-header">{{ $t('warning') }}</div>
         <div class="message-body">
           <template v-if="isOwner">
@@ -92,41 +77,51 @@
               <span class="slug">{{ $t(category.slug) }}</span>
             </p>
           </article>
-          <template v-if="!isOwner">
-            <div class="columns">
-              <div class="column is-half">
-                <b-button
-                    :disabled="itemHasEnded"
-                    type="is-primary"
-                    class="w-100"
-                    @click="startConversation"
-                >
-                  <i class="far fa-envelope mr-1"></i>
-                  {{ $t('send-private-message') }} {{ item.user.first_name }}
+          <template v-if="!item.is_closed">
+            <template v-if="!isOwner">
+              <div class="columns">
+                <div class="column is-half">
+                  <b-button
+                      :disabled="itemHasEnded"
+                      type="is-primary"
+                      class="w-100"
+                      @click="startConversation"
+                  >
+                    <i class="far fa-envelope mr-1"></i>
+                    {{ $t('send-private-message') }} {{ item.user.first_name }}
+                  </b-button>
+                </div>
+                <div class="column is-half">
+                  <b-button
+                      type="is-primary"
+                      outlined
+                      class="w-100"
+                      @click="scrollToComments"
+                  >
+                    <i class="fas fa-bullhorn mr-1"></i>
+                    {{ $t('leave-comment') }}
+                  </b-button>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="is-flex mb-4">
+                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100 ml-1">
+                  <i class="fas fa-edit" style="margin-right: 0.3rem;"></i>
+                  {{ $t('edit') }}
+                </router-link>
+                <b-button type="is-danger" outlined class="w-100 ml-1" @click="openItemCloseModal">
+                  <i class="fas fa-trash"></i>
+                  {{ $t('cloturer') }}
                 </b-button>
               </div>
-              <div class="column is-half">
-                <b-button
-                    type="is-primary"
-                    outlined
-                    class="w-100"
-                    @click="scrollToComments"
-                >
-                  <i class="fas fa-bullhorn mr-1"></i>
-                  {{ $t('leave-comment') }}
-                </b-button>
-              </div>
-            </div>
+            </template>
           </template>
           <template v-else>
-            <div v-if="!itemHasEnded" class="columns">
-              <div class="column is-half">
-                <router-link :to="{name: 'editItem', params: {id: item.id}}" class="button is-primary w-100">{{ $t('edit') }}</router-link>
-              </div>
-              <div class="column is-half">
-                <b-button type="is-danger" class="w-100" @click="isDeleteItemActive = true">{{ $t('delete') }}</b-button>
-              </div>
-            </div>
+            <b-button type="is-danger" outlined class="w-100 ml-1 mb-4" @click="openItemDefinitiveDeletion">
+              <i class="fas fa-trash"></i>
+              {{ $t('definitive-deletion') }}
+            </b-button>
           </template>
           <article id="description" class="mb-5-5">
             <div class="title is-size-4 mb-2">
@@ -182,7 +177,7 @@
                 <span>{{ $tc('comment', 0) }} ({{ comments.length }})</span>
               </div>
             </div>
-            <div id="write" class="mb-5">
+            <div v-if="!item.is_closed" id="write" class="mb-5">
               <div class="columns is-mobile">
                 <div class="column">
                   <textarea
@@ -232,6 +227,9 @@ import UserCard from "@/components/UserCard.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import ItemComment from "@/components/ItemComment.vue";
 import {GeolocationCoords, isNotEmptyString, scrollParentToChild, formattedDate, formattedDateFromNow} from "@/functions";
+import TheManageProfilePicturesModal from "@/components/TheManageProfilePicturesModal.vue";
+import TheItemCloseModal from "@/components/TheItemCloseModal.vue";
+import TheItemDefinitiveDeletion from "@/components/TheItemDefinitiveDeletion.vue";
 
 export default {
   name: 'TheItemView',
@@ -247,7 +245,6 @@ export default {
       commentToSend: "",
       textareaRows: 1,
       waitingFormResponse: false,
-      isDeleteItemActive: false,
       closeAllConversationsOnItemDelete: false,
 
       redirection: false,
@@ -285,6 +282,28 @@ export default {
     }
   },
   methods: {
+    openItemDefinitiveDeletion() {
+      this.$buefy.modal.open({
+        parent: this,
+        props: {
+          item: this.item
+        },
+        component: TheItemDefinitiveDeletion,
+        hasModalCard: true,
+        trapFocus: true
+      });
+    },
+    openItemCloseModal() {
+      this.$buefy.modal.open({
+        parent: this,
+        props: {
+          item: this.item
+        },
+        component: TheItemCloseModal,
+        hasModalCard: true,
+        trapFocus: true
+      });
+    },
     async fetchItem() {
       if (!this.redirection) {
         try {
@@ -353,7 +372,6 @@ export default {
         if (this.closeAllConversationsOnItemDelete)
           await axios.patch(`/api/v1/conversations/items/${this.item.id}/close-all`);
         await axios.delete(`/api/v1/items/${this.item.id}/`);
-        this.isDeleteItemActive = false;
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',

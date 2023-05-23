@@ -188,22 +188,23 @@
               </b-checkbox>
             </div>
             <div class="level-right">
-              <b-dropdown v-model="visibility" aria-role="list" position="is-top-left">
+              <p class="label m-0" style="line-height: 40px;">{{ $t('visibility') }}:</p>
+              <b-dropdown v-model="visibility" aria-role="list" position="is-top-left" :class="{'ml-2': windowWidth > 768}">
                 <template v-if="visibility === 'PB'" #trigger>
                   <b-button :label="$t('item_visibility__PB')" type="is-primary" icon-left="globe-europe" icon-right="menu-down" />
                 </template>
                 <template v-else-if="visibility === 'UL'" #trigger>
                   <b-button :label="$t('item_visibility__UL')" type="is-primary" icon-left="eye-slash" icon-right="menu-down" />
                 </template>
-                <template v-else-if="visibility === 'PR'" #trigger>
-                  <b-button :label="$t('item_visibility__PR')" type="is-primary" icon-left="lock" icon-right="menu-down" />
+                <template v-else-if="visibility === 'DR'" #trigger>
+                  <b-button :label="$t('item_visibility__DR')" type="is-primary" icon-left="lock" icon-right="menu-down" />
                 </template>
                 <b-dropdown-item value="PB" aria-role="listitem">
                   <div class="media">
                     <b-icon class="media-left" pack="fas" icon="globe-europe" size="is-medium"></b-icon>
                     <div class="media-content">
                       <h3>{{ $t('item_visibility__PB') }}</h3>
-                      <small>Visible for everyone can see</small>
+                      <small>{{ $t('help_item_visibility__PB') }}</small>
                     </div>
                   </div>
                 </b-dropdown-item>
@@ -212,16 +213,16 @@
                     <b-icon class="media-left" pack="fas" icon="eye-slash" size="is-medium"></b-icon>
                     <div class="media-content">
                       <h3>{{ $t('item_visibility__UL') }}</h3>
-                      <small>Visible for people you will share it with</small>
+                      <small>{{ $t('help_item_visibility__UL') }}</small>
                     </div>
                   </div>
                 </b-dropdown-item>
-                <b-dropdown-item value="PR" aria-role="listitem">
+                <b-dropdown-item value="DR" aria-role="listitem">
                   <div class="media">
                     <b-icon class="media-left" pack="fas" icon="lock" size="is-medium"></b-icon>
                     <div class="media-content">
-                      <h3>{{ $t('item_visibility__PR') }}</h3>
-                      <small>Only visible to you</small>
+                      <h3>{{ $t('item_visibility__DR') }}</h3>
+                      <small>{{ $t('help_item_visibility__DR') }}</small>
                     </div>
                   </div>
                 </b-dropdown-item>
@@ -231,7 +232,7 @@
         </div>
         <div class="container has-text-centered mt-5">
           <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
-          <b-button type="is-primary" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t('publish-item') }}</b-button>
+          <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
         </div>
       </section>
     </div>
