@@ -101,7 +101,7 @@ export default {
       console.log(error);
     },
     isFromAxios(obj) {
-      return (typeof obj === 'object' && obj.constructor.name === 'AxiosError');
+      return (typeof obj === 'object' && (obj.constructor.name === 'AxiosError' || obj.name === 'AxiosError'));
     },
     isSerializationError(error) {
       return (this.isFromAxios(error) && typeof error.response.data === 'object' && 'serializer_errors' in error.response.data);
