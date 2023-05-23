@@ -15,23 +15,8 @@
 
 <script>
 import axios from "axios"
-import ErrorHandler from "@/mixins/ErrorHandler";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import NoNavbarLayout from "@/layouts/NoNavbarLayout.vue";
-
-export async function logout(instance) {
-  try {
-    await axios.post("/api/v1/token/logout/");
-    axios.defaults.headers.common["Authorization"] = "";
-    localStorage.removeItem("token");
-    instance.$store.commit('removeToken');
-    instance.$store.commit('removeUserID');
-    await instance.$router.push("/log-in");
-  }
-  catch (error) {
-    ErrorHandler.methods.snackbarError(error);
-  }
-}
 
 export default {
   name: 'App',

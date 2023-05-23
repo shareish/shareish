@@ -61,8 +61,8 @@
 
 <script>
 import axios from "axios";
-import { logout } from "@/App.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import {logout} from "@/functions";
 
 const NOTIFICATIONS_REFRESH_INTERVAL = 15000;
 
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     async logout() {
-      logout(this);
+      await logout(this);
     },
     async fetchConversationUpdates() {
       if (this.isAuthenticated) {

@@ -217,7 +217,6 @@ def _prepare_mail_notif_events(user, frequency: MailNotificationFrequencies, con
     new_events, n = _get_last_new_events_near_user(user, frequency)
 
     if n > 0:
-
         if frequency == MailNotificationFrequencies.DAILY:
             digest = "Daily events digest"
         elif frequency == MailNotificationFrequencies.WEEKLY:
@@ -252,7 +251,6 @@ def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, conn
     new_items, n = _get_last_new_items_near_user(user, frequency)
 
     if n > 0:
-
         if frequency == MailNotificationFrequencies.DAILY:
             digest = "Daily items digest"
         elif frequency == MailNotificationFrequencies.WEEKLY:
@@ -282,6 +280,48 @@ def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, conn
             email.render()
 
         return email
+
+
+def send_mail_recover_account(user, token):
+    connection = mail.get_connection(fail_silently=True)
+    to_send = []
+
+    context = {
+        "user": user,
+        "recover_account_token_url": settings.APP_URL + "/recover-account/" + token,
+    }
+
+    email = EmailMessage('emails/recover_account.tpl', context, settings.EMAIL_HOST_USER, [user.email],
+                         connection=connection)
+
+    if not email.is_rendered:
+        email.render()
+
+    to_send.append(email)
+
+    delivered = connection.send_messages(to_send)
+    print("Successfully delivered {}/{} email to recover an account".format(delivered, len(to_send)))
+
+
+def send_mail_start_delete_account_process(user, token):
+    connection = mail.get_connection(fail_silently=True)
+    to_send = []
+
+    context = {
+        "user": user,
+        "delete_account_token_url": settings.APP_URL + "/delete-account/" + token,
+    }
+
+    email = EmailMessage('emails/start_delete_account_process.tpl', context, settings.EMAIL_HOST_USER, [user.email],
+                         connection=connection)
+
+    if not email.is_rendered:
+        email.render()
+
+    to_send.append(email)
+
+    delivered = connection.send_messages(to_send)
+    print("Successfully delivered {}/{} email to start a delete account process".format(delivered, len(to_send)))
 
 
 # To be scheduled

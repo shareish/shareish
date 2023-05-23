@@ -171,16 +171,12 @@ export default {
         this.waitingFormResponse = false;
       }, 400);
     },
-    updatePictures() {
-
-    },
     manageProfilePictures() {
       this.$buefy.modal.open({
         parent: this,
         props: {
           user: this.user
         },
-        events: {updatePictures: this.updatePictures},
         component: TheManageProfilePicturesModal,
         hasModalCard: true,
         trapFocus: true

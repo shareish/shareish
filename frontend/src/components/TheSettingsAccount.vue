@@ -71,14 +71,36 @@
         </div>
       </div>
     </div>
+    <div class="box" id="advanced-options">
+      <h2 class="title">{{ $t('advanced-options') }}</h2>
+      <div class="columns mt-1 is-align-content-space-between is-align-items-center">
+        <div class="column">
+          <p class="label">{{ $t('disable-your-account') }}</p>
+          <p class="explanation">{{ $t('help_disable-your-account') }}</p>
+        </div>
+        <div class="column" style="flex: 0 0 auto;">
+          <b-button type="is-danger" @click="clickDisableMoreInfo">{{ $t('more-info') }}</b-button>
+        </div>
+      </div>
+      <div class="columns is-align-content-space-between is-align-items-center">
+        <div class="column">
+          <p class="label">{{ $t('delete-your-account') }}</p>
+          <p class="explanation">{{ $t('help_delete-your-account') }}</p>
+        </div>
+        <div class="column" style="flex: 0 0 auto;">
+          <b-button type="is-danger" @click="clickDeleteMoreInfo">{{ $t('more-info') }}</b-button>
+        </div>
+      </div>
+    </div>
     <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
 </template>
 
-
 <script>
 import axios from 'axios';
 import ErrorHandler from "@/mixins/ErrorHandler";
+import TheDisableAccountModal from "@/components/TheDisableAccountModal.vue";
+import TheDeleteAccountModal from "@/components/TheDeleteAccountModal.vue";
 
 export default {
   name: 'TheSettingsAccount',
@@ -110,6 +132,22 @@ export default {
     };
   },
   methods: {
+    clickDisableMoreInfo() {
+      this.$buefy.modal.open({
+        parent: this,
+        component: TheDisableAccountModal,
+        hasModalCard: true,
+        trapFocus: true
+      });
+    },
+    clickDeleteMoreInfo() {
+      this.$buefy.modal.open({
+        parent: this,
+        component: TheDeleteAccountModal,
+        hasModalCard: true,
+        trapFocus: true
+      });
+    },
     async save() {
       this.waitingFormResponse = true;
 

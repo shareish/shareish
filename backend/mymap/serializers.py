@@ -4,7 +4,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSeria
 from rest_framework import serializers
 
 from .models import Conversation, Item, ItemImage, Message, User, UserImage, ItemComment, ItemView, \
-    UserMapExtraCategory, ConversationUser
+    UserMapExtraCategory, ConversationUser, Token, ScheduledAccountDeletion
 
 
 class UserImageSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
-            'map_ecats', 'save_item_viewing'
+            'map_ecats', 'save_item_viewing', 'is_disabled'
         ]
 
     def validate(self, data):
@@ -92,7 +92,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate', 'enddate', 'type',
-            'category1', 'category2', 'category3', 'user_id', 'images', 'user', 'views_count', 'comments_count'
+            'category1', 'category2', 'category3', 'visibility', 'user_id', 'images', 'hitcount', 'user', 'comments_count'
         ]
 
     def validate(self, data):
@@ -209,3 +209,35 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user'
         ]
+
+        
+class ItemCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+    item = ItemSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = ItemComment
+        fields = [
+            'id', 'content', 'creationdate', 'item_id', 'user_id', 'item', 'user'
+        ]
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = Token
+        fields = [
+            'id', 'user_id', 'token', 'action', 'used_at', 'lifespan', 'updated_at', 'created_at', 'user'
+        ]
+
+
+class ScheduledAccountDeletionSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = ScheduledAccountDeletion
+        fields = [
+            'id', 'interval', 'request_date', 'user', 'user_id', 'is_due'
+        ]
+

@@ -167,12 +167,11 @@ export default {
         const image = (await axios.post("/api/v1/user_images/", data)).data;
         this.user.images.unshift(image);
         this.changesNotSaved = false;
-        this.$emit('close');
-      } else {
-        this.$emit('close');
       }
 
       this.waitingFormResponse =  false;
+
+      this.$emit('close');
     }
   }
 }

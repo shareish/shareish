@@ -19,6 +19,9 @@ import TheAboutView from "@/views/TheAboutView.vue";
 import TheAddItemFromRecurrentsView from "@/views/TheAddItemFromRecurrentsView.vue";
 import TheEditItemView from "@/views/TheEditItemView.vue";
 import TheConversationsView from "@/views/TheConversationsView.vue";
+import TheRecoverAccountView from "@/views/TheRecoverAccountView.vue";
+import TheError404View from "@/views/TheError404View.vue";
+import TheStartAccountDeletionProcessView from "@/views/TheStartAccountDeletionProcessView.vue";
 
 const routes = [
     {
@@ -42,7 +45,7 @@ const routes = [
         name: 'signup',
         component: TheSignUpView,
         meta: {
-            loginForbidden: true,
+            authForbidden: true,
             layout: 'default'
         }
     },
@@ -51,7 +54,7 @@ const routes = [
         name: 'login',
         component: TheLoginView,
         meta: {
-            loginForbidden: true,
+            authForbidden: true,
             layout: 'default'
         }
     },
@@ -84,7 +87,7 @@ const routes = [
         name: 'activateEmail',
         component: TheActivateView,
         meta: {
-            loginForbidden: true,
+            authForbidden: true,
             layout: 'default'
         }
     },
@@ -93,7 +96,7 @@ const routes = [
         name: 'map',
         component: TheMapView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -102,7 +105,7 @@ const routes = [
         name: 'account',
         component: TheAccountView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -111,7 +114,7 @@ const routes = [
         name: 'profile',
         component: TheProfileView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -120,7 +123,7 @@ const routes = [
         name: 'items',
         component: TheItemsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -129,7 +132,7 @@ const routes = [
         name: 'item',
         component: TheItemView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -138,7 +141,7 @@ const routes = [
         name: 'addItem',
         component: TheAddItemView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -147,7 +150,7 @@ const routes = [
         name: 'addItemFrom',
         component: TheAddItemView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -156,7 +159,7 @@ const routes = [
         name: 'addItemFromRecurrents',
         component: TheAddItemFromRecurrentsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -165,7 +168,7 @@ const routes = [
         name: 'editItem',
         component: TheEditItemView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -174,7 +177,7 @@ const routes = [
         name: 'conversations',
         component: TheConversationsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -183,7 +186,7 @@ const routes = [
         name: 'conversation',
         component: TheConversationsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -192,7 +195,7 @@ const routes = [
         name: 'settings',
         component: TheSettingsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -201,7 +204,32 @@ const routes = [
         name: 'settingsTab',
         component: TheSettingsView,
         meta: {
-            requireLogin: true,
+            requiresAuth: true,
+            layout: 'default'
+        }
+    },
+    {
+        path: "/recover-account",
+        name: 'recoverAccount',
+        component: TheRecoverAccountView,
+        meta: {
+            layout: 'default'
+        }
+    },
+    {
+        path: "/recover-account/:token",
+        name: 'recoverAccountToken',
+        component: TheRecoverAccountView,
+        meta: {
+            layout: 'default'
+        }
+    },
+    {
+        path: "/delete-account/:token",
+        name: 'startAccountDeletionProcess',
+        component: TheStartAccountDeletionProcessView,
+        meta: {
+            requiresAuth: true,
             layout: 'default'
         }
     },
@@ -210,7 +238,17 @@ const routes = [
     {path: "/dashboard", redirect: "/map"},
     {path: "/dashboard/items", redirect: "/items"},
     {path: "/dashboard/items/:id", redirect: "/items/:id"},
-    {path: "/dashboard/items/add", redirect: "/add-item"}
+    {path: "/dashboard/items/add", redirect: "/add-item"},
+
+    // Error 404 page
+    {
+        path: '*',
+        name: 'error404',
+        component: TheError404View,
+        meta: {
+            layout: 'default'
+        }
+    }
 ]
 
 // Create router instance
@@ -221,10 +259,14 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const authForbidden = to.matched.some(record => record.meta.authForbidden);
+    const isAuthenticated = store.state.isAuthenticated;
+
+    if (requiresAuth && !isAuthenticated) {
         next("/log-in")
-    } else if (to.matched.some(record => record.meta.loginForbidden) && store.state.isAuthenticated) {
-        next("/")
+    } else if (authForbidden && isAuthenticated) {
+        next("/map")
     } else {
         next()
     }

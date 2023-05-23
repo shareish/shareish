@@ -1,20 +1,25 @@
 import base64
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 
-from django.db import IntegrityError
-from django.db.models import Q, Count
+from django.conf import settings
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.http import FileResponse, JsonResponse, QueryDict
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from rest_framework.authtoken.models import Token as RestToken
+from rest_framework.authtoken.views import ObtainAuthToken
 
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
-    ItemMapBoundsFilterBackend
+    ItemMapBoundsFilterBackend, UserDisabledFilterBackend
 from .functions import verif_location
+from .mail import send_mail_recover_account, send_mail_start_delete_account_process
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
-    ConversationUser
+    ConversationUser, Token, ScheduledAccountDeletion
 
 from rest_framework import filters, viewsets
 from rest_framework import status
@@ -23,7 +28,7 @@ from rest_framework.response import Response
 from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
     ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
-    UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer
+    UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer, TokenSerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -59,9 +64,12 @@ class ItemViewSet(viewsets.ModelViewSet):
                     # Item already viewed
                     pass
 
+            if instance.visibility == Item.Visibility.PRIVATE and request.user != instance.user and not request.user.is_staff:
+                return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
             return Response(serializer.data)
         except Item.DoesNotExist:
-            return Response("This item does not exist.", status=status.HTTP_404_NOT_FOUND)
+            return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request, *args, **kwargs):
         result = verif_location(request.data['location'])
@@ -113,6 +121,7 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
+    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC)
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,
@@ -188,6 +197,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
+    filter_backends = [UserDisabledFilterBackend]
 
     def get_instance(self):
         return self.request.user
@@ -336,6 +346,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
         return Response(conversation.id, status=status.HTTP_201_CREATED)
 
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     pagination_class = MessagePaginationClass
@@ -354,6 +365,47 @@ class MessageViewSet(viewsets.ModelViewSet):
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response("You can't delete a message that do not belongs to you.", status=status.HTTP_403_FORBIDDEN)
+
+
+class CustomLogin(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        if 'authValue' in request.data and 'password' in request.data:
+            auth_value = request.data['authValue']
+            try:
+                user = User.objects.get(email=auth_value)
+            except User.DoesNotExist:
+                try:
+                    user = User.objects.get(username=auth_value)
+                except User.DoesNotExist:
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if user.is_active:
+                if not user.is_disabled:
+                    if user.check_password(request.data['password']):
+                        # Update user's last login date
+                        user.last_login = timezone.now()
+                        user.save()
+
+                        # Generate auth token
+                        token, created = RestToken.objects.get_or_create(user=user)
+                        return Response({
+                            'token': token.key,
+                            'id': user.pk
+                        })
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    try:
+                        schedule = ScheduledAccountDeletion.objects.get(user=user)
+                        if schedule.due_date() > timezone.now():
+                            days_left = (schedule.due_date() - timezone.now()).days
+                        else:
+                            days_left = 0
+                        return Response({'key': 'SCHEDULED_DELETION_ACCOUNT', 'days_left': days_left}, status=status.HTTP_400_BAD_REQUEST)
+                    except Exception as e:
+                        print(e)
+                        return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -450,17 +502,19 @@ def get_userimage(request, userimage_id):
         except UserImage.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
-        try:
-            user_image = UserImage.objects.get(pk=userimage_id)
-            if user_image.user_id == request.user.id:
-                user_image.delete()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response("You are not the owner of this image.", status=status.HTTP_403_FORBIDDEN)
-        except UserImage.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except UserImage.MultipleObjectsReturned:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if request.user.is_authenticated:
+            try:
+                user_image = UserImage.objects.get(pk=userimage_id)
+                if user_image.user_id == request.user.id:
+                    user_image.delete()
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    return Response({'key': 'NOT_IMAGE_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+            except UserImage.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            except UserImage.MultipleObjectsReturned:
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'key': 'MUST_BE_AUTHENTICATED'}, status=status.HTTP_403_FORBIDDEN)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -512,7 +566,7 @@ def get_item_images_base64(request, item_id):
 
 
 @api_view(['PATCH'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def close_all_conversations_from_item(request, item_id):
     if request.method == 'PATCH':
         item = Item.objects.get(pk=item_id)
@@ -521,4 +575,237 @@ def close_all_conversations_from_item(request, item_id):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response("You are not the owner of this item.", status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disable_user(request, user_id):
+    if request.method == 'POST':
+        if 'visibility' in request.data and 'password' in request.data:
+            if user_id == request.user.id or request.user.is_staff:
+                # Retrieve the user to modify
+                try:
+                    user = User.objects.get(pk=user_id)
+                except User.DoesNotExist:
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Verify that the password entered is correct
+                if not user.check_password(request.data['password']):
+                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if not user.is_disabled:
+                    # Check if the visibility is accepted
+                    if request.data['visibility'] == 'unlisted':
+                        visibility = Item.Visibility.UNLISTED
+                    elif request.data['visibility'] == 'private':
+                        visibility = Item.Visibility.PRIVATE
+                    else:
+                        return Response({'key': 'ITEM_VISIBILITY_MUST_BE_UL_OR_PR'}, status=status.HTTP_400_BAD_REQUEST)
+
+                    try:
+                        with transaction.atomic():
+                            # Disable the user
+                            user.is_disabled = True
+                            user.save()
+
+                            # Update all its item visibility
+                            Item.objects.filter(user=user).update(visibility=visibility)
+
+                            # Closing 1to1 conversations where user was part of
+                            conversations_user = ConversationUser.objects.filter(user=user, conversation__max_users=2)
+                            for conversation_user in conversations_user:
+                                conversation_to_close = conversation_user.conversation
+                                conversation_to_close.is_closed = True
+                                conversation_to_close.save()
+
+                            return Response(status=status.HTTP_200_OK)
+                    except:
+                        return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def user_send_delete_confirmation(request, user_id):
+    if request.method == 'POST':
+        if 'password' in request.data:
+            if user_id == request.user.id or request.user.is_staff:
+                # Retrieve the user to contact
+                try:
+                    user = User.objects.get(pk=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Verify that the password entered is correct
+                if not user.check_password(request.data['password']):
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Generate and store a delete_account token for the user
+                token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
+
+                # Send the user an email containing a link to start the deletion process of its account
+                send_mail_start_delete_account_process(user, token.token)
+
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_token(request, token):
+    if request.method == 'GET':
+        check = Token.check_token(token, request.GET.get('action'))
+        if 'success' in check:
+            token = check['success']
+
+            tk_serializer = TokenSerializer(instance=token)
+            serialized_token = tk_serializer.data
+            return JsonResponse(serialized_token, status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def recover_account(request):
+    """
+    Form received when a user clicked on the recover button from the /recover-account page
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
+    if request.method == 'POST':
+        if 'accountValue' in request.data:
+            auth_value = request.data['accountValue']
+
+            # Fetch the user based on the auth value
+            try:
+                user = User.objects.get(email=auth_value)
+            except User.DoesNotExist:
+                try:
+                    user = User.objects.get(username=auth_value)
+                except User.DoesNotExist:
+                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if user.is_disabled:
+                # Generate and store a recover_account token for the user
+                token = Token.get_or_create(user, Token.TokenActions.RECOVER_ACCOUNT)
+
+                # Send the user an email containing a link to recover its account
+                send_mail_recover_account(user, token.token)
+
+                return Response(user.email, status=status.HTTP_201_CREATED)
+            return Response({'key': 'ACCOUNT_NOT_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def recover_account_confirm_token(request, token):
+    """
+    Apply the action of recovering an account based on a token
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :param token: The token required to apply the account recovering
+    :type token: str
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
+    if request.method == 'GET':
+        check = Token.check_token(token, 'recover_account')
+        if 'success' in check:
+            token = check['success']
+            user = token.user
+
+            # Here we don't check whether the account is disabled or not to prevent any error that may have
+            # occurred. We still do all the checks to prevent undesired account deletion.
+
+            try:
+                with transaction.atomic():
+                    # Recover the account
+                    user.is_disabled = False
+                    user.save()
+
+                    # Use the token
+                    token.use()
+
+                    # Remove the account from the deletion scheduling if it was present
+                    ScheduledAccountDeletion.objects.filter(user=user).delete()
+
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_account_confirm_token(request, token):
+    """
+    Start the process of account deleting
+
+    :param request: The request made by the user
+    :type request: WSGIRequest
+    :param token: The token required to start the process
+    :type token: str
+    :return: A HTTP response send back to the user
+    :rtype: Response
+    """
+    if request.method == 'GET':
+        check = Token.check_token(token, 'delete_account')
+        if 'success' in check:
+            token = check['success']
+            user = token.user
+
+            try:
+                with transaction.atomic():
+                    # Disable the user account
+                    user.is_disabled = True
+                    user.save()
+
+                    # Make all his items private
+                    # Forced to private as the process is of account deletion is more restrictive
+                    Item.objects.filter(user=user).update(visibility=Item.Visibility.PRIVATE)
+
+                    # Use the token
+                    token.use()
+
+                    # Add the user inside the deletion scheduling system
+                    ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
+
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
