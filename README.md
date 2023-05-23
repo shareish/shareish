@@ -1,11 +1,13 @@
 # SHAREISH
 
 ## Project Introduction
-Shareish is an open-source web platform to foster mutual aid, and solidarity (also called generalized exchange or gift economy). On shareish, everything is free, no real or virtual currency is used. Everyone is free to request or offer any material, manual, intellectual, logistical aid, and act in solidarity on a regular or occasional basis.
+Shareish is an open-source web platform to foster mutual aid and solidarity (also called generalized exchange or gift economy). On shareish, everything is free, no real or virtual currency is used. Everyone is free to request or offer any material, manual, intellectual, logistical aid, and act in solidarity on a regular or occasional basis.
 
 Once you are registered and logged in, Shareish offers an interactive map where specific items (goods and services to give or to lend, requests for help, free events) can be viewed, added, and edited by registered users. Items can be geolocated so it is very easy to explore your neighbourdhood hence foster local mutual aid, at your street corner or in your area. Users can start conversations to get further details about an item/request or to arrange an appointment for the exchange. This items can also be viewed as a list where they are sorted by date. External public data (such as free drinking water sources, public bookcases and gift boxes, falling fruits, ...) can also be displayed. Search mechanisms and AI methods can be used to ease search and encoding.
 
-Shareish development was initiated by a team of computer scientists at the Montefiore Institute supervised by [rmaree](https://github.com/rmaree), University of Liège, Belgium. Its first official release is described in the scientific paper "Shareish (Share & Cherish): an open-source, map-based, web platform to foster mutual aid", accepted for publication in the Proceedings of the 11th International Conference on Communities & Technologies, Lahti, May 2023.
+Shareish development was initiated by a team of computer scientists at the Montefiore Institute coordinated by [rmaree](https://github.com/rmaree), University of Liège, Belgium. Its first official release is described in the scientific paper "Shareish (Share & Cherish): an open-source, map-based, web platform to foster mutual aid" (https://hdl.handle.net/2268/302644), accepted for publication in the Proceedings of the 11th International Conference on Communities & Technologies, Lahti, May 2023.
+
+![Shareish map](shareish-map-screenshot.jpg?raw=true "Shareish map")
 
 ## Demonstration server
 

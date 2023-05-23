@@ -65,10 +65,9 @@ export default {
         axios.defaults.headers.common["Authorization"] = "Token " + auth['token'];
         this.$store.commit('setToken', auth['token']);
         localStorage.setItem("token", auth['token']);
-
         this.$store.commit('setUserID', auth['id']);
         localStorage.setItem("user_id", auth['id']);
-
+        
         await this.$router.push('/map');
       }
       catch (error) {

@@ -85,13 +85,14 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
     user = UserSerializer(allow_null=True, default=None)
-    hitcount = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+    views_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
         fields = [
             'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate', 'enddate', 'type',
-            'category1', 'category2', 'category3', 'visibility', 'user_id', 'images', 'hitcount', 'user'
+            'category1', 'category2', 'category3', 'visibility', 'user_id', 'images', 'hitcount', 'user', 'comments_count'
         ]
 
     def validate(self, data):
@@ -119,8 +120,11 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return data
 
-    def get_hitcount(self, obj):
-        return ItemView.objects.filter(item=obj).count()
+    def get_comments_count(self, obj):
+        return obj.comments.count()
+
+    def get_views_count(self, obj):
+        return obj.views.count()
 
 
 class ItemImageSerializer(serializers.ModelSerializer):
@@ -130,6 +134,17 @@ class ItemImageSerializer(serializers.ModelSerializer):
         model = ItemImage
         fields = [
             'id', 'image', 'item', 'url'
+        ]
+
+
+class ItemCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(allow_null=True, default=None)
+    item = ItemSerializer(allow_null=True, default=None)
+
+    class Meta:
+        model = ItemComment
+        fields = [
+            'id', 'content', 'creationdate', 'item_id', 'user_id', 'item', 'user'
         ]
 
 
@@ -195,7 +210,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user'
         ]
 
-
+        
 class ItemCommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(allow_null=True, default=None)
     item = ItemSerializer(allow_null=True, default=None)
@@ -225,3 +240,4 @@ class ScheduledAccountDeletionSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'interval', 'request_date', 'user', 'user_id', 'is_due'
         ]
+
