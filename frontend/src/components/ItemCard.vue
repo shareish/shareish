@@ -21,9 +21,14 @@
           </b-carousel-item>
         </template>
       </b-carousel>
-      <div class="hitcount tag">{{ item.hitcount }}<i class="far fa-eye"></i></div>
-      <div v-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
-      <div v-else class="closed is-danger tag"><i class="fas fa-lock mr-1"></i>{{ $t('clotured') }}</div>
+      <div class="top-left">
+        <div v-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
+        <div v-else class="closed is-danger tag"><i class="fas fa-lock mr-1"></i>{{ $t('clotured') }}</div>
+      </div>
+      <div class="stats">
+        <div v-if="item.comments_count > 0" class="tag mr-2">{{ item.comments_count }}<i class="fas fa-comments"></i></div>
+        <div class="tag">{{ item.views_count }}<i class="far fa-eye"></i></div>
+      </div>
     </div>
     <div class="card-content">
       <div class="media">
@@ -157,23 +162,24 @@ export default {
 .card-image {
   position: relative;
 
-  .hitcount, .visibility, .closed {
+  .top-left, .stats {
     position: absolute;
     font-weight: bold;
   }
 
-  .hitcount {
-    right: 10px;
+  .top-left {
+    top: 10px;
+    left: 10px;
+  }
+
+  .stats {
     bottom: 10px;
+    right: 10px;
+    display: inline-flex;
 
     i {
       margin-left: 4px;
     }
-  }
-
-  .visibility, .closed {
-    top: 10px;
-    left: 10px;
   }
 }
 

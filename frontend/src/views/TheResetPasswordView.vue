@@ -2,32 +2,32 @@
   <div id="page-reset-password" class="page-signup">
     <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('reset-password') }}</h1>
-      <form @submit.prevent="submitForm">
-        <div class="field">
-          <label>{{ $t('email') }}</label>
-          <div class="control">
-            <input v-model="email" class="input" name="email" required type="email">
-          </div>
+      <div class="field">
+        <label>{{ $t('email') }}</label>
+        <div class="control">
+          <input v-model="email" class="input" name="email" required type="email">
         </div>
-        <div class="field">
-          <div class="control">
-            <b-button type="is-primary">{{ $t('reset-password') }}</b-button>
-          </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <b-button type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('reset-password') }}</b-button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 export default {
   name: 'TheResetPasswordView',
+  mixins: [ErrorHandler],
   data() {
     return {
       email: '',
-      errors: []
+      waitingFormResponse: false
     }
   },
   mounted() {
@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async submitForm() {
-      this.errors.splice(0);
+      this.waitingFormResponse = true;
 
       const formData = {
         email: this.email,
@@ -43,42 +43,19 @@ export default {
 
       try {
         await axios.post("/api/v1/users/reset_password/", formData);
-        await this.$router.push('/');
         this.$buefy.snackbar.open({
           duration: 5000,
           type: 'is-success',
           message: this.$t('notif-success-password-reset-sent'),
           pauseOnHover: true
         });
+        await this.$router.push('/log-in');
       }
       catch (error) {
-        let errorMessage;
-        if (error.response) {
-          for (const property in error.response.data) {
-            if (Array.isArray(error.response.data[property])) {
-              for (const idx in error.response.data[property])
-                this.errors.push(`${property}: ${error.response.data[property][idx]}`);
-            } else {
-              this.errors.push(`${property}: ${error.response.data[property]}`);
-            }
-          }
-          console.log(JSON.stringify(error.response.data));
-          errorMessage = this.errors.join('<br />');
-        } else if (error.message) {
-          console.log(JSON.stringify(error.message));
-          errorMessage = error.message;
-        } else {
-          console.log(JSON.stringify(error));
-          errorMessage = this.$t('notif-error-password-reset-sent');
-        }
-
-        this.$buefy.snackbar.open({
-          duration: 5000,
-          type: 'is-danger',
-          message: errorMessage,
-          pauseOnHover: true
-        });
+        this.snackbarError(this.$t('notif-error-password-reset-sent'));
       }
+
+      this.waitingFormResponse = false;
     }
   }
 }

@@ -69,7 +69,7 @@
             {{ $t("published") }}
             {{ formattedDateFromNow(item.creationdate, $i18n.locale) }}
             &middot;
-            <i class="far fa-eye"></i>{{ item.hitcount }} {{ $t('views') }}
+            <i class="far fa-eye"></i>{{ item.views_count }} {{ $t('views') }}
           </h5>
           <article id="categories" class="mb-5">
             <p v-for="category in itemCategories" :key="category.slug" class="category">
@@ -378,7 +378,7 @@ export default {
           message: this.$t('item-deleted'),
           pauseOnHover: true
         });
-        await this.$router.push("/items");
+        this.$router.push("/items");
       }
       catch (error) {
         this.snackbarError(this.$t('notif-error-item-delete'));

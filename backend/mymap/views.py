@@ -43,7 +43,7 @@ locator = Nominatim(user_agent='shareish')
 
 class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
-    queryset = Item.objects.all()
+    queryset = Item.objects.all().annotate(comments_count=Count('comments'), views_count=Count('views'))
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
     search_fields = ['name', 'description']
     ordering_fields = '__all__'
