@@ -71,6 +71,9 @@ class ItemViewSet(viewsets.ModelViewSet):
                 if instance.user != request.user:
                     return Response({'key': 'ITEM_IS_CLOSED'}, status=status.HTTP_403_FORBIDDEN)
 
+            if instance.user.is_disabled:
+                return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
+            
             return Response(serializer.data)
         except Item.DoesNotExist:
             return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
@@ -139,7 +142,7 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
-    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC, closed_reason="")
+    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC, closed_reason="", user__is_disabled=False)
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,
