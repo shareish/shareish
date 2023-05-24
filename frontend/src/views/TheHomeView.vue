@@ -74,7 +74,7 @@
       </p>
       <br />
 
-      <p>
+      <p ref="gdpr">
         <b>{{ $t('faq_data_collection') }}</b><br />
         <i>{{ $t('faq_data_collection_answer') }}.</i>
       </p>
@@ -123,7 +123,10 @@ export default {
   name: 'TheHomeView',
   components: {},
   mounted() {
-    document.title = "Shareish"
+      document.title = "Shareish"
+      
+      if (this.$route.hash === '#gdpr') this.$refs['gdpr'].scrollIntoView();
+
   },
   methods: {
     changeLanguage(lang) {

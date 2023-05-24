@@ -6,6 +6,9 @@
           <i class="icon far fa-question-circle"></i>
         </b-tooltip>
       </h1>
+      <div>
+	<br><b-checkbox v-model="agreement">{{ $t('gdpr_read_agree')}} <router-link to="/#gdpr">{{ $t('gdpr_privacy_policy') }}</router-link></b-checkbox><br><br>
+      </div>
       <div class="field">
         <label>{{ $t('email') }}</label>
         <div class="control">
@@ -48,9 +51,11 @@
       </div>
       <div class="field">
         <div class="control">
-          <b-button type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>
+          <b-button :disabled="!agreement" type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>
         </div>
       </div>
+      
+      
     </div>
   </div>
 </template>
@@ -68,6 +73,7 @@ export default {
       first_name: '',
       last_name: '',
       errors: [],
+      agreement: false,	
       waitingFormResponse: false
     }
   },
