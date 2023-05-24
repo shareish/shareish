@@ -48,6 +48,9 @@ To stop: `docker compose stop` (in the root directory).
 To remove container: `docker compose rm` (in the root directory, data are kept in the volumes).
 See Docker documentation for more information.
 
+If you later need to update Shareish to latest version, git pull the last commits and run again the Docker build (3.) and up (4.) commands.
+The Docker volumes are kept so the data inserted in your database will be conserved.
+
 
 ## Installation for deployment on a production server
 
@@ -71,7 +74,10 @@ unzip main.zip
 
 Change the name of your host server name by editing the file main.js in the directory frontend/src/
 
-Then edit backend/mapsite/settings.py (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
+Then edit backend/mapsite/settings.py (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...). Do not forget to change the settings in the /backend/mapsite/settings.py file that are marked as
+```
+#CHANGE THIS WHEN CLONING THE PROJECT
+```
 
 Download Docker and start it on your server (https://docs.docker.com/engine/install/):
 
@@ -117,17 +123,9 @@ Start the docker containers.
 > docker-compose up -d
 ```
 
-When you need to update the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. If you want to refresh everything and prune every volumes on your server (WARNING: it deletes everything), you can type:
+If you later need to update Shareish to latest version, download the latest zip files and run again the Docker build and up commands.
+The Docker volumes are kept so the data inserted in your database will be conserved.
 
-```
-> docker volumes prune -a
-```
-
-Do not forget to change the settings in the /backend/mapsite/settings.py file that are marked as
-
-```
-#CHANGE THIS WHEN CLONING THE PROJECT
-```
 
 ## Update of SSL certificate for HTTPS production server
 The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you downloaded Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where Shareish is installed has to be modified accordingly):
@@ -136,5 +134,12 @@ The let's encrypt certificate has to be renewed every three months. It is possib
 16 3 * * * cd /SHAREISH_FOLDER && certbot renew -n --pre-hook "docker-compose stop" --post-hook "docker-compose up -d" >> /output.cron
 ```
 
+## Reinitialize Shareish database
+When you need to update the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. However, if you want to refresh everything and prune every volumes on your server (WARNING: it deletes everything), you can type:
 
+```
+> docker volumes prune -a
+```
+
+See Docker documentation for more information about volumes, images, etc.
 
