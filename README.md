@@ -11,10 +11,43 @@ Shareish development was initiated by a team of computer scientists at the Monte
 
 ## Demonstration server
 
-A demonstration server is available at https://shareish.org/
+A demonstration server hosted by the University of Liège is available at https://shareish.org/
 
 ## Installation
-Shareish can be installed in production mode on a server ("Installation for deployment on a production server"), or in development mode for local development ("Local development with Docker-compose (on your own computer)"). See below for relevant installation instructions.
+Shareish can be installed in development mode for local tests and development ("Local development with Docker-compose (on your own computer)") or in production mode on a server ("Installation for deployment on a production server"). See below for relevant installation instructions.
+
+## Local development with Docker-compose (on your own computer)
+
+Shareish can be run in development mode on your own computer environment using Docker-compose :
+
+Install Docker and Docker compose on your computer (https://docs.docker.com/engine/install/).
+
+Then, clone the Shareish repository on your system:
+git clone https://github.com/shareish/shareish.git
+
+Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
+1. Set `DEV=True` in `backend/mapsite/settings.py`.
+2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have 
+   strange issues with `npm`).
+3. To build backend and frontend dev images:
+```
+docker compose -f docker-compose.dev.yaml build
+```
+4. To run dev environment:
+``` 
+docker compose -f docker-compose.dev.yaml up -d --build
+```
+
+Once installed, frontend is running locally at `http://localhost:8081`; backend API is located at `http://localhost:8000/api/v1/`, and backend administration interface is running at `http://localhost:8000/admin/`.
+
+In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the 
+corresponding code is recompiled if needed and the server is restarted automatically (see the logs using docker compose logs -f web or docker compose logs -f ui or docker compose logs -f web db).
+
+See the logs in live: `docker compose logs` (in the root directory).
+To stop: `docker compose stop` (in the root directory).
+To remove container: `docker compose rm` (in the root directory, data are kept in the volumes).
+See Docker documentation for more information.
+
 
 ## Installation for deployment on a production server
 
@@ -84,7 +117,7 @@ Start the docker containers.
 > docker-compose up -d
 ```
 
-When you need to update the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. If you want to refresh everything and prune every volumes on your server, you can type:
+When you need to update the code and re-deploy your website, the volumes are kept so the data inserted in your database will be conserved. If you want to refresh everything and prune every volumes on your server (WARNING: it deletes everything), you can type:
 
 ```
 > docker volumes prune -a
@@ -96,40 +129,12 @@ Do not forget to change the settings in the /backend/mapsite/settings.py file th
 #CHANGE THIS WHEN CLONING THE PROJECT
 ```
 
-## Update of SSL certificate
-The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you downloaded Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where shareish is installed has to be modified accordingly):
+## Update of SSL certificate for HTTPS production server
+The let's encrypt certificate has to be renewed every three months. It is possible to have a cron script to do this procedure automatically (this script stop docker compose, launch certificate update using certbot, then restart docker compose). This script has to be executed within the directory where you downloaded Shareish folders and files as explained previously. Here is an example of cron script scheduled at 3.16 AM (the folder where Shareish is installed has to be modified accordingly):
 ```
 > crontab -e
 16 3 * * * cd /SHAREISH_FOLDER && certbot renew -n --pre-hook "docker-compose stop" --post-hook "docker-compose up -d" >> /output.cron
 ```
 
-## Local development with Docker-compose (on your own computer)
 
-Shareish can be run in development environment using Docker-compose on your own computer:
 
-Install Docker and Docker compose on your computer (https://docs.docker.com/engine/install/).
-
-Then, clone the Shareish repository on your system:
-git clone https://github.com/shareish/shareish.git
-
-Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
-1. Set `DEV=True` in `backend/mapsite/settings.py`.
-2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have 
-   strange issues with `npm`).
-3. To build backend and frontend dev images:
-```
-docker compose -f docker-compose.dev.yaml build
-```
-4. To run dev environment:
-``` 
-docker compose -f docker-compose.dev.yaml up -d --build
-```
-
-Backend is running at `http://localhost:8000`, and frontend at `http://localhost:8081`.
-
-See the logs in live: `docker compose logs` (in the root directory).
-To stop: `docker compose stop` (in the root directory).
-To remove container: `docker compose rm` (in the root directory, data are kept in the volumes).
-
-In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the 
-corresponding code is recompiled if needed and the server is restarted automatically (see the logs using docker compose logs -f web/ui/db).
