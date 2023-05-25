@@ -106,7 +106,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
 
-        if instance.user != request.user:
+        if instance.user == request.user:
             result = verif_location(request.data['location'])
             if 'success' in result:
                 request.data['location'] = result['success']
