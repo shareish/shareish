@@ -48,8 +48,7 @@ To stop: `docker compose stop` (in the root directory).
 To remove container: `docker compose rm` (in the root directory, data are kept in the volumes).
 See Docker documentation for more information.
 
-If you later need to update Shareish to latest version, git pull the last commits and run again the Docker build (3.) and up (4.) commands.
-The Docker volumes are kept so the data inserted in your database will be conserved.
+If you want to update Shareish to latest version, git pull the last commits (or release tag) and run again the Docker build (3.) and up (4.) commands. The Docker volumes are kept so the data inserted in your database will be conserved.
 
 
 ## Installation for deployment on a production server
@@ -123,7 +122,7 @@ Start the docker containers.
 > docker-compose up -d
 ```
 
-If you later need to update Shareish to latest version, download the latest zip files and run again the Docker build and up commands.
+If you want to update Shareish to latest version, download the latest zip files and run again the Docker build and up commands.
 The Docker volumes are kept so the data inserted in your database will be conserved.
 
 
