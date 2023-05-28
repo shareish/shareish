@@ -34,11 +34,7 @@ item_types = {
 
 
 def _get_unread_messages(user):
-    messages = Message.objects.filter(
-        Q(conversation__owner=user) | Q(conversation__buyer=user),
-        Q(seen=False), ~Q(user=user)
-    )
-
+    messages = Message.objects.filter(conversation__users__user=user, seen=False).exclude(user=user)
     return messages[:to_show['conversations']], messages.count()
 
 
