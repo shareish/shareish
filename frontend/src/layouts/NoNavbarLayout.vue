@@ -19,7 +19,7 @@
               {{ $t('useful-links') }}
             </h6>
             <div class="custom-flex-column">
-              <a href="https://hdl.handle.net/2268/30264">Scientific paper @ Communities & Technologies 2023</a>
+              <a href="https://doi.org/10.1145/3593743.3593790">Scientific paper @ Communities & Technologies 2023</a>
               <a href="https://github.com/shareish" class="mt-3">
                 Open source code on
                 <img alt="https://github.com/shareish" src="../assets/GitHub-Mark-32px.png" style="vertical-align: middle; margin-top: -3px; margin-left: 5px;">
