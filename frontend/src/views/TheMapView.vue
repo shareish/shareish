@@ -224,6 +224,7 @@ export default {
 
       initialItemsLoadDone: false,
       user: {},
+      itemId: null,	
 
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
@@ -322,14 +323,17 @@ export default {
   async created() {
     document.title = `Shareish | ${this.$t('map')}`;
 
+    if (this.$route.query.id)
+	  this.itemId = Number(this.$route.query.id);
+    
     await this.updateGeoLocation();
     await this.fetchUser();
-
+      
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
     }
-
+    
     if (this.geoLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.geoLocation.leafletLatLng;
     else if (this.refLocation instanceof GeolocationCoords)
@@ -343,9 +347,6 @@ export default {
     this.mapLoading = false;
   },
   computed: {
-    itemId() {
-      return (this.$route.query.id) ? Number(this.$route.query.id) : null;
-    },
     userId() {
       return Number(this.$store.state.user.id);
     },
