@@ -17,10 +17,10 @@ Thank you for wanting to contribute to the Shareish project ! :green_heart:
 3. Before submitting a patch related to the front-end, please check if you follow [VueJS style guide](https://v2.vuejs.org/v2/style-guide/?redirect=true).
 
 ## Do you intend to add a new feature?
-Please [contact us]<info@shareish.org> or submit an issue describing the enhancement you plan to implement.
+Please contact us at <info@shareish.org> or submit an issue describing the enhancement you plan to implement.
 
 ## Do you have questions about the source code?
-[Contact us]<info@shareish.org>
+Please contact us at <info@shareish.org>.
 
 
 
