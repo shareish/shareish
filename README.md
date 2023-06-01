@@ -1,7 +1,7 @@
 # SHAREISH
 
 ## Project Introduction
-Shareish is an open-source web platform to foster mutual aid and solidarity (also called generalized exchange or gift economy). On shareish, everything is free, no real or virtual currency is used. Everyone is free to request or offer any material, manual, intellectual, logistical aid, and act in solidarity on a regular or occasional basis.
+Shareish is an open-source web platform to foster mutual aid and solidarity (also called non-monetary sharing, generalized exchange, or gift economy). On Shareish, everything is free, no real or virtual currency is used. Everyone is free to request or offer any material, manual, intellectual, logistical aid, and act in solidarity on a regular or occasional basis.
 
 Once you are registered and logged in, Shareish offers an interactive map where specific items (goods and services to give or to lend, requests for help, free events) can be viewed, added, and edited by registered users. Items can be geolocated so it is very easy to explore your neighbourdhood hence foster local mutual aid, at your street corner or in your area. Users can start conversations to get further details about an item/request or to arrange an appointment for the exchange. This items can also be viewed as a list where they are sorted by date. External public data (such as free drinking water sources, public bookcases and gift boxes, falling fruits, ...) can also be displayed. Search mechanisms and AI methods can be used to ease search and encoding.
 
@@ -11,7 +11,7 @@ Shareish development was initiated by a team of computer scientists at the Monte
 
 ## Demonstration server
 
-A demonstration server hosted by the University of Liège is available at https://shareish.org/
+A public server hosted by the University of Liège is available at https://shareish.org/
 
 ## Installation
 Shareish can be installed in development mode for local tests and development ("Local development with Docker-compose (on your own computer)") or in production mode on a server ("Installation for deployment on a production server"). See below for relevant installation instructions.
@@ -23,12 +23,13 @@ Shareish can be run in development mode on your own computer environment using D
 Install Docker and Docker compose on your computer (https://docs.docker.com/engine/install/).
 
 Then, clone the Shareish repository on your system:
+```
 git clone https://github.com/shareish/shareish.git
+```
 
 Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
 1. Set `DEV=True` in `backend/mapsite/settings.py`.
-2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have 
-   strange issues with `npm`).
+2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have strange issues with `npm`).
 3. To build backend and frontend dev images:
 ```
 docker compose -f docker-compose.dev.yaml build
@@ -40,8 +41,7 @@ docker compose -f docker-compose.dev.yaml up -d --build
 
 Once installed, frontend is running locally at `http://localhost:8081`; backend API is located at `http://localhost:8000/api/v1/`, and backend administration interface is running at `http://localhost:8000/admin/`.
 
-In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the 
-corresponding code is recompiled if needed and the server is restarted automatically (see the logs using docker compose logs -f web or docker compose logs -f ui or docker compose logs -f web db).
+In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the corresponding code is recompiled if needed and the server is restarted automatically (see the logs using docker compose logs -f web or docker compose logs -f ui or docker compose logs -f web db). This eases direct assessment of your changes to the code.
 
 See the logs in live: `docker compose logs` (in the root directory).
 To stop: `docker compose stop` (in the root directory).
