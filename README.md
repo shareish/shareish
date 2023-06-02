@@ -7,6 +7,8 @@ Once you are registered and logged in, Shareish offers an interactive map where 
 
 Shareish development was initiated by a team of computer scientists at the Montefiore Institute, University of Liège, Belgium. Its first official release is described in the scientific paper [Shareish (Share & Cherish): an open-source, map-based, web platform to foster mutual aid](https://dl.acm.org/doi/10.1145/3593743.3593790), published in the Proceedings of the 11th International Conference on Communities & Technologies, Lahti, May 2023.
 
+If you are interested by this project (as a potential user, contributor, developer, member of a grassroot movements, ...), say a word in [GitHub Discussions](https://github.com/shareish/shareish/discussions) or <info@shareish.org> (if you are more comfortable by e-mail) !
+
 ![Shareish map](shareish-map-screenshot.jpg?raw=true "Shareish map")
 
 ## Demonstration server
