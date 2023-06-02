@@ -5,7 +5,7 @@ Thank you for wanting to contribute to the Shareish project ! :green_heart:
 ## Do you want to translate Shareish into another language (or improve the existing translation) ?
 1. Get the latest version of the [translation csv file](https://github.com/shareish/shareish/blob/main/frontend/src/locales/translations.csv).
 2. If the language is not yet present, add a column, otherwise fill the existing column.
-3. [Contact us](info@shareish.org) when done or open a pull request (see below similar procedure than submitting a patch that fixes a bug).
+3. [Contact us](on [GitHub Discussions](https://github.com/shareish/shareish/discussions) or info@shareish.org if you are more comfortable) when done or open a pull request (see below similar procedure than submitting a patch that fixes a bug).
 
 ## Did you find a bug?
 1. Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/shareish/shareish/issues).
@@ -17,10 +17,15 @@ Thank you for wanting to contribute to the Shareish project ! :green_heart:
 3. Before submitting a patch related to the front-end, please check if you follow [VueJS style guide](https://v2.vuejs.org/v2/style-guide/?redirect=true).
 
 ## Do you intend to add a new feature?
-Please contact us at <info@shareish.org> or submit an issue describing the enhancement you plan to implement.
+Please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions) or submit an issue describing the enhancement you plan to implement.
 
 ## Do you have questions about the source code?
-Please contact us at <info@shareish.org>.
+Please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions).
+
+## Do you intend to install Shareish in your own community ?
+ Let us know in [GitHub Discussions](https://github.com/shareish/shareish/discussions) (or <info@shareish.org> if you are more comfortable).
+ 
+
 
 
 
