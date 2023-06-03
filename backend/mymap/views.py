@@ -15,7 +15,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from .filters import ItemTypeFilterBackend, ConversationContentFilterBackend, ItemCategoryFilterBackend, \
     ActiveItemFilterBackend, UserItemFilterBackend, ConversationSelectedCategoryFilterBackend, ItemViewFilterBackend, \
     ItemAvailabilityFilterBackend, ItemLocationFilterBackend, ItemMinCreationdateFilterBackend, \
-    ItemMapBoundsFilterBackend, UserDisabledFilterBackend
+    ItemMapBoundsFilterBackend, UserDisabledFilterBackend, ItemVisibilityFilterBackend, ItemClosedReasonFilterBackend, \
+    ItemUserDisabledFilterBackend
 from .functions import verif_location
 from .mail import send_mail_recover_account, send_mail_start_delete_account_process
 from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComment, ItemView, UserMapExtraCategory, \
@@ -142,11 +143,10 @@ class RecurrentItemViewSet(ItemViewSet):
 
 
 class ActiveItemViewSet(ItemViewSet):
-    queryset = Item.objects.filter(visibility=Item.Visibility.PUBLIC, closed_reason="", user__is_disabled=False)
     filter_backends = [
         filters.SearchFilter, filters.OrderingFilter, ActiveItemFilterBackend, ItemCategoryFilterBackend,
         ItemTypeFilterBackend, ItemViewFilterBackend, ItemAvailabilityFilterBackend, ItemLocationFilterBackend,
-        ItemMinCreationdateFilterBackend, ItemMapBoundsFilterBackend
+        ItemMinCreationdateFilterBackend, ItemMapBoundsFilterBackend, ItemVisibilityFilterBackend, ItemClosedReasonFilterBackend, ItemUserDisabledFilterBackend
     ]
     search_fields = ['name', 'description', 'user__username']
     pagination_class = ActivePaginationClass

@@ -34,6 +34,21 @@ class ItemTypeFilterBackend(filters.BaseFilterBackend):
                 return queryset.none()
         return queryset
 
+class ItemVisibilityFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter((Q(visibility=Item.Visibility.PUBLIC)))
+
+class ItemClosedReasonFilterBackend(filters.BaseFilterBackend):
+    ##return open items (closedreason empty); to implement: closed reason choices in query_params
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter((Q(closed_reason="")))
+
+class ItemUserDisabledFilterBackend(filters.BaseFilterBackend):
+    ##return items whose users are not disabled
+    def filter_queryset(self, request, queryset, view):
+        return queryset.filter((Q(user__is_disabled=False)))
+
+    
 
 class ItemViewFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
