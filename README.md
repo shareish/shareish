@@ -29,10 +29,12 @@ Then, clone the Shareish repository on your system:
 git clone https://github.com/shareish/shareish.git
 ```
 
-Then edit settings (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...):
-1. Set `DEV=True` in `backend/mapsite/settings.py`.
-2. Be sure the `frontend/node_modules` does not exist (only first time, or when you have strange issues with `npm`).
-3. To build backend and frontend dev images:
+Then edit settings:
+1. Set `DEV=True` in `backend/mapsite/settings.py` to activate the DEVelopment mode.
+2. Edit the **SECRET_KEY** (see `backend/mapsite/settings.py` with instructions how to generate a secret key).
+3. Edit the **E-mail settings** in `backend/mapsite/settings.py` that are used by the backend to send e-mails for account creation and notifications by editing the following variables: **EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD**. 
+4. Be sure the `frontend/node_modules` does not exist (only first time, or when you have strange issues with `npm`).
+5. To build backend and frontend dev images:
 ```
 docker compose -f docker-compose.dev.yaml build
 ```
@@ -73,12 +75,12 @@ sudo curl -L https://github.com/shareish/shareish/archive/refs/heads/main.zip
 unzip main.zip 
 ```
 
-Change the name of your host server name by editing the file main.js in the directory frontend/src/
+Change the name of your host server name by editing the file **main.js** in the directory frontend/src/
 
-Then edit backend/mapsite/settings.py (you should change e.g. the default email address used to send e-mails for account creation, notifications, ...). Do not forget to change the settings in the /backend/mapsite/settings.py file that are marked as
-```
-#CHANGE THIS WHEN CLONING THE PROJECT
-```
+Then edit **backend/mapsite/settings.py**:
+1. Edit the **SECRET_KEY** (see instructions how to generate a secret key).
+2. Edit the **PROD_DOMAIN** variable to match your production server host name.
+3. Edit the **E-mail settings** that are used by the backend to send e-mails for account creation and notifications by editing the following variables: **EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD**.
 
 Download Docker and start it on your server (https://docs.docker.com/engine/install/):
 
