@@ -57,8 +57,7 @@ If you want to update Shareish to latest version, git pull the last commits (or 
 
 ## Installation for deployment on a production server
 
-The first step is to have a server that can be accessed through HTTP.
-
+The first step is to have a server that can be accessed through HTTP(s).
 Then, you need a SSL certificate (for HTTPS, used for geolocalization of users) for your domain. In our case, we use certbot that use let's encrypt certificate. 
 ```
 > sudo snap install --classic certbot
@@ -69,18 +68,20 @@ When asked specify the URL associated to your server (e.g. shareish.org correspo
 
 
 Then, download the Shareish folders and files and unzip them in a directory on your server, e.g.  using:
-
 ```
 sudo curl -L https://github.com/shareish/shareish/archive/refs/heads/main.zip -o main.zip
 unzip main.zip 
 ```
 
-Change the name of your host server name by editing the file **main.js** in the directory frontend/src/
+Then edit **frontend/src/main.js**:
+1. Change the name of your host server name by editing the variable **PROD_URL**.
 
 Then edit **backend/mapsite/settings.py**:
 1. Edit the **SECRET_KEY** (see instructions how to generate a secret key).
 2. Edit the **PROD_DOMAIN** variable to match your production server host name.
 3. Edit the **E-mail settings** that are used by the backend to send e-mails for account creation and notifications by editing the following variables: **EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD**.
+
+You should also have your own privacy policy and terms of conditions (as you will be hosting user data), these are defined in **frontend/src/locales/translations.csv** in variables faq_data_collection_answer and faq_everything_answer and will be displayed on the homepage.
 
 Download Docker and start it on your server (https://docs.docker.com/engine/install/):
 
