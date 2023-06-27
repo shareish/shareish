@@ -22,7 +22,8 @@
         </template>
       </b-carousel>
       <div class="top-left">
-        <div v-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
+	<div v-if="item.visibility == 'PB' && !item.is_closed"></div>
+        <div v-else-if="!item.is_closed" class="visibility tag">{{ $t('item_visibility__' + item.visibility) }}</div>
         <div v-else class="closed is-danger tag"><i class="fas fa-lock mr-1"></i>{{ $t('clotured') }}</div>
       </div>
       <div class="stats">
