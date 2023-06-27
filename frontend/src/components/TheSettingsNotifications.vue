@@ -14,7 +14,7 @@
                 </template>
                 <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
                   <b-button type="is-info" @click="fetchAddressGeoLoc">
-                    <i class="fas fa-street-view"></i>
+                    <i class="fas fa-home"></i>
                   </b-button>
                 </b-tooltip>
                 <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />

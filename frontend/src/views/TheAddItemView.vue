@@ -130,8 +130,12 @@
                 <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
                   <b-button type="is-info" @click="fetchAddressGeoLoc">
                     <i class="fas fa-street-view"></i>
-                  </b-button>
+                  </b-button> &nbsp; 
                 </b-tooltip>
+		<b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
+                     <b-button
+                        @click="fetchAddressRefLoc" type="is-info"><i class="fas fa-home"></i></b-button>
+		</b-tooltip><br>
                 <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
@@ -285,6 +289,7 @@ export default {
       visibility: 'PB',
 
       geoLocation: null,
+      refLocation : null,
       waitingFormResponse: false
     }
   },
@@ -384,9 +389,25 @@ export default {
         this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
+      async fetchAddressRefLoc() {
+	  try {
+	    const params = {
+		columns: ['ref_location']
+            }
+	    const userId = Number(this.$store.state.user.id);
+	    const refLocation = (await axios.get(`api/v1/webusers/${userId}`,  {params: params})).data.ref_location;
+	    if (refLocation !== null) {
+		this.refLocation = new GeolocationCoords(refLocation);
+		this.address = await this.fetchAddress(this.refLocation);
+	    }
+	  }
+	  catch (error) {
+              this.snackbarError(error);
+	  }
+    },
     async fetchAddressGeoLoc() {
       if (this.geoLocation !== null)
-        this.address = await this.fetchAddress(this.geoLocation);
+            this.address = await this.fetchAddress(this.geoLocation);
       else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
     },
