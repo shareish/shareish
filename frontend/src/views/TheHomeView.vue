@@ -34,6 +34,25 @@
 
       <br />
       <br />
+      <br />
+      <br />
+      <h2 class="subtitle is-size-3 has-text-centered" style="margin-bottom: 2rem;"><b>{{ $t('terms_conditions') }}</b></h2>
+
+      <p>
+        <b>{{ $t('terms_content') }}</b><br />
+        <i>{{ $t('terms_content_details') }}</i>
+      </p>
+      <br />
+      <p ref="gdpr">
+        <b>{{ $t('faq_data_collection') }}</b><br />
+        <i>{{ $t('faq_data_collection_answer') }}.</i>
+      </p>
+      <br />
+
+      
+      
+      <br />
+      <br />
       <h2 class="subtitle is-size-3 has-text-centered" style="margin-bottom: 2rem;"><b>{{ $t('faq') }}</b></h2>
 
       <p>
@@ -50,12 +69,14 @@
 
       <!-- can you give me exemples of services: promener chiens, faire courses, aller à la pharmacie, déposer qqun quelque part, citer exemple covid etc.... //-->
 
-      <p>
-        <b>{{ $t('faq_everything') }}</b><br />
-        <i>{{ $t('faq_everything_answer') }}</i>
+
+<p>
+        <b>{{ $t('faq_notifications') }}</b><br />
+        <i>{{ $t('faq_notifications_answer') }}</i>
       </p>
       <br />
 
+      
       <p>
         <b>{{ $t('faq_colors') }}</b><br />
         <i>{{ $t('faq_colors_answer') }}</i>
@@ -74,12 +95,7 @@
       </p>
       <br />
 
-      <p ref="gdpr">
-        <b>{{ $t('faq_data_collection') }}</b><br />
-        <i>{{ $t('faq_data_collection_answer') }}.</i>
-      </p>
-      <br />
-
+      
       <p>
         <b>{{ $t('faq_public_resources') }}</b><br />
         <i>
