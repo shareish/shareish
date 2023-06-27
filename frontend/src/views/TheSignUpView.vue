@@ -7,7 +7,7 @@
         </b-tooltip>
       </h1>
       <div>
-	<br><b-checkbox v-model="agreement">{{ $t('gdpr_read_agree')}} <router-link to="/#gdpr">{{ $t('gdpr_privacy_policy') }}</router-link></b-checkbox><br><br>
+	<br><b-checkbox v-model="agreement">{{ $t('terms_read_agree')}} <router-link to="/#terms_conditions">{{ $t('terms_conditions_privacy_policy') }}</router-link></b-checkbox><br><br>
       </div>
       <div class="field">
         <label>{{ $t('email') }}</label>

@@ -36,14 +36,14 @@
       <br />
       <br />
       <br />
-      <h2 class="subtitle is-size-3 has-text-centered" style="margin-bottom: 2rem;"><b>{{ $t('terms_conditions') }}</b></h2>
+      <h2 ref="terms_conditions" class="subtitle is-size-3 has-text-centered" style="margin-bottom: 2rem;"><b>{{ $t('terms_conditions') }}</b></h2>
 
       <p>
         <b>{{ $t('terms_content') }}</b><br />
         <i>{{ $t('terms_content_details') }}</i>
       </p>
       <br />
-      <p ref="gdpr">
+	<p>
         <b>{{ $t('faq_data_collection') }}</b><br />
         <i>{{ $t('faq_data_collection_answer') }}.</i>
       </p>
@@ -141,7 +141,7 @@ export default {
   mounted() {
       document.title = "Shareish"
       
-      if (this.$route.hash === '#gdpr') this.$refs['gdpr'].scrollIntoView();
+      if (this.$route.hash === '#terms_conditions') this.$refs['terms_conditions'].scrollIntoView();
 
   },
   methods: {
