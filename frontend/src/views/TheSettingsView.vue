@@ -24,7 +24,7 @@
           <li>
             <router-link :to="{name: 'settingsTab', params: {tab: 'notifications'}}" :class="{'is-active': currentView === 'notifications'}">
               <i class="fas fa-bell"></i>
-              {{ $t('email') }} {{ $t('notifications').toLowerCase() }}
+              {{ $t('reflocation') }} & {{ $t('email') }} {{ $t('notifications').toLowerCase() }}
             </router-link>
           </li>
         </ul>

@@ -398,9 +398,12 @@ export default {
 	    const refLocation = (await axios.get(`api/v1/webusers/${userId}`,  {params: params})).data.ref_location;
 	    if (refLocation !== null) {
 		this.refLocation = new GeolocationCoords(refLocation);
-		this.address = await this.fetchAddress(this.refLocation);
+		if (this.refLocation instanceof GeolocationCoords)
+		    this.address = await this.fetchAddress(this.refLocation);
 	    }
-	  }
+	    else
+		this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
+	    }
 	  catch (error) {
               this.snackbarError(error);
 	  }

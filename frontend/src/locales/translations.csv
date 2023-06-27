@@ -133,7 +133,7 @@ submit,Submit,Soumettre
 ends,Ends,Se termine
 ended,Ended,S'est terminé
 submit-again,Submit again,Soumettre à nouveau
-profile,Profile,Profil
+profile,User profile & pictures, Profil utilisateur & photos
 my-conversations,My conversations,Mes conversations
 new-messages,New messages,Nouveaux messages
 open-conversation,Open conversation,Ouvrir la conversation
@@ -338,8 +338,8 @@ deselect-all,Deselect all,Déselectionner tout
 open-map-settings,Open map settings,Ouvrir les paramètres de la carte
 filter-items,Filter items,Filtrer les items
 general-information,General information,Informations générales
-save-items-you-see,Save the items you see on Shareish,Sauvegarder les éléments que vous voyez sur Shareish
-help_save-items-you-see,We save the items you see to enable later filtering on the website and in e-mail notifications,Nous enregistrons les items que vous visionnez afin de permettre de les filtrer ultérieurement sur le site ou dans les notifications envoyées par e-mail.
+save-items-you-see,Authorize the recording of the items you see on Shareish,Autoriser l'enregistrement des éléments que vous voyez sur Shareish
+help_save-items-you-see,By default we record the items you see to allow you to filter out already seen items on the website (in the map and browse list) and to avoid sending e-mail notifications for already seen items,Par défaut nous enregistrons les éléments que vous consultez afin de vous permettre de filtrer les éléments déjà vus sur le site (sur la carte et dans la liste) et pour éviter de vous envoyer des notifications par e-mail pour les éléments déjà vus. 
 yes,Yes,Oui
 no,No,Non
 send-private-message,Message,Contacter
