@@ -299,8 +299,8 @@
   "distance": "Distance",
   "comments_count": "Comments count",
   "views_count": "Views count",
-  "use-geolocation": "Use geolocation",
-  "use-reflocation": "Use reference location",
+  "use-geolocation": "Use geolocation from your device",
+  "use-reflocation": "Use reference location from your user profile",
   "dont-use-geolocation": "Don't use geolocation",
   "or-enter-an-address": "Or enter an address",
   "radius-from-location": "Radius from location (km)",
@@ -458,5 +458,6 @@
   "developers": "Developers",
   "project_coordination": "Project coordination",
   "scientific_paper": "Scientific paper",
-  "open_source_code": "Open source code on:"
+  "open_source_code": "Open source code on:",
+  "report_bug": "Report a bug or issue"
 }

@@ -32,6 +32,7 @@
             </h6>
             <div class="custom-flex-column">
               <a href="mailto:info@shareish.org">info@shareish.org</a>
+	      <a href="https://github.com/shareish/shareish/issues">{{ $t('report_bug') }}</a>
             </div>
           </div>
         </div>

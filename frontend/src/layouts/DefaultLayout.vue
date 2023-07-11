@@ -27,6 +27,7 @@
 		{{ $t('open_source_code') }}
                 <img alt="https://github.com/shareish" src="../assets/GitHub-Mark-32px.png" style="vertical-align: middle; margin-top: -3px; margin-left: 5px;">
               </a>
+	      
             </div>
           </div>
           <div class="column">
@@ -35,6 +36,7 @@
             </h6>
             <div class="custom-flex-column">
               <a href="mailto:info@shareish.org">info@shareish.org</a>
+	      <a href="https://github.com/shareish/shareish/issues">{{ $t('report_bug') }}</a>
             </div>
           </div>
         </div>
