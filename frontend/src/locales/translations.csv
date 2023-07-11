@@ -296,8 +296,8 @@ enddate,End date,Date de fin
 distance,Distance,Distance
 comments_count,Comments count,Nombre de commentaires
 views_count,Views count,Nombre de vues
-use-geolocation,Use geolocation,Utiliser la géolocalisation
-use-reflocation,Use reference location,Utiliser la localisation de référence
+use-geolocation,Use geolocation from your device,Utiliser la géolocalisation de votre appareil
+use-reflocation,Use reference location from your profile,Utiliser la localisation de référence définie dans votre profil d'utilisateur
 dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
 or-enter-an-address,Or enter an address,Ou entrez une adresse
 radius-from-location,Radius from location (km),Rayon depuis la localisation (km)
