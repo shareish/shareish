@@ -127,7 +127,7 @@ export class GeolocationCoords {
 
   update(param1, param2) {
     if (isArr(param1)) {
-      if (isNumber(param1[0]) && isNumber(param1[1])) {
+	if (isNumber(param1[0]) && isNumber(param1[1])) {
         this.longitude = param1[0];
         this.latitude = param1[1];
       }
@@ -135,9 +135,9 @@ export class GeolocationCoords {
       this.longitude = param1.coords.longitude;
       this.latitude = param1.coords.latitude;
     } else if (typeof param1 === 'string') {
-      const regex = /^SRID=4326;POINT \([0-9]+(\.[0-9]+)? [0-9]+(\.[0-9]+)?\)$/
+      const regex = /^SRID=4326;POINT \(-?[0-9]+(\.[0-9]+)? -?[0-9]+(\.[0-9]+)?\)$/
       if (regex.test(param1)) {
-        let coords = param1.substring(17, param1.length - 1).split(" ");
+	let coords = param1.substring(17, param1.length - 1).split(" ");
         this.longitude = parseFloat(coords[0]);
         this.latitude = parseFloat(coords[1]);
       }
