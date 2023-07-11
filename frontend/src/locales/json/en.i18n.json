@@ -458,6 +458,7 @@
   "developers": "Developers",
   "project_coordination": "Project coordination",
   "scientific_paper": "Scientific paper",
-  "open_source_code": "Open source code on:",
-  "report_bug": "Report a bug or issue"
+  "open_source_code": "Open source code on",
+  "report_bug": "Report a bug or issue",
+  "follow_us": "Follow us on"
 }

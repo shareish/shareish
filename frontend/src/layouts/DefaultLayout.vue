@@ -37,6 +37,7 @@
             <div class="custom-flex-column">
               <a href="mailto:info@shareish.org">info@shareish.org</a>
 	      <a href="https://github.com/shareish/shareish/issues">{{ $t('report_bug') }}</a>
+	      <a href="https://mapstodon.space/@shareish">{{ $t('follow_us') }} <img alt="Shareish on Mastodon" src="../assets/mastodon.png" width="32" style="vertical-align: middle; margin-top: -3px; margin-left: 5px;"></a>
             </div>
           </div>
         </div>
