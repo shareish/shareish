@@ -49,6 +49,9 @@
           </b-tooltip>
         </div>
       </div>
+      <div>
+	{{ $t('after_registration_settings') }}
+      </div>
       <div class="field">
         <div class="control">
           <b-button :disabled="!agreement" type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>

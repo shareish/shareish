@@ -271,7 +271,7 @@ router.beforeEach((to, from, next) => {
         next()
     }
 
-    i18n.locale = localStorage.getItem('language') || 'fr'
+    i18n.locale = localStorage.getItem('language') || 'en'
 });
 
 export default router;

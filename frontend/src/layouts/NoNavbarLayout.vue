@@ -10,7 +10,7 @@
               <img src="../assets/montefiore_institute.svg" alt="Montefiore Institute, ULiège">
             </a>
             <address class="custom-flex-column mt-2">
-	       <span class="mb-2">{{ $t('developers') }}: Adrien Guilliams, Ulysse Rubens, Florent Banneux, Pierre Chapeau, Raphaël Marée</span>
+	        <span class="mb-2">{{ $t('developers') }}: Adrien Guilliams, Ulysse Rubens, Florent Banneux, Pierre Chapeau, Raphaël Marée, <a href="https://github.com/shareish/shareish/blob/main/CONTRIBUTING.md">{{ $t('and_you') }}</a></span>
 	            <span>{{ $t('project_coordination') }}: <a href="https://people.montefiore.uliege.be/maree/">Raphaël Marée</a></span>
             </address>
           </div>
@@ -33,6 +33,7 @@
             <div class="custom-flex-column">
               <a href="mailto:info@shareish.org">info@shareish.org</a>
 	      <a href="https://github.com/shareish/shareish/issues">{{ $t('report_bug') }}</a>
+	      <a href="https://github.com/shareish/shareish/discussions/categories/ideas">{{ $t('suggest_idea') }}</a>
 	      <a href="https://mapstodon.space/@shareish">{{ $t('follow_us') }} <img alt="Shareish on Mastodon" src="../assets/mastodon.png" width="32" style="vertical-align: middle; margin-top: -3px; margin-left: 5px;"></a>
             </div>
           </div>

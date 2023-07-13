@@ -3,8 +3,8 @@
     <div id="map-preview" class="box">
       <div class="container">
         <div class="choose-language is-inline-flex mb-3">
-          <b-button class="is-small" type="is-info" :outlined="$i18n.locale !== 'fr'" @click="changeLanguage('fr')">FR</b-button>
-          <b-button class="is-small" type="is-info ml-2" :outlined="$i18n.locale !== 'en'" @click="changeLanguage('en')">EN</b-button>
+          <b-button class="is-small" type="is-dark" :outlined="$i18n.locale !== 'en'" @click="changeLanguage('en')">EN</b-button>
+	   <b-button class="is-small" type="is-dark ml-2" :outlined="$i18n.locale !== 'fr'" @click="changeLanguage('fr')">FR</b-button>
         </div>
         <div id="description" class="box">
           <h1 class="title is-size-1">Shareish</h1>
@@ -103,6 +103,7 @@
           <a href="https://wiki.openstreetmap.org/wiki/Editors">editor tools</a>,
           <a href="https://mapcomplete.osm.be/">MapComplete</a> (web),
           <a href="https://wiki.openstreetmap.org/wiki/StreetComplete">StreetComplete</a> (Android),
+	  <a href="https://vespucci.io/">Vespucci</a> (Android),
           <a href="https://wiki.openstreetmap.org/wiki/OSM_Contributor">OSMand Contributor</a> (Android),
           <a href="https://wiki.openstreetmap.org/wiki/Go_Map!!">Go Map!!!</a> (macOS).
         </i>

@@ -21,14 +21,14 @@
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-100 mt-1">
-              <b-button type="is-primary" @click="openFlap('settings')" expanded>
-                <i class="fas fa-cog"></i>
-              </b-button>
-            </b-tooltip>
             <b-tooltip :label="$t('filter-items')" position="is-left" type="is-primary" class="w-100 mt-1">
               <b-button type="is-primary" @click="openFlap('filters')" expanded>
                 <i class="fas fa-filter"></i>
+              </b-button>
+            </b-tooltip>
+	    <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-100 mt-1">
+              <b-button type="is-primary" @click="openFlap('settings')" expanded>
+                <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
           </div>
@@ -226,6 +226,7 @@ export default {
       user: {},
       itemId: null,	
 
+      //url: "https://tile.tracestrack.com/_/{z}/{x}/{y}.png?key=d9344714a8fbf28773ce4c955ea8adfb",
       url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
       tileLayerOptions: {
