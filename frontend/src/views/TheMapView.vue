@@ -278,7 +278,7 @@ export default {
         'FRS': {
           id: 'free-shops',
           markers: [],
-          tagValue: 'free_shop'
+          tagValue: 'freeshop'
         },
         'GVB': {
           id: 'give-boxes',
@@ -299,7 +299,7 @@ export default {
         'food_sharing': 'amenity',
         'soup_kitchen': 'social_facility',
         'drinking_water': 'amenity',
-        'free_shop': 'amenity'
+        'freeshop': 'amenity'
       },
       extraCategoriesIcons: {
         'bookcases': publicBookcaseIcon,
@@ -534,7 +534,7 @@ export default {
           this.getOverPassElements('food_sharing'),
           this.getOverPassElements('soup_kitchen'),
           this.getOverPassElements('drinking_water'),
-          this.getOverPassElements('free_shop'),
+          this.getOverPassElements('freeshop'),
         ]);
 
         const tmpExtraCategories = {...this.extraCategories};

@@ -98,7 +98,7 @@ export const drinkingWaterIcon = new L.Icon({
 });
 
 export const freeShopIcon = new L.Icon({
-  iconUrl: 'https://wiki.openstreetmap.org/w/images/b/b2/Public_bookcase-14.svg',
+  iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Shop_%2850373%29_-_The_Noun_Project.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
