@@ -106,6 +106,9 @@
 	  <a href="https://vespucci.io/">Vespucci</a> (Android),
           <a href="https://wiki.openstreetmap.org/wiki/OSM_Contributor">OSMand Contributor</a> (Android),
           <a href="https://wiki.openstreetmap.org/wiki/Go_Map!!">Go Map!!!</a> (macOS).
+	  {{ $t('faq_falling_fruits_edit') }}
+	  <a href="https://fallingfruit.org/">Falling fruit</a> (web).
+	  {{ $t('faq_edit_public_account') }}.
         </i>
       </p><br />
 
