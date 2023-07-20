@@ -206,12 +206,12 @@ avatar,Avatar,Avatar
 help_avatar,Upload an image that represents you,Transférez une image qui vous représente
 notif-error-item-delete,An error prevented the item to be deleted,Une erreur a empêché la suppression de l'élément
 user-items,His/her items,Ses éléments
-notif-error-user-login,"The username or the password is invalid, or your account is not activated yet (check your emails).","Le nom d'utilisateur ou le mot de passe est invalide, ou votre compte n'a pas encore été activé (verifiez vos e-mails)."
+notif-error-user-login,"The username or the password is invalid, or your account is not activated yet (check your emails).","Le nom d'utilisateur ou le mot de passe est invalide, ou votre compte n'a pas encore été activé (verifiez votre boîte e-mail)."
 password-forgotten-?,Forgotten password?,Mot de passe oublié ?
-notif-success-user-sign-up,Your account has been created. Check your emails to activate it.,Votre compte a été créé. Vérifiez vos emails pour l'activer.
+notif-success-user-sign-up,Your account has been created. Check your emails to activate it.,Votre compte a été créé. Vérifiez votre boîte e-mail pour l'activer.
 notif-error-user-sign-up,The username or the email is already taken.,Le nom d'utilisateur ou l'e-mail est déjà pris.
 notif-error-email-activation,Something went wrong during email activation,Quelque chose s'est mal passé pendant l'activation de votre compte
-notif-success-email-activation,"The email address has been activated successfully!","L'adresse email a été validée avec succès!"
+notif-success-email-activation,"Your email address has been activated successfully, you can now log in !","Votre adresse email a été validée avec succès, vous pouvez maintenant vous connecter !"
 activate-your-account,Activate your account,Activation de votre compte
 resend-activation,Resend activation email,Renvoyer l'e-mail d'activation
 notif-success-resend-activation,"A new activation link has been sent to your email address","Un nouveau lien de validation a été envoyé à votre adresse email"

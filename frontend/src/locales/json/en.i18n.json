@@ -214,7 +214,7 @@
   "notif-success-user-sign-up": "Your account has been created. Check your emails to activate it.",
   "notif-error-user-sign-up": "The username or the email is already taken.",
   "notif-error-email-activation": "Something went wrong during email activation",
-  "notif-success-email-activation": "The email address has been activated successfully!",
+  "notif-success-email-activation": "Your email address has been activated successfully, you can now log in !",
   "activate-your-account": "Activate your account",
   "resend-activation": "Resend activation email",
   "notif-success-resend-activation": "A new activation link has been sent to your email address",

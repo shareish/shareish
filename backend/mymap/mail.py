@@ -13,6 +13,8 @@ from mail_templated import EmailMessage
 from .models import Message, MailNotificationFrequencies
 from .models import Item
 
+from djoser import email
+
 User = get_user_model()
 
 # Time required between two conversation messages to be
@@ -32,7 +34,12 @@ item_types = {
     "EV": "Event"
 }
 
+class ActivationEmail(email.ActivationEmail):
+    template_name = 'emails/activation.html'
 
+class ConfirmationEmail(email.ConfirmationEmail):
+    template_name = 'emails/confirmation.html'
+    
 def _get_unread_messages(user):
     messages = Message.objects.filter(conversation__users__user=user, seen=False).exclude(user=user)
     return messages[:to_show['conversations']], messages.count()

@@ -1,0 +1,21 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %}{{ site_name }} solidarity platform - Your account has been successfully activated!{% endblocktrans %}
+{% endblock subject %}
+
+{% block text_body %}
+{% blocktrans %}Hello, Your {{ site_name }} account has been created and is ready to use, please log in on: {{ protocol }}://{{ domain }}/log-in ! We invite you to edit your profile and settings here: {{ protocol }}://{{ domain }}/settings/notification to configure notifications when new content is created in your neighbourdhood. You can also provide more details about yourself here: {{ protocol }}://{{ domain }}/settings/profile .{% endblocktrans %}
+
+{% trans "Thanks for using Share & Cherish!" %}
+
+{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% endblock text_body %}
+
+{% block html_body %}
+<p>{% blocktrans %}Hello,<br><br>Your {{ site_name }} account has been created and is ready to use, please log in at: <a href="{{ protocol }}://{{ domain }}/log-in">{{ protocol }}://{{ domain }}/log-in</a> ! <br><br>Then, we invite you to <b>edit your profile and settings</b> (top-right "Account" menu) here: <a href="{{ protocol }}://{{ domain }}/settings/notifications">{{ protocol }}://{{ domain }}/settings/notifications</a> to <b>configure notifications</b> when new content is created in your neighbourdhood. You can also provide more details about yourself here: <a href="{{ protocol }}://{{ domain }}/settings/profile">{{ protocol }}://{{ domain }}/settings/profile</a>. {% endblocktrans %}</p>
+
+<p>{% trans "Thanks for using Share & Cherish!" %}</p>
+
+<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+{% endblock html_body %}

@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'XXXXXXXXXXXXXXX'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-DEV = False
+DEV = True
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -77,7 +77,8 @@ ROOT_URLCONF = 'mapsite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        #'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,10 +129,12 @@ DATABASES = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'XXXXXXXXXXXXXXX'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'noreply@shareish.org'
+EMAIL_HOST_USER = 'XXX@XXX.XXX'
 EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True
+
+
 
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 MEDIA_URL = '/media/'
@@ -221,6 +224,10 @@ SITE_NAME = 'Shareish'
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'PASSWORD_RESET_CONFIRM_URL': 'reset-password/confirm/{uid}/{token}',
+    'EMAIL': {
+        'activation': 'mymap.mail.ActivationEmail',
+        'confirmation': 'mymap.mail.ConfirmationEmail',
+    },
     'SEND_ACTIVATION_EMAIL': True,  # also send if email has changed
     'SEND_CONFIRMATION_EMAIL': True,  # registration or activation
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
@@ -232,6 +239,7 @@ DJOSER = {
         'user_create': 'mymap.serializers.UserRegistrationSerializer',
         'user_update': 'mymap.serializers.UserSerializer',
     },
+    
 }
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
