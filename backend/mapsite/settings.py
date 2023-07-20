@@ -21,13 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # use e.g. https://django-secret-key-generator.netlify.app/ to generate a secret key
-# https://stackoverflow.com/questions/15209978/where-to-store-secret-keys-django  
+# https://stackoverflow.com/questions/15209978/where-to-store-secret-keys-django
 SECRET_KEY = 'XXXXXXXXXXXXXXX'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-DEV = True
+DEV = False
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -133,7 +133,6 @@ EMAIL_HOST_USER = 'XXX@XXX.XXX'
 EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True
-
 
 
 MEDIA_ROOT = BASE_DIR / "mediafiles"
