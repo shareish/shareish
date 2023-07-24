@@ -73,13 +73,17 @@
                 >
                   <l-popup>
                     <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
+		    <figure class="image">
+		      <img v-if="marker.image" :src="marker.image" alt="Image">
+		    </figure>
                     <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
                     <div v-if="marker.description">{{ marker.description }}</div>
                     <div class="is-grey is-size-7 has-text-right is-italic">
-                      <a :href="getMarkerURL(extraCategory.category, marker.id)" target="_blank">
+                      <a :href="getMarkerURLView(extraCategory.category, marker.id)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
-                        <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
-                      </a>
+                        <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span></a> <span>{{ $t('or')}}</span> <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('edit_minor') }}</span></a> <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      <br>
+		      
                     </div>
                   </l-popup>
                 </l-marker>
@@ -103,7 +107,7 @@
               </b-button>
             </header>
             <div class="content">
-              <h3 class="title is-size-4 mb-1">OpenStreetMap & Falling Fruit</h3>
+              <h3 class="title is-size-4 mb-1">{{ $t('external-public-resources') }}</h3>
               <p class="subtitle is-size-6 mt-0 mb-5">{{ $t('define-elements-to-see-on-map') }}</p>
               <div class="columns is-mobile buttons m-0 mb-4">
                 <div class="column p-0 pr-2">
@@ -563,7 +567,8 @@ export default {
                   id: element['id'],
                   type: extraCategory.tagValue,
                   name: element['tags']['name'],
-                  location: new GeolocationCoords(element['lon'], element['lat'])
+                  location: new GeolocationCoords(element['lon'], element['lat']),
+		  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image']  
                 }
               });
             }
@@ -573,13 +578,20 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-    getMarkerURL(category, markerId) {
-      if (category === 'FLF') {
-        return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
+    getMarkerURLView(category, markerId) {
+	if (category === 'FLF') {
+	return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
       } else {
         return "https://openstreetmap.org/node/" + markerId;
       }
     },
+    getMarkerURLEdit(category, marker) {
+	if (category === 'FLF') {
+	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
+      } else {
+	return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
+      }
+    },  
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';

@@ -100,8 +100,11 @@ map_ecat_FLF,Falling fruits|Falling fruits,Fruits qui tombent|Fruits qui tombent
 map_ecat_FRS,Free shop|Free shops,Magasin gratuit|Magasins gratuits
 map_ecat_GVB,Give box|Give boxes,Boîte à dons|Boîtes à dons
 map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
-from-osm,details on OpenStreetMap,détails sur OpenStreetMap
-from-ff,details on Falling Fruit,détails sur Falling Fruit
+view-from-osm,view,voir
+view-from-ff,view,voir
+edit_minor,edit,éditer
+from-osm,on OpenStreetMap,sur OpenStreetMap
+from-ff,on Falling Fruit,sur Falling Fruit
 by,by,par
 at,at,à
 i-am-interested,Details,Détails
@@ -331,12 +334,13 @@ created-at,at,à
 will-be-showed, will be shown, seront affichés
 set-a-reflocation-to-use-feature,You must set a reference location in your settings to use this feature.,Vous devez indiquer une adresse de référence dans vos paramètres pour utiliser cette fonctionnalité.
 map-settings-saved,Your map settings have been saved.,Vos paramètres de la carte ont été sauvegardés.
-define-elements-to-see-on-map,Define what public elements (external from Shareish) you want to see on the map.,Définissez quels éléments publics (externes à Shareish) vous souhaitez afficher sur la carte.
+define-elements-to-see-on-map,Define which public resources (from OpenStreetMap & Falling Fruit) you want to display on the map.,Définissez quelles ressources publiques (importées depuis OpenStreetmap et Falling Fruit) vous souhaitez afficher sur la carte.
+external-public-resources, Public resources, Ressources publiques
 this-item-doesnt-have-a-location,"This item does not have a location, cannot show it on the map.","Cet élément n'a pas de localisation, impossbible de l'afficher sur la carte."
 select-all,Select all,Sélectionner tout
 deselect-all,Deselect all,Déselectionner tout
-open-map-settings,Open map settings,Ouvrir les paramètres de la carte
-filter-items,Filter items,Filtrer les items
+open-map-settings,Configure public resources display,Paramétrer l'affichage des ressources publiques
+filter-items,Filter displayed content,Filtrer les éléments affichés
 general-information,General information,Informations générales
 save-items-you-see,Authorize the recording of the items you see on Shareish,Autoriser l'enregistrement des éléments que vous voyez sur Shareish
 help_save-items-you-see,By default we record the items you see to allow you to filter out already seen items on the website (in the map and browse list) and to avoid sending e-mail notifications for already seen items,Par défaut nous enregistrons les éléments que vous consultez afin de vous permettre de filtrer les éléments déjà vus sur le site (sur la carte et dans la liste) et pour éviter de vous envoyer des notifications par e-mail pour les éléments déjà vus. 
