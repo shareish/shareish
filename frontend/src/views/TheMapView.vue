@@ -231,7 +231,7 @@ export default {
       waitingFormResponse: false,
 
       newmarker: [0,0],
-	newPopupOptions: {autoPan: false},	
+      newPopupOptions: {autoPan: false, maxWidth: '400'},	
 	
       bounds: null,
       searchBounds: null,
