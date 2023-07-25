@@ -155,6 +155,15 @@ const routes = [
         }
     },
     {
+        path: "/add-item/pos/:lat/:lng",
+        name: 'addItemPos',
+        component: TheAddItemView,
+        meta: {
+            requiresAuth: true,
+            layout: 'default'
+        }
+    },
+    {
         path: "/add-item/from-recurrents",
         name: 'addItemFromRecurrents',
         component: TheAddItemFromRecurrentsView,

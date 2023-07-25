@@ -294,7 +294,9 @@ export default {
     }
   },
   created() {
-    this.fetchRecurrentItem();
+    if (this.isRecurrentItemUsed) { this.fetchRecurrentItem(); }
+      
+    if (this.isMapMarkerUsed) { this.fetchMapMarkerAddress(this.$route.params.lat,this.$route.params.lng);}
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -334,6 +336,15 @@ export default {
     },
     isRecurrentItemUsed() {
       return this.recurrentItemId > 0;
+    },
+    mapMarkerLat() {
+      return Number(this.$route.params.lat);
+    },
+    mapMarkerLng() {
+      return Number(this.$route.params.lng);
+    },
+    isMapMarkerUsed() {
+      return (this.mapMarkerLat > 0 && this.mapMarkerLng > 0);	  
     }
   },
   watch: {
@@ -365,6 +376,16 @@ export default {
           await this.$router.push("/add-item");
         }
       }
+    },
+    async fetchMapMarkerAddress(lat,lng) {
+	  try {
+	      const markerloc = new GeolocationCoords(lng,lat);
+	      if (markerloc instanceof GeolocationCoords)
+		  this.address = await this.fetchAddress(markerloc);
+	  }
+	  catch (error) {
+	      this.snackbarError(error);
+	  }
     },
     async setFieldFromRecurrentItem() {
       if (this.recurrentItem !== null) {
@@ -398,6 +419,8 @@ export default {
 	    const refLocation = (await axios.get(`api/v1/webusers/${userId}`,  {params: params})).data.ref_location;
 	    if (refLocation !== null) {
 		this.refLocation = new GeolocationCoords(refLocation);
+		console.log(refLocation);
+		console.log(this.refLocation);
 		if (this.refLocation instanceof GeolocationCoords)
 		    this.address = await this.fetchAddress(this.refLocation);
 	    }

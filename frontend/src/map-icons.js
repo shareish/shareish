@@ -48,6 +48,27 @@ export const blueIcon = new L.Icon({
 
 // Special icons
 
+
+export const addIcon = new L.Icon({
+    //Attribution: MGalloway (WMF), CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/OOjs_UI_icon_mapPinAdd-ltr.svg/240px-OOjs_UI_icon_mapPinAdd-ltr.svg.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 25],
+  //iconAnchor: [12, 41],
+  popupAnchor: [0, -20],
+  shadowSize: [1, 1]
+});
+
+export const homeIcon = new L.Icon({
+    //Attribution: ipapun, CC BY 3.0 
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/66/Home_icon_blue-1.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [30, 30],
+  //iconAnchor: [12, 41],
+  popupAnchor: [0, -20],
+  shadowSize: [1, 1]
+});
+
 export const eventIcon = new L.Icon({
     //iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Map_marker_icon_%E2%80%93_Nicolas_Mollet_%E2%80%93_Group_%E2%80%93_People_%E2%80%93_Default.png',
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png', 

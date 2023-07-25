@@ -7,7 +7,18 @@
           :zoom.sync="zoom"
           id="leaflet-map"
           @update:bounds="boundsUpdated"
+          @click="addMarker"
       >
+       <l-marker ref="newmarker" :lat-lng="newmarker" :icon="addIcon"> 
+         <l-popup ref="newpopup" :options="newPopupOptions">
+           <b>{{ $t('choose_add_content_type_map') }}</b> <br><br>
+           <template v-if="newmarker.lat">
+            <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng}}">{{ $t('add_item') }}</router-link><br><br>
+           </template>
+           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span></a><br><br>
+           <a :href="getMarkerURLAddFF(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_ffruit') }}</span></a><br>
+         </l-popup>
+    </l-marker>
         <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
         <l-control position="topright">
           <div class="is-flex is-flex-direction-column">
@@ -43,7 +54,7 @@
         </l-control>
 
         <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
-        <l-marker v-if="refLocation" :icon="geoLocationIcon" :lat-lng="refLocation.leafletLatLng" />
+        <l-marker v-if="refLocation" :icon="refLocationIcon" :lat-lng="refLocation.leafletLatLng" />
 
         <l-layer-group v-if="zoom >= minZoomToShowElements">
           <v-marker-cluster :options="markerClusterGroupOptions">
@@ -74,7 +85,7 @@
                   <l-popup>
                     <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
 		    <figure class="image">
-		      <img v-if="marker.image" :src="marker.image" alt="Image">
+                      <img v-if="marker.image" :src="marker.image" :alt="marker.image">
 		    </figure>
                     <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
                     <div v-if="marker.description">{{ marker.description }}</div>
@@ -174,7 +185,7 @@ import {
   publicBookcaseIcon,
   aedIcon,
   giveBoxIcon,
-  drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon
+  drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon, addIcon, homeIcon
 } from "@/map-icons";
 
 import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
@@ -219,6 +230,9 @@ export default {
       ecatsCheckboxes: [],
       waitingFormResponse: false,
 
+      newmarker: [0,0],
+	newPopupOptions: {autoPan: false},	
+	
       bounds: null,
       searchBounds: null,
       geoLocation: null,
@@ -318,6 +332,8 @@ export default {
         'falling-fruits': fallingfruitIcon
       },
       geoLocationIcon: blueIcon,
+      refLocationIcon: homeIcon,	
+      addIcon: addIcon,	
       routedItemLocation: null,
       items: [],
 
@@ -578,6 +594,13 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
+    addMarker(e) {
+	this.newmarker = e.latlng;
+	this.$refs.newmarker.mapObject.setOpacity(1);
+	this.$refs.newmarker.mapObject.getPopup().on('remove', function () {this._source.setOpacity(0);});
+	this.$refs.newmarker.mapObject.openPopup();
+	//console.log(this.$refs.newmarker.mapObject.getPopup());
+    },
     getMarkerURLView(category, markerId) {
 	if (category === 'FLF') {
 	return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
@@ -591,7 +614,14 @@ export default {
       } else {
 	return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
       }
-    },  
+    },
+    getMarkerURLAddOSM(marker) {
+	return "https://openstreetmap.org/edit#map=16/" + marker.lat + "/" + marker.lng;
+    },
+    getMarkerURLAddFF(marker) {
+	  //https://fallingfruit.org/locations/new?lat=50.59674620306897&lng=5.521801665684833&locale=en
+	  return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
+    },
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';

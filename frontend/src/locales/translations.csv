@@ -105,6 +105,10 @@ view-from-ff,view,voir
 edit_minor,edit,éditer
 from-osm,on OpenStreetMap,sur OpenStreetMap
 from-ff,on Falling Fruit,sur Falling Fruit
+choose_add_content_type_map,"Choose which type of content you want to add here:","Choisir le type de contenu à ajouter ici:"
+add_ffruit,"A public resource with Falling Fruit (edible fruits or plants).","Une ressource publique avec Falling Fruit (e.g. fruit ou plantes comestibles)."
+add_osm,"A public resource  with OpenStreetMap (e.g. public bookcase, give boxes, ...).","Une ressource publique avec OpenStreetMap (p.ex. boîte à livres ou à dons)."
+add_item,"A Shareish item: gift, loan, request, or event.","Un élément Shareish: don, prêt, demande, ou événement."
 by,by,par
 at,at,à
 i-am-interested,Details,Détails
