@@ -7,7 +7,7 @@
           :zoom.sync="zoom"
           id="leaflet-map"
           @update:bounds="boundsUpdated"
-          @click="addMarker"
+          @contextmenu="addMarker"
           ref="map"
       >
        <l-marker ref="newmarker" :lat-lng="newmarker" :icon="addIcon"> 
