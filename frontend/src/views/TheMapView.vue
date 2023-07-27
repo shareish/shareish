@@ -8,15 +8,34 @@
           id="leaflet-map"
           @update:bounds="boundsUpdated"
           @click="addMarker"
+          ref="map"
       >
        <l-marker ref="newmarker" :lat-lng="newmarker" :icon="addIcon"> 
          <l-popup ref="newpopup" :options="newPopupOptions">
            <b>{{ $t('choose_add_content_type_map') }}</b> <br><br>
            <template v-if="newmarker.lat">
-            <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng}}">{{ $t('add_item') }}</router-link><br><br>
-           </template>
-           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span></a><br><br>
-           <a :href="getMarkerURLAddFF(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_ffruit') }}</span></a><br>
+	     <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">{{ $t('add_item') }}</router-link>
+	     <div style="display: grid;grid-template-columns:repeat(4,1fr);">
+	       <span v-for="(itemtype,index) in itemTypeIcons" :key="index">
+		 <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index}}">
+		   <b-tooltip :label="$t('item_type_'+index)">
+		     <img :src="itemTypeIcons[index].options.iconUrl" style="height: 30px; display: inline">
+		   </b-tooltip>
+		 </router-link>
+		 </span>
+	       </div>
+           </template><br>
+           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span>
+	     <div style="display: grid;grid-template-columns:repeat(4,1fr);">
+		 <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
+		 <b-tooltip v-if="extraCategory.category!='FLF'" :label="$tc('map_ecat_'+ extraCategory.category, 1)">
+		   <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; display: inline">
+                 </b-tooltip></span>
+           </div></a><br>
+	   
+           <a :href="getMarkerURLAddFF(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span>
+	     <span>{{ $t('add_ffruit') }}<br><b-tooltip :label="$tc('map_ecat_FLF',1)"><img :src="extraCategoriesIcons[extraCategories['FLF'].id].options.iconUrl" style="width: 24px; display: inline"></b-tooltip>
+	   </span></a><br>
          </l-popup>
     </l-marker>
         <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
@@ -197,12 +216,7 @@ import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
 import ItemsFilters from "@/components/ItemsFilters.vue";
 
-const itemTypeIcons = {
-  'DN': greenIcon,
-  'LN': yellowIcon,
-  'RQ': redIcon,
-  'EV': eventIcon
-}
+
 
 export default {
   name: 'TheMapView',
@@ -230,8 +244,8 @@ export default {
       ecatsCheckboxes: [],
       waitingFormResponse: false,
 
-      newmarker: [0,0],
-      newPopupOptions: {autoPan: false, maxWidth: '400'},	
+      newmarker: [0,0], //window middle?
+	newPopupOptions: {autoPan: false, maxWidth: '200'},	
 	
       bounds: null,
       searchBounds: null,
@@ -331,6 +345,12 @@ export default {
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon
       },
+      itemTypeIcons: {
+	  'DN': greenIcon,
+	  'LN': yellowIcon,
+	  'RQ': redIcon,
+	  'EV': eventIcon
+      },
       geoLocationIcon: blueIcon,
       refLocationIcon: homeIcon,	
       addIcon: addIcon,	
@@ -393,6 +413,14 @@ export default {
           }
         }
       }
+    },
+    ecatswithoutFF() {
+	var catswithoutFF=[];
+	  for (const i in this.user.map_ecats) {
+	      if (this.user.map_ecats[i].category != 'FLF')
+		  catswithoutFF.push(this.user.map_ecats[i])
+	  }
+	return catswithoutFF;
     },
     rewriteURL() {
       clearTimeout(this.timeouts['rewriteURL']);
@@ -532,7 +560,7 @@ export default {
             ).map(item => {
               return {
                 ...item,
-                icon: itemTypeIcons[item['type']] || greyIcon,
+                icon: this.itemTypeIcons[item['type']] || greyIcon,
                 location: new GeolocationCoords(item.location)
               };
             });
@@ -594,13 +622,22 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-    addMarker(e) {
-	this.newmarker = e.latlng;
-	this.$refs.newmarker.mapObject.setOpacity(1);
-	this.$refs.newmarker.mapObject.getPopup().on('remove', function () {this._source.setOpacity(0);});
-	this.$refs.newmarker.mapObject.openPopup();
-	//console.log(this.$refs.newmarker.mapObject.getPopup());
-    },
+      addMarker(e) {
+	  this.newmarker = e.latlng;
+
+	//this.$refs.map.mapObject.on('popupopen', function(e) {
+	//    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
+	//    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
+	//    this.$refs.map.mapObject.panTo(map.unproject(px),{animate: true}); // pan to new center
+	//});
+
+	
+	  this.$refs.newmarker.mapObject.setOpacity(1);
+	  this.$refs.newmarker.mapObject.getPopup().on('remove', function () {this._source.setOpacity(0);});
+	  this.$refs.newmarker.mapObject.openPopup();
+	  //this.$refs.map.mapObject.setView(this.newmarker);
+	
+     },
     getMarkerURLView(category, markerId) {
 	if (category === 'FLF') {
 	return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
@@ -616,7 +653,7 @@ export default {
       }
     },
     getMarkerURLAddOSM(marker) {
-	return "https://openstreetmap.org/edit#map=16/" + marker.lat + "/" + marker.lng;
+	return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
     },
     getMarkerURLAddFF(marker) {
 	  //https://fallingfruit.org/locations/new?lat=50.59674620306897&lng=5.521801665684833&locale=en

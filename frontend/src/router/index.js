@@ -155,7 +155,7 @@ const routes = [
         }
     },
     {
-        path: "/add-item/pos/:lat/:lng",
+        path: "/add-item/pos/:lat/:lng/:type",
         name: 'addItemPos',
         component: TheAddItemView,
         meta: {

@@ -296,7 +296,7 @@ export default {
   created() {
     if (this.isRecurrentItemUsed) { this.fetchRecurrentItem(); }
       
-    if (this.isMapMarkerUsed) { this.fetchMapMarkerAddress(this.$route.params.lat,this.$route.params.lng);}
+    if (this.isMapMarkerUsed) { this.fetchMapMarkerAddress(this.$route.params.lat,this.$route.params.lng,this.$route.params.type);}
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -377,8 +377,9 @@ export default {
         }
       }
     },
-    async fetchMapMarkerAddress(lat,lng) {
+    async fetchMapMarkerAddress(lat,lng,type) {
 	  try {
+	      this.type = type;
 	      const markerloc = new GeolocationCoords(lng,lat);
 	      if (markerloc instanceof GeolocationCoords)
 		  this.address = await this.fetchAddress(markerloc);

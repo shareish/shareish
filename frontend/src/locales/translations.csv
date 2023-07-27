@@ -58,6 +58,10 @@ help_item_noimage,"Choose this option if you don't have an image for your item (
 help_item_category,"Choose 1 to 3 categories describing your item that will help other users to quickly search about relevant items","Choisissez de 1 à 3 catégories pour décrire votre élément ce qui permet aux autres utilisateurs de plus rapidement chercher les éléments qui les intéressent"
 request,Request,Demande
 requests,Requests,Demandes
+item_type_DN,Gift,Don
+item_type_LN,Free loan,Prêt gratuit
+item_type_RQ,Request,Demande
+item_type_EV,Free event, Événement gratuit
 donation,Gift,Don
 donations,Free offers,Dons
 event,Free event,Événement gratuit
@@ -96,7 +100,7 @@ map_ecat_DEF,Defibrillator|Defibrillators,Défibrillateur|Défibrillateurs
 map_ecat_DWS,Drinking water spot|Drinking water spots,Point d'eau potable|Points d'eau potable
 map_ecat_FDB,Food Bank|Food Banks,Banque alimentaire|Banques alimentaires
 map_ecat_FDS,Food Sharing|Food Sharing,Frigo solidaire|Frigos solidaires
-map_ecat_FLF,Falling fruits|Falling fruits,Fruits qui tombent|Fruits qui tombent
+map_ecat_FLF,Falling fruit|Falling fruits,Fruit qui tombe|Fruits qui tombent
 map_ecat_FRS,Free shop|Free shops,Magasin gratuit|Magasins gratuits
 map_ecat_GVB,Give box|Give boxes,Boîte à dons|Boîtes à dons
 map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
@@ -106,9 +110,9 @@ edit_minor,edit,éditer
 from-osm,on OpenStreetMap,sur OpenStreetMap
 from-ff,on Falling Fruit,sur Falling Fruit
 choose_add_content_type_map,"Choose which type of content you want to add here:","Choisir le type de contenu à ajouter ici:"
-add_ffruit,"A public resource with Falling Fruit (edible fruits or plants).","Une ressource publique avec Falling Fruit (e.g. fruit ou plantes comestibles)."
-add_osm,"A public resource  with OpenStreetMap (e.g. public bookcase, give boxes, ...).","Une ressource publique avec OpenStreetMap (p.ex. boîte à livres ou à dons)."
-add_item,"A Shareish item: gift, loan, request, or event.","Un élément Shareish: don, prêt, demande, ou événement."
+add_ffruit,"A public edible fruit or plant (Location on Falling Fruit):","Un fruit ou une plante comestible disponible publiquement (Site sur Falling Fruit):"
+add_osm,"A public resource (Point on OpenStreetMap):","Une ressource publique (Point sur OpenStreetMap):"
+add_item,"A gift, loan, request, or event (Shareish):","Un don, prêt, demande, ou événement (Shareish):"
 by,by,par
 at,at,à
 i-am-interested,Details,Détails
@@ -344,7 +348,7 @@ this-item-doesnt-have-a-location,"This item does not have a location, cannot sho
 select-all,Select all,Sélectionner tout
 deselect-all,Deselect all,Déselectionner tout
 open-map-settings,Configure public resources display,Paramétrer l'affichage des ressources publiques
-filter-items,Filter displayed content,Filtrer les éléments affichés
+filter-items,Filter displayed items,Filtrer les éléments affichés
 general-information,General information,Informations générales
 save-items-you-see,Authorize the recording of the items you see on Shareish,Autoriser l'enregistrement des éléments que vous voyez sur Shareish
 help_save-items-you-see,By default we record the items you see to allow you to filter out already seen items on the website (in the map and browse list) and to avoid sending e-mail notifications for already seen items,Par défaut nous enregistrons les éléments que vous consultez afin de vous permettre de filtrer les éléments déjà vus sur le site (sur la carte et dans la liste) et pour éviter de vous envoyer des notifications par e-mail pour les éléments déjà vus. 
