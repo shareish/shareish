@@ -25,13 +25,14 @@
 		 </span>
 	       </div>
            </template><br>
-           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span>
+           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span></a>
 	     <div style="display: grid;grid-template-columns:repeat(4,1fr);">
 		 <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
-		 <b-tooltip v-if="extraCategory.category!='FLF'" :label="$tc('map_ecat_'+ extraCategory.category, 1)">
-		   <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; display: inline">
+		   <b-tooltip :label="$tc('map_ecat_'+ extraCategory.category, 1)">
+		     <a :href="getMarkerURLAddSpecificOSM(newmarker,extraCategory.category)" target="_blank">
+		   <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; display: inline"></a>
                  </b-tooltip></span>
-           </div></a><br>
+           </div><br>
 	   
            <a :href="getMarkerURLAddFF(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span>
 	     <span>{{ $t('add_ffruit') }}<br><b-tooltip :label="$tc('map_ecat_FLF',1)"><img :src="extraCategoriesIcons[extraCategories['FLF'].id].options.iconUrl" style="width: 24px; display: inline"></b-tooltip>
@@ -245,7 +246,7 @@ export default {
       waitingFormResponse: false,
 
       newmarker: [0,0], //window middle?
-	newPopupOptions: {autoPan: false, maxWidth: '200'},	
+      newPopupOptions: {autoPan: false, maxWidth: '200'},
 	
       bounds: null,
       searchBounds: null,
@@ -612,7 +613,7 @@ export default {
                   type: extraCategory.tagValue,
                   name: element['tags']['name'],
                   location: new GeolocationCoords(element['lon'], element['lat']),
-		  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image']  
+		  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
                 }
               });
             }
@@ -648,15 +649,36 @@ export default {
     getMarkerURLEdit(category, marker) {
 	if (category === 'FLF') {
 	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
-      } else {
+	}
+	else if (category === 'BKC') {
+	    return "https://mapcomplete.osm.be/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
+	}
+        else if (category === "DEF") {
+	     return "https://mapcomplete.org/aed?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
+	  }
+	else if (category === "DWS") {
+	    return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
+	      }
+	else {
 	return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
       }
     },
     getMarkerURLAddOSM(marker) {
 	return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
     },
+    getMarkerURLAddSpecificOSM(marker,category) {
+	if (category === "BKC") {
+	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.lat+"&lon="+marker.lng;
+	}
+	  else if (category === "DEF") {
+	      return "https://mapcomplete.org/aed.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
+	  }
+	  else if (category === "DWS") {
+	      return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
+	      }
+	else return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
+    },
     getMarkerURLAddFF(marker) {
-	  //https://fallingfruit.org/locations/new?lat=50.59674620306897&lng=5.521801665684833&locale=en
 	  return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
     },
     async getFallingFruitElements() {
@@ -682,8 +704,8 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        // http://overpass-api.de/api
-        // https://overpass.kumi.systems/api
+	//const baseURL = "http://overpass-api.de/api";
+        //const baseURL = "https://overpass.kumi.systems/api";
         const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];

@@ -100,13 +100,12 @@
         <b>{{ $t('faq_public_resources') }}</b><br />
         <i>
           {{ $t('faq_public_resources_answer') }}
-          <a href="https://wiki.openstreetmap.org/wiki/Editors">editor tools</a>,
           <a href="https://mapcomplete.osm.be/">MapComplete</a> (web),
           <a href="https://wiki.openstreetmap.org/wiki/StreetComplete">StreetComplete</a> (Android),
 	  <a href="https://vespucci.io/">Vespucci</a> (Android),
           <a href="https://wiki.openstreetmap.org/wiki/OSM_Contributor">OSMand Contributor</a> (Android),
-          <a href="https://wiki.openstreetmap.org/wiki/Go_Map!!">Go Map!!!</a> (macOS).
-	  {{ $t('faq_falling_fruits_edit') }}
+          <a href="https://wiki.openstreetmap.org/wiki/Go_Map!!">Go Map!!!</a> (macOS),
+	  <a href="https://wiki.openstreetmap.org/wiki/Editors">OSM editor tools</a>, 
 	  <a href="https://fallingfruit.org/">Falling fruit</a> (web).
 	  {{ $t('faq_edit_public_account') }}.
         </i>
