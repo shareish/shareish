@@ -127,7 +127,7 @@ export class GeolocationCoords {
 
   update(param1, param2) {
     if (isArr(param1)) {
-	if (isNumber(param1[0]) && isNumber(param1[1])) {
+      if (isNumber(param1[0]) && isNumber(param1[1])) {
         this.longitude = param1[0];
         this.latitude = param1[1];
       }

@@ -39,8 +39,9 @@
 	   </span></a><br>
          </l-popup>
     </l-marker>
-        <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
-        <l-control position="topright">
+       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
+       <v-geosearch :options="geosearchOptions"></v-geosearch>
+	<l-control position="topright">
           <div class="is-flex is-flex-direction-column">
             <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-100 mt-1">
               <b-button type="is-info" @click="setCenterAtGeoLocation" expanded>
@@ -194,7 +195,8 @@
 import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
-import axios from "axios"
+import axios from "axios";
+//import "leaflet-geosearch";
 
 import {
   greenIcon,
@@ -216,8 +218,8 @@ import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
 import ItemsFilters from "@/components/ItemsFilters.vue";
-
-
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import VGeoSearch from "vue2-leaflet-geosearch";
 
 export default {
   name: 'TheMapView',
@@ -228,6 +230,7 @@ export default {
     LMap,
     LTileLayer,
     LControl,
+    'v-geosearch': VGeoSearch,
     LLayerGroup,
     LPopup,
     LMarker,
@@ -266,6 +269,12 @@ export default {
         zoom: 14,
         maxZoom: 19
       },
+
+      geosearchOptions: { 
+          provider: new OpenStreetMapProvider(),
+	  searchLabel: this.$t('search_address'),
+      },
+	
       markerClusterGroupOptions: {
         // disableClusteringAtZoom: 16,
         chunkedLoading: true,

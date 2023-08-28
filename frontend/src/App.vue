@@ -18,6 +18,7 @@ import axios from "axios"
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import NoNavbarLayout from "@/layouts/NoNavbarLayout.vue";
 
+
 export default {
   name: 'App',
   components: {NoNavbarLayout, DefaultLayout},

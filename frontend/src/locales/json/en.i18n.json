@@ -477,5 +477,6 @@
   "after_registration_settings": "After registration, please go to your account page to configure more details and settings (including neighbourdhood notifications).",
   "and_you": "and you ?",
   "faq_falling_fruits_edit": "To add falling fruits, the simplest way is to go on ",
-  "faq_edit_public_account": "To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily"
+  "faq_edit_public_account": "To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily",
+  "search_address": "Enter address"
 }

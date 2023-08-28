@@ -477,3 +477,4 @@ after_registration_settings,"After registration, please go to your account page 
 and_you,"and you ?","et vous ?"
 faq_falling_fruits_edit,"To add falling fruits, the simplest way is to go on ","Pour ajouter des fruits à glâner, le plus simple est de se rendre sur "
 faq_edit_public_account,"To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily","Pour éditer des ressources publiques sur OpenStreetMap, vous aurez besoin de créer un compte OpenStreetMap. Pour FallingFruit, vous pourrez ajouter des données de manière anonyme ou créer un compte. La création de compte sur ces sites se fait très facilement"
+search_address,"Enter address","Entrez une adresse"
