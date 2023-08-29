@@ -478,5 +478,12 @@
   "and_you": "et vous ?",
   "faq_falling_fruits_edit": "Pour ajouter des fruits à glâner, le plus simple est de se rendre sur ",
   "faq_edit_public_account": "Pour éditer des ressources publiques sur OpenStreetMap, vous aurez besoin de créer un compte OpenStreetMap. Pour FallingFruit, vous pourrez ajouter des données de manière anonyme ou créer un compte. La création de compte sur ces sites se fait très facilement",
-  "search_address": "Entrez une adresse"
+  "search_address": "Entrez une adresse",
+  "tilemap_osm_humanitarian": "Carte humanitaire",
+  "tilemap_osm_standard": "Carte standard",
+  "tilemap_cyclosm": " Carte cyclable CyclOSM",
+  "tilemap_transport": "Carte des transports en commun",
+  "tilemap_transport_dark": "Carte des transports en commun (sombre)",
+  "tilemap_neighbourhood": "Carte de voisinage légère",
+  "tilemap_outdoors": "Carte d'extérieurs"
 }

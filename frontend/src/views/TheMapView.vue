@@ -9,7 +9,8 @@
           @update:bounds="boundsUpdated"
           @contextmenu="addMarker"
           ref="map"
-      >
+	>
+	<l-control-layers position="bottomleft"></l-control-layers>
        <l-marker ref="newmarker" :lat-lng="newmarker" :icon="addIcon"> 
          <l-popup ref="newpopup" :options="newPopupOptions">
            <b>{{ $t('choose_add_content_type_map') }}</b> <br><br>
@@ -39,8 +40,15 @@
 	   </span></a><br>
          </l-popup>
     </l-marker>
-       <l-tile-layer :attribution="attribution" :options="tileLayerOptions" :url="url"></l-tile-layer>
        <v-geosearch :options="geosearchOptions"></v-geosearch>
+	<l-tile-layer
+	  v-for="tileProvider in tileProviders"
+	  :key="tileProvider.name"
+	  :name="tileProvider.name"
+	  :visible="tileProvider.visible"
+	  :url="tileProvider.url"
+	  :attribution="tileProvider.attribution"
+	  layer-type="base"/>
 	<l-control position="topright">
           <div class="is-flex is-flex-direction-column">
             <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-100 mt-1">
@@ -210,7 +218,7 @@ import {
   drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon, addIcon, homeIcon
 } from "@/map-icons";
 
-import {LMap, LTileLayer, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
+import {LMap, LTileLayer, LControlLayers, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
 import ItemMapPopup from "@/components/ItemMapPopup.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
@@ -228,7 +236,8 @@ export default {
     ItemsFilters,
     ItemMapPopup,
     LMap,
-    LTileLayer,
+      LTileLayer,
+      LControlLayers,
     LControl,
     'v-geosearch': VGeoSearch,
     LLayerGroup,
@@ -241,6 +250,7 @@ export default {
     return {
       mapLoading: true,
       zoom: 14,
+      maxZoom: 19,
       preLeafletCenter: new LatLng(50.6450944, 5.5736112),
       leafletCenter: new LatLng(50.6450944, 5.5736112),
       flapOpened: false,
@@ -262,14 +272,53 @@ export default {
       user: {},
       itemId: null,	
 
-      //url: "https://tile.tracestrack.com/_/{z}/{x}/{y}.png?key=d9344714a8fbf28773ce4c955ea8adfb",
-      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
-      tileLayerOptions: {
-        zoom: 14,
-        maxZoom: 19
-      },
-
+      tileProviders: [
+	  {
+	      name: this.$t('tilemap_osm_humanitarian'), 
+	      visible: true,
+	      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+	      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
+	  },
+	  {
+          name: this.$t('tilemap_osm_standard'), 
+          visible: false,
+          attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          },
+	  {
+	      name : this.$t('tilemap_cyclosm'), 
+	      visible: false,
+	      url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+	      attribution: '&copy; <a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases">CyclOSM</a> & <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+	  },
+	  {
+	      name: this.$t('tilemap_transport'), 
+	      visible: false,
+	      url: 'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	  },
+	  {
+	      name: this.$t('tilemap_transport_dark'), 
+	      visible: false,
+	      url: 'https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	  },
+	  
+	  {
+	      name: this.$t('tilemap_neighbourhood'), 
+	      visible: false,
+	      url: 'https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	  },
+	  {
+	      name: this.$t('tilemap_outdoors'),
+	      visible: false,
+	      url: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	  },
+	      
+      ],
+	
       geosearchOptions: { 
           provider: new OpenStreetMapProvider(),
 	  searchLabel: this.$t('search_address'),
@@ -714,8 +763,8 @@ export default {
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
 	//const baseURL = "http://overpass-api.de/api";
-        //const baseURL = "https://overpass.kumi.systems/api";
-        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+        const baseURL = "https://overpass.kumi.systems/api";
+        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       }

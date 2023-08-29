@@ -478,5 +478,12 @@
   "and_you": "and you ?",
   "faq_falling_fruits_edit": "To add falling fruits, the simplest way is to go on ",
   "faq_edit_public_account": "To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily",
-  "search_address": "Enter address"
+  "search_address": "Enter address",
+  "tilemap_osm_humanitarian": "Humanitarian map",
+  "tilemap_osm_standard": "Standard map",
+  "tilemap_cyclosm": "Cycling map",
+  "tilemap_transport": "Transport map",
+  "tilemap_transport_dark": "Transport map (dark)",
+  "tilemap_neighbourhood": "Clean neighbourhood Map",
+  "tilemap_outdoors": "Outdoors map"
 }
