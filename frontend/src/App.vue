@@ -59,6 +59,10 @@ export default {
   width: 100%;
 }
 
+.w-75 {
+  width: 75%;
+}
+
 .h-align-center {
   position: relative;
 

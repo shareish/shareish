@@ -51,22 +51,22 @@
 	  layer-type="base"/>
 	<l-control position="topright">
           <div class="is-flex is-flex-direction-column">
-            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-100 mt-1">
+            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-75 mt-1">
               <b-button type="is-info" @click="setCenterAtGeoLocation" expanded>
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-100 mt-1">
+            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-75 mt-1">
               <b-button type="is-info" @click="setCenterAtRefLocation" expanded>
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-primary" class="w-100 mt-1">
+            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-primary" class="w-75 mt-1">
               <b-button type="is-primary" @click="openFlap('filters')" expanded>
                 <i class="fas fa-filter"></i>
               </b-button>
             </b-tooltip>
-	    <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-100 mt-1">
+	    <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-75 mt-1">
               <b-button type="is-primary" @click="openFlap('settings')" expanded>
                 <i class="fas fa-cog"></i>
               </b-button>
@@ -325,16 +325,15 @@ export default {
       },
 	
       markerClusterGroupOptions: {
-        // disableClusteringAtZoom: 16,
         chunkedLoading: true,
-        maxClusterRadius: 25,
-        disableClusteringAtZoom: 15
+        maxClusterRadius: 15,
+        disableClusteringAtZoom: 15,
       },
-      minZoomToShowElements: 12,
+      minZoomToShowElements: 11,
       extraLayersMarkerClusterGroupOptions: {
         disableClusteringAtZoom: 15,
         chunkedLoading: true,
-        maxClusterRadius: 30
+        maxClusterRadius: 10
       },
       extraCategories: {
         'BKC': {
