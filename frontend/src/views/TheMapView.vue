@@ -277,7 +277,7 @@ export default {
 	      name: this.$t('tilemap_osm_humanitarian'), 
 	      visible: true,
 	      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-	      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
+	      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.hotosm.org/" target="_blank">Humanitarian OSM Team</a>, hosted by <a href="https://openstreetmap.fr/" target="_blank">OSM France</a>',
 	  },
 	  {
           name: this.$t('tilemap_osm_standard'), 
@@ -295,26 +295,26 @@ export default {
 	      name: this.$t('tilemap_transport'), 
 	      visible: false,
 	      url: 'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
 	  },
 	  {
 	      name: this.$t('tilemap_transport_dark'), 
 	      visible: false,
 	      url: 'https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
 	  },
 	  
 	  {
 	      name: this.$t('tilemap_neighbourhood'), 
 	      visible: false,
 	      url: 'https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
 	  },
 	  {
 	      name: this.$t('tilemap_outdoors'),
 	      visible: false,
 	      url: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy Map Tiles <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
 	  },
 	      
       ],
