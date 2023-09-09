@@ -28,7 +28,7 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
-    ItemSerializer, UserSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
+    ItemSerializer, UserSerializer, UserLightSerializer, ItemImageSerializer, ConversationSerializer, MessageSerializer,
     UserImageSerializer, ItemCommentSerializer, UserMapExtraCategorySerializer, TokenSerializer
 )
 from .permissions import IsOwnerProfileOrReadOnly
@@ -218,12 +218,24 @@ class ItemImageViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnerProfileOrReadOnly, IsAuthenticated]
     filter_backends = [UserDisabledFilterBackend]
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if (request.user.id == instance.id):
+            serializer = UserSerializer(instance)
+        else:
+            serializer = UserLightSerializer(instance)
+        return Response(serializer.data)
+    
     def get_instance(self):
         return self.request.user
 

@@ -17,13 +17,25 @@ class UserImageSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserLightSerializer(serializers.ModelSerializer):
+    images = UserImageSerializer(many=True, allow_null=True, default=None)
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'first_name', 'last_name', 'sign_up_date', 'homepage_url', 'facebook_url', 'instagram_url',
+            'is_active', 'images', 'description',
+            'is_disabled'
+        ]
+
+
+
 class UserMapExtraCategorySerializer(serializers.ModelSerializer):
+    user = UserLightSerializer(allow_null=True, default=None) 
     class Meta:
         model = UserMapExtraCategory
         fields = [
             'id', 'user', 'category', 'selected', 'update_date', 'creation_date'
         ]
-
 
 class UserSerializer(serializers.ModelSerializer):
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), allow_null=True)
@@ -74,7 +86,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         return new_rep
 
+    
 
+
+
+        
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta(BaseUserRegistrationSerializer.Meta):
         fields = [
@@ -84,7 +100,7 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     images = serializers.StringRelatedField(many=True)
-    user = UserSerializer(allow_null=True, default=None)
+    user = UserLightSerializer(allow_null=True, default=None)
     comments_count = serializers.SerializerMethodField()
     views_count = serializers.SerializerMethodField()
 
@@ -139,7 +155,7 @@ class ItemImageSerializer(serializers.ModelSerializer):
 
 
 class ItemCommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(allow_null=True, default=None)
+    user = UserLightSerializer(allow_null=True, default=None)
     item = ItemSerializer(allow_null=True, default=None)
 
     class Meta:
@@ -166,7 +182,7 @@ class MapNameAndDescriptionSerializer(serializers.ModelSerializer):
 
 
 class ConversationUserSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserLightSerializer()
 
     class Meta:
         model = ConversationUser
@@ -203,7 +219,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = UserSerializer(allow_null=True, default=None)
+    user = UserLightSerializer(allow_null=True, default=None)
 
     class Meta:
         model = Message
@@ -213,7 +229,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
         
 class ItemCommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(allow_null=True, default=None)
+    user = UserLightSerializer(allow_null=True, default=None)
     item = ItemSerializer(allow_null=True, default=None)
 
     class Meta:
