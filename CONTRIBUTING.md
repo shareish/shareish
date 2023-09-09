@@ -23,7 +23,7 @@ Please contact us using [GitHub Discussions](https://github.com/shareish/shareis
 Please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions).
 
 ## Do you intend to install Shareish in your own community ?
- Let us know in [GitHub Discussions](https://github.com/shareish/shareish/discussions) (or <info@shareish.org> if you are more comfortable).
+ Follow our [installation instructions](https://github.com/shareish/shareish/blob/main/README.md) and keep us updated in [GitHub Discussions](https://github.com/shareish/shareish/discussions) (or <info@shareish.org> if you are more comfortable).
  
 
 
