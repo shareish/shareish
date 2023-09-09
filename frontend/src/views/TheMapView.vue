@@ -520,7 +520,7 @@ export default {
         const params = {
           columns: ['ref_location', 'map_ecats']
         }
-        this.user = (await axios.get(`api/v1/webusers/${this.userId}/`, {params: params})).data;
+	  this.user = (await axios.get('/api/v1/users/me/', {params: params})).data;
 
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);

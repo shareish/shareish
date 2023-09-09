@@ -30,11 +30,10 @@ class UserLightSerializer(serializers.ModelSerializer):
 
 
 class UserMapExtraCategorySerializer(serializers.ModelSerializer):
-    user = UserLightSerializer(allow_null=True, default=None) 
     class Meta:
         model = UserMapExtraCategory
         fields = [
-            'id', 'user', 'category', 'selected', 'update_date', 'creation_date'
+            'id', 'category', 'selected', 'update_date', 'creation_date'
         ]
 
 class UserSerializer(serializers.ModelSerializer):
@@ -151,17 +150,6 @@ class ItemImageSerializer(serializers.ModelSerializer):
         model = ItemImage
         fields = [
             'id', 'image', 'item', 'url'
-        ]
-
-
-class ItemCommentSerializer(serializers.ModelSerializer):
-    user = UserLightSerializer(allow_null=True, default=None)
-    item = ItemSerializer(allow_null=True, default=None)
-
-    class Meta:
-        model = ItemComment
-        fields = [
-            'id', 'content', 'creationdate', 'item_id', 'user_id', 'item', 'user'
         ]
 
 
