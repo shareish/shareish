@@ -1,3 +1,6 @@
+import {logout} from "@/functions";
+import axios from "axios";
+
 export default {
   data: () => ({
     code_t48xGa: null,
@@ -6,7 +9,7 @@ export default {
   methods: {
     snackbarError(error, options = {}) {
       const replace = 'replace' in options ? options['replace'] : true;
-      const showErrorCode = 'showErrorCode' in options ? options['showErrorCode'] : true;
+      let showErrorCode = 'showErrorCode' in options ? options['showErrorCode'] : true;
 
       if (this.isFromAxios(error)) {
         // Error received from Axios
@@ -27,7 +30,18 @@ export default {
               } else if (this._keyInDictIsString('key', data)) {
                 this.message_v0sDM7 = this.$t('error_keys__' + data.key);
               } else if (this._keyInDictIsString('detail', data)) {
-                this.message_v0sDM7 = data.detail;
+		  if (data.detail === 'Invalid token.') {
+		      axios.defaults.headers.common["Authorization"] = "";
+		      localStorage.removeItem("token");
+		      this.$store.commit('removeToken');
+		      this.$store.commit('removeUserID');
+		      showErrorCode=false;
+		      this.message_v0sDM7 = this.$t('notif-error-invalidtoken-disconnected'); //"Disconnected";
+		      this.$router.push("/log-in");
+		  }
+                  else {
+		      this.message_v0sDM7 = data.detail;
+		  }
               } else {
                 this._unableToParse(error);
               }

@@ -236,6 +236,7 @@
   "enter-new-password": "Enter your new password here...",
   "notif-success-password-reset": "Your password has been changed.",
   "notif-error-password-reset": "An error prevented to change your password.",
+  "notif-error-invalidtoken-disconnected": "You have been disconnected.",
   "edit-item": "Edit an item",
   "notif-success-item-update": "The item has been successfully edited",
   "item-image": "Image",

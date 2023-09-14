@@ -236,6 +236,7 @@
   "enter-new-password": "Entrez votre nouveau mot de passe ici...",
   "notif-success-password-reset": "Votre mot de passe a été modifié.",
   "notif-error-password-reset": "Une erreur a empêché la mise à jour de votre mot de passe.",
+  "notif-error-invalidtoken-disconnected": "Vous avez été déconnecté.",
   "edit-item": "Éditer un élément",
   "notif-success-item-update": "L'élément a été correctement édité",
   "item-image": "Image",
