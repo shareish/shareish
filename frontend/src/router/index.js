@@ -101,6 +101,15 @@ const routes = [
         }
     },
     {
+        path: "/map/pos/:lat/:lng",
+        name: 'mapPos',
+        component: TheMapView,
+        meta: {
+            requiresAuth: true,
+            layout: 'default'
+        }
+    },
+    {
         path: "/account",
         name: 'account',
         component: TheAccountView,

@@ -70,6 +70,13 @@ class MailNotificationFrequenciesConversations(models.TextChoices):
     NEVER = 'N', _("Never")
 
 
+class MailNotificationFrequenciesOSM(models.TextChoices):
+    DAILY = 'D', _("Daily")
+    WEEKLY = 'W', _("Weekly")
+    MONTHLY = 'M', _("Monthly")
+    NEVER = 'N', _("Never")
+
+
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=20, null=True, blank=True)
@@ -85,6 +92,7 @@ class User(AbstractBaseUser):
     instagram_url = models.URLField(blank=True, default="")
     ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)
+    mail_notif_generalinfo = models.BooleanField(default=True)
     mail_notif_freq_conversations = models.CharField(
         max_length=1,
         choices=MailNotificationFrequenciesConversations.choices,
@@ -99,6 +107,11 @@ class User(AbstractBaseUser):
         max_length=1,
         choices=MailNotificationFrequencies.choices,
         default=MailNotificationFrequencies.DAILY
+    )
+    mail_notif_freq_osm = models.CharField(
+        max_length=1,
+        choices=MailNotificationFrequenciesOSM.choices,
+        default=MailNotificationFrequenciesOSM.WEEKLY
     )
     dwithin_notifications = models.PositiveSmallIntegerField(
         null=True,

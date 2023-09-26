@@ -40,7 +40,7 @@
 	   </span></a><br>
          </l-popup>
     </l-marker>
-       <v-geosearch :options="geosearchOptions"></v-geosearch>
+        <v-geosearch :options="geosearchOptions"></v-geosearch>
 	<l-tile-layer
 	  v-for="tileProvider in tileProviders"
 	  :key="tileProvider.name"
@@ -331,9 +331,9 @@ export default {
       },
       minZoomToShowElements: 11,
       extraLayersMarkerClusterGroupOptions: {
-        disableClusteringAtZoom: 15,
+        disableClusteringAtZoom: 16,
         chunkedLoading: true,
-        maxClusterRadius: 10
+        maxClusterRadius: 40
       },
       extraCategories: {
         'BKC': {
@@ -412,7 +412,7 @@ export default {
       geoLocationIcon: blueIcon,
       refLocationIcon: homeIcon,	
       addIcon: addIcon,	
-      routedItemLocation: null,
+      routedItemLocation: null,	
       items: [],
 
       routedItemError: false,
@@ -422,7 +422,9 @@ export default {
   async created() {
     document.title = `Shareish | ${this.$t('map')}`;
 
-    if (this.$route.query.id)
+    if (this.isPosUsed) {
+	this.routedItemLocation = new GeolocationCoords(this.PosLng,this.PosLat);
+    } else if (this.$route.query.id)
 	  this.itemId = Number(this.$route.query.id);
     
     await this.updateGeoLocation();
@@ -432,8 +434,11 @@ export default {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
     }
-    
-    if (this.geoLocation instanceof GeolocationCoords)
+
+    if (this.routedItemLocation) {
+	this.preLeafletCenter = this.routedItemLocation.leafletLatLng;
+    }
+    else if (this.geoLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.geoLocation.leafletLatLng;
     else if (this.refLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.refLocation.leafletLatLng;
@@ -444,10 +449,22 @@ export default {
     this.leafletCenter = this.preLeafletCenter;
 
     this.mapLoading = false;
+
   },
   computed: {
     userId() {
       return Number(this.$store.state.user.id);
+    },
+      PosLat() {
+	  console.log(this.$route.params.lat)
+	  return Number(this.$route.params.lat);	  
+    },
+      PosLng() {
+	console.log(this.$route.params.lng)
+	return Number(this.$route.params.lng);
+    },
+    isPosUsed() {
+	return (this.PosLat > 0 && this.PosLng > 0);
     },
   },
   watch: {
@@ -556,6 +573,7 @@ export default {
         this.leafletCenter = this.geoLocation.leafletLatLng;
       else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+	  
     },
     async setCenterAtRefLocation() {
       if (this.refLocation instanceof GeolocationCoords)

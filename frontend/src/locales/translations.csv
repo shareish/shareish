@@ -68,6 +68,7 @@ event,Free event,Événement gratuit
 events,Free events,Événements gratuits
 loan,Free loan,Prêt gratuit
 loans,Free loans,Prêts gratuits
+public_resource_osm,Public resources (OSM),Ressources publiques (OSM)
 all,All,Tous
 category,Categories|Category|Categories,Catégories|Catégorie|Catégories
 food,Food and Supplies,Aliments et provisions
@@ -179,13 +180,18 @@ dwithin_notif,Notification radius (in km),Rayon de notification (en km)
 help_dwithin,Size of your neighborhood of interest (in kilometers) to get notifications (small value means you will only get notifications for activities in a small area around your reference address),Rayon (en kilomètres) de votre voisinage d'intérêt pour recevoir des notifications (une petite valeur signifie que vous ne recevrez des notifications que pour les activités dans un petit rayon autour de votre adresse de référence)
 email,Email,E-mail
 help_email,"Type your e-mail address (mandatory, one account only per e-mail address)", "Entrez votre adresse e-mail (obligatoire, un seul compte par adresse e-mail)"
-help_notif_conversations,"Tell us how frequently should we notify you from new conversations and messages","Choisissez à quelle fréquence nous devrions vous prévenir de nouvelles conversations et de nouveaux messages"
-help_notif_items,"Tell us how frequently we should notify you from new items being published","Choisissez à quelle fréquence nous devrions vous prévenir de la publication de nouveaux objets"
-help_notif_events,"Tell us how frequently we should notify you from new events being published","Choisissez à quelle fréquence nous devrions vous prévenir de la publication de nouveaux évènements"
+help_notif_conversations,"Choose how often you want to be notified of new conversations and messages sent by Shareish users","Choisissez à quelle fréquence vous voulez être prévenus de nouvelles conversations et de nouveaux messages envoyés par des utilisateurs de Shareish"
+help_notif_items,"Choose how often you want to be notified of new items (donations/loans/requests) being published by Shareish users in your neighborhood (according to your reference address and notification radius)","Choisissez à quelle fréquence vous voulez être prévenus de la publication de nouveaux éléments (dons/prêts/demandes) par d'autres utilisateurs de Shareish"
+help_notif_events,"Tell us how frequently you want to be notified of new events being published by Shareish users in your neighborhood (according to your reference address and notification radius","Choisissez à quelle fréquence vous voulez êtres prévenus de la publication de nouveaux événements par d'autres utilisateurs de Shareish"
+help_notif_osm,"Tell us how frequently you want to be notified of new public resources from OpenStreetMap contributors (e.g. public bookcases and give boxes, solidarity fridges,...) in your neighborhood (according to your reference address and notification radius","Choisissez à quelle fréquence vous voulez êtres prévenus de nouvelles ressources publiques de la communauté OpenStreetMap (p.ex. boîtes à livres et à dons, frigos solidaires, ...)"
+help_notif_generalinfo,"Tell us if you want to receive sometimes general information about the Shareish platform sent by developers/administrators (e.g. announcements of new important features, tutorial/guides to use Shareish, ...)", "Choisissez si vous voulez recevoir de temps en temps des informations générales sur la plateforme Shareish de la part des développeurs/administrateurs (p.ex. l'annonce de nouvelles fonctionnalités importantes, des guides d'utilisation de Shareish, ...)."
+notif_generalinfo,"General info","Informations générales"
 frequency_instantly,Instantly,Directement
 frequency_daily,Daily,Journalier
 frequency_weekly,Weekly,Hebdomadaire
+frequency_monthly,Monthly,Mensuel
 frequency_never,Never,Jamais
+frequency_always,Always,Toujours
 save,Save,Enregistrer
 cancel,Cancel,Annuler
 validations.messages._default,Invalid field,Champ incorrect

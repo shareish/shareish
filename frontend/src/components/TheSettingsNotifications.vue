@@ -45,6 +45,61 @@
       </div>
     </div>
     <div class="box">
+      <b-field v-for="{field, translationKey, helpTranslationKey} in notificationsFields" :key="field" horizontal>
+        <template #label>
+          <b-tooltip :label="$t(helpTranslationKey)" class="frequency_label" multilined position="is-right">
+            {{ $t(translationKey) }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </template>
+        <template v-if="windowWidth >= 1024">
+          <b-radio-button
+              v-for="{key, translationKey, color} in frequencies"
+              :key="key"
+              v-model="radioGroups[field]"
+              :native-value="key" :type="color"
+          >
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
+        </template>
+        <template v-else>
+          <b-select v-model="radioGroups[field]" expanded placeholder="Select a name">
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">
+              {{ $t(translationKey) }}
+            </option>
+          </b-select>
+        </template>
+      </b-field>
+    </div>
+    <div class="box">
+      <b-field key="notif_osm" horizontal>
+        <template #label>
+          <b-tooltip :label="$t('help_notif_osm')" class="frequency_label" multilined position="is-right">
+            {{ $t('public_resource_osm') }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </template>
+        <template v-if="windowWidth >= 1024">
+          <b-radio-button
+              v-for="{key, translationKey, color} in OSMFrequencies"
+              :key="key"
+              v-model="radioGroups['notif_osm']"
+              :native-value="key"
+              :type="color"
+          >
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
+        </template>
+        <template v-else>
+          <b-select v-model="radioGroups['notif_osm']" expanded placeholder="Select a frequency">
+            <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">
+              {{ $t(translationKey) }}
+            </option>
+          </b-select>
+        </template>
+      </b-field>
+    </div>
+    <div class="box">
       <b-field key="notif_conversations" horizontal>
         <template #label>
           <b-tooltip :label="$t('help_notif_conversations')" class="frequency_label" multilined position="is-right">
@@ -73,25 +128,26 @@
       </b-field>
     </div>
     <div class="box">
-      <b-field v-for="{field, translationKey, helpTranslationKey} in notificationsFields" :key="field" horizontal>
+      <b-field key="notif_generalinfo" horizontal>
         <template #label>
-          <b-tooltip :label="$t(helpTranslationKey)" class="frequency_label" multilined position="is-right">
-            {{ $t(translationKey) }}
+          <b-tooltip :label="$t('help_notif_generalinfo')" class="frequency_label" multilined position="is-right">
+            {{ $t('notif_generalinfo') }}
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
         <template v-if="windowWidth >= 1024">
           <b-radio-button
-              v-for="{key, translationKey, color} in frequencies"
+              v-for="{key, translationKey, color} in GeneralInfoFrequencies"
               :key="key"
-              v-model="radioGroups[field]"
-              :native-value="key" :type="color"
+              v-model="radioGroups['notif_generalinfo']"
+              :native-value="key"
+              :type="color"
           >
             <span>{{ $t(translationKey) }}</span>
           </b-radio-button>
         </template>
         <template v-else>
-          <b-select v-model="radioGroups[field]" expanded placeholder="Select a name">
+          <b-select v-model="radioGroups['notif_generalinfo']" expanded placeholder="Select a frequency">
             <option v-for="{key, translationKey} in frequencies" :key="key" :value="key">
               {{ $t(translationKey) }}
             </option>
@@ -99,6 +155,7 @@
         </template>
       </b-field>
     </div>
+    
     <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save" />
   </section>
 </template>
@@ -131,7 +188,9 @@ export default {
       radioGroups: {
         'notif_conversations': String,
         'notif_events': String,
-        'notif_items': String
+        'notif_items': String,
+        'notif_osm': String,
+        'notif_generalinfo': String,
       },
       waitingFormResponse: false,
       timeouts: {}
@@ -146,8 +205,12 @@ export default {
       'dwithin_notifications': this.user.dwithin_notifications,
       'mail_notif_freq_conversations': this.user.mail_notif_freq_conversations,
       'mail_notif_freq_events': this.user.mail_notif_freq_events,
-      'mail_notif_freq_items': this.user.mail_notif_freq_items
+      'mail_notif_freq_items': this.user.mail_notif_freq_items,
+      'mail_notif_freq_osm': this.user.mail_notif_freq_osm,
+      'mail_notif_generalinfo': this.user.mail_notif_generalinfo,	
+	
     };
+
     if (this.user.ref_location !== null) {
       this.internalUser.ref_location = new GeolocationCoords(this.user.ref_location);
       this.address = await this.fetchAddress(this.internalUser.ref_location);
@@ -158,7 +221,10 @@ export default {
     this.radioGroups.notif_conversations = this.internalUser.mail_notif_freq_conversations;
     this.radioGroups.notif_events = this.internalUser.mail_notif_freq_events;
     this.radioGroups.notif_items = this.internalUser.mail_notif_freq_items;
+    this.radioGroups.notif_osm = this.internalUser.mail_notif_freq_osm;
+    this.radioGroups.notif_generalinfo = this.internalUser.mail_notif_generalinfo;  
 
+      
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
@@ -231,6 +297,8 @@ export default {
             this.internalUser.mail_notif_freq_conversations = this.radioGroups.notif_conversations;
             this.internalUser.mail_notif_freq_events = this.radioGroups.notif_events;
             this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
+	    this.internalUser.mail_notif_freq_osm = this.radioGroups.notif_osm;
+	    this.internalUser.mail_notif_generalinfo = this.radioGroups.notif_generalinfo;  
 
             await axios.patch("/api/v1/webusers/me/", this.internalUser);
             this.$emit('updateUser', this.internalUser);
@@ -263,7 +331,7 @@ export default {
           field: 'notif_events',
           translationKey: 'events',
           helpTranslationKey: 'help_notif_events'
-        }
+        },
       ];
     },
     frequencies() {
@@ -308,7 +376,46 @@ export default {
           color: 'is-danger'
         }
       ];
+    },
+    OSMFrequencies() {
+      return [
+        {
+          key: 'D',
+          translationKey: 'frequency_daily',
+          color: 'is-primary'
+        },
+	{
+          key: 'W',
+          translationKey: 'frequency_weekly',
+          color: 'is-info'
+        },
+	{
+          key: 'M',
+          translationKey: 'frequency_monthly',
+          color: 'is-warning'
+        },
+        {
+          key: 'N',
+          translationKey: 'frequency_never',
+          color: 'is-danger'
+        }
+      ];
+    },
+    GeneralInfoFrequencies() {
+      return [
+        {
+          key: true,
+          translationKey: 'frequency_always',
+          color: 'is-primary'
+        },
+        {
+          key: false,
+          translationKey: 'frequency_never',
+          color: 'is-danger'
+        }
+      ];
     }
+      
   }
 };
 </script>

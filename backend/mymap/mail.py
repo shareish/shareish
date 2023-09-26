@@ -7,13 +7,16 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
 
 from mail_templated import EmailMessage
 
-from .models import Message, MailNotificationFrequencies
+from .models import Message, MailNotificationFrequencies, MailNotificationFrequenciesOSM
 from .models import Item
 
 from djoser import email
+
+import overpy
 
 User = get_user_model()
 
@@ -24,7 +27,8 @@ delay_instant_notif_conversations = 10
 to_show = {
     'conversations': 3,
     'items': 5,
-    'events': 3
+    'events': 3,
+    'osm': 20,
 }
 
 item_types = {
@@ -182,6 +186,7 @@ def send_mail_notif_new_single_item_published(item, user_that_published):
         print("Successfully delivered {}/{} emails".format(delivered, len(to_send)))
 
 
+    
 def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequencies, connection):
     # Get the messages don't take into account the frequency
     # It takes all the pending conversations
@@ -250,6 +255,119 @@ def _prepare_mail_notif_events(user, frequency: MailNotificationFrequencies, con
         return email
 
 
+def _prepare_mail_notif_norefloc(user, frequency: MailNotificationFrequencies, connection):
+    context = {
+            "user": user,
+            "app_url": settings.APP_URL,
+            "app_url_reflocsettings": settings.APP_URL+"/settings/notifications"
+        }
+
+    email = EmailMessage(
+            'emails/notif_norefloc.tpl',
+            context,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            connection=connection
+    )
+
+    if not email.is_rendered:
+        email.render()
+
+    return email
+
+
+def _get_osm_type(node):
+    amenity = node.tags.get("amenity","");
+    social_facility = node.tags.get("social_facility","");
+    emergency = node.tags.get("emergency","");
+    if amenity:
+        return amenity
+    elif social_facility:
+        return social_facility
+    elif emergency:
+        return emergency
+    else:
+        return ""
+    
+
+def _get_last_new_osm_items_near_user(user, frequency: MailNotificationFrequenciesOSM):
+    end = datetime.now().date()
+    if frequency == MailNotificationFrequenciesOSM.DAILY:
+        start = end - timedelta(days=1)   
+    elif frequency == MailNotificationFrequenciesOSM.WEEKLY:
+        start = end - timedelta(days=7)
+    elif frequency == MailNotificationFrequenciesOSM.MONTHLY:
+        start = end - timedelta(days=30)
+    else:
+        return [], 0
+    start = "%sT00:00:00Z" % (start)
+        
+    overapi = overpy.Overpass()
+
+    print(user)
+
+    #overpass query to get nodes around reference location that were created (version 1) since start date, limits the output to a maximum of to_show
+    result = overapi.query(
+        f"""
+        ( node["amenity"="public_bookcase"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["amenity"="give_box"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["amenity"="food_sharing"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["amenity"="freeshop"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["social_facility"="food_bank"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["social_facility"="soup_kitchen"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["amenity"="drinking_water"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+          node["emergency"="defibrillator"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+        );
+        out {to_show['osm']} body qt;
+        """
+        )
+
+    #build array with essential node info for email
+    nodes  = []
+    nodes += [[ _get_osm_type(node), node.tags.get("name",""),
+               Point(user.ref_location.coords[1],user.ref_location.coords[0]).distance(Point(float(node.lat),float(node.lon)))*100,
+               float(node.lat), float(node.lon)]
+           for node in result.nodes]
+    #print(nodes)
+    return nodes,len(nodes)
+
+
+
+def _prepare_mail_notif_osm(user, frequency: MailNotificationFrequencies, connection):
+    new_items, n = _get_last_new_osm_items_near_user(user, frequency)
+    if n > 0:
+        print("we have to send an email with new osm items")
+        if frequency == MailNotificationFrequenciesOSM.DAILY:
+            digest = "Daily public resources digest"
+        elif frequency == MailNotificationFrequenciesOSM.WEEKLY:
+            digest = "Weekly public resources digest"
+        elif frequency == MailNotificationFrequenciesOSM.MONTHLY:
+            digest = "Monthly public resources digest"
+        else:
+            digest = "Recent items"
+        context = {
+            "n": n,
+            "digest": digest,
+            "user": user,
+            "new_items": new_items,
+            "app_url": settings.APP_URL,
+            "to_show": to_show['osm']
+        }
+
+        email = EmailMessage(
+            'emails/notif_digest_osm_items.tpl',
+            context,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            connection=connection
+        )
+
+        if not email.is_rendered:
+            email.render()
+
+        return email
+
+    
 def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, connection):
     new_items, n = _get_last_new_items_near_user(user, frequency)
 
@@ -326,14 +444,17 @@ def send_mail_start_delete_account_process(user, token):
     delivered = connection.send_messages(to_send)
     print("Successfully delivered {}/{} email to start a delete account process".format(delivered, len(to_send)))
 
-
+    
 # To be scheduled
 def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequencies.DAILY):
     # Get all activated users who have their notifications frequency equals to the one of the scheduler's job
     users_conversations = User.objects.filter(is_active=True, mail_notif_freq_conversations=frequency)
     users_events = User.objects.filter(is_active=True, mail_notif_freq_events=frequency, ref_location__isnull=False)
     users_items = User.objects.filter(is_active=True, mail_notif_freq_items=frequency, ref_location__isnull=False)
-
+    #Get users who did/not configure ref location
+    users_osm_withref = User.objects.filter(is_active=True, mail_notif_freq_osm=frequency, ref_location__isnull=False)
+    users_withoutref = User.objects.filter(is_active=True, ref_location__isnull=True, mail_notif_generalinfo=True)
+    
     # Establish connection for the email sending
     connection = mail.get_connection(fail_silently=True)
 
@@ -341,8 +462,26 @@ def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequen
     to_send_types_count = {
         'conversations': 0,
         'items': 0,
-        'events': 0
+        'events': 0,
+        'norefloc': 0,
+        'osm': 0
     }
+
+    # General information / no ref location: emails preparation
+    # Runs only monthly for users with general info ON
+    if frequency == 'M':
+        for user in users_withoutref:
+            prepared_mail = _prepare_mail_notif_norefloc(user, frequency, connection)
+            if prepared_mail:
+                to_send.append(prepared_mail)
+                to_send_types_count['norefloc'] += 1
+
+    #OSM public resources: emails preparation
+    for user in users_osm_withref:
+        prepared_mail = _prepare_mail_notif_osm(user, frequency, connection)
+        if prepared_mail:
+            to_send.append(prepared_mail)
+            to_send_types_count['osm'] += 1
 
     # Conversations: emails preparation
     for user in users_conversations:
@@ -375,10 +514,12 @@ def send_emails(frequency: MailNotificationFrequencies = MailNotificationFrequen
         print("\t{} for conversations".format(to_send_types_count['conversations']))
         print("\t{} for events".format(to_send_types_count['events']))
         print("\t{} for items".format(to_send_types_count['items']))
+        print("\t{} for missing reference location".format(to_send_types_count['norefloc']))
+        print("\t{} for OSM resources".format(to_send_types_count['osm']))
     else:
         print("No scheduled emails to send.")
 
-
+        
 def start_mail_scheduler():
     def _scheduler_listener(event):
         if event.exception:
@@ -393,12 +534,17 @@ def start_mail_scheduler():
 
     # once a week: every friday at 8 o'clock
     scheduler.add_job(send_emails, args=[MailNotificationFrequencies.WEEKLY], trigger='cron', day_of_week='fri', hour=8)
-
+    
+    # once a month: every last day of the month at 8 o'clock (for OSM and norefloc notifications)
+    scheduler.add_job(send_emails, args=[MailNotificationFrequenciesOSM.MONTHLY], trigger='cron', month='*', day='last', hour=8)
+    
     # To test quickly (10s delay between checks), uncomment line below.
     # Update args parameter to tell who are the job's targets
     # MailNotificationFrequencies.DAILY = all users that have at least one of the 3 notif settings set on Daily
-    # scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='interval', seconds=10)
+    #scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='interval', seconds=10)
+    #scheduler.add_job(send_emails, args=[MailNotificationFrequenciesOSM.MONTHLY], trigger='interval', seconds=10)
 
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
     scheduler.start()
+

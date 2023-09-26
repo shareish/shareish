@@ -28,7 +28,6 @@ class UserLightSerializer(serializers.ModelSerializer):
         ]
 
 
-
 class UserMapExtraCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserMapExtraCategory
@@ -46,8 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
             'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
-            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'items', 'images',
-            'map_ecats', 'save_item_viewing', 'is_disabled'
+            'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'mail_notif_freq_osm', 'mail_notif_generalinfo',
+            'items', 'images', 'map_ecats', 'save_item_viewing', 'is_disabled'
         ]
 
     def validate(self, data):
