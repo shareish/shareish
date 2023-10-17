@@ -780,8 +780,8 @@ export default {
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
 	//const baseURL = "http://overpass-api.de/api";
-        //const baseURL = "https://overpass.kumi.systems/api";
-        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+        const baseURL = "https://overpass.kumi.systems/api";
+        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       }
