@@ -726,7 +726,7 @@ export default {
 	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
 	}
 	else if (category === 'BKC') {
-	    return "https://mapcomplete.osm.be/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
+	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
 	}
         else if (category === "DEF") {
 	     return "https://mapcomplete.org/aed?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
@@ -780,8 +780,8 @@ export default {
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
 	//const baseURL = "http://overpass-api.de/api";
-        const baseURL = "https://overpass.kumi.systems/api";
-        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+        //const baseURL = "https://overpass.kumi.systems/api";
+        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       }
