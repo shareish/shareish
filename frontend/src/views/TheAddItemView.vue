@@ -60,7 +60,7 @@
           <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
         </div>
         <div id="form">
-          <div class="columns">
+          <div class="columns is-align-items-flex-end">
             <div class="column">
               <b-field key="name" expanded :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
                 <template #label>{{ $t('name') }}
@@ -80,19 +80,11 @@
               </b-field>
             </div>
             <div class="column">
-              <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
-                <template #label>{{ $tc('type', 1) }}
-                  <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
-                    <i class="icon far fa-question-circle"></i>
-                  </b-tooltip>
-                </template>
-                <b-select v-model="type" expanded name="type" v-validate="'required'">
-                  <option value="RQ">{{ $t('request') }}</option>
-                  <option value="DN">{{ $t('donation') }}</option>
-                  <option value="LN">{{ $t('loan') }}</option>
-                  <option value="EV">{{ $t('event') }}</option>
-                </b-select>
-              </b-field>
+              <div class="columns is-variable is-1 is-align-content-stretch">
+                <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
+                  <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">{{ $t(itemType['slug']) }}</b-button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="columns">
@@ -260,6 +252,13 @@ export default {
   components: {CategorySelector},
   data() {
     return {
+      itemTypes: [
+        {'type': "DN", 'slug': "donation", 'color': 'is-success'},
+        {'type': "LN", 'slug': "loan", 'color': 'is-warning'},
+        {'type': "RQ", 'slug': "request", 'color': 'is-danger'},
+        {'type': "EV", 'slug': "event", 'color': 'is-purple'}
+      ],
+
       loading: false,
       step: 0,
 
