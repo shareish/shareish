@@ -60,7 +60,7 @@
           <b-button class="vertical-align-middle ml-2" @click="hideRecurrentsItemsInfoBox = true">{{ $t('no-thanks') }}</b-button>
         </div>
         <div id="form">
-          <div class="columns is-align-items-flex-end">
+          <div class="columns">
             <div class="column">
               <b-field key="name" expanded :message="errors.first('name')" :type="{'is-danger': errors.has('name')}">
                 <template #label>{{ $t('name') }}
@@ -80,11 +80,18 @@
               </b-field>
             </div>
             <div class="column">
-              <div class="columns is-variable is-1 is-align-content-stretch">
-                <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
-                  <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">{{ $t(itemType['slug']) }}</b-button>
+              <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
+                <template #label>{{ $tc('type', 1) }}
+                  <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+                </template>
+                <div class="columns is-variable is-1">
+                  <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">{{ $t(itemType['slug']) }}</b-button>
+                  </div>
                 </div>
-              </div>
+              </b-field>
             </div>
           </div>
           <div class="columns">
