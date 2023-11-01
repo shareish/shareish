@@ -86,12 +86,11 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="type" expanded name="type" v-validate="'required'">
-                  <option value="RQ">{{ $t('request') }}</option>
-                  <option value="DN">{{ $t('donation') }}</option>
-                  <option value="LN">{{ $t('loan') }}</option>
-                  <option value="EV">{{ $t('event') }}</option>
-                </b-select>
+                <div class="columns is-variable is-1">
+                  <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">{{ $t(itemType['slug']) }}</b-button>
+                  </div>
+                </div>
               </b-field>
             </div>
           </div>
@@ -260,6 +259,13 @@ export default {
   components: {CategorySelector},
   data() {
     return {
+      itemTypes: [
+        {'type': "DN", 'slug': "donation", 'color': 'is-success'},
+        {'type': "LN", 'slug': "loan", 'color': 'is-warning'},
+        {'type': "RQ", 'slug': "request", 'color': 'is-danger'},
+        {'type': "EV", 'slug': "event", 'color': 'is-purple'}
+      ],
+
       loading: false,
       step: 0,
 
