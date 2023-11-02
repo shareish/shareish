@@ -35,8 +35,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
                 message = await self.save_message(
                     content['content'],
                     content['user_id'],
-                    content['conversation_id'],
-                    content['date']
+                    content['conversation_id']
                 )
                 if message is not None:
                     response = json.dumps({
@@ -63,7 +62,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=event['message'])
 
     @sync_to_async
-    def save_message(self, content, user_id, conversation_id, date):
+    def save_message(self, content, user_id, conversation_id):
         try:
             conversation = Conversation.objects.get(pk=conversation_id)
         except Conversation.DoesNotExist:
@@ -107,7 +106,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             for receiver in receivers:
                 send_mail_notif_new_message_received(conversation, content, sender, receiver.user)
 
-        message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id, date=date)
+        message = Message.objects.create(content=content, user_id=user_id, conversation_id=conversation_id)
         Conversation.objects.filter(pk=conversation_id).update(lastmessagedate=datetime.now(timezone.utc))
 
         return json.dumps(MessageSerializer(message).data)

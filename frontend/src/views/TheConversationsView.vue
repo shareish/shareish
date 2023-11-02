@@ -502,8 +502,7 @@ export default {
             'content': {
               'content': this.messageToSend,
               'conversation_id': this.activeConversation.id,
-              'user_id': this.$store.state.user.id,
-              'date': new Date()
+              'user_id': this.$store.state.user.id
             }
           };
           this.ws.send(JSON.stringify(data));
