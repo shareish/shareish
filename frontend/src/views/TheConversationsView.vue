@@ -117,7 +117,9 @@
                 <p v-else><strong>Group chat</strong></p>
               </div>
               <div class="level-right">
-                <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? 'Open conversation' : 'This user closed the conversation') : 'Close conversation'">
+                <!--<b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? 'Unlock conversation' : 'This user locked the conversation') : 'Lock conversation'">//-->
+		  <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? $t('unlock-conversation') : $t('locked-conversation')) : $t('lock-conversation')"> 
+		  
                   <b-button
                       type="is-primary"
                       outlined

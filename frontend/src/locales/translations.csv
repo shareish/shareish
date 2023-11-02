@@ -149,6 +149,9 @@ profile,User profile & pictures, Profil utilisateur & photos
 my-conversations,My conversations,Mes conversations
 new-messages,New messages,Nouveaux messages
 open-conversation,Open conversation,Ouvrir la conversation
+unlock-conversation,Unlock conversation,Déverrouiller la conversation
+closed-conversation,This user locked the conversation,Cet utilisateur a verrouillé la conversation
+lock-conversation,Lock conversation,Verrouiller la conversation
 no-conversation,No conversation,Pas de conversation
 language-en,English,Anglais
 language-fr,French,Français
