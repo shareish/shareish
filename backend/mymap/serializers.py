@@ -179,16 +179,22 @@ class ConversationUserSerializer(serializers.ModelSerializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
+    item = ItemSerializer()
     unread_messages = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
-    item = ItemSerializer()
+    closed_by = UserLightSerializer()
+    is_closed = serializers.SerializerMethodField()
     users = ConversationUserSerializer(many=True, allow_null=True, default=None)
 
     class Meta:
         model = Conversation
         fields = [
-            'id', 'item_id', 'is_closed', 'lastmessagedate', 'unread_messages', 'last_message', 'item', 'users'
+            'id', 'item_id', 'lastmessagedate', 'unread_messages', 'last_message', 'item', 'users', 'closed_by',
+            'is_closed'
         ]
+
+    def get_is_closed(self, obj):
+        return obj.closed_by is not None
 
     def get_unread_messages(self, obj):
         request = self.context.get('request')
