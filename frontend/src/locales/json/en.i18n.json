@@ -380,7 +380,7 @@
   "item-linked-to-conv-unavailable-deleted": "The item linked to this conversation is unavailable or has been deleted.",
   "item-unavailable": "Item unavailable",
   "write-your-message": "Write your message",
-  "this-conv-is-closed-textarea": "This conversation is closed, you cannot send a message.",
+  "this-conv-is-closed-textarea": "This conversation is locked, you cannot send a message.",
   "advanced-options": "Advanced options",
   "disable-your-account": "Disable your account",
   "help_disable-your-account": "This is a temporary action. You can still recover your account whenever you want.",
@@ -450,9 +450,9 @@
   "warning-item-is-closed": "You have marked this item has closed.",
   "notif-success-item-definitive-deletion": "The item has been successfully permanently deleted.",
   "notif-success-item-close": "The item has been successfully marked as closed.",
-  "notif-success-close-conversation": "This conversation has been closed.",
-  "notif-error-close-conversation": "The conversation could not be closed.",
-  "notif-success-open-conversation": "This conversation has been opened back.",
+  "notif-success-close-conversation": "This conversation has been locked.",
+  "notif-error-close-conversation": "The conversation could not be locked.",
+  "notif-success-open-conversation": "This conversation has been unlocked.",
   "terms_read_agree": "I have read and I agree to",
   "terms_conditions_privacy_policy": "Shareish's Terms, Conditions, and Privacy Policy",
   "developers": "Developers",
@@ -499,7 +499,7 @@
   "error_keys__TOKEN_EXPIRED": "Token is expired.",
   "error_keys__TOKEN_LENGTH_INVALID": "Token length is invalid.",
   "error_keys__SELF_NOT_PART_OF_CONVERSATION": "You are not part of this conversation.",
-  "error_keys__CONVERSATION_ALREADY_CLOSED": "This conversation is already closed.",
-  "error_keys__CONVERSATION_ALREADY_OPEN": "This conversation is already open.",
-  "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been closed by another user. You cannot open it back."
+  "error_keys__CONVERSATION_ALREADY_CLOSED": "This conversation is already locked.",
+  "error_keys__CONVERSATION_ALREADY_OPEN": "This conversation is already unlocked.",
+  "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been locked by another user. You cannot unlock it."
 }
