@@ -107,7 +107,7 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'description', 'location', 'is_recurrent', 'creationdate', 'startdate', 'enddate', 'type',
             'category1', 'category2', 'category3', 'visibility', 'user_id', 'images', 'views_count', 'user',
-            'closed_reason', 'is_closed', 'comments_count'
+            'closed_reason', 'is_closed', 'comments_count', 'use_coordinates'
         ]
 
     def validate(self, data):

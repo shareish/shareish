@@ -104,17 +104,29 @@
             <div class="column">
               <b-field>
                 <template #label>
-                  <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
-                    {{ $t('address') }}
-                    <i class="icon far fa-question-circle"></i>
-                  </b-tooltip>
+                  <div class="level">
+                    <div class="level-left">
+                      <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
+                        {{ $t('address') }}
+                        <i class="icon far fa-question-circle"></i>
+                      </b-tooltip>
+                    </div>
+                    <div class="level-right">
+                      <b-switch v-model="use_coordinates" size="is-small" type="is-primary">{{ $t('use-coordinates') }}</b-switch>
+                    </div>
+                  </div>
                 </template>
-                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
+                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom" class="mr-2">
                   <b-button type="is-info" @click="fetchAddressGeoLoc">
                     <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
-                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
+		            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
+                   <b-button @click="fetchAddressRefLoc" type="is-info">
+                     <i class="fas fa-home"></i>
+                   </b-button>
+                </b-tooltip>
+                <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
               </b-field>
             </div>
           </div>
@@ -220,13 +232,6 @@
             {{ $t('cancel') }}
           </router-link>
           <b-button
-              type="is-normal"
-              :class="formBottomButtonsSize"
-              class="ml-2"
-              @click="reset">
-            {{ $t('reset') }}
-          </b-button>
-          <b-button
               :type="internalItem.visibility !== 'DR' ? 'is-primary' : 'is-warning'"
               class="ml-2"
               :class="formBottomButtonsSize"
@@ -234,6 +239,8 @@
               @click="submit">
             {{ $t(internalItem.visibility !== 'DR' ? 'save' : 'modify') }}
           </b-button>
+          <br />
+          <a class="is-inline-block mt-5 has-text-danger" :class="formBottomButtonsSize" @click="resetForm">{{ $t('reset-form') }}</a>
         </div>
       </section>
     </div>
@@ -271,7 +278,10 @@ export default {
 
       item: {},
       internalItem: {},
+      address_text: "",
+      address_coords: null,
       address: "",
+      use_coordinates: false,
       initialStartdate: Date.now(),
 
       geoLocation: null,
@@ -341,6 +351,10 @@ export default {
         }
         this.filesSelected = [];
       }
+    },
+    use_coordinates() {
+      if (!this.user_updated_address_field)
+        this.updateAddressField();
     }
   },
   methods: {
@@ -381,15 +395,44 @@ export default {
           this.snackbarError(error);
         }
 
-        if (this.internalItem.location !== null)
-          this.address = await this.fetchAddress(new GeolocationCoords(this.internalItem.location));
+        this.use_coordinates = this.internalItem.use_coordinates;
+        if (this.internalItem.location !== null) {
+          this.address_coords = new GeolocationCoords(this.internalItem.location);
+          this.address_text = await this.fetchAddress(this.address_coords);
+          this.updateAddressField();
+        }
+      }
+    },
+    async fetchAddressRefLoc() {
+      try {
+        const params = {
+          columns: ['ref_location']
+        }
+        const userId = Number(this.$store.state.user.id);
+        const refLocation = (await axios.get(`api/v1/webusers/${userId}`, {params: params})).data.ref_location;
+        if (refLocation !== null) {
+          this.refLocation = new GeolocationCoords(refLocation);
+          if (this.refLocation instanceof GeolocationCoords) {
+            this.address_text = await this.fetchAddress(this.refLocation);
+            this.address_coords = this.refLocation;
+            this.updateAddressField();
+          }
+        } else {
+          this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
+        }
+      }
+      catch (error) {
+        this.snackbarError(error);
       }
     },
     async fetchAddressGeoLoc() {
-      if (this.geoLocation !== null)
-        this.address = await this.fetchAddress(this.geoLocation);
-      else
+      if (this.geoLocation instanceof GeolocationCoords) {
+        this.address_text = await this.fetchAddress(this.geoLocation);
+        this.address_coords = this.geoLocation;
+        this.updateAddressField();
+      } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
     },
     async fetchAddress(location) {
       if (location instanceof GeolocationCoords) {
@@ -401,6 +444,16 @@ export default {
         }
       }
       return null;
+    },
+    updateAddressField() {
+      if (!this.use_coordinates)
+        this.address = this.address_text;
+      else
+        this.address = this.address_coords.toStringForUser();
+    },
+    addressUpdatedByUser() {
+      if (!this.user_updated_address_field)
+        this.user_updated_address_field = true;
     },
     async processImage(file) {
       this.loading = true;
@@ -443,6 +496,7 @@ export default {
             category3: this.internalItem.category3,
             description: this.internalItem.description,
             location: this.address,
+            use_coordinates: this.use_coordinates,
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
             enddate: endDate,
@@ -476,7 +530,7 @@ export default {
 
       this.waitingFormResponse = false;
     },
-    reset() {
+    resetForm() {
       this.setFieldFromItem();
     },
     clearStartdate() {

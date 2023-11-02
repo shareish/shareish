@@ -473,8 +473,7 @@ class CustomLogin(ObtainAuthToken):
                         else:
                             days_left = 0
                         return Response({'key': 'SCHEDULED_DELETION_ACCOUNT', 'days_left': days_left}, status=status.HTTP_400_BAD_REQUEST)
-                    except Exception as e:
-                        print(e)
+                    except Exception:
                         return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

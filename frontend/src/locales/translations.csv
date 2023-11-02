@@ -270,6 +270,7 @@ yes-please,"Yes, please!","Oui, je veux!"
 no-thanks,"No, thanks.",Non merci.
 want-an-other-recurrent,"You are using item <strong>#{n}</strong>. Want to use an other one?","Vous utilisez l'élément #{n}. Voulez-vous en utiliser un autre?"
 reset,Reset,Réinitialiser
+reset-form,Reset form,Réinitialiser le formulaire
 profile-picture,Profile picture|Profile pictures,Photo de profil|Photos de profil
 remove,Remove,Supprimer
 removing-picture,Removing picture,Retirer l'image
@@ -449,6 +450,30 @@ notif-success-item-close,The item has been successfully marked as closed.,L'él�
 notif-success-close-conversation,This conversation has been closed.,Cette conversation a été fermée.
 notif-error-close-conversation,The conversation could not be closed.,Cette conversation n'a pas pu être fermée.
 notif-success-open-conversation,This conversation has been opened back.,Cette conversation a été réouverte.
+on-day,on,le
+terms_read_agree,"I have read and I agree to","J'ai lu et j'accepte les"
+terms_conditions_privacy_policy,"Shareish's Terms, Conditions, and Privacy Policy","conditions d'utilisation et la politique de confidentialité de Shareish"
+developers,"Developers","Développeurs"
+project_coordination,"Project coordination","Coordination du projet"
+scientific_paper,"Scientific paper","Article scientifique"
+open_source_code,"Open source code on", "Code source disponible sur"
+report_bug,"Report a bug or an issue","Signaler un bug ou une erreur"
+follow_us,"Follow us on","Suivez-nous sur"
+suggest_idea,"Suggest an idea","Suggérez une idée/fonctionnalité"
+after_registration_settings,"After registration, please go to your account page to configure more details and settings (including neighbourdhood notifications).","Après avoir confirmé votre inscription, nous vous invitons à vous rendre sur votre page de compte pour davantage de configurations (notamment les notifications dans votre voisinage)."
+and_you,"and you ?","et vous ?"
+faq_falling_fruits_edit,"To add falling fruits, the simplest way is to go on ","Pour ajouter des fruits à glâner, le plus simple est de se rendre sur "
+faq_edit_public_account,"To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily","Pour éditer des ressources publiques sur OpenStreetMap, vous aurez besoin de créer un compte OpenStreetMap. Pour FallingFruit, vous pourrez ajouter des données de manière anonyme ou créer un compte. La création de compte sur ces sites se fait très facilement"
+search_address,"Enter address","Entrez une adresse"
+tilemap_osm_humanitarian,"Humanitarian map","Carte humanitaire"
+tilemap_osm_standard,"Standard map","Carte standard"
+tilemap_cyclosm,"Cycling map", "Carte cyclable CyclOSM"
+tilemap_transport,"Transport map","Carte des transports en commun"
+tilemap_transport_dark,"Transport map (dark)","Carte des transports en commun (sombre)"
+tilemap_neighbourhood,"Clean neighbourhood Map","Carte de voisinage légère"
+tilemap_outdoors,"Outdoors map","Carte d'extérieurs"
+use-coordinates,Use GPS coordinates,Utiliser les coordonnées GPS
+
 
 
 error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.
@@ -478,26 +503,3 @@ error_keys__SELF_NOT_PART_OF_CONVERSATION,You are not part of this conversation.
 error_keys__CONVERSATION_ALREADY_CLOSED,This conversation is already closed.,Cette conversation est déjà fermée.
 error_keys__CONVERSATION_ALREADY_OPEN,This conversation is already open.,Cette conversation est déjà ouverte.
 error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has been closed by another user. You cannot open it back.,Cette conversation a été fermée par un autre utilisateur. Vous ne pouvez pas la réouvrir.
-
-on-day,on,le
-terms_read_agree,"I have read and I agree to","J'ai lu et j'accepte les"
-terms_conditions_privacy_policy,"Shareish's Terms, Conditions, and Privacy Policy","conditions d'utilisation et la politique de confidentialité de Shareish"
-developers,"Developers","Développeurs"
-project_coordination,"Project coordination","Coordination du projet"
-scientific_paper,"Scientific paper","Article scientifique"
-open_source_code,"Open source code on", "Code source disponible sur"
-report_bug,"Report a bug or an issue","Signaler un bug ou une erreur"
-follow_us,"Follow us on","Suivez-nous sur"
-suggest_idea,"Suggest an idea","Suggérez une idée/fonctionnalité"
-after_registration_settings,"After registration, please go to your account page to configure more details and settings (including neighbourdhood notifications).","Après avoir confirmé votre inscription, nous vous invitons à vous rendre sur votre page de compte pour davantage de configurations (notamment les notifications dans votre voisinage)."
-and_you,"and you ?","et vous ?"
-faq_falling_fruits_edit,"To add falling fruits, the simplest way is to go on ","Pour ajouter des fruits à glâner, le plus simple est de se rendre sur "
-faq_edit_public_account,"To edit public resources on OSM, you will have to create an account on OpenStreetMap. On FallingFruit, you can either add anonymously or create an account. User account creation on these websites  can be done very easily","Pour éditer des ressources publiques sur OpenStreetMap, vous aurez besoin de créer un compte OpenStreetMap. Pour FallingFruit, vous pourrez ajouter des données de manière anonyme ou créer un compte. La création de compte sur ces sites se fait très facilement"
-search_address,"Enter address","Entrez une adresse"
-tilemap_osm_humanitarian,"Humanitarian map","Carte humanitaire"
-tilemap_osm_standard,"Standard map","Carte standard"
-tilemap_cyclosm,"Cycling map", "Carte cyclable CyclOSM"
-tilemap_transport,"Transport map","Carte des transports en commun"
-tilemap_transport_dark,"Transport map (dark)","Carte des transports en commun (sombre)"
-tilemap_neighbourhood,"Clean neighbourhood Map","Carte de voisinage légère"
-tilemap_outdoors,"Outdoors map","Carte d'extérieurs"

@@ -259,6 +259,7 @@ class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
     location = models.PointField(blank=True, geography=True, null=True)
+    use_coordinates = models.BooleanField(default=False)
     creationdate = models.DateTimeField(auto_now_add=True)
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
