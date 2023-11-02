@@ -117,35 +117,27 @@
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
-              <b-field>
-                <template #label>
-                  <div class="level">
-                    <div class="level-left">
-                      <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
-                        {{ $t('address') }}
-                        <i class="icon far fa-question-circle"></i>
-                      </b-tooltip>
-                    </div>
-                    <div class="level-right">
-                      <b-switch v-model="use_coordinates" size="is-small" type="is-primary">{{ $t('use-coordinates') }}</b-switch>
-                    </div>
-                  </div>
-                </template>
-                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom" class="mr-2">
-                  <b-button type="is-info" @click="fetchAddressGeoLoc">
-                    <i class="fas fa-street-view"></i>
-                  </b-button>
-                </b-tooltip>
-		            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
-                   <b-button @click="fetchAddressRefLoc" type="is-info">
-                     <i class="fas fa-home"></i>
-                   </b-button>
-                </b-tooltip>
-                <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
-              </b-field>
-            </div>
+          <b-field>
+            <template #label>
+              <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
+                {{ $t('address') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom" class="mr-2">
+              <b-button type="is-info" @click="fetchAddressGeoLoc">
+                <i class="fas fa-street-view"></i>
+              </b-button>
+            </b-tooltip>
+            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
+               <b-button @click="fetchAddressRefLoc" type="is-info">
+                 <i class="fas fa-home"></i>
+               </b-button>
+            </b-tooltip>
+            <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
+          </b-field>
+          <div class="is-flex is-justify-content-flex-end mb-3">
+            <b-switch v-model="use_coordinates" size="is-small" type="is-primary">{{ $t('use-coordinates') }}</b-switch>
           </div>
           <div class="columns">
             <div class="column">
@@ -298,7 +290,7 @@ export default {
       category2: '',
       category3: '',
       address_text: "",
-      address_coords: null,
+      address_coords: new GeolocationCoords(),
       address: "",
       use_coordinates: false,
       user_updated_address_field: false,
