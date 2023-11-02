@@ -239,7 +239,7 @@ notif-error-password-reset-sent,An error prevented to reset your password.,Une e
 enter-new-password,Enter your new password here...,Entrez votre nouveau mot de passe ici...
 notif-success-password-reset,Your password has been changed.,Votre mot de passe a été modifié.
 notif-error-password-reset,An error prevented to change your password.,Une erreur a empêché la mise à jour de votre mot de passe.
-notif-error-invalidtoken-disconnected,"You have been disconnected.","Vous avez été déconnecté."
+notif-error-invalid-token-disconnected,"You have been disconnected.","Vous avez été déconnecté."
 edit-item,Edit an item,Éditer un élément
 notif-success-item-update,The item has been successfully edited,L'élément a été correctement édité
 item-image,Image,Image
@@ -373,7 +373,7 @@ what-is-shareish,What is Shareish?,Qu'est-ce que Shareish?
 confirm,Confirm,Confirmer
 close-all-conv-from-item,Close all conversation from this item,Fermer toutes les conversations liées à cet élément
 close-all-conv-from-item-reversible,Conversations closed can still be re-opened later on.,Les conversations fermées peuvent toujours être réouvertes plus tard.
-item-linked-to-conv-unavailable-delted,The item linked to this conversation is unavailable or has been deleted.,L'élément lié à cette conversation n'est plus disponible ou a été supprimé.
+item-linked-to-conv-unavailable-deleted,The item linked to this conversation is unavailable or has been deleted.,L'élément lié à cette conversation n'est plus disponible ou a été supprimé.
 item-unavailable,Item unavailable,Élément indisponible
 write-your-message,Write your message,Écrivez votre message
 this-conv-is-closed-textarea,"This conversation is closed, you cannot send a message.","Cette conversation est fermée, vous ne pouvez pas envoyer de message."
@@ -446,6 +446,10 @@ help_definitive-deletion,"If you want to definitively delete this item, you can 
 warning-item-is-closed,You have marked this item has closed.,Vous avez marqué cet élément comme clôturé.
 notif-success-item-definitive-deletion,The item has been successfully permanently deleted.,L'élément a bien été supprimé définitivement.
 notif-success-item-close,The item has been successfully marked as closed.,L'élément a bien été marqué comme clôturé.
+notif-success-close-conversation,This conversation has been closed.,Cette conversation a été fermée.
+notif-error-close-conversation,The conversation could not be closed.,Cette conversation n'a pas pu être fermée.
+notif-success-open-conversation,This conversation has been opened back.,Cette conversation a été réouverte.
+
 
 error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.
 error_keys__ACCOUNT_DOESNT_EXIST,This account doesn't exist.,Ce compte n'existe pas.
@@ -470,6 +474,11 @@ error_keys__TOKEN_BAD_FORMAT,Token has a bad format.,Le token a un mauvais forma
 error_keys__TOKEN_DOESNT_EXIST,Token doesn't exist.,Ce token n'existe pas.
 error_keys__TOKEN_EXPIRED,Token is expired.,Le token est expiré.
 error_keys__TOKEN_LENGTH_INVALID,Token length is invalid.,La longueur du token est invalide.
+error_keys__SELF_NOT_PART_OF_CONVERSATION,You are not part of this conversation.,Vous ne faites pas partie de cette conversation.
+error_keys__CONVERSATION_ALREADY_CLOSED,This conversation is already closed.,Cette conversation est déjà fermée.
+error_keys__CONVERSATION_ALREADY_OPEN,This conversation is already open.,Cette conversation est déjà ouverte.
+error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has been closed by another user. You cannot open it back.,Cette conversation a été fermée par un autre utilisateur. Vous ne pouvez pas la réouvrir.
+
 on-day,on,le
 terms_read_agree,"I have read and I agree to","J'ai lu et j'accepte les"
 terms_conditions_privacy_policy,"Shareish's Terms, Conditions, and Privacy Policy","conditions d'utilisation et la politique de confidentialité de Shareish"

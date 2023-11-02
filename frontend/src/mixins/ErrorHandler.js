@@ -1,4 +1,3 @@
-import {logout} from "@/functions";
 import axios from "axios";
 
 export default {
@@ -30,18 +29,17 @@ export default {
               } else if (this._keyInDictIsString('key', data)) {
                 this.message_v0sDM7 = this.$t('error_keys__' + data.key);
               } else if (this._keyInDictIsString('detail', data)) {
-		  if (data.detail === 'Invalid token.') {
-		      axios.defaults.headers.common["Authorization"] = "";
-		      localStorage.removeItem("token");
-		      this.$store.commit('removeToken');
-		      this.$store.commit('removeUserID');
-		      showErrorCode=false;
-		      this.message_v0sDM7 = this.$t('notif-error-invalidtoken-disconnected'); //"Disconnected";
-		      this.$router.push("/log-in");
-		  }
-                  else {
-		      this.message_v0sDM7 = data.detail;
-		  }
+                if (data.detail === 'Invalid token.') {
+                    axios.defaults.headers.common["Authorization"] = "";
+                    localStorage.removeItem("token");
+                    this.$store.commit('removeToken');
+                    this.$store.commit('removeUserID');
+                    showErrorCode=false;
+                    this.message_v0sDM7 = this.$t('notif-error-invalid-token-disconnected');
+                    this.$router.push("/log-in");
+                } else {
+		              this.message_v0sDM7 = data.detail;
+		            }
               } else {
                 this._unableToParse(error);
               }
@@ -97,6 +95,9 @@ export default {
       } else {
         this.snackbarError(error);
       }
+    },
+    snackbarErrorFromKey(key) {
+      this.snackbarError(this.$t('error_keys__' + key));
     },
     isKeyedError(error) {
       return this.isFromAxios(error) && error.code !== 'ERR_NETWORK' && typeof error.response.data !== 'string' && this._keyInDictIsString('key', error.response.data);

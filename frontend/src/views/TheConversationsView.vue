@@ -116,6 +116,18 @@
                 </p>
                 <p v-else><strong>Group chat</strong></p>
               </div>
+              <div class="level-right">
+                <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? 'Open conversation' : 'This user closed the conversation') : 'Close conversation'">
+                  <b-button
+                      type="is-primary"
+                      outlined
+                      @click="toggleConversationClose()"
+                      :disabled="activeConversation.is_closed && activeConversation.closed_by.id !== userId"
+                  >
+                    <i class="fas" :class="activeConversation.is_closed ? 'fa-lock-open' : 'fa-lock'"></i>
+                  </b-button>
+                </b-tooltip>
+              </div>
             </div>
           </div>
           <div id="item">
@@ -124,7 +136,7 @@
                 :item="activeConversation.item"
                 :height="itemCardHorizontalHeight" />
             <div v-else class="v-align-center" style="height: 100%;">
-              <p class="has-text-centered" style="left: 0; right: 0;">{{ $t('item-linked-to-conv-unavailable-delted') }}</p>
+              <p class="has-text-centered" style="left: 0; right: 0;">{{ $t('item-linked-to-conv-unavailable-deleted') }}</p>
             </div>
           </div>
           <div id="messages" ref="messages" class="pt-4">
@@ -584,6 +596,51 @@ export default {
       setTimeout(() => {
         this.messagesLoading = false;
       }, 400);
+    },
+    async toggleConversationClose() {
+      this.waitingFormResponse = true;
+
+      if (!this.activeConversation.is_closed) {
+        try {
+          await axios.get(`/api/v1/conversations/${this.activeConversation.id}/close`);
+
+          this.conversations[this.selected].closed_by = {'id': this.userId};
+          this.conversations[this.selected].is_closed = true;
+
+          this.$buefy.snackbar.open({
+            duration: 5000,
+            type: 'is-success',
+            message: this.$t('notif-success-close-conversation'),
+            pauseOnHover: true
+          });
+        }
+        catch (error) {
+          this.snackbarError(error, {'showErrorCode': false});
+        }
+      } else {
+        if (this.activeConversation.closed_by.id === this.userId) {
+          try {
+            await axios.get(`/api/v1/conversations/${this.activeConversation.id}/open`);
+
+            this.conversations[this.selected].closed_by.id = null;
+            this.conversations[this.selected].is_closed = false;
+
+            this.$buefy.snackbar.open({
+              duration: 5000,
+              type: 'is-success',
+              message: this.$t('notif-success-open-conversation'),
+              pauseOnHover: true
+            });
+          }
+          catch (error) {
+            this.snackbarError(error, {'showErrorCode': false});
+          }
+        } else {
+          this.snackbarErrorFromKey('CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN');
+        }
+      }
+
+      this.waitingFormResponse = false;
     }
   },
   async mounted() {

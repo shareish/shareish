@@ -385,6 +385,39 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
         return Response(conversation.id, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['get'], url_path='close')
+    def close(self, request, pk=None):
+        instance = self.get_object()
+        already_closed = self.get_serializer(instance).data.get('is_closed')
+
+        if not already_closed:
+            if instance.users.filter(user=request.user.id).exists():
+                instance.closed_by = request.user
+                instance.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response({'key': 'SELF_NOT_PART_OF_CONVERSATION'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'key': 'CONVERSATION_ALREADY_CLOSED'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'], url_path='open')
+    def open(self, request, pk=None):
+        instance = self.get_object()
+        already_open = not self.get_serializer(instance).data.get('is_closed')
+
+        if not already_open:
+            if instance.closed_by == request.user:
+                if instance.users.filter(user=request.user.id).exists():
+                    instance.closed_by = None
+                    instance.save()
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    return Response({'key': 'SELF_NOT_PART_OF_CONVERSATION'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'key': 'CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'key': 'CONVERSATION_ALREADY_OPEN'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer

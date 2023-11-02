@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 
-from .serializers import MessageSerializer
+from .serializers import MessageSerializer, ConversationSerializer
 from .models import Conversation, Message, ConversationUser
 
 User = get_user_model()
@@ -77,7 +77,9 @@ class ConversationConsumer(AsyncWebsocketConsumer):
             print("INTERNAL ERROR: User is not member of this conversation.")
             return None
 
-        if conversation.is_closed:
+        serializer = ConversationSerializer(conversation)
+        conversation_is_closed = serializer.data.get('is_closed')
+        if conversation_is_closed:
             print("This conversation is closed")
             return None
 
