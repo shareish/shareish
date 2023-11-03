@@ -482,6 +482,7 @@
   "error_keys__CONVERSATION_ALREADY_CLOSED": "Cette conversation est déjà fermée.",
   "error_keys__CONVERSATION_ALREADY_OPEN": "Cette conversation est déjà déverrouillée.",
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.",
+  "error_keys__CANNOT_CLOSE_ITEM_NOT_OWNED": "Vous ne pouvez pas clôturer un élément qui ne vous appartient pas.",
   "terms_read_agree": "J'ai lu et j'accepte les",
   "terms_conditions_privacy_policy": "conditions d'utilisation et la politique de confidentialité de Shareish",
   "developers": "Développeurs",

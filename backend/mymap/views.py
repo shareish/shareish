@@ -135,6 +135,25 @@ class ItemViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.delete()
 
+    @action(detail=True, methods=['post'], url_path='close')
+    def close(self, request, pk=None):
+        print(request.data)
+        if 'reason' in request.data:
+            reason = request.data['reason']
+            if reason in Item.ClosedReason.values:
+                instance = self.get_object()
+
+                if instance.user_id != request.user.id:
+                    return Response({'key': 'CANNOT_CLOSE_ITEM_NOT_OWNED'}, status=status.HTTP_403_FORBIDDEN)
+
+                instance.closed_reason = reason
+                instance.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response({'key': 'ITEM_CLOSING_REASON_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RecurrentItemViewSet(ItemViewSet):
     filter_backends = [filters.OrderingFilter]
@@ -480,6 +499,27 @@ class CustomLogin(ObtainAuthToken):
         return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class TokenViewSet(viewsets.ModelViewSet):
+    serializer_class = TokenSerializer
+
+    @action(detail=False, methods=['GET'], url_path=r'(?P<token>[a-zA-Z0-9\-_]+)/check')
+    def check(self, request, token):
+        print("test!!!")
+        check = Token.check_token(token, request.GET.get('action'))
+        if 'success' in check:
+            token = check['success']
+
+            tk_serializer = TokenSerializer(instance=token)
+            serialized_token = tk_serializer.data
+            return JsonResponse(serialized_token, status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
 def get_address_reverse(request):
     if request.method == 'POST':
@@ -716,26 +756,6 @@ def user_send_delete_confirmation(request, user_id):
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def check_token(request, token):
-    if request.method == 'GET':
-        check = Token.check_token(token, request.GET.get('action'))
-        if 'success' in check:
-            token = check['success']
-
-            tk_serializer = TokenSerializer(instance=token)
-            serialized_token = tk_serializer.data
-            return JsonResponse(serialized_token, status=status.HTTP_200_OK)
-        else:
-            error_key = check['error']
-            if error_key == 'TOKEN_DOESNT_EXIST':
-                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def recover_account(request):
@@ -859,29 +879,4 @@ def delete_account_confirm_token(request, token):
                 return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def close_item(request, item_id):
-    if request.method == 'POST':
-        if 'reason' in request.data:
-            reason = request.data['reason']
-            if reason in Item.ClosedReason.values:
-                try:
-                    item = Item.objects.get(pk=item_id)
-
-                    if item.user_id != request.user.id:
-                        return Response("You cannot close an item you do not own.", status=status.HTTP_403_FORBIDDEN)
-
-                    item.closed_reason = reason
-                    item.save()
-                    return Response(status=status.HTTP_200_OK)
-                except Item.DoesNotExist:
-                    return Response({'key': 'ITEM_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response({'key': 'ITEM_CLOSING_REASON_DOESNT_EXIST'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
