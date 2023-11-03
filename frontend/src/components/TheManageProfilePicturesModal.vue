@@ -158,13 +158,12 @@ export default {
 
       if (this.filename !== null) {
         const data = new FormData();
-        data.append('user_id', this.user['id']);
 
         const blob = await (await fetch(this.preview)).blob();
         const tempFile = new File([blob], this.filename);
         data.append('image', tempFile);
 
-        const image = (await axios.post("/api/v1/user_images/", data)).data;
+        const image = (await axios.post("/api/v1/users_images/", data)).data;
         this.user.images.unshift(image);
         this.changesNotSaved = false;
       }

@@ -388,11 +388,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserImageViewSet(viewsets.ViewSet):
-    def create(self, request):
-        user = User.objects.get(pk=request.POST['user_id'])
+class UserImageViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
         image = request.FILES.get('image')
-        new_image = UserImage(image=image, user=user)
+        new_image = UserImage(image=image, user=request.user)
         new_image.save()
         serialized_image = UserImageSerializer(new_image)
         return Response(serialized_image.data, status=status.HTTP_201_CREATED)
@@ -400,6 +401,7 @@ class UserImageViewSet(viewsets.ViewSet):
 
 class UserMapExtraCategoriesViewSet(viewsets.ModelViewSet):
     serializer_class = UserMapExtraCategorySerializer
+    permission_classes = [IsAuthenticated]
     queryset = UserMapExtraCategory.objects.all()
 
 
@@ -412,7 +414,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
         return Conversation.objects.filter(users__user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-
         data = request.data
         try:
             item = Item.objects.get(pk=data['item_id'])

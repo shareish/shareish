@@ -78,7 +78,7 @@ export default {
     },
     async deleteMessage() {
       try {
-        await axios.delete(`/api/v1/conversations/messages/${this.message.id}`);
+        await axios.delete(`/api/v1/messages/${this.message.id}`);
         this.$emit('deleted');
       }
       catch (error) {
