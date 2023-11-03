@@ -5,14 +5,15 @@
       <div class="column">
         <div id="search-n-filters">
           <b-field grouped>
-            <b-input
-                v-model="search"
-                :placeholder="$t('search')"
-                id="search-input"
-                :icon-right="search ? 'close-circle' : ''"
-                icon-right-clickable
-                @icon-right-click="search = ''"
-            ></b-input>
+            <div id="search-input" class="mr-3">
+              <b-input
+                  v-model="search"
+                  :placeholder="$t('search')"
+                  :icon-right="search ? 'close-circle' : ''"
+                  icon-right-clickable
+                  @icon-right-click="search = ''"
+              />
+            </div>
             <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="All">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'all'"
@@ -117,9 +118,7 @@
                 <p v-else><strong>Group chat</strong></p>
               </div>
               <div class="level-right">
-                <!--<b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? 'Unlock conversation' : 'This user locked the conversation') : 'Lock conversation'">//-->
-		  <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? $t('unlock-conversation') : $t('locked-conversation')) : $t('lock-conversation')"> 
-		  
+		              <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? $t('unlock-conversation') : $t('locked-conversation')) : $t('lock-conversation')">
                   <b-button
                       type="is-primary"
                       outlined
@@ -899,8 +898,9 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   }
 
   #search-n-filters .is-clearfix {
-    width: calc(100% - 3 * 40px - 2 * 5px - #{rem(0.75)});
+    width: 100%;
   }
+
   #search-n-filters #search-input {
     width: 100%;
   }
