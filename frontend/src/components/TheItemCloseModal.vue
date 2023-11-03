@@ -61,7 +61,7 @@ export default {
       data.append('reason', this.closingReasonRadioGroup);
 
       try {
-        await axios.post(`/api/v1/items/${this.itemId}/close`, data);
+        await axios.post(`/api/v1/items/${this.itemId}/close/`, data);
         await this.$router.push("/items");
 
         this.$buefy.snackbar.open({

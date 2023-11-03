@@ -101,7 +101,7 @@ export default {
       this.waitingFormResponse = true;
 
       try {
-        await axios.get(`/api/v1/recover-account/confirm/${this.token.token}`);
+        await axios.get(`/api/v1/tokens/${this.token.token}/recover-account/`);
 
         this.$buefy.snackbar.open({
           duration: 9000,

@@ -54,7 +54,7 @@ export default {
         const data = {
           password: this.password
         }
-        await axios.post(`/api/v1/users/${this.userId}/disable`, data);
+        await axios.post(`/api/v1/webusers/${this.userId}/disable/`, data);
 
         this.$emit('close');
 

@@ -59,7 +59,7 @@ export default {
         const data = {
           password: this.password
         }
-        await axios.post(`/api/v1/users/${this.userId}/send-delete-confirmation`, data);
+        await axios.post(`/api/v1/webusers/${this.userId}/send-delete-confirmation/`, data);
 
         this.$emit('close');
 

@@ -30,7 +30,6 @@ urlpatterns = [
     path("predictClass/", views.predict_class, name='predict_class'),
     path("notifications/", views.get_notifications, name='notifications'),
     path("auth/login/", CustomLogin.as_view(), name='custom_login'),
-    path("recover-account/", views.recover_account, name='recover_account'),
 
 
     # ----------------------------------------------------#
@@ -38,11 +37,7 @@ urlpatterns = [
     # ----------------------------------------------------#
 
     # Going to: UserViewSet
-    re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
-    re_path(r'^delete-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.delete_account_confirm_token, name='delete_account_confirm_token'),
-    path("users/<int:user_id>/disable", views.disable_user, name='disable_user'),
-    path("users/<int:user_id>/send-delete-confirmation", views.user_send_delete_confirmation,
-         name='user_send_delete_confirmation'),
+    path("recover-account/", views.recover_account, name='recover_account'),
 
     # Going to: UserImageViewSet
     path("users/images/<int:userimage_id>", views.get_userimage, name='get_userimage'),

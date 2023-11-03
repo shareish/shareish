@@ -137,7 +137,6 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='close')
     def close(self, request, pk=None):
-        print(request.data)
         if 'reason' in request.data:
             reason = request.data['reason']
             if reason in Item.ClosedReason.values:
@@ -238,7 +237,6 @@ class ItemImageViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -330,6 +328,64 @@ class UserViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, headers=headers)
         return Response({'serializer_errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], url_path='disable')
+    def disable(self, request, pk=None):
+        if 'password' in request.data:
+            if int(pk) == request.user.id or request.user.is_staff:
+                # Retrieve the user to modify
+                instance = self.get_instance()
+
+                # Verify that the password entered is correct
+                if not instance.check_password(request.data['password']):
+                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if not instance.is_disabled:
+                    try:
+                        with transaction.atomic():
+                            # Disable the user
+                            instance.is_disabled = True
+                            instance.save()
+
+                            # Closing 1to1 conversations where user was part of
+                            conversations_user = ConversationUser.objects.filter(user=instance, conversation__max_users=2)
+                            for conversation_user in conversations_user:
+                                conversation_to_close = conversation_user.conversation
+                                conversation_to_close.is_closed = True
+                                conversation_to_close.save()
+
+                            return Response(status=status.HTTP_200_OK)
+                    except:
+                        return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], url_path='send-delete-confirmation')
+    def send_delete_confirmation(self, request, pk=None):
+        if 'password' in request.data:
+            if int(pk) == request.user.id or request.user.is_staff:
+                # Retrieve the user to contact
+                instance = self.get_instance()
+
+                # Verify that the password entered is correct
+                if not instance.check_password(request.data['password']):
+                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Generate and store a delete_account token for the user
+                token = Token.get_or_create(instance, Token.TokenActions.DELETE_ACCOUNT)
+
+                # Send the user an email containing a link to start the deletion process of its account
+                send_mail_start_delete_account_process(instance, token.token)
+
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserImageViewSet(viewsets.ViewSet):
@@ -501,10 +557,10 @@ class CustomLogin(ObtainAuthToken):
 
 class TokenViewSet(viewsets.ModelViewSet):
     serializer_class = TokenSerializer
+    permission_classes = [AllowAny]
 
     @action(detail=False, methods=['GET'], url_path=r'(?P<token>[a-zA-Z0-9\-_]+)/check')
     def check(self, request, token):
-        print("test!!!")
         check = Token.check_token(token, request.GET.get('action'))
         if 'success' in check:
             token = check['success']
@@ -512,6 +568,87 @@ class TokenViewSet(viewsets.ModelViewSet):
             tk_serializer = TokenSerializer(instance=token)
             serialized_token = tk_serializer.data
             return JsonResponse(serialized_token, status=status.HTTP_200_OK)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path=r'(?P<token>[a-zA-Z0-9\-_]+)/recover-account')
+    def recover_account_confirm(self, request, token):
+        """
+        Apply the action of recovering an account based on a token
+
+        :param request: The request made by the user
+        :type request: WSGIRequest
+        :param token: The token required to apply the account recovering
+        :type token: str
+        :return: A HTTP response send back to the user
+        :rtype: Response
+        """
+        check = Token.check_token(token, 'recover_account')
+        if 'success' in check:
+            token = check['success']
+            user = token.user
+
+            # Here we don't check whether the account is disabled or not to prevent any error that may have
+            # occurred. We still do all the checks to prevent undesired account deletion.
+
+            try:
+                with transaction.atomic():
+                    # Recover the account
+                    user.is_disabled = False
+                    user.save()
+
+                    # Use the token
+                    token.use()
+
+                    # Remove the account from the deletion scheduling if it was present
+                    ScheduledAccountDeletion.objects.filter(user=user).delete()
+
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            error_key = check['error']
+            if error_key == 'TOKEN_DOESNT_EXIST':
+                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path=r'(?P<token>[a-zA-Z0-9\-_]+)/delete-account')
+    def delete_account_confirm(self, request, token):
+        """
+        Start the process of account deleting
+
+        :param request: The request made by the user
+        :type request: WSGIRequest
+        :param token: The token required to start the process
+        :type token: str
+        :return: A HTTP response send back to the user
+        :rtype: Response
+        """
+        check = Token.check_token(token, 'delete_account')
+        if 'success' in check:
+            token = check['success']
+            user = token.user
+
+            try:
+                with transaction.atomic():
+                    # Disable the user account
+                    user.is_disabled = True
+                    user.save()
+
+                    # Use the token
+                    token.use()
+
+                    # Add the user inside the deletion scheduling system
+                    ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
+
+                    return Response(status=status.HTTP_200_OK)
+            except:
+                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             error_key = check['error']
             if error_key == 'TOKEN_DOESNT_EXIST':
@@ -685,78 +822,6 @@ def close_all_conversations_from_item(request, item_id):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def disable_user(request, user_id):
-    if request.method == 'POST':
-        if 'password' in request.data:
-            if user_id == request.user.id or request.user.is_staff:
-                # Retrieve the user to modify
-                try:
-                    user = User.objects.get(pk=user_id)
-                except User.DoesNotExist:
-                    return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
-
-                # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
-
-                if not user.is_disabled:
-                    try:
-                        with transaction.atomic():
-                            # Disable the user
-                            user.is_disabled = True
-                            user.save()
-
-                            # Closing 1to1 conversations where user was part of
-                            conversations_user = ConversationUser.objects.filter(user=user, conversation__max_users=2)
-                            for conversation_user in conversations_user:
-                                conversation_to_close = conversation_user.conversation
-                                conversation_to_close.is_closed = True
-                                conversation_to_close.save()
-
-                            return Response(status=status.HTTP_200_OK)
-                    except:
-                        return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                else:
-                    return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def user_send_delete_confirmation(request, user_id):
-    if request.method == 'POST':
-        if 'password' in request.data:
-            if user_id == request.user.id or request.user.is_staff:
-                # Retrieve the user to contact
-                try:
-                    user = User.objects.get(pk=user_id)
-                except User.DoesNotExist:
-                    return JsonResponse({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
-
-                # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
-
-                # Generate and store a delete_account token for the user
-                token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
-
-                # Send the user an email containing a link to start the deletion process of its account
-                send_mail_start_delete_account_process(user, token.token)
-
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['POST'])
 @permission_classes([AllowAny])
 def recover_account(request):
     """
@@ -790,93 +855,4 @@ def recover_account(request):
                 return Response(user.email, status=status.HTTP_201_CREATED)
             return Response({'key': 'ACCOUNT_NOT_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def recover_account_confirm_token(request, token):
-    """
-    Apply the action of recovering an account based on a token
-
-    :param request: The request made by the user
-    :type request: WSGIRequest
-    :param token: The token required to apply the account recovering
-    :type token: str
-    :return: A HTTP response send back to the user
-    :rtype: Response
-    """
-    if request.method == 'GET':
-        check = Token.check_token(token, 'recover_account')
-        if 'success' in check:
-            token = check['success']
-            user = token.user
-
-            # Here we don't check whether the account is disabled or not to prevent any error that may have
-            # occurred. We still do all the checks to prevent undesired account deletion.
-
-            try:
-                with transaction.atomic():
-                    # Recover the account
-                    user.is_disabled = False
-                    user.save()
-
-                    # Use the token
-                    token.use()
-
-                    # Remove the account from the deletion scheduling if it was present
-                    ScheduledAccountDeletion.objects.filter(user=user).delete()
-
-                    return Response(status=status.HTTP_200_OK)
-            except:
-                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            error_key = check['error']
-            if error_key == 'TOKEN_DOESNT_EXIST':
-                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def delete_account_confirm_token(request, token):
-    """
-    Start the process of account deleting
-
-    :param request: The request made by the user
-    :type request: WSGIRequest
-    :param token: The token required to start the process
-    :type token: str
-    :return: A HTTP response send back to the user
-    :rtype: Response
-    """
-    if request.method == 'GET':
-        check = Token.check_token(token, 'delete_account')
-        if 'success' in check:
-            token = check['success']
-            user = token.user
-
-            try:
-                with transaction.atomic():
-                    # Disable the user account
-                    user.is_disabled = True
-                    user.save()
-
-                    # Use the token
-                    token.use()
-
-                    # Add the user inside the deletion scheduling system
-                    ScheduledAccountDeletion.objects.create(user=user, interval=settings.INTERVAL_ACCOUNT_DELETION)
-
-                    return Response(status=status.HTTP_200_OK)
-            except:
-                return Response({'key': 'INTERNAL_ERROR'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            error_key = check['error']
-            if error_key == 'TOKEN_DOESNT_EXIST':
-                return Response({'key': error_key}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response({'key': error_key}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
