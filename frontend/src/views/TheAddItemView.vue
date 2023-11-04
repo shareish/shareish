@@ -137,7 +137,10 @@
             <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
-            <b-switch v-model="use_coordinates" size="is-small" type="is-primary">{{ $t('use-coordinates') }}</b-switch>
+	    <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
+              <b-switch v-model="use_coordinates" size="is-small" type="is-primary"> {{ $t('use-coordinates') }} </b-switch>
+	      <i class="icon far fa-question-circle"></i>
+	    </b-tooltip>
           </div>
           <div class="columns">
             <div class="column">
