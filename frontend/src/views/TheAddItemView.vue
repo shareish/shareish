@@ -117,27 +117,30 @@
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
-              <b-field>
-                <template #label>
-                  <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
-                    {{ $t('address') }}
-                    <i class="icon far fa-question-circle"></i>
-                  </b-tooltip>
-                </template>
-                <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
-                  <b-button type="is-info" @click="fetchAddressGeoLoc">
-                    <i class="fas fa-street-view"></i>
-                  </b-button> &nbsp; 
-                </b-tooltip>
-		<b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
-                     <b-button
-                        @click="fetchAddressRefLoc" type="is-info"><i class="fas fa-home"></i></b-button>
-		</b-tooltip><br>
-                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
-              </b-field>
-            </div>
+          <b-field>
+            <template #label>
+              <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
+                {{ $t('address') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom" class="mr-2">
+              <b-button type="is-info" @click="fetchAddressGeoLoc">
+                <i class="fas fa-street-view"></i>
+              </b-button>
+            </b-tooltip>
+            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
+               <b-button @click="fetchAddressRefLoc" type="is-info">
+                 <i class="fas fa-home"></i>
+               </b-button>
+            </b-tooltip>
+            <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
+          </b-field>
+          <div class="is-flex is-justify-content-flex-end mb-3">
+	    <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
+              <b-switch v-model="use_coordinates" size="is-small" type="is-primary"> {{ $t('use-coordinates') }} </b-switch>
+	      <i class="icon far fa-question-circle"></i>
+	    </b-tooltip>
           </div>
           <div class="columns">
             <div class="column">
@@ -234,8 +237,9 @@
           </div>
         </div>
         <div class="container has-text-centered mt-5">
-          <a class="button mt-2" :class="formBottomButtonsSize" @click="reset">{{ $t('reset') }}</a>
           <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
+          <br />
+          <a class="is-inline-block mt-5 has-text-danger" :class="formBottomButtonsSize" @click="resetForm">{{ $t('reset-form') }}</a>
         </div>
       </section>
     </div>
@@ -288,7 +292,11 @@ export default {
       category1: '',
       category2: '',
       category3: '',
+      address_text: "",
+      address_coords: new GeolocationCoords(),
       address: "",
+      use_coordinates: false,
+      user_updated_address_field: false,
       startdate: null,
       enddate: null,
       isRecurrent: false,
@@ -300,9 +308,13 @@ export default {
     }
   },
   created() {
-    if (this.isRecurrentItemUsed) { this.fetchRecurrentItem(); }
+    if (this.isRecurrentItemUsed)
+      this.fetchRecurrentItem();
       
-    if (this.isMapMarkerUsed) { this.fetchMapMarkerAddress(this.$route.params.lat,this.$route.params.lng,this.$route.params.type);}
+    if (this.isMapMarkerUsed) {
+      this.fetchMapMarkerAddress(this.mapMarkerLat, this.mapMarkerLng);
+      this.type = this.$route.params.type;
+    }
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -368,6 +380,10 @@ export default {
         }
         this.filesSelected = [];
       }
+    },
+    use_coordinates() {
+      if (!this.user_updated_address_field)
+        this.updateAddressField();
     }
   },
   methods: {
@@ -383,16 +399,18 @@ export default {
         }
       }
     },
-    async fetchMapMarkerAddress(lat,lng,type) {
-	  try {
-	      this.type = type;
-	      const markerloc = new GeolocationCoords(lng,lat);
-	      if (markerloc instanceof GeolocationCoords)
-		  this.address = await this.fetchAddress(markerloc);
-	  }
-	  catch (error) {
-	      this.snackbarError(error);
-	  }
+    async fetchMapMarkerAddress(lat, lng) {
+      try {
+        const coords = new GeolocationCoords(lng, lat);
+	      if (coords instanceof GeolocationCoords) {
+		      this.address_text = await this.fetchAddress(coords);
+		      this.address = this.address_text;
+          this.address_coords = coords;
+        }
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
     },
     async setFieldFromRecurrentItem() {
       if (this.recurrentItem !== null) {
@@ -406,9 +424,13 @@ export default {
 
         try {
           const images = JSON.parse((await axios.get(`/api/v1/items/${this.recurrentItemId}/images/base64`)).data);
-          for (const i in images) {
-            this.images.push({"filename": images[i].name, 'predictions': [], 'preview': images[i].base64_url, 'probability': 0});
-          }
+          for (const i in images)
+            this.images.push({
+              'filename': images[i].name,
+              'predictions': [],
+              'preview': images[i].base64_url,
+              'probability': 0
+            });
         }
         catch (error) {
           this.snackbarError(error);
@@ -417,32 +439,38 @@ export default {
         this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
-      async fetchAddressRefLoc() {
-	  try {
-	    const params = {
-		columns: ['ref_location']
-            }
-	    const userId = Number(this.$store.state.user.id);
-	    const refLocation = (await axios.get(`api/v1/webusers/${userId}`,  {params: params})).data.ref_location;
-	    if (refLocation !== null) {
-		this.refLocation = new GeolocationCoords(refLocation);
-		console.log(refLocation);
-		console.log(this.refLocation);
-		if (this.refLocation instanceof GeolocationCoords)
-		    this.address = await this.fetchAddress(this.refLocation);
-	    }
-	    else
-		this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
-	    }
-	  catch (error) {
-              this.snackbarError(error);
-	  }
+    async fetchAddressRefLoc() {
+      try {
+        const params = {
+          columns: ['ref_location']
+        }
+        const userId = Number(this.$store.state.user.id);
+        const refLocation = (await axios.get(`api/v1/webusers/${userId}`, {params: params})).data.ref_location;
+        if (refLocation !== null) {
+          this.refLocation = new GeolocationCoords(refLocation);
+          if (this.refLocation instanceof GeolocationCoords) {
+            this.user_updated_address_field = false;
+            this.address_text = await this.fetchAddress(this.refLocation);
+            this.address_coords = this.refLocation;
+            this.updateAddressField();
+          }
+        } else {
+          this.snackbarError(this.$t('set-a-reflocation-to-use-feature'));
+        }
+      }
+      catch (error) {
+        this.snackbarError(error);
+      }
     },
     async fetchAddressGeoLoc() {
-      if (this.geoLocation !== null)
-            this.address = await this.fetchAddress(this.geoLocation);
-      else
+      if (this.geoLocation instanceof GeolocationCoords) {
+        this.user_updated_address_field = false;
+        this.address_text = await this.fetchAddress(this.geoLocation);
+        this.address_coords = this.geoLocation;
+        this.updateAddressField();
+      } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
     },
     async fetchAddress(location) {
       if (location instanceof GeolocationCoords) {
@@ -454,6 +482,16 @@ export default {
         }
       }
       return null;
+    },
+    updateAddressField() {
+      if (!this.use_coordinates)
+        this.address = this.address_text;
+      else
+        this.address = this.address_coords.toStringForUser();
+    },
+    addressUpdatedByUser() {
+      if (!this.user_updated_address_field)
+        this.user_updated_address_field = true;
     },
     async processImage(file) {
       this.loading = true;
@@ -569,6 +607,7 @@ export default {
             category3: this.category3,
             description: this.description,
             location: this.address,
+            use_coordinates: this.use_coordinates,
             is_recurrent: this.isRecurrent,
             startdate: startDate,
             enddate: endDate,
@@ -603,7 +642,7 @@ export default {
 
       this.waitingFormResponse = false;
     },
-    reset() {
+    resetForm() {
       this.name = "";
       this.description = "";
       this.type = '';

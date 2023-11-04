@@ -137,7 +137,7 @@ export class GeolocationCoords {
     } else if (typeof param1 === 'string') {
       const regex = /^SRID=4326;POINT \(-?[0-9]+(\.[0-9]+)? -?[0-9]+(\.[0-9]+)?\)$/
       if (regex.test(param1)) {
-	let coords = param1.substring(17, param1.length - 1).split(" ");
+	      let coords = param1.substring(17, param1.length - 1).split(" ");
         this.longitude = parseFloat(coords[0]);
         this.latitude = parseFloat(coords[1]);
       }
@@ -154,6 +154,24 @@ export class GeolocationCoords {
 
   toString() {
     return "SRID=4326;POINT (" + this.longitude + " " + this.latitude + ")";
+  }
+
+  toStringForUser(usingDegrees = false) {
+    if (!usingDegrees)
+      return this.latitude + ", " + this.longitude;
+    else
+      return this.decimalToDegrees(this.latitude, true) + ", " + this.decimalToDegrees(this.longitude, false);
+  }
+
+  decimalToDegrees(decimal, isLat) {
+    const degrees = Math.floor(decimal);
+    const minutesDecimal = (decimal - degrees) * 60;
+    const minutes = Math.floor(minutesDecimal);
+    const seconds = (minutesDecimal - minutes) * 60;
+
+    const direction = isLat ? (decimal >= 0 ? "N" : "S") : (decimal >= 0 ? "E" : "W");
+
+    return `${degrees}°${minutes}'${seconds.toFixed(2)}"${direction}`;
   }
 
   toRadians(deg) {

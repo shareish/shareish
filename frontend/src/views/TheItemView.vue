@@ -407,10 +407,9 @@ export default {
             'creationdate': new Date()
           };
           const comment = (await axios.post(`/api/v1/items/${this.itemId}/comments/`, data)).data;
-          this.comments.unshift(comment);
 
           setTimeout(() => {
-            this.waitingFormResponse = false;
+            this.comments.unshift(comment);
           }, 500);
 
           this.commentToSend = "";
@@ -420,6 +419,10 @@ export default {
         catch (error) {
           this.snackbarError(this.$t('notif-error-post-comment'));
         }
+
+        setTimeout(() => {
+          this.waitingFormResponse = false;
+        }, 500);
       }
     },
     removeComment(index) {
@@ -440,8 +443,12 @@ export default {
     this.loading = true;
     await this.fetchItem();
     document.title = `Shareish | ${this.item.name}`;
-    if (this.item.location !== null)
-      this.address = await this.fetchAddress(new GeolocationCoords(this.item.location));
+    if (this.item.location !== null) {
+      if (!this.item.use_coordinates)
+        this.address = await this.fetchAddress(new GeolocationCoords(this.item.location));
+      else
+        this.address = new GeolocationCoords(this.item.location).toStringForUser(true);
+    }
     await this.fetchUser();
     await this.fetchComments();
     this.loading = false;
