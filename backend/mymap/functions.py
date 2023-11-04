@@ -31,8 +31,8 @@ def verif_location(data):
                         longitude = float(match.group(4))
 
                         # Verifies that values are in the correct range
-                        if abs(latitude) <= 90:
-                            if abs(longitude) <= 180:
+                        if abs(longitude) <= 180:
+                            if abs(latitude) <= 90:
                                 srid = "SRID=4326;POINT ({} {})".format(str(longitude), str(latitude))
                             else:
                                 return {'error': "Latitude value is invalid."}
@@ -68,8 +68,8 @@ def verif_location(data):
                                 longitude = second if first_is_lat else first
 
                                 # Verifies that values are in the correct range
-                                if abs(latitude) <= 90:
-                                    if abs(longitude) <= 180:
+                                if abs(longitude) <= 180:
+                                    if abs(latitude) <= 90:
                                         srid = "SRID=4326;POINT ({} {})".format(str(longitude), str(latitude))
                                     else:
                                         return {'error': "Latitude value is invalid."}
@@ -88,28 +88,28 @@ def verif_location(data):
                             except:
                                 return {'error': "Third party geolocation service did not work properly."}
         elif isinstance(data, dict):
-            if 'latitude' in data and 'longitude' in data:
-                latitude = data['longitude']
+            if 'longitude' in data and 'latitude' in data:
                 longitude = data['latitude']
+                latitude = data['longitude']
 
                 # Verifies if the values are in accepted formats
-                if isinstance(latitude, str) or isinstance(latitude, int) or isinstance(latitude, float):
-                    if isinstance(longitude, str) or isinstance(longitude, int) or isinstance(longitude, float):
-                        latitude = float(data['longitude'])
-                        longitude = float(data['latitude'])
+                if isinstance(longitude, str) or isinstance(longitude, int) or isinstance(longitude, float):
+                    if isinstance(latitude, str) or isinstance(latitude, int) or isinstance(latitude, float):
+                        longitude = float(data['longitude'])
+                        latitude = float(data['latitude'])
 
                         # Verifies that values are in the correct range
-                        if abs(latitude) <= 90:
-                            if abs(longitude) <= 180:
+                        if abs(longitude) <= 180:
+                            if abs(latitude) <= 90:
                                 srid = "SRID=4326;POINT ({} {})".format(str(longitude), str(latitude))
                             else:
-                                return {'error': "Longitude value is invalid."}
+                                return {'error': "Latitude value is invalid."}
                         else:
-                            return {'error': "Latitude value is invalid."}
+                            return {'error': "Longitude value is invalid."}
                     else:
-                        return {'error': "Longitude value is invalid."}
+                        return {'error': "Latitude value is invalid."}
                 else:
-                    return {'error': "Latitude value is invalid."}
+                    return {'error': "Longitude value is invalid."}
             else:
                 return {'error': "No suitable address to process."}
         else:

@@ -342,30 +342,6 @@ export default {
         }
       }
       return null;
-    },
-    async fetchGeolocation(address) {
-      if (isNotEmptyString(address)) {
-        try {
-          const formData = new FormData();
-          formData.append('address', address);
-          return (await axios.post("/api/v1/address", formData)).data;
-        }
-        catch (error) {
-          this.fullErrorHandling(error);
-        }
-      }
-      return null;
-    },
-    async updateGeolocationFromAddress() {
-      if (isNotEmptyString(this.input_address)) {
-        const geolocation = await this.fetchGeolocation(this.input_address);
-        if (geolocation !== null)
-          this.input_location = new GeolocationCoords(geolocation)
-        else
-          this.input_location = null;
-      } else {
-        this.input_location = null;
-      }
     }
   },
   destroyed: function () {

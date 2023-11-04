@@ -297,8 +297,8 @@ export default {
             this.internalUser.mail_notif_freq_conversations = this.radioGroups.notif_conversations;
             this.internalUser.mail_notif_freq_events = this.radioGroups.notif_events;
             this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
-	    this.internalUser.mail_notif_freq_osm = this.radioGroups.notif_osm;
-	    this.internalUser.mail_notif_generalinfo = this.radioGroups.notif_generalinfo;  
+            this.internalUser.mail_notif_freq_osm = this.radioGroups.notif_osm;
+            this.internalUser.mail_notif_generalinfo = this.radioGroups.notif_generalinfo;
 
             await axios.patch("/api/v1/webusers/me/", this.internalUser);
             this.$emit('updateUser', this.internalUser);

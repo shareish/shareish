@@ -507,7 +507,7 @@ def get_address(request):
         try:
             location = locator.geocode(request.POST['address'])
             if location is not None:
-                return Response((location.longitude, location.latitude), status=status.HTTP_200_OK)
+                return JsonResponse({'latitude': location.latitude, 'longitude': location.longitude}, status=status.HTTP_200_OK)
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response("Third party geolocation service did not work properly.", status=status.HTTP_400_BAD_REQUEST)
