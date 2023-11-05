@@ -131,6 +131,11 @@ export class GeolocationCoords {
         this.longitude = param1[0];
         this.latitude = param1[1];
       }
+    } else if (isDict(param1)) {
+      if (isNumber(param1['longitude']) && isNumber(param1['latitude'])) {
+        this.longitude = param1['longitude'];
+        this.latitude = param1['latitude'];
+      }
     } else if (param1 instanceof GeolocationPosition) {
       this.longitude = param1.coords.longitude;
       this.latitude = param1.coords.latitude;
