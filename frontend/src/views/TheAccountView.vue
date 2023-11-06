@@ -52,9 +52,6 @@ export default {
         this.snackbarError(error);
       }
     },
-    updateUser(user) {
-      this.user = user;
-    },
     windowWidthChanged() {
       // Below or equal 520
       let columnsWidthClass = "is-full";

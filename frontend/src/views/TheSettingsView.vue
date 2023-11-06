@@ -83,7 +83,7 @@ export default {
       }
     },
     updateUser(user) {
-      for (const [key, value] in user)
+      for (const [key, value] of Object.entries(user))
         this.user[key] = value;
     }
   },

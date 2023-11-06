@@ -208,7 +208,6 @@ export default {
       'mail_notif_freq_items': this.user.mail_notif_freq_items,
       'mail_notif_freq_osm': this.user.mail_notif_freq_osm,
       'mail_notif_generalinfo': this.user.mail_notif_generalinfo,	
-	
     };
 
     if (this.user.ref_location !== null) {
@@ -300,7 +299,11 @@ export default {
             this.internalUser.mail_notif_freq_osm = this.radioGroups.notif_osm;
             this.internalUser.mail_notif_generalinfo = this.radioGroups.notif_generalinfo;
 
+            if (this.internalUser.ref_location instanceof GeolocationCoords)
+              this.internalUser.ref_location = this.internalUser.ref_location.toString();
+
             await axios.patch("/api/v1/webusers/me/", this.internalUser);
+
             this.$emit('updateUser', this.internalUser);
 
             this.$buefy.snackbar.open({
