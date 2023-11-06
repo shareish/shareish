@@ -395,8 +395,13 @@ export default {
 
       // TODO: Use URL/store to fetch address saved and assign location from it
       this.checkAddress = false;
-      this.input_address = this.geoLocationAddress;
-      this.location = this.geoLocation;
+      if (this.refLocationAddress !== "") {
+        this.input_address = this.refLocationAddress;
+        this.location = this.refLocation;
+      } else if (this.geoLocationAddress !== "") {
+        this.input_address = this.geoLocationAddress;
+        this.location = this.geoLocation;
+      }
     }
 
     this.inputsLoaded = true;
