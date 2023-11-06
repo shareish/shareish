@@ -313,7 +313,16 @@ export default {
       
     if (this.isMapMarkerUsed) {
       this.fetchMapMarkerAddress(this.mapMarkerLat, this.mapMarkerLng);
+      console.log("---after fetchmapmarkeraddress-----");	
+      console.log(this.address_coords);	
       this.type = this.$route.params.type;
+	if (this.isResourceLinked) {
+	    console.log("we are creating a request for a public resource");
+	    console.log(this.address_coords);
+	    this.user_updated_address_field = false;
+	    //this.use_coordinates=true;
+            this.updateAddressField();
+	}
     }
 
     // Has the user activated geolocation?
@@ -363,6 +372,9 @@ export default {
     },
     isMapMarkerUsed() {
       return (this.mapMarkerLat > 0 && this.mapMarkerLng > 0);	  
+    },
+    isResourceLinked() {
+	return (this.$route.params.resource);
     }
   },
   watch: {
@@ -382,6 +394,7 @@ export default {
       }
     },
     use_coordinates() {
+      console.log("call to use_coordinates");
       if (!this.user_updated_address_field)
         this.updateAddressField();
     }
@@ -405,8 +418,12 @@ export default {
 	      if (coords instanceof GeolocationCoords) {
 		      this.address_text = await this.fetchAddress(coords);
 		      this.address = this.address_text;
-          this.address_coords = coords;
-        }
+		      this.address_coords = coords;
+	              console.log(this.address_coords);
+		      console.log(this.address);
+		      console.log(coords);
+		      console.log("-------- in fetchmapmarkeraddress");
+              }
       }
       catch (error) {
         this.snackbarError(error);
@@ -484,10 +501,13 @@ export default {
       return null;
     },
     updateAddressField() {
+    console.log("-- in updateAddressField");	  
+    console.log(this.use_coordinates);	  
       if (!this.use_coordinates)
         this.address = this.address_text;
       else
-        this.address = this.address_coords.toStringForUser();
+          this.address = this.address_coords.toStringForUser();
+      console.log(this.address);
     },
     addressUpdatedByUser() {
       if (!this.user_updated_address_field)

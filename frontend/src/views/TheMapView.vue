@@ -123,8 +123,8 @@
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span></a> <span>{{ $t('or')}}</span> <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('edit_minor') }}</span></a> <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br>
-		      
                     </div>
+		    <div><span><router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category}}">Create a request here</router-link></span></div>
                   </l-popup>
                 </l-marker>
               </template>
@@ -779,8 +779,8 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-	//const baseURL = "http://overpass-api.de/api";
-        const baseURL = "https://overpass.kumi.systems/api";
+	const baseURL = "http://overpass-api.de/api";
+        //const baseURL = "https://overpass.kumi.systems/api";
         //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
