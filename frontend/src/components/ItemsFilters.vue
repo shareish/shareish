@@ -148,42 +148,22 @@
             </toggle-box>
             <toggle-box v-if="locationFilter" :title="$t('location')" outlined :title-size="6" class="mt-3">
               <div class="columns is-mobile mb-2">
-                <div class="column is-one-third pr-1">
-                  <b-tooltip :label="$t('dont-use-geolocation')" position="is-top" type="is-danger" class="w-100">
-                    <b-button
-                        expanded
-                        @click="input_locationType = 'none'"
-                        :outlined="input_locationType !== 'none'"
-                        :disabled="input_locationType !== 'none' && locationLoading"
-                        :loading="input_locationType === 'none' && locationLoading"
-                        type="is-danger"
-                    >
-                      <i class="fas fa-times"></i>
-                    </b-button>
-                  </b-tooltip>
-                </div>
-                <div class="column is-one-third pr-1 pl-1">
+                <div class="column is-half pr-1">
                   <b-tooltip :label="$t('use-geolocation')" position="is-top" type="is-info" class="w-100">
                     <b-button
                         expanded
-                        @click="input_locationType = 'geoLocation'"
-                        :outlined="input_locationType !== 'geoLocation'"
-                        :disabled="input_locationType !== 'geoLocation' && locationLoading"
-                        :loading="input_locationType === 'geoLocation' && locationLoading"
+                        @click="useLocationType('geoLocation')"
                         type="is-info"
                     >
                       <i class="fas fa-street-view"></i>
                     </b-button>
                   </b-tooltip>
                 </div>
-                <div class="column is-one-third pl-1">
+                <div class="column is-half pl-1">
                   <b-tooltip :label="$t('use-reflocation')" position="is-top" type="is-primary" class="w-100">
                     <b-button
                         expanded
-                        @click="input_locationType = 'refLocation'"
-                        :outlined="input_locationType !== 'refLocation'"
-                        :disabled="input_locationType !== 'refLocation' && locationLoading"
-                        :loading="input_locationType === 'refLocation' && locationLoading"
+                        @click="useLocationType('refLocation')"
                         type="is-primary"
                     >
                       <i class="fas fa-home"></i>
@@ -192,12 +172,12 @@
                 </div>
               </div>
               <b-field :label="$t('or-enter-an-address') + ':'">
-                <b-input v-model="input_address" :disabled="input_locationType !== 'none' || locationLoading" :placeholder="$t('address')" />
+                <b-input v-model="input_address" :placeholder="$t('address')" />
               </b-field>
               <b-field>
-                <b-switch v-model="input_restrictDistance" :disabled="input_location === null" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
+                <b-switch v-model="input_restrictDistance" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
               </b-field>
-              <b-field :label="$t('radius-from-location') + ':'" v-if="input_restrictDistance && input_location !== null">
+              <b-field :label="$t('radius-from-location') + ':'" v-if="input_restrictDistance">
                 <b-slider v-model="input_distancesRadius" class="pr-5 pl-4" :min="0" :max="100" :step="1" indicator :tooltip="false" />
               </b-field>
             </toggle-box>
@@ -347,9 +327,7 @@ export default {
     }
 
     if (this.locationFilter) {
-      data['input_location'] = null;
-      data['input_locationType'] = 'none';
-      data['locationTypeSetFromOutside'] = false;
+      data['location'] = null;
       data['input_address'] = "";
       data['input_restrictDistance'] = false;
       data['input_distancesRadius'] = [0, 100];
@@ -359,7 +337,6 @@ export default {
       data['refLocation'] = null;
       data['geoLocationAddress'] = "";
       data['refLocationAddress'] = "";
-      data['locationLoading'] = false;
     }
 
     if (this.publicationFilter) {
@@ -390,8 +367,6 @@ export default {
         navigator.geolocation.getCurrentPosition(
             position => {
               this.geoLocation = new GeolocationCoords(position);
-              if (!this.locationTypeSetFromOutside)
-                this.input_locationType = 'geoLocation';
             },
             null,
             {
@@ -418,15 +393,10 @@ export default {
       this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
       this.refLocationAddress = await this.fetchAddress(this.refLocation);
 
-      if (this.input_locationType === 'geoLocation') {
-        this.checkAddress = false;
-        this.input_address = this.geoLocationAddress;
-        this.input_location = this.geoLocation;
-      } else if (this.input_locationType === 'refLocation') {
-        this.checkAddress = false;
-        this.input_address = this.refLocationAddress;
-        this.input_location = this.refLocation;
-      }
+      // TODO: Use URL/store to fetch address saved and assign location from it
+      this.checkAddress = false;
+      this.input_address = this.geoLocationAddress;
+      this.location = this.geoLocation;
     }
 
     this.inputsLoaded = true;
@@ -482,7 +452,7 @@ export default {
         'includeAfterAvailableFrom': this.input_includeAfterAvailableFrom,
         'availableUntil': this.input_availableUntil,
         'includeBeforeAvailableUntil': this.input_includeBeforeAvailableUntil,
-        'location': this.input_location,
+        'location': this.location,
         'restrictDistance': this.input_restrictDistance,
         'distancesRadius': this.input_distancesRadius,
         'onlyUnseen': this.input_onlyUnseen,
@@ -508,37 +478,12 @@ export default {
     input_timeUnit() {
       this.input_timeUnitValue = this.sliderTimeUnitMemory[this.input_timeUnit];
     },
-    input_locationType() {
-      this.locationLoading = true;
-      this.timeouts['input_locationType'] = setTimeout(() => {
-        switch (this.input_locationType) {
-          case 'geoLocation':
-            this.checkAddress = false;
-            if (this.geoLocation === null)
-              this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-            this.input_address = this.geoLocationAddress;
-            this.input_location = this.geoLocation;
-            break;
-          case 'refLocation':
-            this.checkAddress = false;
-            this.input_address = this.refLocationAddress;
-            this.input_location = this.refLocation;
-            break;
-          case 'none':
-            this.checkAddress = false;
-            this.input_address = "";
-            this.input_location = null;
-            break;
-        }
-        this.locationLoading = false;
-      }, 600);
-    },
     input_address() {
       if (this.checkAddress) {
         clearTimeout(this.timeouts['input_address']);
         this.timeouts['input_address'] = setTimeout(() => {
-          this.updateGeolocationFromAddress();
-        }, 1000);
+          this.doubleReverseAddress();
+        }, 1500);
       } else {
         this.checkAddress = true;
       }
@@ -572,11 +517,8 @@ export default {
           columns: ['ref_location']
         }
         const refLocation = (await axios.get(`api/v1/webusers/${this.userId}`, {params: params})).data.ref_location;
-        if (refLocation !== null) {
+        if (refLocation !== null)
           this.refLocation = new GeolocationCoords(refLocation);
-          if (this.input_locationType === 'none' && !this.locationTypeSetFromOutside)
-            this.input_locationType = 'refLocation';
-        }
       }
       catch (error) {
         this.snackbarError(error);
@@ -614,17 +556,11 @@ export default {
           this.input_includeBeforeAvailableUntil = ('ibavu' in data && (data['ibavu'] === 'true' || data['ibavu'] === true));
         }
 
-        if (this.locationFilter) {
-          if ('lt' in data) {
-            this.input_locationType = data['lt'];
-            this.locationTypeSetFromOutside = true;
-          }
-          if ('dr' in data) {
+        if (this.locationFilter && 'dr' in data) {
             if (isArr(data['dr']) && data['dr'].length === 2) {
               this.input_restrictDistance = true;
               this.input_distancesRadius[0] = parseInt(data['dr'][0]);
               this.input_distancesRadius[1] = parseInt(data['dr'][1]);
-            }
           }
         }
 
@@ -704,12 +640,8 @@ export default {
           params['ibavu'] = (filteredQueryValues['includeBeforeAvailableUntil'] === true)
       }
 
-      if (this.locationFilter) {
-        params['lt'] = this.input_locationType;
-
-        if ('distancesRadius' in filteredQueryValues)
-          params['dr'] = filteredQueryValues['distancesRadius'];
-      }
+      if (this.locationFilter && 'distancesRadius' in filteredQueryValues)
+        params['dr'] = filteredQueryValues['distancesRadius'];
 
       if (this.publicationFilter) {
         if ('onlyUnseen' in filteredQueryValues)
@@ -728,7 +660,9 @@ export default {
         try {
           const formData = new FormData();
           formData.append('address', address);
-          return (await axios.post("/api/v1/address", formData)).data;
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
         }
         catch (error) {
           this.fullErrorHandling(error);
@@ -736,15 +670,37 @@ export default {
       }
       return null;
     },
-    async updateGeolocationFromAddress() {
+    async doubleReverseAddress() {
       if (isNotEmptyString(this.input_address)) {
         const geolocation = await this.fetchGeolocation(this.input_address);
-        if (geolocation !== null)
-          this.input_location = new GeolocationCoords(geolocation)
-        else
-          this.input_location = null;
+        if (geolocation !== null) {
+          this.location = geolocation;
+          this.checkAddress = false;
+          this.input_address = await this.fetchAddress(geolocation);
+        } else {
+          this.location = null;
+        }
       } else {
-        this.input_location = null;
+        this.location = null;
+      }
+    },
+    useLocationType(type) {
+      if (type === 'geoLocation') {
+        if (this.geoLocation === null) {
+          this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+        } else {
+          this.location = this.geoLocation;
+          this.checkAddress = false;
+          this.input_address = this.geoLocationAddress;
+        }
+      } else if (type === 'refLocation') {
+        if (this.refLocation === null) {
+          this.snackbarError(this.$t('enable-reflocation-to-use-feature'));
+        } else {
+          this.location = this.refLocation;
+          this.checkAddress = false;
+          this.input_address = this.refLocationAddress;
+        }
       }
     }
   },

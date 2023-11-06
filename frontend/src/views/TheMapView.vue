@@ -2,72 +2,90 @@
   <div id="page-map">
     <div id="map-surrounding">
       <l-map
+          id="leaflet-map"
+          ref="map"
           :bounds.sync="bounds"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
-          id="leaflet-map"
-          @update:bounds="boundsUpdated"
           @contextmenu="addMarker"
-          ref="map"
-	>
-	<l-control-layers position="bottomleft"></l-control-layers>
-       <l-marker ref="newmarker" :lat-lng="newmarker" :icon="addIcon"> 
-         <l-popup ref="newpopup" :options="newPopupOptions">
-           <b>{{ $t('choose_add_content_type_map') }}</b> <br><br>
-           <template v-if="newmarker.lat">
-	     <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">{{ $t('add_item') }}</router-link>
-	     <div style="display: grid;grid-template-columns:repeat(4,1fr);">
-	       <span v-for="(itemtype,index) in itemTypeIcons" :key="index">
-		 <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index}}">
-		   <b-tooltip :label="$t('item_type_'+index)">
-		     <img :src="itemTypeIcons[index].options.iconUrl" style="height: 30px; display: inline">
-		   </b-tooltip>
-		 </router-link>
-		 </span>
-	       </div>
-           </template><br>
-           <a :href="getMarkerURLAddOSM(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('add_osm') }}</span></a>
-	     <div style="display: grid;grid-template-columns:repeat(4,1fr);">
-		 <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
-		   <b-tooltip :label="$tc('map_ecat_'+ extraCategory.category, 1)">
-		     <a :href="getMarkerURLAddSpecificOSM(newmarker,extraCategory.category)" target="_blank">
-		   <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; display: inline"></a>
-                 </b-tooltip></span>
-           </div><br>
-	   
-           <a :href="getMarkerURLAddFF(newmarker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span>
-	     <span>{{ $t('add_ffruit') }}<br><b-tooltip :label="$tc('map_ecat_FLF',1)"><img :src="extraCategoriesIcons[extraCategories['FLF'].id].options.iconUrl" style="width: 24px; display: inline"></b-tooltip>
-	   </span></a><br>
-         </l-popup>
-    </l-marker>
+          @update:bounds="boundsUpdated"
+      >
+        <l-control-layers position="bottomleft"></l-control-layers>
+        <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
+          <l-popup ref="newpopup" :options="newPopupOptions">
+            <b>{{ $t('choose_add_content_type_map') }}</b> <br/><br/>
+            <template v-if="newmarker.lat">
+              <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">
+                {{ $t('add_item') }}
+              </router-link>
+              <div style="display: grid;grid-template-columns:repeat(4,1fr);">
+                <span v-for="(itemtype,index) in itemTypeIcons" :key="index">
+                  <router-link
+                      :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index}}">
+                    <b-tooltip :label="$t('item_type_'+index)">
+                      <img :src="itemTypeIcons[index].options.iconUrl" style="height: 30px; display: inline">
+                    </b-tooltip>
+                  </router-link>
+                </span>
+              </div>
+            </template>
+            <br/>
+            <a :href="getMarkerURLAddOSM(newmarker)" target="_blank">
+              <span><i class="fas fa-external-link-alt"></i></span>
+              <span>{{ $t('add_osm') }}</span>
+            </a>
+            <div style="display: grid;grid-template-columns:repeat(4,1fr);">
+              <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
+                <b-tooltip :label="$tc('map_ecat_'+ extraCategory.category, 1)">
+                  <a :href="getMarkerURLAddSpecificOSM(newmarker,extraCategory.category)" target="_blank">
+                    <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl"
+                         style="width: 24px; display: inline">
+                  </a>
+                </b-tooltip>
+              </span>
+            </div>
+            <br/>
+            <a :href="getMarkerURLAddFF(newmarker)" target="_blank">
+              <span><i class="fas fa-external-link-alt"></i></span>
+              <span>
+                {{ $t('add_ffruit') }}<br/>
+                <b-tooltip :label="$tc('map_ecat_FLF',1)">
+                  <img :src="extraCategoriesIcons[extraCategories['FLF'].id].options.iconUrl"
+                       style="width: 24px; display: inline">
+                </b-tooltip>
+              </span>
+            </a>
+            <br/>
+          </l-popup>
+        </l-marker>
         <v-geosearch :options="geosearchOptions"></v-geosearch>
-	<l-tile-layer
-	  v-for="tileProvider in tileProviders"
-	  :key="tileProvider.name"
-	  :name="tileProvider.name"
-	  :visible="tileProvider.visible"
-	  :url="tileProvider.url"
-	  :attribution="tileProvider.attribution"
-	  layer-type="base"/>
-	<l-control position="topright">
+        <l-tile-layer
+            v-for="tileProvider in tileProviders"
+            :key="tileProvider.name"
+            :attribution="tileProvider.attribution"
+            :name="tileProvider.name"
+            :url="tileProvider.url"
+            :visible="tileProvider.visible"
+            layer-type="base"/>
+        <l-control position="topright">
           <div class="is-flex is-flex-direction-column">
-            <b-tooltip :label="$t('use-geolocation')" position="is-left" type="is-info" class="w-75 mt-1">
-              <b-button type="is-info" @click="setCenterAtGeoLocation" expanded>
+            <b-tooltip :label="$t('use-geolocation')" class="w-75 mt-1" position="is-left" type="is-info">
+              <b-button expanded type="is-info" @click="setCenterAtGeoLocation">
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-left" type="is-info" class="w-75 mt-1">
-              <b-button type="is-info" @click="setCenterAtRefLocation" expanded>
+            <b-tooltip :label="$t('use-reflocation')" class="w-75 mt-1" position="is-left" type="is-info">
+              <b-button expanded type="is-info" @click="setCenterAtRefLocation">
                 <i class="fas fa-home"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('filter-items')" position="is-left" type="is-primary" class="w-75 mt-1">
-              <b-button type="is-primary" @click="openFlap('filters')" expanded>
+            <b-tooltip :label="$t('filter-items')" class="w-75 mt-1" position="is-left" type="is-primary">
+              <b-button expanded type="is-primary" @click="openFlap('filters')">
                 <i class="fas fa-filter"></i>
               </b-button>
             </b-tooltip>
-	    <b-tooltip :label="$t('open-map-settings')" position="is-left" type="is-primary" class="w-75 mt-1">
-              <b-button type="is-primary" @click="openFlap('settings')" expanded>
+            <b-tooltip :label="$t('open-map-settings')" class="w-75 mt-1" position="is-left" type="is-primary">
+              <b-button expanded type="is-primary" @click="openFlap('settings')">
                 <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
@@ -82,8 +100,8 @@
           </div>
         </l-control>
 
-        <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng" />
-        <l-marker v-if="refLocation" :icon="refLocationIcon" :lat-lng="refLocation.leafletLatLng" />
+        <l-marker v-if="geoLocation" :icon="geoLocationIcon" :lat-lng="geoLocation.leafletLatLng"/>
+        <l-marker v-if="refLocation" :icon="refLocationIcon" :lat-lng="refLocation.leafletLatLng"/>
 
         <l-layer-group v-if="zoom >= minZoomToShowElements">
           <v-marker-cluster :options="markerClusterGroupOptions">
@@ -95,7 +113,7 @@
                 :lat-lng="item.location.leafletLatLng"
             >
               <l-popup :options="{className:'item-popup', maxWidth: '500'}">
-                <item-map-popup :item="item" />
+                <item-map-popup :item="item"/>
               </l-popup>
             </l-marker>
           </v-marker-cluster>
@@ -113,17 +131,23 @@
                 >
                   <l-popup>
                     <div v-if="marker.name"><strong>{{ marker.name }}</strong></div>
-		    <figure class="image">
-                      <img v-if="marker.image" :src="marker.image" :alt="marker.image">
-		    </figure>
+                    <figure class="image">
+                      <img v-if="marker.image" :alt="marker.image" :src="marker.image">
+                    </figure>
                     <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
                     <div v-if="marker.description">{{ marker.description }}</div>
                     <div class="is-grey is-size-7 has-text-right is-italic">
                       <a :href="getMarkerURLView(extraCategory.category, marker.id)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
-                        <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span></a> <span>{{ $t('or')}}</span> <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('edit_minor') }}</span></a> <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
-                      <br>
-		      
+                        <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
+                      </a>
+                      <span>{{ $t('or') }}</span>
+                      <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
+                        <span><i class="fas fa-external-link-alt"></i></span>
+                        <span>{{ $t('edit_minor') }}</span>
+                      </a>
+                      <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      <br/>
                     </div>
                   </l-popup>
                 </l-marker>
@@ -138,9 +162,9 @@
             <header class="is-flex">
               <h2 class="title">{{ $t('settings') }}</h2>
               <b-button
-                  type="is-dark"
-                  outlined
                   class="close"
+                  outlined
+                  type="is-dark"
                   @click="closeFlap"
               >
                 <i class="fas fa-times"></i>
@@ -158,10 +182,13 @@
                 </div>
               </div>
               <div id="ecats-checkboxes" class="columns is-mobile is-flex-wrap-wrap m-0">
-                <div v-for="(extraCategory, index) in user.map_ecats" :key="index" class="column is-half p-0 pb-2" :class="{'pr-2': index % 2 === 0, 'pl-2': index % 2 !== 0}">
+                <div v-for="(extraCategory, index) in user.map_ecats" :key="index"
+                     :class="{'pr-2': index % 2 === 0, 'pl-2': index % 2 !== 0}"
+                     class="column is-half p-0 pb-2">
                   <b-field>
                     <b-checkbox v-model="ecatsCheckboxes" :native-value="extraCategory.category" type="is-primary">
-                      <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl" style="width: 24px; vertical-align: middle;" class="mr-1">
+                      <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl"
+                           class="mr-1" style="width: 24px; vertical-align: middle;">
                       {{ $tc('map_ecat_' + extraCategory.category, 0) }}
                     </b-checkbox>
                   </b-field>
@@ -175,9 +202,9 @@
             <header class="is-flex">
               <h2 class="title">{{ $tc('filter', 0) }}</h2>
               <b-button
-                  type="is-dark"
-                  outlined
                   class="close"
+                  outlined
+                  type="is-dark"
                   @click="closeFlap"
               >
                 <i class="fas fa-times"></i>
@@ -185,11 +212,11 @@
             </header>
             <div class="content">
               <items-filters
-                @fieldsUpdated="itemFiltersUpdated"
-                rewrite-url-page-name="map"
-                :limited-vertical-space="false"
-                :locationFilter="false"
-                :boxed="false"
+                  :boxed="false"
+                  :limited-vertical-space="false"
+                  :locationFilter="false"
+                  rewrite-url-page-name="map"
+                  @fieldsUpdated="itemFiltersUpdated"
               />
             </div>
           </div>
@@ -215,7 +242,15 @@ import {
   publicBookcaseIcon,
   aedIcon,
   giveBoxIcon,
-  drinkingWaterIcon, freeShopIcon, foodSharingIcon, foodBankIcon, soupKitchenIcon, fallingfruitIcon, blueIcon, addIcon, homeIcon
+  drinkingWaterIcon,
+  freeShopIcon,
+  foodSharingIcon,
+  foodBankIcon,
+  soupKitchenIcon,
+  fallingfruitIcon,
+  blueIcon,
+  addIcon,
+  homeIcon
 } from "@/map-icons";
 
 import {LMap, LTileLayer, LControlLayers, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
@@ -226,7 +261,7 @@ import {GeolocationCoords, lcall, ucfirst} from "@/functions";
 import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
 import ItemsFilters from "@/components/ItemsFilters.vue";
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import {OpenStreetMapProvider} from 'leaflet-geosearch';
 import VGeoSearch from "vue2-leaflet-geosearch";
 
 export default {
@@ -236,8 +271,8 @@ export default {
     ItemsFilters,
     ItemMapPopup,
     LMap,
-      LTileLayer,
-      LControlLayers,
+    LTileLayer,
+    LControlLayers,
     LControl,
     'v-geosearch': VGeoSearch,
     LLayerGroup,
@@ -258,9 +293,9 @@ export default {
       ecatsCheckboxes: [],
       waitingFormResponse: false,
 
-      newmarker: [0,0], //window middle?
+      newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
-	
+
       bounds: null,
       searchBounds: null,
       geoLocation: null,
@@ -270,60 +305,60 @@ export default {
 
       initialItemsLoadDone: false,
       user: {},
-      itemId: null,	
+      itemId: null,
 
       tileProviders: [
-	  {
-	      name: this.$t('tilemap_osm_humanitarian'), 
-	      visible: true,
-	      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-	      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.hotosm.org/" target="_blank">Humanitarian OSM Team</a>, hosted by <a href="https://openstreetmap.fr/" target="_blank">OSM France</a>',
-	  },
-	  {
-          name: this.$t('tilemap_osm_standard'), 
+        {
+          name: this.$t('tilemap_osm_humanitarian'),
+          visible: true,
+          url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.hotosm.org/" target="_blank">Humanitarian OSM Team</a>, hosted by <a href="https://openstreetmap.fr/" target="_blank">OSM France</a>',
+        },
+        {
+          name: this.$t('tilemap_osm_standard'),
           visible: false,
           attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
           url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          },
-	  {
-	      name : this.$t('tilemap_cyclosm'), 
-	      visible: false,
-	      url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
-	      attribution: '&copy; <a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases">CyclOSM</a> & <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-	  },
-	  {
-	      name: this.$t('tilemap_transport'), 
-	      visible: false,
-	      url: 'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
-	  },
-	  {
-	      name: this.$t('tilemap_transport_dark'), 
-	      visible: false,
-	      url: 'https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
-	  },
-	  
-	  {
-	      name: this.$t('tilemap_neighbourhood'), 
-	      visible: false,
-	      url: 'https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
-	  },
-	  {
-	      name: this.$t('tilemap_outdoors'),
-	      visible: false,
-	      url: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
-	      attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
-	  },
-	      
+        },
+        {
+          name: this.$t('tilemap_cyclosm'),
+          visible: false,
+          url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+          attribution: '&copy; <a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases">CyclOSM</a> & <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        },
+        {
+          name: this.$t('tilemap_transport'),
+          visible: false,
+          url: 'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+          attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+        },
+        {
+          name: this.$t('tilemap_transport_dark'),
+          visible: false,
+          url: 'https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+          attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+        },
+
+        {
+          name: this.$t('tilemap_neighbourhood'),
+          visible: false,
+          url: 'https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+          attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+        },
+        {
+          name: this.$t('tilemap_outdoors'),
+          visible: false,
+          url: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=a940a24136c24077857d0f9e0faa5a9f',
+          attribution: '&copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles &copy <a href="https://www.thunderforest.com/maps/transport/">Thunderforest</a>',
+        },
+
       ],
-	
-      geosearchOptions: { 
-          provider: new OpenStreetMapProvider(),
-	  searchLabel: this.$t('search_address'),
+
+      geosearchOptions: {
+        provider: new OpenStreetMapProvider(),
+        searchLabel: this.$t('search_address'),
       },
-	
+
       markerClusterGroupOptions: {
         chunkedLoading: true,
         maxClusterRadius: 15,
@@ -376,7 +411,7 @@ export default {
           markers: [],
           tagValue: 'give_box'
         },
-        'SPK':  {
+        'SPK': {
           id: 'soup-kitchens',
           markers: [],
           tagValue: 'soup_kitchen'
@@ -404,15 +439,15 @@ export default {
         'falling-fruits': fallingfruitIcon
       },
       itemTypeIcons: {
-	  'DN': greenIcon,
-	  'LN': yellowIcon,
-	  'RQ': redIcon,
-	  'EV': eventIcon
+        'DN': greenIcon,
+        'LN': yellowIcon,
+        'RQ': redIcon,
+        'EV': eventIcon
       },
       geoLocationIcon: blueIcon,
-      refLocationIcon: homeIcon,	
-      addIcon: addIcon,	
-      routedItemLocation: null,	
+      refLocationIcon: homeIcon,
+      addIcon: addIcon,
+      routedItemLocation: null,
       items: [],
 
       routedItemError: false,
@@ -423,22 +458,21 @@ export default {
     document.title = `Shareish | ${this.$t('map')}`;
 
     if (this.isPosUsed) {
-	this.routedItemLocation = new GeolocationCoords(this.PosLng,this.PosLat);
+      this.routedItemLocation = new GeolocationCoords(this.PosLng, this.PosLat);
     } else if (this.$route.query.id)
-	  this.itemId = Number(this.$route.query.id);
-    
+      this.itemId = Number(this.$route.query.id);
+
     await this.updateGeoLocation();
     await this.fetchUser();
-      
+
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
     }
 
     if (this.routedItemLocation) {
-	this.preLeafletCenter = this.routedItemLocation.leafletLatLng;
-    }
-    else if (this.geoLocation instanceof GeolocationCoords)
+      this.preLeafletCenter = this.routedItemLocation.leafletLatLng;
+    } else if (this.geoLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.geoLocation.leafletLatLng;
     else if (this.refLocation instanceof GeolocationCoords)
       this.preLeafletCenter = this.refLocation.leafletLatLng;
@@ -455,16 +489,16 @@ export default {
     userId() {
       return Number(this.$store.state.user.id);
     },
-      PosLat() {
-	  console.log(this.$route.params.lat)
-	  return Number(this.$route.params.lat);	  
+    PosLat() {
+      console.log(this.$route.params.lat)
+      return Number(this.$route.params.lat);
     },
-      PosLng() {
-	console.log(this.$route.params.lng)
-	return Number(this.$route.params.lng);
+    PosLng() {
+      console.log(this.$route.params.lng)
+      return Number(this.$route.params.lng);
     },
     isPosUsed() {
-	return (this.PosLat > 0 && this.PosLng > 0);
+      return (this.PosLat > 0 && this.PosLng > 0);
     },
   },
   watch: {
@@ -482,20 +516,19 @@ export default {
           try {
             await axios.patch(`/api/v1/map_ecats/${this.user.map_ecats[i].id}/`, {selected: checkboxSelected});
             this.user.map_ecats[i].selected = checkboxSelected;
-          }
-          catch (error) {
+          } catch (error) {
             this.snackbarError(error);
           }
         }
       }
     },
     ecatswithoutFF() {
-	var catswithoutFF=[];
-	  for (const i in this.user.map_ecats) {
-	      if (this.user.map_ecats[i].category != 'FLF')
-		  catswithoutFF.push(this.user.map_ecats[i])
-	  }
-	return catswithoutFF;
+      var catswithoutFF = [];
+      for (const i in this.user.map_ecats) {
+        if (this.user.map_ecats[i].category != 'FLF')
+          catswithoutFF.push(this.user.map_ecats[i])
+      }
+      return catswithoutFF;
     },
     rewriteURL() {
       clearTimeout(this.timeouts['rewriteURL']);
@@ -537,12 +570,11 @@ export default {
         const params = {
           columns: ['ref_location', 'map_ecats']
         }
-	  this.user = (await axios.get('/api/v1/users/me/', {params: params})).data;
+        this.user = (await axios.get('/api/v1/users/me/', {params: params})).data;
 
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);
-      }
-      catch (error) {
+      } catch (error) {
         this.snackbarError(error);
       }
     },
@@ -563,8 +595,8 @@ export default {
             this.geoLocation.update(position);
           else
             this.geoLocation = new GeolocationCoords(position);
+        } catch {
         }
-        catch {}
       }
     },
     async setCenterAtGeoLocation() {
@@ -573,7 +605,7 @@ export default {
         this.leafletCenter = this.geoLocation.leafletLatLng;
       else
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
-	  
+
     },
     async setCenterAtRefLocation() {
       if (this.refLocation instanceof GeolocationCoords)
@@ -616,8 +648,7 @@ export default {
           this.routedItemError = true;
           this.snackbarError(this.$t('this-item-doesnt-have-a-location'));
         }
-      }
-      catch (error) {
+      } catch (error) {
         this.routedItemError = true;
         this.snackbarError(error);
       }
@@ -667,7 +698,7 @@ export default {
         for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
           if (key === 'FLF') {
             tmpExtraCategories['FLF']['markers'] = elements[0].filter(element =>
-              element['id'] != null && element['lat'] != null && element['lng'] != null
+                element['id'] != null && element['lat'] != null && element['lng'] != null
             ).map(element => {
               return {
                 id: element['id'],
@@ -681,14 +712,14 @@ export default {
             const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
             if (opKey !== -1) {
               tmpExtraCategories[key]['markers'] = elements[opKey + 1].filter(element =>
-                element['id'] != null && element['lat'] != null && element['lon'] != null
+                  element['id'] != null && element['lat'] != null && element['lon'] != null
               ).map(element => {
                 return {
                   id: element['id'],
                   type: extraCategory.tagValue,
                   name: element['tags']['name'],
                   location: new GeolocationCoords(element['lon'], element['lat']),
-		  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
+                  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
                 }
               });
             }
@@ -698,63 +729,58 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-      addMarker(e) {
-	  this.newmarker = e.latlng;
+    addMarker(e) {
+      this.newmarker = e.latlng;
 
-	//this.$refs.map.mapObject.on('popupopen', function(e) {
-	//    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
-	//    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
-	//    this.$refs.map.mapObject.panTo(map.unproject(px),{animate: true}); // pan to new center
-	//});
+      //this.$refs.map.mapObject.on('popupopen', function(e) {
+      //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
+      //    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
+      //    this.$refs.map.mapObject.panTo(map.unproject(px),{animate: true}); // pan to new center
+      //});
 
-	
-	  this.$refs.newmarker.mapObject.setOpacity(1);
-	  this.$refs.newmarker.mapObject.getPopup().on('remove', function () {this._source.setOpacity(0);});
-	  this.$refs.newmarker.mapObject.openPopup();
-	  //this.$refs.map.mapObject.setView(this.newmarker);
-	
-     },
+
+      this.$refs.newmarker.mapObject.setOpacity(1);
+      this.$refs.newmarker.mapObject.getPopup().on('remove', function () {
+        this._source.setOpacity(0);
+      });
+      this.$refs.newmarker.mapObject.openPopup();
+      //this.$refs.map.mapObject.setView(this.newmarker);
+
+    },
     getMarkerURLView(category, markerId) {
-	if (category === 'FLF') {
-	return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
+      if (category === 'FLF') {
+        return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
       } else {
         return "https://openstreetmap.org/node/" + markerId;
       }
     },
     getMarkerURLEdit(category, marker) {
-	if (category === 'FLF') {
-	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
-	}
-	else if (category === 'BKC') {
-	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
-	}
-        else if (category === "DEF") {
-	     return "https://mapcomplete.org/aed?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
-	  }
-	else if (category === "DWS") {
-	    return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
-	      }
-	else {
-	return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
+      if (category === 'FLF') {
+        return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
+      } else if (category === 'BKC') {
+        return "https://mapcomplete.org/bookcases.html?z=19&lat=" + marker.location.leafletLatLng.lat + "&lon=" + marker.location.leafletLatLng.lng + "#node/" + marker.id
+      } else if (category === "DEF") {
+        return "https://mapcomplete.org/aed?z=19&lat=" + marker.location.leafletLatLng.lat + "&lon=" + marker.location.leafletLatLng.lng + "#node/" + marker.id
+      } else if (category === "DWS") {
+        return "https://mapcomplete.org/drinking_water.html?z=19&lat=" + marker.location.leafletLatLng.lat + "&lon=" + marker.location.leafletLatLng.lng + "#node/" + marker.id
+      } else {
+        return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
       }
     },
     getMarkerURLAddOSM(marker) {
-	return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
+      return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
     },
-    getMarkerURLAddSpecificOSM(marker,category) {
-	if (category === "BKC") {
-	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.lat+"&lon="+marker.lng;
-	}
-	  else if (category === "DEF") {
-	      return "https://mapcomplete.org/aed.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
-	  }
-	  else if (category === "DWS") {
-	      return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
-	      }
-	else return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
+    getMarkerURLAddSpecificOSM(marker, category) {
+      if (category === "BKC") {
+        return "https://mapcomplete.org/bookcases.html?z=19&lat=" + marker.lat + "&lon=" + marker.lng;
+      } else if (category === "DEF") {
+        return "https://mapcomplete.org/aed.html?z=19&lat=" + marker.lat + "&lon=" + marker.lng;
+      } else if (category === "DWS") {
+        return "https://mapcomplete.org/drinking_water.html?z=19&lat=" + marker.lat + "&lon=" + marker.lng;
+      } else return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
     },
     getMarkerURLAddFF(marker) {
-	  return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
+      return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
     },
     async getFallingFruitElements() {
       try {
@@ -767,8 +793,7 @@ export default {
             return data;
           }
         })).data;
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         return [];
       }
@@ -779,13 +804,12 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-	//const baseURL = "http://overpass-api.de/api";
+        //const baseURL = "http://overpass-api.de/api";
         const baseURL = "https://overpass.kumi.systems/api";
         //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
         return [];
       }

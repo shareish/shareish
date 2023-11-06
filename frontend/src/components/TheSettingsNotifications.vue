@@ -13,8 +13,8 @@
                   </b-tooltip>
                 </template>
                 <b-tooltip :label="$t('use-geolocation')" type="is-info" position="is-bottom">
-                  <b-button type="is-info" @click="fetchAddressGeoLoc">
-                    <i class="fas fa-home"></i>
+                  <b-button type="is-info" @click="useGeoLocAddress">
+                    <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
                 <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
@@ -155,7 +155,6 @@
         </template>
       </b-field>
     </div>
-    
     <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save" />
   </section>
 </template>
@@ -183,6 +182,8 @@ export default {
     return {
       loading: true,
       geoLocation: null,
+      geoLocationAddress: "",
+      checkAddress: false,
       internalUser: null,
       address: "",
       radioGroups: {
@@ -212,6 +213,7 @@ export default {
 
     if (this.user.ref_location !== null) {
       this.internalUser.ref_location = new GeolocationCoords(this.user.ref_location);
+      this.checkAddress = false;
       this.address = await this.fetchAddress(this.internalUser.ref_location);
     } else {
       this.internalUser.ref_location = null;
@@ -228,8 +230,9 @@ export default {
     if ('geolocation' in navigator) {
       // Get the position
       navigator.geolocation.getCurrentPosition(
-        position => {
+        async position => {
           this.geoLocation = new GeolocationCoords(position);
+          this.geoLocationAddress = await this.fetchAddress(this.geoLocation);
         },
         null,
         {
@@ -242,12 +245,35 @@ export default {
 
     this.loading = false;
   },
+  watch: {
+    address() {
+      if (this.checkAddress) {
+        clearTimeout(this.timeouts['address']);
+        this.timeouts['address'] = setTimeout(() => {
+          this.doubleReverseAddress();
+        }, 1500);
+      } else {
+        this.checkAddress = true;
+      }
+    }
+  },
   methods: {
-    async fetchAddressGeoLoc() {
-      if (this.geoLocation instanceof GeolocationCoords)
-        this.address = await this.fetchAddress(this.geoLocation);
-      else
+    async doubleReverseAddress() {
+      if (isNotEmptyString(this.address)) {
+        const geolocation = await this.fetchGeolocation(this.address);
+        if (geolocation !== null) {
+          this.checkAddress = false;
+          this.address = await this.fetchAddress(geolocation);
+        }
+      }
+    },
+    async useGeoLocAddress() {
+      if (this.geoLocation instanceof GeolocationCoords) {
+        this.checkAddress = false;
+        this.address = this.geoLocationAddress;
+      } else {
         this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
     },
     async fetchAddress(location) {
       if (location instanceof GeolocationCoords) {
@@ -258,14 +284,16 @@ export default {
           this.fullErrorHandling(error);
         }
       }
-      return null
+      return null;
     },
     async fetchGeolocation(address) {
       if (isNotEmptyString(address)) {
         try {
           const formData = new FormData();
           formData.append('address', address);
-          return (await axios.post("/api/v1/address", formData)).data;
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
         }
         catch (error) {
           this.fullErrorHandling(error);
@@ -283,8 +311,8 @@ export default {
           try {
             if (isNotEmptyString(this.address)) {
               const newRefLocation = await this.fetchGeolocation(this.address);
-              if (newRefLocation !== null) {
-                this.internalUser.ref_location = new GeolocationCoords(newRefLocation);
+              if (newRefLocation instanceof GeolocationCoords) {
+                this.internalUser.ref_location = newRefLocation;
                 this.address = await this.fetchAddress(this.internalUser.ref_location);
               } else {
                 this.internalUser.ref_location = null;
