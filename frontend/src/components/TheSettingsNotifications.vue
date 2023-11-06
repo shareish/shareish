@@ -265,7 +265,7 @@ export default {
             if (geolocation !== null)
               this.suggestedAddresses = [await this.fetchAddress(geolocation)];
           }
-        }, 1000);
+        }, 750);
       } else {
         this.checkAddress = true;
       }

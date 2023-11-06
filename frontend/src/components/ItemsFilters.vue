@@ -509,7 +509,7 @@ export default {
           } else {
             this.location = null;
           }
-        }, 1500);
+        }, 750);
       } else {
         this.checkAddress = true;
       }
