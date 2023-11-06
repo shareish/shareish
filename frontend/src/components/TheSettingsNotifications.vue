@@ -17,7 +17,16 @@
                     <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
-                <b-input v-model="address" class="is-expanded ml-2" name="ref_location" type="text" />
+                <b-autocomplete
+                    v-model="address"
+                    :open-on-focus="true"
+                    :data="suggestedAddresses"
+                    field="ref_location"
+                    :clearable="true"
+                    class="is-expanded ml-2"
+                    :placeholder="$t('address')"
+                >
+                </b-autocomplete>
               </b-field>
             </div>
           </div>
@@ -184,6 +193,7 @@ export default {
       geoLocation: null,
       geoLocationAddress: "",
       checkAddress: false,
+      suggestedAddresses: [],
       internalUser: null,
       address: "",
       radioGroups: {
@@ -249,24 +259,19 @@ export default {
     address() {
       if (this.checkAddress) {
         clearTimeout(this.timeouts['address']);
-        this.timeouts['address'] = setTimeout(() => {
-          this.doubleReverseAddress();
-        }, 1500);
+        this.timeouts['address'] = setTimeout(async () => {
+          if (isNotEmptyString(this.address)) {
+            const geolocation = await this.fetchGeolocation(this.address);
+            if (geolocation !== null)
+              this.suggestedAddresses = [await this.fetchAddress(geolocation)];
+          }
+        }, 1000);
       } else {
         this.checkAddress = true;
       }
     }
   },
   methods: {
-    async doubleReverseAddress() {
-      if (isNotEmptyString(this.address)) {
-        const geolocation = await this.fetchGeolocation(this.address);
-        if (geolocation !== null) {
-          this.checkAddress = false;
-          this.address = await this.fetchAddress(geolocation);
-        }
-      }
-    },
     async useGeoLocAddress() {
       if (this.geoLocation instanceof GeolocationCoords) {
         this.checkAddress = false;

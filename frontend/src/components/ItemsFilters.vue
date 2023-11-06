@@ -172,7 +172,16 @@
                 </div>
               </div>
               <b-field :label="$t('or-enter-an-address') + ':'">
-                <b-input v-model="input_address" :placeholder="$t('address')" />
+                <b-autocomplete
+                    v-model="input_address"
+                    :open-on-focus="true"
+                    :data="suggestedAddresses"
+                    field="ref_location"
+                    :clearable="true"
+                    :placeholder="$t('address')"
+                    @select="option => assignLocation(option)"
+                >
+                </b-autocomplete>
               </b-field>
               <b-field>
                 <b-switch v-model="input_restrictDistance" type="is-primary">{{ $t('restrict-distance') }}</b-switch>
@@ -327,6 +336,8 @@ export default {
     }
 
     if (this.locationFilter) {
+      data['suggestedAddresses'] = [];
+      data['suggestedLocations'] = [];
       data['location'] = null;
       data['input_address'] = "";
       data['input_restrictDistance'] = false;
@@ -486,8 +497,18 @@ export default {
     input_address() {
       if (this.checkAddress) {
         clearTimeout(this.timeouts['input_address']);
-        this.timeouts['input_address'] = setTimeout(() => {
-          this.doubleReverseAddress();
+        this.timeouts['input_address'] = setTimeout(async () => {
+          if (isNotEmptyString(this.input_address)) {
+            const geolocation = await this.fetchGeolocation(this.input_address);
+            if (geolocation !== null) {
+              this.suggestedAddresses = [await this.fetchAddress(geolocation)];
+              this.suggestedLocations = [geolocation];
+            } else {
+              this.location = null;
+            }
+          } else {
+            this.location = null;
+          }
         }, 1500);
       } else {
         this.checkAddress = true;
@@ -675,20 +696,6 @@ export default {
       }
       return null;
     },
-    async doubleReverseAddress() {
-      if (isNotEmptyString(this.input_address)) {
-        const geolocation = await this.fetchGeolocation(this.input_address);
-        if (geolocation !== null) {
-          this.location = geolocation;
-          this.checkAddress = false;
-          this.input_address = await this.fetchAddress(geolocation);
-        } else {
-          this.location = null;
-        }
-      } else {
-        this.location = null;
-      }
-    },
     useLocationType(type) {
       if (type === 'geoLocation') {
         if (this.geoLocation === null) {
@@ -707,6 +714,11 @@ export default {
           this.input_address = this.refLocationAddress;
         }
       }
+    },
+    assignLocation(option) {
+      const index = this.suggestedAddresses.indexOf(option);
+      if (index !== -1)
+        this.location = this.suggestedLocations[index];
     }
   },
   destroyed: function () {
