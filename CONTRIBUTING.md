@@ -17,7 +17,8 @@ Thank you for wanting to contribute to the Shareish project ! :green_heart:
 3. Before submitting a patch related to the front-end, please check if you follow [VueJS style guide](https://v2.vuejs.org/v2/style-guide/?redirect=true).
 
 ## Do you intend to add a new feature?
-Please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions) or submit an issue describing the enhancement you plan to implement.
+If you don't have a specific idea but you want to contribute to the code, please have a look at the "good first issue" label under [Issues](https://github.com/shareish/shareish/issues).
+If you have a specific new feature in mind, please ensure it is not already under development in a branch or assigned to someone under [Issues](https://github.com/shareish/shareish/issues). If you don't find a similar planned feature, please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions) or submit an issue describing the enhancement you plan to implement.
 
 ## Do you have questions about the source code?
 Please contact us using [GitHub Discussions](https://github.com/shareish/shareish/discussions).
