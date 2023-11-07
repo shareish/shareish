@@ -129,8 +129,8 @@
                 <i class="fas fa-street-view"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-info">
-               <b-button @click="fetchAddressRefLoc" type="is-info">
+            <b-tooltip :label="$t('use-reflocation')" position="is-bottom" type="is-primary">
+               <b-button @click="fetchAddressRefLoc" type="is-primary">
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
