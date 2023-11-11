@@ -141,12 +141,12 @@
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
                       </a>
-                      <span>{{ $t('or') }}</span>
+                      <span> {{ $t('or') }} </span>
                       <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t('edit_minor') }}</span>
                       </a>
-                      <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br/>
                     </div>
                   </l-popup>
