@@ -137,6 +137,12 @@ export const categories = {
     "image-placeholder": require('@/assets/categories/means_of_transport.jpg'), 
     "icon": "fas fa-car-side"
   },
+  "PR": {
+    "id": "PR",
+    "slug": "publicresource",
+    "image-placeholder": require('@/assets/categories/publicresource.jpg'), 
+    "icon": "fas fa-car-side"
+  },
   "OT": {
     "id": "OT",
     "slug": "other",
