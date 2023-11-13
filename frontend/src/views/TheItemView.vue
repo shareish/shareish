@@ -150,14 +150,14 @@
               <em>{{ $t('no-address') }}</em>
             </div>
           </article>
-          <article id="availability" v-if="isOwner || notAvailableYet || item.enddate" class="mb-5-5">
+          <article id="availability" v-if="isOwner || notAvailableYet || item.enddate || item.type === 'EV'" class="mb-5-5">
             <div class="title is-size-4 mb-2">
               <div class="icon-text">
                 <span class="icon is-medium"><i class="fas fa-calendar-day"></i></span>
                 <span>{{ $t('availability') }}</span>
               </div>
             </div>
-            <template v-if="isOwner || itemHasEnded || notAvailableYet">
+            <template v-if="isOwner || itemHasEnded || notAvailableYet || item.type === 'EV'">
               <span>
                 {{ $t('item-availability-from') }}
                 {{ formattedDate(item.startdate, $i18n.locale) }} ({{ formattedDateFromNow(item.startdate, $i18n.locale) }})
@@ -275,7 +275,7 @@ export default {
       return itemCategories;
     },
     notAvailableYet() {
-      return this.item.enddate && new Date(this.item.enddate) <= Date.now();
+      return this.item.startdate && new Date(this.item.startdate) > Date.now();
     },
     itemHasEnded() {
       return this.item.enddate && new Date(this.item.enddate) <= Date.now();
