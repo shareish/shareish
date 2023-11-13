@@ -243,6 +243,7 @@ class Item(models.Model):
         SPORT = 'SP', _("Sports")
         TRANSPORT = 'TS', _("Transportation, Delivery, Pick-up, Moving")
         VEHICLE = 'VE', _("Vehicles and Means of transport")
+        PUBLICRESOURCE = 'PR', _("Public Resource")
         OTHER = 'OT', _("Other")
 
     class Visibility(models.TextChoices):

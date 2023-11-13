@@ -94,7 +94,10 @@ media,"CDs, DVDs, Blu-rays, Discs","CDs, DVDs, Blu-rays, Disques"
 sport,Sports,Sports
 transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Livraison, Déménagement"
 vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
+publicresource,Public resource,Ressource publique
 other,Other,Autres
+foodsharing_status,"Food sharing fridge status: Broken / Dirty / Empty","Statut du frigo solidaire: Cassé / Sale / Vide"
+related_to,Related to,Lié à
 search-dot,Search...,Recherche...
 map_ecat_BKC,Public bookcase|Public bookcases,Boîte à livres|Boîtes à livres
 map_ecat_DEF,Defibrillator|Defibrillators,Défibrillateur|Défibrillateurs
@@ -119,6 +122,7 @@ at,at,à
 i-am-interested,Details,Détails
 button-load-more,Load more,Charger plus
 no-items,No item,Pas d'élément
+add-a-request,Add a request here,Ajouter une requête ici
 add-new-item,Add a new item,Ajout d'élément
 add-new-item-from-recurrents,Add a new item from recurrents,Ajout d'élément à partir de récurrents
 i-have-image,I have image for my item,J'ai une image pour mon élément

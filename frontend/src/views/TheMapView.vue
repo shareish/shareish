@@ -124,7 +124,7 @@
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span></a> <span>{{ $t('or')}}</span> <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank"><span><i class="fas fa-external-link-alt"></i></span><span>{{ $t('edit_minor') }}</span></a> <span>{{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br>
                     </div>
-		    <div><span><router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category}}">Create a request here</router-link></span></div>
+		    <div><span><router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">{{ $t('add-a-request') }}</router-link></span></div>
                   </l-popup>
                 </l-marker>
               </template>
@@ -733,9 +733,15 @@ export default {
 	  }
 	else if (category === "DWS") {
 	    return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
-	      }
+	}
+	else if (category === "GVB") {
+	    return "https://mapcomplete.org/theme.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"&userlayout=https%3A%2F%2Fstudio.mapcomplete.org%2F75871%2Flayers%2Fgive_box%2Fgive_box.json#node/"+marker.id
+	}
+	else if (category === "FDS") {
+	    return "https://mapcomplete.org/theme.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"&userlayout=https%3A%2F%2Fstudio.mapcomplete.org%2F75871%2Flayers%2Ffood_sharing%2Ffood_sharing.json#node/"+marker.id
+	}
 	else {
-	return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
+	    return "https://openstreetmap.org/edit?node=" + marker.id + "#map=19/" + marker.location.leafletLatLng.lat + "/" + marker.location.leafletLatLng.lng;
       }
     },
     getMarkerURLAddOSM(marker) {
@@ -743,14 +749,14 @@ export default {
     },
     getMarkerURLAddSpecificOSM(marker,category) {
 	if (category === "BKC") {
-	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.lat+"&lon="+marker.lng;
+	    return "https://mapcomplete.org/bookcases.html?z=18&lat="+marker.lat+"&lon="+marker.lng;
 	}
-	  else if (category === "DEF") {
-	      return "https://mapcomplete.org/aed.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
-	  }
-	  else if (category === "DWS") {
-	      return "https://mapcomplete.org/drinking_water.html?z=19&lat="+marker.lat+"&lon="+marker.lng; 
-	      }
+	else if (category === "DEF") {
+	    return "https://mapcomplete.org/aed.html?z=18&lat="+marker.lat+"&lon="+marker.lng; 
+	}
+	else if (category === "DWS") {
+	    return "https://mapcomplete.org/drinking_water.html?z=18&lat="+marker.lat+"&lon="+marker.lng; 
+	}
 	else return "https://openstreetmap.org/edit#map=20/" + marker.lat + "/" + marker.lng;
     },
     getMarkerURLAddFF(marker) {

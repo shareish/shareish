@@ -294,6 +294,7 @@ export default {
       category3: '',
       address_text: "",
       address_coords: new GeolocationCoords(),
+      ressource_id : '',  //public resource id
       address: "",
       use_coordinates: false,
       user_updated_address_field: false,
@@ -304,25 +305,78 @@ export default {
 
       geoLocation: null,
       refLocation : null,
-      waitingFormResponse: false
+      waitingFormResponse: false,
+
+      extraCategories: {
+        'BKC': {
+          id: 'bookcases',
+          markers: [],
+          tagValue: 'public_bookcase',
+	  item_category: 'BK'  
+        },
+        'DEF': {
+          id: 'defibrillators',
+          markers: [],
+          tagValue: 'defibrillator',
+	  item_category: 'HE'  
+        },
+        'DWS': {
+          id: 'drinking-water-spots',
+          markers: [],
+          tagValue: 'drinking_water',
+	  item_category: 'FD'  
+        },
+        'FDB': {
+          id: 'food-banks',
+          markers: [],
+          tagValue: 'food_bank',
+	  item_category: 'FD'  
+        },
+        'FDS': {
+          id: 'food-sharings',
+          markers: [],
+          tagValue: 'food_sharing',
+	  item_category: 'FD'  
+        },
+        'FLF': {
+          id: 'falling-fruits',
+          markers: [],
+          tagValue: 'ffruit',
+	  item_category: 'FD'  
+        },
+        'FRS': {
+          id: 'free-shops',
+          markers: [],
+          tagValue: 'freeshop',
+	  item_category: 'EQ'    
+        },
+        'GVB': {
+          id: 'give-boxes',
+          markers: [],
+          tagValue: 'give_box',
+	  item_category: 'EQ'    
+        },
+        'SPK':  {
+          id: 'soup-kitchens',
+          markers: [],
+          tagValue: 'soup_kitchen',
+	  item_category: 'FD'    
+        }
+      },
+	
     }
   },
-  created() {
+  async created() {
     if (this.isRecurrentItemUsed)
       this.fetchRecurrentItem();
       
     if (this.isMapMarkerUsed) {
-      this.fetchMapMarkerAddress(this.mapMarkerLat, this.mapMarkerLng);
-      console.log("---after fetchmapmarkeraddress-----");	
-      console.log(this.address_coords);	
+      await this.fetchMapMarkerAddress(this.mapMarkerLat, this.mapMarkerLng);
       this.type = this.$route.params.type;
-	if (this.isResourceLinked) {
-	    console.log("we are creating a request for a public resource");
-	    console.log(this.address_coords);
-	    this.user_updated_address_field = false;
-	    //this.use_coordinates=true;
-            this.updateAddressField();
-	}
+      if (this.isResourceLinked) {
+	  this.use_coordinates = true;
+	  this.fetchResourceInfo(this.$route.params.rid);
+      }
     }
 
     // Has the user activated geolocation?
@@ -374,7 +428,7 @@ export default {
       return (this.mapMarkerLat > 0 && this.mapMarkerLng > 0);	  
     },
     isResourceLinked() {
-	return (this.$route.params.resource);
+	return(this.$route.params.resource)
     }
   },
   watch: {
@@ -394,7 +448,6 @@ export default {
       }
     },
     use_coordinates() {
-      console.log("call to use_coordinates");
       if (!this.user_updated_address_field)
         this.updateAddressField();
     }
@@ -412,6 +465,19 @@ export default {
         }
       }
     },
+    async fetchResourceInfo(rid) {
+	this.ressource_id = rid
+	let prsource = "";
+	if (this.$route.params.resource == 'FDS')
+	    this.description = this.$t('foodsharing_status');
+        if (this.$route.params.resource == 'FLF')
+	    prsource = "Falling Fruit"
+	else
+	    prsource = "OpenStreetMap"
+	this.description += "\n("+this.$t('related_to')+" " + this.$tc('map_ecat_'+this.$route.params.resource,1) + " " + prsource + " node ID "+this.ressource_id+")";
+	this.category1 = 'PR';
+	this.category2 = this.extraCategories[this.$route.params.resource].item_category;
+    },
     async fetchMapMarkerAddress(lat, lng) {
       try {
         const coords = new GeolocationCoords(lng, lat);
@@ -419,10 +485,6 @@ export default {
 		      this.address_text = await this.fetchAddress(coords);
 		      this.address = this.address_text;
 		      this.address_coords = coords;
-	              console.log(this.address_coords);
-		      console.log(this.address);
-		      console.log(coords);
-		      console.log("-------- in fetchmapmarkeraddress");
               }
       }
       catch (error) {
@@ -501,13 +563,10 @@ export default {
       return null;
     },
     updateAddressField() {
-    console.log("-- in updateAddressField");	  
-    console.log(this.use_coordinates);	  
       if (!this.use_coordinates)
         this.address = this.address_text;
       else
           this.address = this.address_coords.toStringForUser();
-      console.log(this.address);
     },
     addressUpdatedByUser() {
       if (!this.user_updated_address_field)
