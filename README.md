@@ -13,7 +13,7 @@ If you are interested by this project (as a potential user, contributor, develop
 
 ## Demonstration server
 
-A public server hosted by the University of Liège is available at https://shareish.org/
+[A public server hosted by the University of Liège is available](https://shareish.org/)
 
 ## Installation
 Shareish can be installed in development mode for local tests and development ("Local development with Docker-compose (on your own computer)") or in production mode on a server ("Installation for deployment on a production server"). See below for relevant installation instructions.
