@@ -11,7 +11,7 @@ django-cors-headers==3.13.0
 django-mail-templated==2.6.5
 torch==1.12.1
 torchvision==0.13.1
-Pillow==9.0.1
+Pillow==10.0.1
 matplotlib==3.4.3
 asgiref==3.5.2
 geopy==2.2.0
