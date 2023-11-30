@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from torchvision import models, transforms
 
 model = torch.hub.load(
-    'pytorch/vision:v0.10.0', 'mobilenet_v3_large',
+    'pytorch/vision:v0.14.1', 'mobilenet_v3_large',
     weights=models.MobileNet_V3_Large_Weights.IMAGENET1K_V1
     )
 model.eval()
