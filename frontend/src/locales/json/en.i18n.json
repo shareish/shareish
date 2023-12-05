@@ -483,6 +483,7 @@
   "tilemap_neighbourhood": "Clean neighbourhood Map",
   "tilemap_outdoors": "Outdoors map",
   "use-coordinates": "Use GPS coordinates",
+  "current-time": "Now",
   "error_keys__ACCOUNT_ALREADY_DISABLED": "This account is already disabled.",
   "error_keys__ACCOUNT_DOESNT_EXIST": "This account doesn't exist.",
   "error_keys__ACCOUNT_NOT_DISABLED": "This account is not disabled.",

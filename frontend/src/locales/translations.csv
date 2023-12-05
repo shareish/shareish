@@ -481,7 +481,7 @@ tilemap_transport_dark,"Transport map (dark)","Carte des transports en commun (s
 tilemap_neighbourhood,"Clean neighbourhood Map","Carte de voisinage légère"
 tilemap_outdoors,"Outdoors map","Carte d'extérieurs"
 use-coordinates,Use GPS coordinates,Utiliser les coordonnées GPS
-
+current-time,Now,Maintenant
 
 
 error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.

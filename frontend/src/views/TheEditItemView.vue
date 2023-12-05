@@ -152,8 +152,21 @@
                     @icon-right-click="clearStartdate"
                     icon-pack="fas"
                     :locale="$i18n.locale"
-                    @change="startdateChanged"
-                />
+                    @change="startdateChanged">
+		  <template #left>
+                     <b-button
+                       :label="$t('current-time')"
+                       type="is-primary"
+                       icon-left="clock"
+                       @click="internalItem.startdate = new Date()" />
+		   </template>
+		   <template #right>
+                     <b-button
+                       :label="$t('reset')"
+                       type="is-danger"
+                       @click="internalItem.startdate = null" />
+		   </template>
+                </b-datetimepicker>
               </b-field>
             </div>
             <div class="column">
@@ -172,8 +185,21 @@
                     @icon-right-click="clearEnddate"
                     icon-pack="fas"
                     :locale="$i18n.locale"
-                    @change="enddateChanged"
-                />
+                    @change="enddateChanged">
+		  <template #left>
+                     <b-button
+                       :label="$t('current-time')"
+                       type="is-primary"
+                       icon-left="clock"
+                       @click="internalItem.enddate = new Date()" />
+		   </template>
+		   <template #right>
+                     <b-button
+                       :label="$t('reset')"
+                       type="is-danger"
+                       @click="internalItem.enddate = null" />
+		   </template>
+		</b-datetimepicker>
               </b-field>
             </div>
           </div>

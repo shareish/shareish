@@ -483,6 +483,7 @@
   "tilemap_neighbourhood": "Carte de voisinage légère",
   "tilemap_outdoors": "Carte d'extérieurs",
   "use-coordinates": "Utiliser les coordonnées GPS",
+  "current-time": "Maintenant",
   "error_keys__ACCOUNT_ALREADY_DISABLED": "Ce compte déjà désactivé.",
   "error_keys__ACCOUNT_DOESNT_EXIST": "Ce compte n'existe pas.",
   "error_keys__ACCOUNT_NOT_DISABLED": "Ce compte n'est pas désactivé.",
