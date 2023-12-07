@@ -30,6 +30,11 @@
         <router-link :to="{name: 'login'}">{{ $t('logged_in') }}</router-link>, Shareish {{ $t('offers') }}
         <router-link :to="{name: 'map'}">{{ $t('interactive_map') }}</router-link> {{ $t('shareish_description2') }}.
       </p>
+      <img src="../assets/shareish-map-overview-items.jpg" alt="Overview of Shareish map" width="45%">
+      <img src="../assets/shareish-browseitems-overview.jpg" alt="Overview of Shareish content" width="45%">
+      <img src="../assets/shareish-conversations-overview.jpg" alt="Overview of Shareish conversation" width="45%">
+      <img src="../assets/shareish-overview-settings.jpg" alt="Overview of Shareish conversation" width="45%">
+      
       <br />
 
       <br />
