@@ -38,6 +38,8 @@ faq_who_answer,"The initial team is composed by researchers and students in comp
 faq_further,"I have further comments, issues, remarks, questions, proposals, where should I send them ?","J'ai d'autres commentaires, problèmes, remarques, questions, propositions, où puis-je les envoyer ?"
 faq_further_answer,"Constructive comments are very welcome and we are open to new ideas as we would like the development of Shareish to be participatory. See our Contact links below to report bugs using GitHub issues or to discuss about the project using Github Discussions. Also feel free to send us an e-mail","Les commentaires constructifs sont toujours les bienvenus et nous sommes ouverts à de nouvelles idées comme nous souhaitons que le développement de Shareish soit participatif. Voir la rubrique Contact en bas de page où il est possible de signaler des bugs en utilisant les "Issues" de GitHub ou de discuter du projet en utilisant les "Discussions" de GitHub. N'hésitez pas à nous envoyer un courriel si vous préférez ce mode de communication:"
 map,Map,Carte
+view-map,View the map,Voir la carte
+view-map-noaccount,View the map with limited content (without an account).,Voir la carte avec un contenu limité (sans compte).
 browse-items,Browse items,Liste d'éléments
 add-item,Add item,Ajouter un élément
 conversations,Conversations,Conversations
@@ -482,8 +484,7 @@ tilemap_neighbourhood,"Clean neighbourhood Map","Carte de voisinage légère"
 tilemap_outdoors,"Outdoors map","Carte d'extérieurs"
 use-coordinates,Use GPS coordinates,Utiliser les coordonnées GPS
 current-time,Now,Maintenant
-
-
+better_if_connected,"Shareish experience is better (map with more data, user conversations, profile configurations, ...) if you create an account and log in.","L'expérience Shareish est meilleure (carte avec davantage de données, conversations avec les autres utilisateurs, configurations du profil, ...) si vous créez un compte et êtes connectés."
 error_keys__ACCOUNT_ALREADY_DISABLED,This account is already disabled.,Ce compte déjà désactivé.
 error_keys__ACCOUNT_DOESNT_EXIST,This account doesn't exist.,Ce compte n'existe pas.
 error_keys__ACCOUNT_NOT_DISABLED,This account is not disabled.,Ce compte n'est pas désactivé.

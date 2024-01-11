@@ -464,8 +464,25 @@ export default {
       this.itemId = Number(this.$route.query.id);
 
     await this.updateGeoLocation();
-    await this.fetchUser();
-
+      
+    if (this.isAuthenticated) {
+	await this.fetchUser();
+    } 
+    else {
+	//Create fake user.map_ecats to be able to display OSM/FF data while not logged in
+	this.user.map_ecats = [{category: "BKC", selected: true},
+			       {category: "DEF", selected: true},
+			       {category: "DWS", selected: true},
+			       {category: "FDB", selected: true},
+			       {category: "FDS", selected: true},
+			       {category: "FLF", selected: true},
+			       {category: "FRS", selected: true},
+			       {category: "GVB", selected: true},
+			       {category: "SPK", selected: true},
+			      ];
+    }
+    console.log(this.user.map_ecats)
+      
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
@@ -487,6 +504,9 @@ export default {
 
   },
   computed: {
+    isAuthenticated() {
+      return this.$store.state.isAuthenticated;
+    },
     userId() {
       return Number(this.$store.state.user.id);
     },
@@ -572,7 +592,8 @@ export default {
           columns: ['ref_location', 'map_ecats']
         }
         this.user = (await axios.get('/api/v1/users/me/', {params: params})).data;
-
+	console.log(this.user.map_ecats);
+	  
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);
       } catch (error) {
@@ -818,9 +839,9 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        //const baseURL = "http://overpass-api.de/api";
+        const baseURL = "http://overpass-api.de/api";
         //const baseURL = "https://overpass.kumi.systems/api";
-        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       } catch (error) {
@@ -842,7 +863,12 @@ export default {
           this.searchBounds[1].update(SECoords);
         }
 
-        await this.fetchItems(this.filteredQueryValues);
+        if (this.isAuthenticated) {
+	    await this.fetchItems(this.filteredQueryValues);
+	}
+	else {
+	    this.snackbarError(this.$t('better_if_connected'));
+	}
 
         if (!this.initialItemsLoadDone) {
           if (this.itemId !== null && !this.routedItemError) {
