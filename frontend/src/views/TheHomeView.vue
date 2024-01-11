@@ -14,8 +14,9 @@
           <div class="is-flex is-flex-wrap-wrap mt-3">
             <template v-if="!$store.state.isAuthenticated">
               <router-link :to="{name: 'signup'}" class="button is-primary">{{ $t('sign-up') }}</router-link>
-              <router-link :to="{name: 'login'}" class="button is-primary ml-2">{{ $t('log-in') }}</router-link>
-            </template>
+              <router-link :to="{name: 'login'}" class="button is-primary ml-2">{{ $t('log-in') }}</router-link><br><br>
+	      <b-tooltip :label="$t('view-map-noaccount')" multilined position="is-top"><router-link :to="{name: 'map'}" class="button is-primary ml-2">{{ $t('view-map') }}</router-link></b-tooltip>
+	    </template>
             <template v-else>
               <router-link :to="{name: 'map'}" class="button is-primary">{{ $t('enter-shareish') }}</router-link>
             </template>

@@ -96,7 +96,7 @@ const routes = [
         name: 'map',
         component: TheMapView,
         meta: {
-            requiresAuth: true,
+            requiresAuth: false,
             layout: 'default'
         }
     },
