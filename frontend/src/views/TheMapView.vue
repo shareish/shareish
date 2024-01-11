@@ -481,7 +481,6 @@ export default {
 			       {category: "SPK", selected: true},
 			      ];
     }
-    console.log(this.user.map_ecats)
       
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
@@ -511,11 +510,9 @@ export default {
       return Number(this.$store.state.user.id);
     },
     PosLat() {
-      console.log(this.$route.params.lat)
       return Number(this.$route.params.lat);
     },
     PosLng() {
-      console.log(this.$route.params.lng)
       return Number(this.$route.params.lng);
     },
     isPosUsed() {
@@ -592,7 +589,6 @@ export default {
           columns: ['ref_location', 'map_ecats']
         }
         this.user = (await axios.get('/api/v1/users/me/', {params: params})).data;
-	console.log(this.user.map_ecats);
 	  
         if (this.user.ref_location !== null)
           this.refLocation = new GeolocationCoords(this.user.ref_location);
