@@ -835,7 +835,7 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        const baseURL = "http://overpass-api.de/api";
+        const baseURL = "https://overpass-api.de/api";
         //const baseURL = "https://overpass.kumi.systems/api";
         //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
