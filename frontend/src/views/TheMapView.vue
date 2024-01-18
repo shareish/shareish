@@ -149,7 +149,7 @@
                       <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br/>
                     </div>
-		    <div><span><router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">{{ $t('add-a-request') }}</router-link></span></div>
+		    <div v-if="ecatsInteractive(extraCategory.category)"><span>{{ $t('add-a')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">{{ $t('request') }}</router-link> {{ $t('or')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">{{ $t('donation') }}</router-link></span></div>
                   </l-popup>
                 </l-marker>
               </template>
@@ -548,6 +548,10 @@ export default {
       }
       return catswithoutFF;
     },
+    ecatsInteractive(category) {
+	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB'];
+	return(interactiveCats.indexOf(category)+1)
+    },
     rewriteURL() {
       clearTimeout(this.timeouts['rewriteURL']);
       this.timeouts['rewriteURL'] = setTimeout(async () => {
@@ -802,6 +806,13 @@ export default {
 	if (category === "BKC") {
 	    return "https://mapcomplete.org/bookcases.html?z=18&lat="+marker.lat+"&lon="+marker.lng;
 	}
+	else if (category === "GVB") {
+	    return "https://mapcomplete.org/theme.html?z=19&lat="+marker.lat+"&lon="+marker.lng+"&userlayout=https%3A%2F%2Fstudio.mapcomplete.org%2F75871%2Flayers%2Fgive_box%2Fgive_box.json";
+	}
+	else if (category === "FDS") {
+	    return "https://mapcomplete.org/theme.html?z=19&lat="+marker.lat+"&lon="+marker.lng+"&userlayout=https%3A%2F%2Fstudio.mapcomplete.org%2F75871%2Flayers%2Ffood_sharing%2Ffood_sharing.json";
+	}
+	
 	else if (category === "DEF") {
 	    return "https://mapcomplete.org/aed.html?z=18&lat="+marker.lat+"&lon="+marker.lng; 
 	}

@@ -98,7 +98,13 @@ transport,"Transportation, Pick-up, Delivery, Moving","Transport, Ramassage, Liv
 vehicle,Vehicles and Means of transport,Véhicules et moyens de transport
 publicresource,Public resource,Ressource publique
 other,Other,Autres
-foodsharing_status,"Food sharing fridge status: Broken / Dirty / Empty","Statut du frigo solidaire: Cassé / Sale / Vide"
+foodsharing_status,"Can anyone help to resolve the following food sharing fridge status: Broken / Dirty / Empty","Est-ce que quelqu'un peut aider à résoudre le statut du frigo solidaire: Cassé / Sale / Vide"
+publicbookcase_status,"Can anyone help to resolve the following public bookcase status: Damaged books / Bookcase is empty / Bookcase is full / To be cleaned","Est-ce que quelqu'un peut aider à résoudre le statut suivant de la boîte à livres: Livres endommagés / Boîte vide / Boîte pleine / Tri ou nettoyage à faire"
+publicbookcase_donation,"Free books have been deposited here:","Livres gratuits déposés ici:"
+givebox_donation,"I put the following free objects here:","J'ai déposé ces objets gratuits ici:"
+freeshop_donation,"The following free objects are available here:","Les objets gratuits suivants sont disponibles ici:"
+freeshop_request,"Can anyone help us: We are looking for the following objects: / We are looking for volunteers to ...","Est-ce que quelqu'un peut nous aider: nous cherchons les objets suivants / Nous avons besoin de bénévoles pour ..."
+givebox_status,"Can anyone help to resolve the following give box status: Damaged items / Empty / Full / To be cleaned","Est-ce que quelqu'un peut aider à résoudre le statut de la boîte à dons: Objets endommagés / Boîte vide / Boîte pleine / À nettoyer"
 related_to,Related to,Lié à
 search-dot,Search...,Recherche...
 map_ecat_BKC,Public bookcase|Public bookcases,Boîte à livres|Boîtes à livres
@@ -125,6 +131,8 @@ i-am-interested,Details,Détails
 button-load-more,Load more,Charger plus
 no-items,No item,Pas d'élément
 add-a-request,Add a request here,Ajouter une requête ici
+add-a,Add a,"Ajouter un(e)"
+here,here,ici
 add-new-item,Add a new item,Ajout d'élément
 add-new-item-from-recurrents,Add a new item from recurrents,Ajout d'élément à partir de récurrents
 i-have-image,I have image for my item,J'ai une image pour mon élément
@@ -140,7 +148,7 @@ address,Address,Adresse
 help_item_address,"Enter the address of the item (where it is offered/requested, optional but strongly recommended). You can click on the localization button (or home) to use your current detected geolocalization (or reference address) and edit it if necessary. The more precise the address, the better, but you can discard some details for privacy, e.g. use either streetname with or without the street number, the city or area name.","Entrez l'adresse de l'élément (où il est offert/demandé, information facultative mais fortement conseillée). Cliquez sur le bouton de localisation (ou la maison) pour copier l'adresse détectée par géolocalisaiton (ou l'adresse de référence) et éditez-la si nécessaire. Plus l'adresse est précise, mieux c'est, mais vous pouvez la simplifier pour protéger votre vie privée, par exemple utilisez le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier."
 help_gps_coordinates,"If the item is located in a specific place without a street name (e.g. a cultivated field where to glean) you can encode its GPS coordinates (Degrees/Minutes/Seconds or Decimal degrees).","Si l'élément est situé à un endroit spécfique sans adresse (par exemple un champ où glâner), vous pouvez encoder les coordonnées GPS (en degrés/minutes/secondes  ou décimales)."
 description,Description,Description
-help_item_description,"Describe as precisely as possible your item. E.g. if it is a good, you might add brand/model/sizes/year/... and what it can be useful for. If this is a request for service, try to be as precise as possible about the required work and estimated duration. This field is sometimes pre-filled by an AI algorithm based on the uploaded image but you can edit it.", "Décrivez aussi précisément que possible votre élément. Par exemple si c'est un bien, vous pourriez ajouter la marque/modèle/taille/année et à quoi ce bien peut être utile. Si c'est une demande de service soyez le plus précis possible à propos de la tâche et de la durée estimée."
+help_item_description,"Describe as precisely as possible your item. E.g. if it is a good, you might add brand/model/sizes/year/... and what it can be useful for. If this is a request for service, try to be as precise as possible about the required work and estimated duration. If you request is related to a public resource, describe the problem. This field is sometimes pre-filled by an AI algorithm based on the uploaded image but you can edit it.", "Décrivez aussi précisément que possible votre élément. Par exemple si c'est un bien, vous pourriez ajouter la marque/modèle/taille/année et à quoi ce bien peut être utile. Si c'est une demande de service soyez le plus précis possible à propos de la tâche et de la durée estimée. Si c'est une demande liée à une ressource publique, décrivez le problème. Ce champ est parfois pré-rempli par un module d'intelligence artificielle par exemple si vous ajoutez une image, mais vous pouvez l'éditer."
 start-date,Start date,Date de début
 end-date,End date,Date de fin
 help_item_start_date,"Enter a different start date (by default it is now) if your item is not yet available/applicable","Entrez une date de début différente (par défaut l'heure actuelle) si votre élément n'est pas encore disponible/applicable"

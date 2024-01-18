@@ -494,8 +494,24 @@ export default {
     async fetchResourceInfo(rid) {
 	this.ressource_id = rid
 	let prsource = "";
-	if (this.$route.params.resource == 'FDS')
-	    this.description = this.$t('foodsharing_status');
+	if (this.type=="RQ") {
+	    if (this.$route.params.resource == 'FDS')
+		this.description = this.$t('foodsharing_status');
+	    else if (this.$route.params.resource == 'GVB')
+		this.description = this.$t('givebox_status');
+	    else if (this.$route.params.resource == 'BKC')
+		this.description = this.$t('publicbookcase_status');
+	    else if (this.$route.params.resource == 'FRS')
+		this.description = this.$t('freeshop_request');
+	}
+	else if (this.type=="DN") {
+	    if (this.$route.params.resource == 'BKC')
+		this.description = this.$t('publicbookcase_donation');
+	    else if (this.$route.params.resource == 'GVB')
+		this.description = this.$t('givebox_donation');
+	    else if (this.$route.params.resource == 'FRS')
+		this.description = this.$t('freeshop_donation');
+	}
         if (this.$route.params.resource == 'FLF')
 	    prsource = "Falling Fruit"
 	else
