@@ -13,7 +13,7 @@
         <label>{{ $t('email') }}</label>
         <div class="control">
           <b-tooltip :label="$t('help_email')" multilined position="is-bottom">
-            <input v-model="email" class="input" name="email" required type="email">
+            <b-input v-model="email" name="email" required type="email" icon-pack="fas" icon="envelope"/>
           </b-tooltip>
         </div>
       </div>
@@ -21,7 +21,7 @@
         <label>{{ $t('username') }}</label>
         <div class="control">
           <b-tooltip :label="$t('help_username')" multilined position="is-bottom">
-            <input v-model="username" class="input" name="username" required type="text">
+            <b-input v-model="username" name="username" required type="search" icon-pack="fas" icon="user"/>
           </b-tooltip>
         </div>
       </div>
@@ -29,7 +29,7 @@
         <label>{{ $t('firstname') }}</label>
         <div class="control">
           <b-tooltip :label="$t('help_firstname')" multilined position="is-bottom">
-            <input v-model="first_name" class="input" name="first_name" required type="text">
+            <b-input v-model="first_name" name="first_name" required type="search" icon-pack="fas" icon="user"/>
           </b-tooltip>
         </div>
       </div>
@@ -37,7 +37,7 @@
         <label>{{ $t('lastname') }}</label>
         <div class="control">
           <b-tooltip :label="$t('help_lastname')" multilined position="is-bottom">
-            <input v-model="last_name" class="input" name="last_name" required type="text">
+            <b-input v-model="last_name" name="last_name" required type="search" icon-pack="fas" icon="user"/>
           </b-tooltip>
         </div>
       </div>
@@ -45,7 +45,7 @@
         <label>{{ $t('password') }}</label>
         <div class="control">
           <b-tooltip :label="$t('help_password')" multilined position="is-bottom">
-            <input v-model="password" class="input" name="password" required type="password">
+            <b-input v-model="password" name="password" required type="password" password-reveal icon-pack="fas" icon="lock"/>
           </b-tooltip>
         </div>
       </div>

@@ -322,7 +322,7 @@
   "delete-comment-confirmation": "Are you sure you want to <b>delete</b> this comment? This action cannot be undone.",
   "comment-deleted": "Comment deleted!",
   "leave-a-comment": "Leave a comment",
-  "author": "Author",
+  "author": "Username",
   "or": "or",
   "searched-categories": "Search categories",
   "no-categories-selected-for-search": "No category filter applied. Select a category below to add it to the search!",

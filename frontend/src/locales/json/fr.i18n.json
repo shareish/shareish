@@ -322,7 +322,7 @@
   "delete-comment-confirmation": "Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée.",
   "comment-deleted": "Commentaire supprimé!",
   "leave-a-comment": "Laisser un commentaire",
-  "author": "Auteur",
+  "author": "Utilisateur",
   "or": "ou",
   "searched-categories": "Catégories recherchées",
   "no-categories-selected-for-search": "Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!",

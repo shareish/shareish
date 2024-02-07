@@ -9,7 +9,7 @@
             <template v-if="!limitedVerticalSpace">
               <b-field :label="$t('search')">
                 <b-input
-                    v-model="input_search"
+                    v-model="input_search" icon-pack="fas" icon="search" type="search"
                     :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
               </b-field>
             </template>
@@ -17,7 +17,7 @@
               <div class="column pr-2">
                 <b-field :label="$t('search')">
                   <b-input
-                      v-model="input_search"
+                      v-model="input_search" icon-pack="fas" icon="search" type="search"
                       :placeholder="$t('name') + ', ' + lcall($t('description')) + ' ' + lcall($t('or')) + ' ' + lcall($t('author'))" />
                 </b-field>
               </div>

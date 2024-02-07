@@ -66,7 +66,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['homepage_url']" v-validate="'url'" name="homepage_url" type="text" />
+            <b-input v-model="internalUser['homepage_url']" v-validate="'url'" name="homepage_url" type="search" />
           </b-field>
         </div>
       </div>
@@ -79,7 +79,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['facebook_url']" v-validate="'url'" name="facebook_url" type="text" />
+            <b-input v-model="internalUser['facebook_url']" v-validate="'url'" name="facebook_url" type="search" />
           </b-field>
         </div>
       </div>
@@ -92,7 +92,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['instagram_url']" name="instagram_url" type="text" />
+            <b-input v-model="internalUser['instagram_url']" name="instagram_url" type="search" v-validate="'url'"/>
           </b-field>
         </div>
       </div>

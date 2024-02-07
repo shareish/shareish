@@ -319,7 +319,7 @@ delete-comment,Delete comment,Supprimer le commentaire
 delete-comment-confirmation,"Are you sure you want to <b>delete</b> this comment? This action cannot be undone.","Êtes-vous sûr de vouloir <b>supprimer</b> ce commentaire? Cette action ne peut pas être annulée."
 comment-deleted,Comment deleted!,Commentaire supprimé!
 leave-a-comment,Leave a comment,Laisser un commentaire
-author,Author,Auteur
+author,Username,Utilisateur
 or,or,ou
 searched-categories,Search categories,Catégories recherchées
 no-categories-selected-for-search,No category filter applied. Select a category below to add it to the search!,Aucune catégorie ajoutée au filtre. Sélectionnez une catégorie pour l'ajouter à la recherche!

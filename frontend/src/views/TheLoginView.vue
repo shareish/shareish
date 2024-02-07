@@ -5,7 +5,8 @@
       <div class="field">
         <label>{{ $t('email-or-username') }}</label>
         <div class="control">
-          <input v-model="authValue" class="input" name="authValue" type="text">
+          <b-input v-model="authValue" name="authValue" type="text" icon-pack="fas" icon="user" icon-right="close-circle" icon-right-clickable
+                @icon-right-click="clearAuthIconClick"/>
         </div>
       </div>
       <b-message v-if="showDisabledAccountLink" title="Account disabled" type="is-warning">
@@ -17,7 +18,7 @@
       <div class="field">
         <label>{{ $t('password') }}</label>
         <div class="control">
-          <input v-model="password" class="input" name="password" type="password">
+          <b-input v-model="password" name="password" password-reveal type="password" icon-pack="fas" icon="lock"/>
         </div>
       </div>
       <div class="field">
@@ -51,6 +52,9 @@ export default {
     document.title = `Shareish | ${this.$t('log-in')}`;
   },
   methods: {
+    clearAuthIconClick() {
+        this.authValue = '';
+    },
     async submitForm() {
       this.waitingFormResponse = true;
 
