@@ -96,6 +96,19 @@
           </b-field>
         </div>
       </div>
+      <div class="tile is-parent">
+        <div class="tile is-child box">
+          <b-field key="mastodon_url" :message="errors.first('mastodon_url')" :type="{'is-danger': errors.has('mastodon_url')}">
+            <template #label>
+              <b-tooltip key="mastodon_url" :label="$t('help_mastodon')" multilined position="is-right">
+                {{ $t('mastodon-link') }}
+                <i class="icon far fa-question-circle"></i>
+              </b-tooltip>
+            </template>
+            <b-input v-model="internalUser['mastodon_url']" name="mastodon_url" type="search" v-validate="'url'"/>
+          </b-field>
+        </div>
+      </div>
     </div>
     <b-button :label="$t('save')" type="is-primary" :loading="waitingFormResponse" @click="save" />
   </section>
@@ -140,7 +153,8 @@ export default {
       'description': this.user.description,
       'homepage_url': this.user.homepage_url,
       'facebook_url': this.user.facebook_url,
-      'instagram_url': this.user.instagram_url
+      'instagram_url': this.user.instagram_url,
+      'mastodon_url' : this.user.mastodon_url,
     };
   },
   methods: {
