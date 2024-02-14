@@ -12,9 +12,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import datetime
 from pathlib import Path
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -22,12 +32,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # use e.g. https://django-secret-key-generator.netlify.app/ to generate a secret key
 # https://stackoverflow.com/questions/15209978/where-to-store-secret-keys-django
-SECRET_KEY = 'XXXXXXXXXXXXXXX'
-
+SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-DEV = False
+DEV = True
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -127,10 +136,10 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'XXXXXXXXXXXXXXX'
+EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'XXX@XXX.XXX'
-EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True
 
