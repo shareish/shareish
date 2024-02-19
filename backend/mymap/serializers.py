@@ -66,11 +66,13 @@ class UserSerializer(serializers.ModelSerializer):
                 if not re.match("^" + instagram_regex + "$", data['instagram_url']):
                     errors['instagram_url'] = "Instagram profile/url is invalid."
 
+
         # Check Mastodon url
         if 'mastodon_url' in data and isinstance(data['mastodon_url'], str) and data['mastodon_url'] != "":
-            mastodon_regex = r"^((http[s]?:\/\/)|(www\.))(www\.)?mapstodon\.space\/.*$"
+            mastodon_regex = r"^((http[s]?:\/\/)|(www\.))(www\.)?mastodon\.com\/.*$"
             if not re.match(mastodon_regex, data['mastodon_url']):
                 errors['mastodon_url'] = "Mastodon profile/url is invalid."
+
         
 
         if len(errors) > 0:
