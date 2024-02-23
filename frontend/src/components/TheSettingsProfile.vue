@@ -105,7 +105,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['mastodon_url']" name="mastodon_url" type="search" v-validate="'url'"/>
+            <b-input v-model="internalUser['mastodon_url']" name="mastodon_url" type="search" v-validate="{ required: false, regex: /^@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/}"/>
           </b-field>
         </div>
       </div>
