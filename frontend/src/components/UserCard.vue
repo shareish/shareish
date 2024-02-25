@@ -77,7 +77,7 @@ export default {
   },
   computed: {
     hasOneSocial() {
-      return (this.user.homepage_url || this.user.facebook_url || this.user.instagram_url);
+      return (this.user.homepage_url || this.user.facebook_url || this.user.instagram_url || this.user.mastodon_url);
     }
   },
   methods: {
