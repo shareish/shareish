@@ -5,11 +5,12 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
+
 # Add PostgreSQL repository
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
-
+# Installation des autres packages nécessaires
 RUN apt-get update && apt-get install -y \
     build-essential \
     locate \
@@ -34,9 +35,5 @@ ENTRYPOINT ["/tmp/deploy.sh"]
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV POSTGRES_CONTAINER=db
-ENV POSTGRES_DB=postgres
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
 
 EXPOSE 5432

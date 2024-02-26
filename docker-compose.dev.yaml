@@ -51,5 +51,10 @@ services:
       - media_volume:/backup/mediafiles
       - ./backup/postgres:/backup/shareish_database
       - ./backup/image:/backup/shareish_mediafiles
+    environment:
+        - POSTGRES_CONTAINER=db
+        - POSTGRES_DB=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
     depends_on:
       - db

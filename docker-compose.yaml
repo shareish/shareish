@@ -51,6 +51,22 @@ services:
       - web
     restart: unless-stopped
 
+  backup:
+    build:
+      context: backup
+    volumes:
+      - postgis-data:/backup/postgis
+      - media_volume:/backup/mediafiles
+      - ./backup/postgres:/backup/shareish_database
+      - ./backup/image:/backup/shareish_mediafiles
+    environment:
+        - POSTGRES_CONTAINER=db
+        - POSTGRES_DB=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+
 #  certbot:
 #    image: certbot/certbot:latest
 #    volumes:
