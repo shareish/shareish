@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-DEV = False
+DEV = True
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -124,11 +124,11 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST': env('HOST'),
-        'NAME': env('NAME'),
-        'PASSWORD': env('PASSWORD'),
-        'PORT': env('PORT'),
-        'USER': env('USER'),
+        'HOST': env('DB_HOST'),
+        'NAME': env('DB_NAME'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'PORT': env('DB_PORT'),
+        'USER': env('DB_USER'),
     }
 }
 
