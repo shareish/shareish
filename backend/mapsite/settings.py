@@ -14,10 +14,7 @@ from pathlib import Path
 import os
 import environ
 
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,9 +31,9 @@ environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
 # https://stackoverflow.com/questions/15209978/where-to-store-secret-keys-django
 SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = env('DEBUG')
 
-DEV = True
+DEV = False
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -127,11 +124,11 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST': "db",
-        'NAME': 'postgres',
-        'PASSWORD': "postgres",
-        'PORT': "5432",
-        'USER': "postgres",
+        'HOST': env('HOST'),
+        'NAME': env('NAME'),
+        'PASSWORD': env('PASSWORD'),
+        'PORT': env('PORT'),
+        'USER': env('USER'),
     }
 }
 
