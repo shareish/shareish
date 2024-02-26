@@ -68,9 +68,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         # Check Mastodon url
         if 'mastodon_url' in data and isinstance(data['mastodon_url'], str) and data['mastodon_url'] != "":
-            mastodon_regex =  re.compile(r'^@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
-            if not re.match(mastodon_regex, data['mastodon_url']):
-                errors['mastodon_url'] = "Mastodon profile/url is invalid."
+            mastodon_username_regex =  re.compile(r'^@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
+            mastodon_url_regex = re.compile(r'https:\/\/mastodon\.social\/@[\w.]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+            if not re.match(mastodon_username_regex, data['mastodon_url']):
+                if not re.match(mastodon_url_regex, data['mastodon_url']):
+                    errors['mastodon_url'] = "Mastodon profile/url is invalid."
 
         if len(errors) > 0:
             raise serializers.ValidationError(errors)
