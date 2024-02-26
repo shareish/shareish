@@ -308,7 +308,8 @@ class UserViewSet(viewsets.ModelViewSet):
         if 'mastodon_url' in data:
             mastodon_username_regex = re.compile(r'^@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
             if re.match(mastodon_username_regex , data['mastodon_url']):
-                data['mastodon_url'] = "https://mastodon.social/" + data['mastodon_url'] + "/"
+                mastodon_tab = data['mastodon_url'].split("@")
+                data['mastodon_url'] = "https://" + mastodon_tab[2] + "/@" + mastodon_tab[1] +"/"
 
 
         serializer = self.get_serializer(instance, data=data, partial=partial)
