@@ -19,15 +19,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# use e.g. https://django-secret-key-generator.netlify.app/ to generate a secret key
-# https://stackoverflow.com/questions/15209978/where-to-store-secret-keys-django
-SECRET_KEY = 'XXXXXXXXXXXXXXX'
-
+SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG')
 
-DEV = False
+DEV = True
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
@@ -118,21 +114,21 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST': "db",
-        'NAME': 'postgres',
-        'PASSWORD': "postgres",
-        'PORT': "5432",
-        'USER': "postgres",
+        'HOST': os.environ.get('POSTGRES_DB'),
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
+        'USER': os.environ.get('POSTGRES_USER'),
     }
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'XXXXXXXXXXXXXXX'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'XXX@XXX.XXX'
-EMAIL_HOST_PASSWORD = 'XXXXXXXXXXXXXXX'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
 
 MEDIA_ROOT = BASE_DIR / "mediafiles"
@@ -242,3 +238,5 @@ DJOSER = {
 }
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
+
+
