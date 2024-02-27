@@ -10,10 +10,8 @@ services:
     image: postgis/postgis:14-3.2
     volumes:
       - postgis-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - docker-compose.env
     restart: unless-stopped
 
   web:
@@ -24,10 +22,8 @@ services:
       - static_volume:/static
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - docker-compose.env
     depends_on:
       - db
     restart: unless-stopped
@@ -50,6 +46,19 @@ services:
     depends_on:
       - web
     restart: unless-stopped
+
+  backup:
+    build:
+      context: backup
+    volumes:
+      - postgis-data:/backup/postgis
+      - media_volume:/backup/mediafiles
+      - ./backup/postgres:/backup/shareish_database
+      - ./backup/image:/backup/shareish_mediafiles
+    env_file:
+      - docker-compose.env
+    depends_on:
+      - db
 
 #  certbot:
 #    image: certbot/certbot:latest
