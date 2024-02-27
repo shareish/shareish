@@ -32,7 +32,7 @@ chmod +x /var/shareish/mediafiles/script_backup_mediafiles.sh
 
 
 #hostname:port:database:username:password
-echo "$POSTGRES_CONTAINER:5432:$POSTGRES_DB:$POSTGRES_USER:postgres" > /root/.pgpass
+echo "$POSTGRES_CONTAINER:$POSTGRES_PORT:$POSTGRES_DB:$POSTGRES_USER:$POSTGRES_PASSWORD" > /root/.pgpass
 cat /root/.pgpass
 chmod 600 /root/.pgpass
 
