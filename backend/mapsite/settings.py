@@ -23,7 +23,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG')
 
-DEV = True
+DEV = os.environ.get('DEV') == "True"
 DEV_DOMAIN = "localhost:8081"
 DEV_URL = "http://" + DEV_DOMAIN
 DEV_API_URL = "http://localhost:8000"
