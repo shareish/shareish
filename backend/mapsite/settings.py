@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get('DEBUG') == "True"
 
 DEV = os.environ.get('DEV') == "True"
 DEV_DOMAIN = "localhost:8081"
@@ -35,6 +35,9 @@ PROD_API_URL = PROD_URL
 APP_DOMAIN = DEV_DOMAIN if DEV else PROD_DOMAIN
 APP_URL = DEV_URL if DEV else PROD_URL
 API_URL = DEV_API_URL if DEV else PROD_API_URL
+
+print(APP_URL)
+print(API_URL)
 
 ALLOWED_HOSTS = ['web', APP_DOMAIN.split(":")[0]]
 
