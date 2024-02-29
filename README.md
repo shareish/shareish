@@ -32,11 +32,16 @@ git clone https://github.com/shareish/shareish.git
 ```
 
 Then configure your installation:
-3. Create a **docker-compose.env** file in the main directory (you can copy our template docker-compose.env.template) that contains a short list of environment variables to be adapted to your environment. Edit the file and:
+3. Create a **docker-compose.env** file in the main directory (you can copy our template docker-compose.env.template) that contains a short list of environment variables to be adapted to your environment. Edit the file:
+
 4. Set **DEV=True** to activate the DEVelopment mode.
+
 5. Add a **SECRET_KEY** value (see https://django-secret-key-generator.netlify.app to generate a secret key).
+
 6. Edit the **E-mail settings** that are used by the backend to send e-mails for account creation and notifications by editing the following variables: **EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD** and **EMAIL_USE_TLS=True** (to be checked with your e-mail provider).
+
 7. Edit database settings (**POSTGRES_** variables) or leave default values
+
 8. Be sure the `frontend/node_modules` does not exist (only first time, or when you have strange issues with `npm`).
 
 You are ready to build your local instance:
@@ -44,6 +49,7 @@ You are ready to build your local instance:
 ```
 docker compose -f docker-compose.dev.yaml build
 ```
+
 10. To run dev environment:
 ``` 
 docker compose -f docker-compose.dev.yaml up -d --build
@@ -54,6 +60,7 @@ Once installed, frontend is running locally at `http://localhost:8081`; backend 
 In development mode, there is an hot reload mechanism: every time you save a file in backend or frontend, the corresponding code is recompiled if needed and the server is restarted automatically. This eases direct assessment of your changes to the code.
 
 If you want to update Shareish to latest version, git pull the last commits (or release tag) and run again the Docker build (9.) and up (10.) commands. The Docker volumes are kept so the data inserted in your database will be conserved.
+
 
 
 ## Installation for deployment on a production server
@@ -78,12 +85,17 @@ Then configure settings, first edit **frontend/src/main.js**:
 1. Change the name of your host server name by editing the variable **PROD_URL**.
 
 Then edit **backend/mapsite/settings.py**:
+
 2. Change the name of your host sever name by editing the **PROD_DOMAIN** variable to match the server host name of your production server.
 
 Then create a **docker-compose.env** file in the main directory (you can copy our template docker-compose.env.template) that contains a short list of environment variables to be adapted to your environment:
+
 3. Keep **`DEV=False`** to activate the production mode.
+
 4. Add a **SECRET_KEY** value (see https://django-secret-key-generator.netlify.app to generate a secret key).
+
 5. Edit the **E-mail settings** that are used by the backend to send e-mails for account creation and notifications by editing the following variables: **EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD** and **EMAIL_USE_TLS=True** (to be checked with your e-mail provider).
+
 6. Edit database settings (**POSTGRES_** variables) or leave default values
 
 Additionally, you should also have your own privacy policy and terms of conditions (as you will be hosting user data), these are defined in **frontend/src/locales/translations.csv** in variables faq_data_collection_answer and faq_everything_answer and will be displayed on the homepage.
