@@ -90,6 +90,8 @@ class User(AbstractBaseUser):
     homepage_url = models.URLField(blank=True, default="")
     facebook_url = models.URLField(blank=True, default="")
     instagram_url = models.URLField(blank=True, default="")
+    mastodon_url = models.URLField(blank=True, default="")
+
     ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_generalinfo = models.BooleanField(default=True)

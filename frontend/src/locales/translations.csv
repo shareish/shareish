@@ -191,7 +191,9 @@ help_homepage,Type the URL of your website if any,Entrez l'adresse de votre site
 facebook-link,Facebook profile,Profil Facebook
 help_facebook,Type the URL of your Facebook account if any,"Entrez l'adresse de votre compte Facebook si existant"
 instagram-link,Instagram profile,Profil Instagram
+mastodon-link,Mastodon profile,Profil Mastodond
 help_instagram,Type the URL of your Instagram account if any,"Entrez l'adresse de votre compte Instagram si existant"
+help_mastodon,"Type the @user@server Mastodon account if any","Entrez votre identifiant Mastodon sous la forme @utilisateur@serveur"
 reflocation,Reference address,Adresse de référence
 help_ref_location,"Address (optional but recommended) to define your neighbordhood, so typically this is your home address.  You can click on the localization button to update it based on your current geolocation. The more precise, the better, but you can discard some details, e.g. you can use either streetname with or without the street number, the city or area name. This information is not visible for others and only used when sending notifications by e-mail.","Adresse (facultative mais conseillée) pour définir votre voisinage, donc typiquement l'adresse de votre logement. Vous pouvez cliquer sur le bouton de localisation pour la mettre à jour sur base de votre localisation courante. Plus l'adresse est précise, mieux c'est mais vous êtes libre d'encoder ou non le nom de la rue avec ou sans numéro, le nom de votre ville ou votre quartier. Cette information n'est pas visible pour les autres utilisateurs et uniquement utilisée lors de l'envoi de notifications par e-mail."
 dwithin_notif,Notification radius (in km),Rayon de notification (en km)

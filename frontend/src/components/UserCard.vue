@@ -36,6 +36,9 @@
                 <a v-if="user.instagram_url" :href="user.instagram_url" class="social" target="_blank">
                   <span class="icon is-small"><i class="fab fa-instagram"></i></span>
                 </a>
+                <a v-if="user.mastodon_url" :href="user.mastodon_url" class="social" target="_blank">
+                  <span class="icon is-small"><i class="fab fa-mastodon"></i></span>
+                </a>
               </small>
             </nav>
           </template>
@@ -74,7 +77,7 @@ export default {
   },
   computed: {
     hasOneSocial() {
-      return (this.user.homepage_url || this.user.facebook_url || this.user.instagram_url);
+      return (this.user.homepage_url || this.user.facebook_url || this.user.instagram_url || this.user.mastodon_url);
     }
   },
   methods: {

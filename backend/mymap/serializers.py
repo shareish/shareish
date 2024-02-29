@@ -22,7 +22,7 @@ class UserLightSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'first_name', 'last_name', 'sign_up_date', 'homepage_url', 'facebook_url', 'instagram_url',
+            'id', 'username', 'first_name', 'last_name', 'sign_up_date', 'homepage_url', 'facebook_url', 'instagram_url', 'mastodon_url' ,
             'is_active', 'images', 'description',
             'is_disabled'
         ]
@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 'email', 'sign_up_date', 'homepage_url', 'facebook_url',
-            'instagram_url', 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
+            'instagram_url', 'mastodon_url' , 'ref_location', 'use_ref_loc', 'dwithin_notifications', 'description', 'is_active',
             'mail_notif_freq_conversations', 'mail_notif_freq_events', 'mail_notif_freq_items', 'mail_notif_freq_osm', 'mail_notif_generalinfo',
             'items', 'images', 'map_ecats', 'save_item_viewing', 'is_disabled'
         ]
@@ -65,6 +65,12 @@ class UserSerializer(serializers.ModelSerializer):
                 instagram_regex = r"((http[s]?:\/\/)|(www\.))(www\.)?instagram\.com\/" + instagram_username_regex + "(\/|(\?=.+))?"
                 if not re.match("^" + instagram_regex + "$", data['instagram_url']):
                     errors['instagram_url'] = "Instagram profile/url is invalid."
+
+        # Check Mastodon url
+        if 'mastodon_url' in data and isinstance(data['mastodon_url'], str) and data['mastodon_url'] != "":
+            mastodon_url_regex = r"https:\/\/.*"
+            if not re.match(mastodon_url_regex, data['mastodon_url']):
+                errors['mastodon_url'] = "Mastodon profile/url is invalid."
 
         if len(errors) > 0:
             raise serializers.ValidationError(errors)
