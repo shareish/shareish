@@ -771,14 +771,14 @@ export default {
     },
     getMarkerURLView(category, markerId) {
       if (category === 'FLF') {
-        return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
+        return "https://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
       } else {
         return "https://openstreetmap.org/node/" + markerId;
       }
     },
     getMarkerURLEdit(category, marker) {
 	if (category === 'FLF') {
-	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
+	return "https://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
 	}
 	else if (category === 'BKC') {
 	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
