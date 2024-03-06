@@ -1,11 +1,33 @@
 <template>
   <div class="layout-surrounding">
     <template v-if="$route.meta.layout === 'no-navbar'">
+      
+      <b-notification v-if="showInstallPrompt" type="is-info" has-icon class="notification-overlay"> 
+        <div class="content">
+          <p>{{$t('description-install')}}</p>
+          <div class="button-container">
+            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-dismiss') }}</b-button>
+            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-install') }}</b-button>
+          </div>
+        </div>
+      </b-notification>
+
       <no-navbar-layout>
         <router-view />
       </no-navbar-layout>
+
     </template>
     <template v-else>
+      <b-notification v-if="showInstallPrompt" type="is-info" has-icon class="notification-overlay"> 
+        <div class="content">
+          <p>{{$t('description-install')}}</p>
+          <div class="button-container">
+            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-dismiss') }}</b-button>
+            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-install') }}</b-button>
+          </div>
+        </div>
+      </b-notification>
+      
       <default-layout>
         <router-view />
       </default-layout>
@@ -21,11 +43,47 @@ import NoNavbarLayout from "@/layouts/NoNavbarLayout.vue";
 
 export default {
   name: 'App',
+  data() {
+    return {
+      showInstallPrompt: false,
+      deferredPrompt: null
+    };
+  },
   components: {NoNavbarLayout, DefaultLayout},
   beforeCreate() {
     this.$store.commit('initializeStore');
     const token = this.$store.state.token;
     axios.defaults.headers.common['Authorization'] = (token) ? "Token " + token : "";
+  },
+  created(){
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.showInstallPrompt = true;
+    });
+    window.addEventListener("appinstalled", () => {
+      this.deferredPrompt = null;
+      this.showInstallPrompt = false;
+    });
+  },
+  methods: {
+    dismiss() {
+      this.showInstallPrompt = false;
+    },
+    install() {
+      if (this.deferredPrompt) {
+        this.deferredPrompt.prompt();
+        this.deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted the installation");
+          } else {
+            console.log("User dismissed the installation");
+          }
+          this.deferredPrompt = null;
+          this.showInstallPrompt = false;
+        });
+      }
+    }
   }
 }
 </script>
@@ -83,4 +141,17 @@ export default {
     transform: translate(-50%, -50%);
   }
 }
+
+.notification-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 400px; 
+  z-index: 9999; 
+}
+
+button{
+  margin-left: 10px;
+}
+
 </style>
