@@ -2,7 +2,7 @@
   <div class="layout-surrounding">
     <template v-if="$route.meta.layout === 'no-navbar'">
       
-      <b-notification v-if="showInstallPrompt" type="is-info" has-icon class="notification-overlay"> 
+      <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
         <div class="content">
           <p>{{$t('description-install')}}</p>
           <div class="button-container">
@@ -18,7 +18,7 @@
 
     </template>
     <template v-else>
-      <b-notification v-if="showInstallPrompt" type="is-info" has-icon class="notification-overlay"> 
+      <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
         <div class="content">
           <p>{{$t('description-install')}}</p>
           <div class="button-container">
@@ -46,7 +46,10 @@ export default {
   data() {
     return {
       showInstallPrompt: false,
-      deferredPrompt: null
+      deferredPrompt: null,
+      localTimeStorage : {
+        value : false,
+      }
     };
   },
   components: {NoNavbarLayout, DefaultLayout},
@@ -65,10 +68,15 @@ export default {
       this.deferredPrompt = null;
       this.showInstallPrompt = false;
     });
+
+    this.checkDismiss();
   },
   methods: {
     dismiss() {
       this.showInstallPrompt = false;
+      this.setWithExpiry("isDismiss",true,1)
+      this.localTimeStorage.value = true;
+      this.checkDismiss();
     },
     install() {
       if (this.deferredPrompt) {
@@ -82,6 +90,49 @@ export default {
           this.deferredPrompt = null;
           this.showInstallPrompt = false;
         });
+      }
+    },
+    getExpiry(key){
+      const itemStr = localStorage.getItem(key);
+
+      if(!itemStr){
+        return false
+        
+      }
+      const item = JSON.parse(itemStr)
+      const now = new Date()
+
+      if(now.getTime() > item.expiry){
+        localStorage.removeItem(key)
+        return false
+        console.log("expiry date passed, notification sent !")
+      }
+
+      console.log("expiry date not yet passed, notification not sent !")
+
+      return item.value
+    },
+    setWithExpiry(key,value,ttlInDays){
+
+      const now = new Date()
+      const ttlInMilliseconds = ttlInDays * 24 * 60 * 60 * 1000;
+      const expiry = now.getTime() + ttlInMilliseconds;
+
+      const item = {
+        value: value,
+        expiry: expiry
+      };
+
+      
+
+      console.log("the notification will be re-posted on :"  + new Date(expiry))
+
+      localStorage.setItem(key,JSON.stringify(item));
+    },
+    checkDismiss() {
+      const isDismissed = this.getExpiry("isDismiss");
+      if (isDismissed) {
+        this.localTimeStorage.value = true;
       }
     }
   }
