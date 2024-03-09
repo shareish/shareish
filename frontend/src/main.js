@@ -5,7 +5,7 @@ import axios from "axios";
 axios.defaults.baseURL = (process.env.NODE_ENV === 'production') ? PROD_URL : DEV_URL;
 
 import Vue from "vue";
-
+import './registerServiceWorker';
 import Buefy from "buefy";
 import "buefy/dist/buefy.css";
 Vue.use(Buefy, {
