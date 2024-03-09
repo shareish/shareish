@@ -6,8 +6,8 @@
         <div class="content">
           <p>{{$t('description-install')}}</p>
           <div class="button-container">
-            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-dismiss') }}</b-button>
-            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-install') }}</b-button>
+            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
+            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
           </div>
         </div>
       </b-notification>
@@ -22,8 +22,8 @@
         <div class="content">
           <p>{{$t('description-install')}}</p>
           <div class="button-container">
-            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-dismiss') }}</b-button>
-            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-install') }}</b-button>
+            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
+            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
           </div>
         </div>
       </b-notification>
@@ -83,9 +83,9 @@ export default {
         this.deferredPrompt.prompt();
         this.deferredPrompt.userChoice.then(choiceResult => {
           if (choiceResult.outcome === "accepted") {
-            console.log("User accepted the installation");
+            //console.log("User accepted the App installation");
           } else {
-            console.log("User dismissed the installation");
+            //console.log("User dismissed the App installation");
           }
           this.deferredPrompt = null;
           this.showInstallPrompt = false;
@@ -105,17 +105,18 @@ export default {
       if(now.getTime() > item.expiry){
         localStorage.removeItem(key)
         return false
-        console.log("expiry date passed, notification sent !")
+        //console.log("expiry date passed, notification sent !")
       }
 
-      console.log("expiry date not yet passed, notification not sent !")
+      //console.log("expiry date not yet passed, notification not sent !")
 
       return item.value
     },
     setWithExpiry(key,value,ttlInDays){
 
-      const now = new Date()
-      const ttlInMilliseconds = ttlInDays * 24 * 60 * 60 * 1000;
+      const now = new Date();
+      const daysdelay = 30;
+      const ttlInMilliseconds = ttlInDays * daysdelay * 24 * 60 * 60 * 1000;
       const expiry = now.getTime() + ttlInMilliseconds;
 
       const item = {
@@ -123,9 +124,7 @@ export default {
         expiry: expiry
       };
 
-      
-
-      console.log("the notification will be re-posted on :"  + new Date(expiry))
+      //console.log("the notification will be re-posted on :"  + new Date(expiry))
 
       localStorage.setItem(key,JSON.stringify(item));
     },

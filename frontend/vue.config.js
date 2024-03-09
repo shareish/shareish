@@ -14,7 +14,14 @@ module.exports = {
       start_url: '/',
       display: 'standalone',
       theme_color: '#4DBA87',
-      description : 'Shareish est un application solidaire !'
+      description : 'Shareish solidarity App',
+      icons: [
+        {
+          src: `/img/icons/shareish_helping_hands-192x192.png`,
+          sizes: "192x192",
+          type: "image/png"
+        },
+      ],  
     },
     
     workboxPluginMode: 'InjectManifest',
