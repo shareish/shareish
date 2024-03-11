@@ -874,7 +874,7 @@ export default {
 	    await this.fetchItems(this.filteredQueryValues);
 	}
 	else {
-	    this.snackbarError(this.$t('better_if_connected'));
+	    this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
 	}
 
         if (!this.initialItemsLoadDone) {

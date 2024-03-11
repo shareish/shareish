@@ -21,6 +21,17 @@ module.exports = {
           sizes: "192x192",
           type: "image/png"
         },
+	{
+          src: `/img/icons/shareish_helping_hands-192x192_maskable.png`,
+          sizes: "192x192",
+          type: "image/png",
+	  purpose: "maskable"  
+        },
+	{
+          src: `/img/icons/shareish_helping_hands-512x512.png`,
+          sizes: "512x512",
+          type: "image/png"
+        },
       ],  
     },
     

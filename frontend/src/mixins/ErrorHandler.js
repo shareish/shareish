@@ -70,12 +70,13 @@ export default {
 
       // Displaying the error
       this.$buefy.snackbar.open({
-        duration: 5000,
+        duration: options['timeout'] ? options['timeout'] :  4000,
         type: 'is-danger',
         message: snackbarMessage,
         pauseOnHover: true,
         queue: replace,
-        position: 'is-bottom-right'
+        position: 'is-bottom-right',
+	actionText: null  
       });
 
       // Reset the component fields
