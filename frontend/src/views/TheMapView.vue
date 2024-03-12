@@ -149,7 +149,21 @@
                       <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br/>
                     </div>
-		    <div v-if="ecatsInteractive(extraCategory.category)"><span>{{ $t('add-a')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">{{ $t('request') }}</router-link> {{ $t('or')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">{{ $t('donation') }}</router-link></span></div>
+		                <div v-if="ecatsInteractive(extraCategory.category)"> 
+                      <span>{{ $t('add-a')}}
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
+                          <b-tooltip :label="$t('item_type_RQ')">
+                            <img :src="itemTypeIcons['RQ'].options.iconUrl" style="height: 20px; display: inline">
+                          </b-tooltip>
+                        </router-link> 
+                          {{ $t('or')}} 
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
+                          <b-tooltip :label="$t('item_type_DN')">
+                            <img :src="itemTypeIcons['DN'].options.iconUrl" style="height: 20px; display: inline">
+                          </b-tooltip>
+                        </router-link>
+                      </span>
+                  </div>
                   </l-popup>
                 </l-marker>
               </template>
@@ -550,6 +564,8 @@ export default {
     },
     ecatsInteractive(category) {
 	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB'];
+  console.log("valeur retour : " + interactiveCats.indexOf(category)+1)
+  
 	return(interactiveCats.indexOf(category)+1)
     },
     rewriteURL() {
@@ -913,7 +929,7 @@ export default {
           flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
-    }
+    },
   }
 }
 </script>
