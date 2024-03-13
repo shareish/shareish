@@ -53,13 +53,17 @@
                   <div class="column pr-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="DN" type="is-success">
-                        <span>{{ $t('donation') }}</span>
+                        <span>
+                          <i class="fas fa-heart"></i>
+                          {{ $t('donation') }}
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
                   <div class="column pr-2 pl-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="RQ" type="is-danger">
+                        <i class="far fa-comment"></i>
                         <span>{{ $t('request') }}</span>
                       </b-checkbox-button>
                     </b-field>
@@ -67,14 +71,20 @@
                   <div class="column pr-2 pl-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="LN" type="is-warning">
-                        <span>{{ $t('loan') }}</span>
+                        <span>
+                          {{ $t('loan') }}
+                          <i class="fa fa-bullhorn"></i>
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
                   <div class="column pl-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="EV" type="is-purple">
-                        <span>{{ $t('event') }}</span>
+                        <span>
+                          <i class="far fa-clock"></i>
+                          {{ $t('event') }}
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
@@ -83,22 +93,33 @@
               <template v-else>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="DN" type="is-success">
-                    <span>{{ $t('donation') }}</span>
+                    <span>
+                      <i class="fas fa-heart"></i>
+                      {{ $t('donation') }}</span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="RQ" type="is-danger">
-                    <span>{{ $t('request') }}</span>
+                    <span>
+                      <i class="far fa-comment"></i>
+                      {{ $t('request') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="LN" type="is-warning">
-                    <span>{{ $t('loan') }}</span>
+                    <span>
+                      <i class="fa fa-bullhorn"></i>
+                      {{ $t('loan') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="EV" type="is-purple">
-                    <span>{{ $t('event') }}</span>
+                    <span>
+                      <i class="far fa-clock"></i>
+                      {{ $t('event') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
               </template>

@@ -63,17 +63,18 @@
             </div>
             <div class="column">
               <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
-                <template #label>{{ $t('type') }}
+                <template #label>{{ $tc('type', 1) }}
                   <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="internalItem.type" expanded name="type" v-validate="'required'">
-                  <option value="RQ">{{ $t('request') }}</option>
-                  <option value="DN">{{ $t('donation') }}</option>
-                  <option value="LN">{{ $t('loan') }}</option>
-                  <option value="EV">{{ $t('event') }}</option>
-                </b-select>
+                <div class="columns is-variable is-1">
+                  <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (internalItem.type !== itemType['type'])}]" @click="internalItem.type = itemType['type']">
+                      <i :class="itemType['icon']"></i>
+                      {{ $t(itemType['slug']) }}</b-button>
+                  </div>
+                </div>
               </b-field>
             </div>
           </div>
@@ -295,6 +296,12 @@ export default {
   components: {CategorySelector},
   data() {
     return {
+      itemTypes: [
+        {'type': "DN", 'slug': "donation", 'color': 'is-success', 'icon' : 'fas fa-heart'},
+        {'type': "LN", 'slug': "loan", 'color': 'is-warning', 'icon': 'fa fa-bullhorn'},
+        {'type': "RQ", 'slug': "request", 'color': 'is-danger', 'icon' : 'far fa-comment'},
+        {'type': "EV", 'slug': "event", 'color': 'is-purple', 'icon' : 'far fa-clock'}
+      ],
       loading: false,
       step: 0,
 
