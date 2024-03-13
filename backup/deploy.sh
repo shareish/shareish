@@ -32,7 +32,7 @@ chmod +x /var/shareish/mediafiles/script_backup_mediafiles.sh
 
 
 #hostname:port:database:username:password
-echo "$POSTGRES_CONTAINER:$POSTGRES_PORT:$POSTGRES_DBB:$POSTGRES_USER:$POSTGRES_PASSWORD" > /root/.pgpass
+echo "$POSTGRES_CONTAINER:$POSTGRES_PORT:$POSTGRES_DB_IN_C:$POSTGRES_USER:$POSTGRES_PASSWORD" > /root/.pgpass
 cat /root/.pgpass
 chmod 600 /root/.pgpass
 
@@ -47,7 +47,7 @@ echo "USER=postgres" >> /tmp/crontab
 echo "CONTAINER=db" >> /tmp/crontab
 echo "#End setting env var" >> /tmp/crontab
 
-echo "30 23* * * * /var/shareish/script_backup.sh" >> /tmp/crontab
+echo "30 23 * * * * /var/shareish/script_backup.sh" >> /tmp/crontab
 echo "30 23 * * * /var/shareish/mediafiles/script_backup_mediafiles.sh" >> /tmp/crontab
 crontab /tmp/crontab
 rm /tmp/crontab
