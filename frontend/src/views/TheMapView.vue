@@ -564,8 +564,6 @@ export default {
     },
     ecatsInteractive(category) {
 	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB'];
-  console.log("valeur retour : " + interactiveCats.indexOf(category)+1)
-  
 	return(interactiveCats.indexOf(category)+1)
     },
     rewriteURL() {
