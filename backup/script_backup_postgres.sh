@@ -23,6 +23,8 @@ BackupTime=`date '+%Y-%m-%d_%H-%M'`
 BackupOutDir="/backup/shareish_database/$BackupDatabase"
 BackupFile="$BackupOutDir/PRODbackup-$BackupDatabase-$BackupTime.sql"
 
+export PGPASSFILE=/root/.pgpass
+
 mkdir -p ${BackupOutDir}
 
 echo "Starting Backup of Shareish Prod DB at : ${BackupTime}"             > ${Backuplog}
@@ -31,8 +33,8 @@ echo ""                                                                         
 echo "Starting pg_dump to ${BackupFile} ..."                                    >> ${Backuplog}
 touch ${BackupFile}
 chmod a+rw ${BackupFile}
-echo "pg_dump -h db -U postgres -w -f ${BackupFile} $BackupDatabase"        >> ${Backuplog} 2>&1
-pg_dump -h db -U postgres -w -f ${BackupFile} $BackupDatabase               >> ${Backuplog} 2>&1      
+echo "pg_dump db -U postgres -d db -f ${BackupFile}"                            >> ${Backuplog} 2>&1
+pg_dump -h db -U postgres -d postgres -f ${BackupFile}                            >> ${Backuplog} 2>&1      
 PGDumpRC=$?
 echo "  EXIT_CODE:${PGDumpRC}"                                                  >> ${Backuplog}
 echo ""                                                                         >> ${Backuplog}
