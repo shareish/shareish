@@ -89,7 +89,6 @@
                 <div class="columns is-variable is-1">
                   <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
                     <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">
-                      <i :class="itemType['icon']"></i>
                       {{ $t(itemType['slug']) }}</b-button>
                   </div>
                 </div>
@@ -292,10 +291,10 @@ export default {
   data() {
     return {
       itemTypes: [
-        {'type': "DN", 'slug': "donation", 'color': 'is-success', 'icon' : 'fas fa-heart'},
-        {'type': "LN", 'slug': "loan", 'color': 'is-warning', 'icon': 'fa fa-bullhorn'},
-        {'type': "RQ", 'slug': "request", 'color': 'is-danger', 'icon' : 'far fa-comment'},
-        {'type': "EV", 'slug': "event", 'color': 'is-purple', 'icon' : 'far fa-clock'}
+        {'type': "DN", 'slug': "donation", 'color': 'is-success'},
+        {'type': "LN", 'slug': "loan", 'color': 'is-warning'},
+        {'type': "RQ", 'slug': "request", 'color': 'is-danger'},
+        {'type': "EV", 'slug': "event", 'color': 'is-purple'}
       ],
 
       loading: false,
