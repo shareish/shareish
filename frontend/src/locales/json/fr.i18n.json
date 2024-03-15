@@ -526,5 +526,6 @@
   "error_keys__SELF_NOT_PART_OF_CONVERSATION": "Vous ne faites pas partie de cette conversation.",
   "error_keys__CONVERSATION_ALREADY_CLOSED": "Cette conversation est déjà fermée.",
   "error_keys__CONVERSATION_ALREADY_OPEN": "Cette conversation est déjà déverrouillée.",
-  "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller."
+  "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.",
+  "select_category": "choisissez une catégorie "
 }

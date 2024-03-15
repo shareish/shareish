@@ -526,3 +526,4 @@ error_keys__SELF_NOT_PART_OF_CONVERSATION,You are not part of this conversation.
 error_keys__CONVERSATION_ALREADY_CLOSED,This conversation is already locked.,Cette conversation est déjà fermée.
 error_keys__CONVERSATION_ALREADY_OPEN,This conversation is already unlocked.,Cette conversation est déjà déverrouillée.
 error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has been locked by another user. You cannot unlock it.,Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.
+select_category,choose a category,choisissez une catégorie 
