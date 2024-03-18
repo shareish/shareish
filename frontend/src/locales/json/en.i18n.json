@@ -527,6 +527,5 @@
   "error_keys__CONVERSATION_ALREADY_CLOSED": "This conversation is already locked.",
   "error_keys__CONVERSATION_ALREADY_OPEN": "This conversation is already unlocked.",
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been locked by another user. You cannot unlock it.",
-  "select_category_mandatory": "Choose a category (mandatory)",
   "select_category": "Choose a category"
 }

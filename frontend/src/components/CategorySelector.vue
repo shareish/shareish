@@ -15,16 +15,21 @@
       
       @input="$emit('input', $event)">
       <template #trigger>
-          <b-button
+          <b-button 
+          v-if="( value == '' ? typeButton = 'is-danger' : typeButton = 'is-light') && number === 1"
+          icon-right="fas fa-angle-down"
+          :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
+          :type="typeButton"
+          >
+            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+          </b-button>
+          <b-button 
+          v-else
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
           type="is-light"
-          :expanded="expanded"
           >
-            <span v-if="number === 1">
-            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category_mandatory'))}}
-            </span>
-            <span v-else>
+            <span>
             {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
             </span>
           </b-button>
@@ -56,6 +61,7 @@ export default {
   data() {
     return {
       selectedCategory: this.value || null,
+      typeButton : '',
     }
   },
   props: {
