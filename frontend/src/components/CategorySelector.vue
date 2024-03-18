@@ -12,26 +12,30 @@
       v-model="selectedCategory"
       aria-role="list"
       scrollable
+      expanded
       @input="$emit('input', $event)">
       <template #trigger>
-        <b-button
+        <div class="button-wrapper">
+          <b-button
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
           type="is-white"
           class="truncated-text"
-        >
-      <span>
-        {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
-      </span>
-      </b-button>
-        
+          >
+            <span>
+            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+            </span>
+          </b-button>
+        </div>
       </template>
+    <b-dropdown-item v-if="number > 1 || !number" value="" style=" height: 30px;">
+    </b-dropdown-item>
       <b-dropdown-item
         v-for="(category, key) in categories"
         :key="key"
         :value="key"
         aria-role="listitem"
-      >
+      > 
         <div class="media">
           <b-icon class="media-left" :icon="category.icon"></b-icon>
           <div class="media-content">
@@ -78,9 +82,17 @@ export default {
 </script>
 
 <style scoped>
-.truncated-text {
-  white-space: nowrap;
+.button-wrapper {
   overflow: hidden;
-  text-overflow: ellipsis;
+  width: 300px;
+}
+
+.truncated-text {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis; 
 }
 </style>
