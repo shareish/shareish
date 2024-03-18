@@ -11,6 +11,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from djoser.signals import user_registered
+from django_cryptography.fields import encrypt
 
 
 def get_random_string(length):
@@ -78,7 +79,7 @@ class MailNotificationFrequenciesOSM(models.TextChoices):
 
 
 class User(AbstractBaseUser):
-    first_name = models.CharField(max_length=50, null=True, blank=True)
+    first_name = encrypt(models.CharField(max_length=50, null=True, blank=True))
     last_name = models.CharField(max_length=20, null=True, blank=True)
     birth_date = models.DateField(default=date.today, blank=True)
     sign_up_date = models.DateField(auto_now_add=True)
@@ -90,6 +91,7 @@ class User(AbstractBaseUser):
     homepage_url = models.URLField(blank=True, default="")
     facebook_url = models.URLField(blank=True, default="")
     instagram_url = models.URLField(blank=True, default="")
+    mastodon_url = models.URLField(blank=True, default="")
     ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_generalinfo = models.BooleanField(default=True)
