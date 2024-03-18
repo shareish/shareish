@@ -141,7 +141,7 @@ export const categories = {
     "id": "PR",
     "slug": "publicresource",
     "image-placeholder": require('@/assets/categories/publicresource.jpg'), 
-    "icon": "fas fa-car-side"
+    "icon": "fas fa-city"
   },
   "OT": {
     "id": "OT",

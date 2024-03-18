@@ -95,18 +95,18 @@
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
+          <div>
+            <div>
               <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded />
             </div>
-            <div class="column">
+            <div>
               <category-selector v-model="category2" :number="2" expanded />
             </div>
-            <div class="column">
+            <div >
               <category-selector v-model="category3" :number="3" expanded />
             </div>
           </div>
-          <div class="columns">
+          <div >
             <div class="column">
               <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
                 <template #label> {{ $t('description') }}

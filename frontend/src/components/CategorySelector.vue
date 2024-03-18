@@ -7,20 +7,24 @@
       </b-tooltip>
     </template>
     <b-dropdown
-      position="is-top-right"
+      position="is-bottom-left"
       v-model="selectedCategory"
       aria-role="list"
       scrollable
-      expanded
-      :class="{'ml-2': windowWidth > 768}"
+      :expanded="expanded"
+      
       @input="$emit('input', $event)">
       <template #trigger>
           <b-button
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
-          type="is-white"
+          type="is-light"
+          :expanded="expanded"
           >
-            <span>
+            <span v-if="number === 1">
+            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category_mandatory'))}}
+            </span>
+            <span v-else>
             {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
             </span>
           </b-button>
