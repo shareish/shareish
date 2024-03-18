@@ -77,14 +77,14 @@
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
+          <div>
+            <div>
               <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded />
             </div>
-            <div class="column">
+            <div>
               <category-selector v-model="internalItem.category2" :number="2" expanded />
             </div>
-            <div class="column">
+            <div>
               <category-selector v-model="internalItem.category3" :number="3" expanded />
             </div>
           </div>
