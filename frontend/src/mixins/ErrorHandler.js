@@ -52,11 +52,13 @@ export default {
         if (this._keyInDictIsString('message', error)) {
           // Error is a casual Exception that have been caught
           this.message_v0sDM7 = error.message;
+        } else if (this._keyInDictIsString('key', error)) {
+          this.message_v0sDM7 = this.$t('error_keys__' + error.key);
         } else {
           this._unableToParse(error);
         }
       } else if (typeof error === 'string') {
-        // Error is sent from Vue file intendedly
+        // Error is sent from Vue file intentionally
         this.message_v0sDM7 = error;
       } else {
         this._unableToParse(error);

@@ -22,6 +22,7 @@ import TheConversationsView from "@/views/TheConversationsView.vue";
 import TheRecoverAccountView from "@/views/TheRecoverAccountView.vue";
 import TheError404View from "@/views/TheError404View.vue";
 import TheStartAccountDeletionProcessView from "@/views/TheStartAccountDeletionProcessView.vue";
+import ErrorHandler from "@/mixins/ErrorHandler";
 
 const routes = [
     {
@@ -104,6 +105,16 @@ const routes = [
         path: "/map/pos/:lat/:lng",
         name: 'mapPos',
         component: TheMapView,
+        beforeEnter: (to, from, next) => {
+            const { lat, lng } = to.params;
+            const floatRegex = /^\d+(\.\d+)?$/;
+            if (floatRegex.test(lat) && floatRegex.test(lng)) {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "BAD_MAP_POSITION"});
+                next({ name: 'map' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -122,6 +133,16 @@ const routes = [
         path: "/profile/:id",
         name: 'profile',
         component: TheProfileView,
+        beforeEnter: (to, from, next) => {
+            const { id } = to.params;
+            const integerRegex = /^\d+$/;
+            if (integerRegex.test(id) && id !== '0') {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "ACCOUNT_DOESNT_EXIST"});
+                next({ name: 'error404' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -140,6 +161,16 @@ const routes = [
         path: "/items/:id",
         name: 'item',
         component: TheItemView,
+        beforeEnter: (to, from, next) => {
+            const { id } = to.params;
+            const integerRegex = /^\d+$/;
+            if (integerRegex.test(id) && id !== '0') {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "ITEM_DOESNT_EXIST"});
+                next({ name: 'items' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -158,6 +189,16 @@ const routes = [
         path: "/add-item/from/:id",
         name: 'addItemFrom',
         component: TheAddItemView,
+        beforeEnter: (to, from, next) => {
+            const { id } = to.params;
+            const integerRegex = /^\d+$/;
+            if (integerRegex.test(id) && id !== '0') {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "ITEM_DOESNT_EXIST"});
+                next({ name: 'addItem' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -167,6 +208,18 @@ const routes = [
         path: "/add-item/pos/:lat/:lng/:type/:resource/:rid",
         name: 'addItemPos',
         component: TheAddItemView,
+        beforeEnter: (to, from, next) => {
+            const { lat, lng, type, resource, rid } = to.params;
+            const floatRegex = /^\d+(\.\d+)?$/;
+            if (floatRegex.test(lat) && floatRegex.test(lng)) {
+                // TODO: add type, resource and rid verifications
+                next();
+                return;
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "BAD_ITEM_POSITION"});
+            }
+            next({ name: 'addItem' });
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -185,6 +238,16 @@ const routes = [
         path: "/edit-item/:id",
         name: 'editItem',
         component: TheEditItemView,
+        beforeEnter: (to, from, next) => {
+            const { id } = to.params;
+            const integerRegex = /^\d+$/;
+            if (integerRegex.test(id) && id !== '0') {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "ITEM_DOESNT_EXIST"});
+                next({ name: 'items' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -203,6 +266,16 @@ const routes = [
         path: "/conversations/:id",
         name: 'conversation',
         component: TheConversationsView,
+        beforeEnter: (to, from, next) => {
+            const { id } = to.params;
+            const integerRegex = /^\d+$/;
+            if (integerRegex.test(id) && id !== '0') {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "CONVERSATION_DOESNT_EXIST"});
+                next({ name: 'conversations' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -211,16 +284,28 @@ const routes = [
     {
         path: "/settings",
         name: 'settings',
-        component: TheSettingsView,
-        meta: {
-            requiresAuth: true,
-            layout: 'default'
+        redirect: {
+            name: 'settingsTab',
+            params: { tab: 'profile' }
         }
     },
     {
         path: "/settings/:tab",
         name: 'settingsTab',
         component: TheSettingsView,
+        beforeEnter: (to, from, next) => {
+            const { tab } = to.params;
+            const existingTabs = ['profile', 'account', 'notifications'];
+            if (existingTabs.includes(tab)) {
+                next();
+            } else {
+                // No special message showed
+                next({
+                    name: 'settingsTab',
+                    params: { tab: 'profile' }
+                });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'
@@ -238,6 +323,16 @@ const routes = [
         path: "/recover-account/:token",
         name: 'recoverAccountToken',
         component: TheRecoverAccountView,
+        beforeEnter: (to, from, next) => {
+            const { token } = to.params;
+            const tokenRegex = /^[a-zA-Z0-9\-_]+$/;
+            if (tokenRegex.test(token)) {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "TOKEN_BAD_FORMAT"});
+                next({ name: 'home' });
+            }
+        },
         meta: {
             layout: 'default'
         }
@@ -246,6 +341,16 @@ const routes = [
         path: "/delete-account/:token",
         name: 'startAccountDeletionProcess',
         component: TheStartAccountDeletionProcessView,
+        beforeEnter: (to, from, next) => {
+            const { token } = to.params;
+            const tokenRegex = /^[a-zA-Z0-9\-_]+$/;
+            if (tokenRegex.test(token)) {
+                next();
+            } else {
+                ErrorHandler.methods.snackbarError({ key: "TOKEN_BAD_FORMAT"});
+                next({ name: 'home' });
+            }
+        },
         meta: {
             requiresAuth: true,
             layout: 'default'

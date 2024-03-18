@@ -54,20 +54,13 @@ export default {
     return {
       loading: true,
       user: null,
-      currentView: null,
-      possibleViews: ['profile', 'account', 'notifications']
+      currentView: this.$route.params.tab,
     }
   },
   async created() {
     this.loading = true;
 
     document.title = 'Shareish | Settings';
-
-    if (this.possibleViews.includes(this.$route.params.tab)) {
-      this.currentView = this.$route.params.tab;
-    } else {
-      this.$router.push("/settings/profile")
-    }
 
     await this.fetchUser();
 
