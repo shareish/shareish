@@ -79,7 +79,7 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded />
+              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded/>
             </div>
             <div>
               <category-selector v-model="internalItem.category2" :number="2" expanded />

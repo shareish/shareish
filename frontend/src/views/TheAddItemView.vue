@@ -75,6 +75,8 @@
                     field="name"
                     @select="option => assignCategory(option)"
                     :clearable="true"
+                    v-validate="'required'"
+                    name="name"
                 >
                 </b-autocomplete>
               </b-field>
@@ -97,7 +99,7 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded />
+              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :erreurCat="errors.first('category1')" expanded/>
             </div>
             <div>
               <category-selector v-model="category2" :number="2" expanded />

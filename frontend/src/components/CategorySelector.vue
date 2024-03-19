@@ -1,5 +1,5 @@
 <template>
-  <b-field>
+  <b-field :message="this.erreurCat" type="is-danger">
     <template #label>
       {{ label }}
       <b-tooltip v-if="usesTooltip" :label="$t('help_item_category')" multilined position="is-right">
@@ -12,30 +12,36 @@
       aria-role="list"
       scrollable
       :expanded="expanded"
-      
       @input="$emit('input', $event)">
-      <template #trigger>
-          <b-button 
-          v-if="( value == '' ? typeButton = 'is-danger' : typeButton = 'is-light') && number === 1"
-          icon-right="fas fa-angle-down"
+
+      <template v-if="number===1" #trigger>
+          <b-button v-if="erreurCat"
+          icon-right="fas fa-exclamation-circle"
+          type="is-danger"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
-          :type="typeButton"
           >
             {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
           </b-button>
-          <b-button 
-          v-else
+          <b-button v-else
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
-          type="is-light"
+          >
+            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+          </b-button>
+      </template>
+
+      <template v-else #trigger>
+        <b-button 
+          icon-right="fas fa-angle-down"
+          :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
           >
             <span>
             {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
             </span>
           </b-button>
       </template>
-    <b-dropdown-item v-if="number > 1 || !number" value="" style=" height: 30px;">
-    </b-dropdown-item>
+
+      <b-dropdown-item v-if="number > 1" value="" style=" height: 30px;"></b-dropdown-item>
       <b-dropdown-item
         v-for="(category, key) in categories"
         :key="key"
@@ -61,7 +67,6 @@ export default {
   data() {
     return {
       selectedCategory: this.value || null,
-      typeButton : '',
     }
   },
   props: {
@@ -74,7 +79,9 @@ export default {
     usesTooltip: {
       type: Boolean,
       default: false
-    }
+    },
+    erreurCat: String,
+    typeButton : String,
   },
   computed: {
     label() {
