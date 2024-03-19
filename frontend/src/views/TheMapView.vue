@@ -149,7 +149,21 @@
                       <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
                       <br/>
                     </div>
-		    <div v-if="ecatsInteractive(extraCategory.category)"><span>{{ $t('add-a')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">{{ $t('request') }}</router-link> {{ $t('or')}} <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">{{ $t('donation') }}</router-link></span></div>
+		                <div v-if="ecatsInteractive(extraCategory.category)"> 
+                      <span>{{ $t('add-a')}}
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
+                          <b-tooltip :label="$t('item_type_RQ')">
+                            <img :src="itemTypeIcons['RQ'].options.iconUrl" style="height: 20px; display: inline">
+                          </b-tooltip>
+                        </router-link> 
+                          {{ $t('or')}} 
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
+                          <b-tooltip :label="$t('item_type_DN')">
+                            <img :src="itemTypeIcons['DN'].options.iconUrl" style="height: 20px; display: inline">
+                          </b-tooltip>
+                        </router-link>
+                      </span>
+                  </div>
                   </l-popup>
                 </l-marker>
               </template>
@@ -771,14 +785,14 @@ export default {
     },
     getMarkerURLView(category, markerId) {
       if (category === 'FLF') {
-        return "http://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
+        return "https://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
       } else {
         return "https://openstreetmap.org/node/" + markerId;
       }
     },
     getMarkerURLEdit(category, marker) {
 	if (category === 'FLF') {
-	return "http://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
+	return "https://fallingfruit.org/locations/" + marker.id + "/edit?c=forager%2Cfreegan&locale=" + this.$i18n.locale;
 	}
 	else if (category === 'BKC') {
 	    return "https://mapcomplete.org/bookcases.html?z=19&lat="+marker.location.leafletLatLng.lat+"&lon="+marker.location.leafletLatLng.lng+"#node/"+marker.id
@@ -874,7 +888,7 @@ export default {
 	    await this.fetchItems(this.filteredQueryValues);
 	}
 	else {
-	    this.snackbarError(this.$t('better_if_connected'));
+	    this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
 	}
 
         if (!this.initialItemsLoadDone) {
@@ -913,7 +927,7 @@ export default {
           flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
-    }
+    },
   }
 }
 </script>

@@ -13,7 +13,7 @@
               <img src="../assets/montefiore_institute.svg" alt="Montefiore Institute, ULiège">
             </a>
             <address class="custom-flex-column mt-2">
-              <span class="mb-2">{{ $t('developers') }}: Adrien Guilliams, Ulysse Rubens, Florent Banneux, Pierre Chapeau, Raphaël Marée, <a href="https://github.com/shareish/shareish/blob/main/CONTRIBUTING.md">{{ $t('and_you') }}</a></span>
+	      <span class="mb-2">{{ $t('developers') }}: Adrien Guilliams, Florent Banneux, Ulysse Rubens, Adrien Hoyoux, Ogulcan Sevinç, Pierre Chapeau, Raphaël Marée, <a href="https://github.com/shareish/shareish/blob/main/CONTRIBUTING.md">{{ $t('and_you') }}</a></span>
 	         <span>{{ $t('project_coordination') }}: <a href="https://people.montefiore.uliege.be/maree/">Raphaël Marée</a></span>
             </address>
           </div>
