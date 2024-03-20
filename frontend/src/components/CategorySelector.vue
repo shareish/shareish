@@ -1,5 +1,5 @@
 <template>
-  <b-field :message="this.erreurCat" type="is-danger">
+  <b-field :message="this.errorCat" type="is-danger">
     <template #label>
       {{ label }}
       <b-tooltip v-if="usesTooltip" :label="$t('help_item_category')" multilined position="is-right">
@@ -15,7 +15,7 @@
       @input="$emit('input', $event)">
 
       <template v-if="number===1" #trigger>
-          <b-button v-if="erreurCat"
+          <b-button v-if="errorCat"
           icon-right="fas fa-exclamation-circle"
           type="is-danger"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
@@ -80,8 +80,7 @@ export default {
       type: Boolean,
       default: false
     },
-    erreurCat: String,
-    typeButton : String,
+    errorCat: String,
   },
   computed: {
     label() {
