@@ -31,14 +31,25 @@
       </template>
 
       <template v-else #trigger>
-        <b-button 
+        <b-button v-if="!number"
+          icon-right="fas fa-angle-down"
+          :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
+          class="button-truncate"
+          >
+            <span class="text-truncate">
+            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+            </span>
+            
+        </b-button>
+        <b-button v-else
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
           >
             <span>
-            {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+              {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
             </span>
-          </b-button>
+            
+        </b-button>
       </template>
 
       <b-dropdown-item v-if="number > 1" value="" style=" height: 30px;"></b-dropdown-item>
@@ -72,10 +83,6 @@ export default {
   props: {
     number: Number,
     value: String,
-    expanded: {
-      type: Boolean,
-      default: false
-    },
     usesTooltip: {
       type: Boolean,
       default: false
@@ -93,3 +100,18 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.button-truncate{
+  overflow: hidden;
+}
+
+.text-truncate{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  width: calc(230px - 24px);
+}
+
+</style>

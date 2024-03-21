@@ -100,13 +100,13 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')" expanded/>
+              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
             </div>
             <div>
-              <category-selector v-model="category2" :number="2" expanded />
+              <category-selector v-model="category2" :number="2"/>
             </div>
             <div >
-              <category-selector v-model="category3" :number="3" expanded />
+              <category-selector v-model="category3" :number="3"/>
             </div>
           </div>
           <div >
