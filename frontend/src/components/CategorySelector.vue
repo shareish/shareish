@@ -11,7 +11,7 @@
       v-model="selectedCategory"
       aria-role="list"
       scrollable
-      :expanded="expanded"
+      :expanded="true"
       @input="$emit('input', $event)">
 
       <template v-if="number===1" #trigger>

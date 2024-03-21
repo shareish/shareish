@@ -128,7 +128,9 @@
               <template v-else>
                 <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
               </template>
-              <category-selector v-model="selectedCategory" expanded />
+              <div style="width: 450px;">
+                <category-selector v-model="selectedCategory" expanded />
+              </div>
             </toggle-box>
             <toggle-box v-if="availabilityFilter" :title="$t('availability')" outlined :title-size="6" class="mt-3">
               <b-field :label="$t('from')">
