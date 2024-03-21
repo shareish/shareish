@@ -147,7 +147,8 @@ export default {
           position: 'is-bottom-right'
         });
 
-        this.user.images.splice(index, 1);
+        // eslint-disable-next-line
+	this.user.images.splice(index, 1);
       }
       catch (error) {
         this.snackbarError(error);
@@ -165,7 +166,8 @@ export default {
         data.append('image', tempFile);
 
         const image = (await axios.post("/api/v1/user_images/", data)).data;
-        this.user.images.unshift(image);
+        // eslint-disable-next-line
+	this.user.images.unshift(image);
         this.changesNotSaved = false;
       }
 
