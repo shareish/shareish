@@ -101,7 +101,25 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+@media screen and (min-width: 1024px) {
+
+  .button-truncate{
+    overflow: hidden;
+  }
+
+  .text-truncate{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+    width: calc(230px - 24px);
+  }
+}
+
+@media screen and (max-width: 425px) {
+
 .button-truncate{
   overflow: hidden;
 }
@@ -112,6 +130,7 @@ export default {
   overflow: hidden;
   display: inline-block;
   width: calc(230px - 24px);
+}
 }
 
 </style>

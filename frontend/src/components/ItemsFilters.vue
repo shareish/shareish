@@ -129,7 +129,7 @@
                 <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
               </template>
               <div style="width: 450px;"> 
-                <category-selector v-model="selectedCategory"/>
+                <category-selector v-model="selectedCategory" class="category-selector-width"/>
               </div>
             </toggle-box>
             <toggle-box v-if="availabilityFilter" :title="$t('availability')" outlined :title-size="6" class="mt-3">
@@ -745,6 +745,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
 #filters-surrounding {
   position: relative;
 
