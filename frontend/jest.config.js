@@ -1,5 +1,7 @@
 module.exports = {
   preset: '@vue/cli-plugin-unit-jest',
-  transformIgnorePatterns: ['/node_modules/(?!lib-to-transform|other-lib)'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!leaflet)/' 
+  ],
   setupFilesAfterEnv: ['./tests/unit/setupVue.js']
 }
