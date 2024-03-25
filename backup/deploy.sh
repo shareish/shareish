@@ -47,7 +47,7 @@ echo "USER=postgres" >> /tmp/crontab
 echo "CONTAINER=db" >> /tmp/crontab
 echo "#End setting env var" >> /tmp/crontab
 
-echo "30 23 * * * * /var/shareish/script_backup.sh" >> /tmp/crontab
+echo "30 23 * * * /var/shareish/script_backup.sh" >> /tmp/crontab
 echo "30 23 * * * /var/shareish/mediafiles/script_backup_mediafiles.sh" >> /tmp/crontab
 crontab /tmp/crontab
 rm /tmp/crontab

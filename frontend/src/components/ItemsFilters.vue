@@ -53,7 +53,9 @@
                   <div class="column pr-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="DN" type="is-success">
-                        <span>{{ $t('donation') }}</span>
+                        <span>
+                          {{ $t('donation') }}
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
@@ -67,14 +69,19 @@
                   <div class="column pr-2 pl-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="LN" type="is-warning">
-                        <span>{{ $t('loan') }}</span>
+                        <span>
+                          {{ $t('loan') }}
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
                   <div class="column pl-2">
                     <b-field class="mb-1">
                       <b-checkbox-button v-model="input_types" native-value="EV" type="is-purple">
-                        <span>{{ $t('event') }}</span>
+                        <span>
+                          <i class="far fa-clock"></i>
+                          {{ $t('event') }}
+                        </span>
                       </b-checkbox-button>
                     </b-field>
                   </div>
@@ -83,22 +90,29 @@
               <template v-else>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="DN" type="is-success">
-                    <span>{{ $t('donation') }}</span>
+                    <span>
+                      {{ $t('donation') }}</span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="RQ" type="is-danger">
-                    <span>{{ $t('request') }}</span>
+                    <span>
+                      {{ $t('request') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="LN" type="is-warning">
-                    <span>{{ $t('loan') }}</span>
+                    <span>
+                      {{ $t('loan') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
                 <b-field class="mb-1">
                   <b-checkbox-button v-model="input_types" native-value="EV" type="is-purple">
-                    <span>{{ $t('event') }}</span>
+                    <span>
+                      {{ $t('event') }}
+                    </span>
                   </b-checkbox-button>
                 </b-field>
               </template>
@@ -114,7 +128,9 @@
               <template v-else>
                 <p class="mb-2"><small>{{ $t('no-categories-selected-for-search') }}</small></p>
               </template>
-              <category-selector v-model="selectedCategory" expanded />
+              <div style="width: 450px;"> 
+                <category-selector v-model="selectedCategory" class="category-selector-width"/>
+              </div>
             </toggle-box>
             <toggle-box v-if="availabilityFilter" :title="$t('availability')" outlined :title-size="6" class="mt-3">
               <b-field :label="$t('from')">
@@ -729,6 +745,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
 #filters-surrounding {
   position: relative;
 
