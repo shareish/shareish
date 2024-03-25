@@ -75,6 +75,8 @@
                     field="name"
                     @select="option => assignCategory(option)"
                     :clearable="true"
+                    v-validate="'required'"
+                    name="name"
                 >
                 </b-autocomplete>
               </b-field>
@@ -82,30 +84,32 @@
             <div class="column">
               <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
                 <template #label>{{ $tc('type', 1) }}
+                  <b-icon v-if="errors.first('type')" :type="{'is-danger': errors.has('type')}" class="fas fa-exclamation-circle"></b-icon>
                   <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
                 <div class="columns is-variable is-1">
                   <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
-                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']">{{ $t(itemType['slug']) }}</b-button>
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']" v-model="type" v-validate="'required'" name="type">
+                      {{ $t(itemType['slug']) }}</b-button>
                   </div>
                 </div>
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" expanded :loader="loading"/>
+          <div>
+            <div>
+              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
             </div>
-            <div class="column">
-              <category-selector v-model="category2" :number="2" expanded />
+            <div>
+              <category-selector v-model="category2" :number="2"/>
             </div>
-            <div class="column">
-              <category-selector v-model="category3" :number="3" expanded />
+            <div >
+              <category-selector v-model="category3" :number="3"/>
             </div>
           </div>
-          <div class="columns">
+          <div >
             <div class="column">
               <b-field key="description" :message="errors.first('description')" :type="{'is-danger': errors.has('description')}">
                 <template #label> {{ $t('description') }}
@@ -134,10 +138,10 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
+            <b-input v-model="address" @input="addressUpdatedByUser" icon-right="fas fa-times-circle" icon-right-clickable @icon-right-click="clearAddress" class="is-expanded ml-2" name="ref_location" type="text" />
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
-	    <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
+	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
               <b-switch v-model="use_coordinates" size="is-small" type="is-primary"> {{ $t('use-coordinates') }} </b-switch>
 	      <i class="icon far fa-question-circle"></i>
 	    </b-tooltip>
@@ -479,6 +483,10 @@ export default {
     }
   },
   methods: {
+
+    clearAddress(){
+      this.address = ''
+    },
     async fetchRecurrentItem() {
       if (this.isRecurrentItemUsed) {
         try {

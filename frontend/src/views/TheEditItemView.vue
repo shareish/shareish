@@ -63,28 +63,28 @@
             </div>
             <div class="column">
               <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
-                <template #label>{{ $t('type') }}
+                <template #label>{{ $tc('type', 1) }}
                   <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-select v-model="internalItem.type" expanded name="type" v-validate="'required'">
-                  <option value="RQ">{{ $t('request') }}</option>
-                  <option value="DN">{{ $t('donation') }}</option>
-                  <option value="LN">{{ $t('loan') }}</option>
-                  <option value="EV">{{ $t('event') }}</option>
-                </b-select>
+                <div class="columns is-variable is-1">
+                  <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (internalItem.type !== itemType['type'])}]" @click="internalItem.type = itemType['type']">
+                      {{ $t(itemType['slug']) }}</b-button>
+                  </div>
+                </div>
               </b-field>
             </div>
           </div>
-          <div class="columns">
-            <div class="column">
-              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded />
+          <div>
+            <div>
+              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded/>
             </div>
-            <div class="column">
+            <div>
               <category-selector v-model="internalItem.category2" :number="2" expanded />
             </div>
-            <div class="column">
+            <div>
               <category-selector v-model="internalItem.category3" :number="3" expanded />
             </div>
           </div>
@@ -295,6 +295,12 @@ export default {
   components: {CategorySelector},
   data() {
     return {
+      itemTypes: [
+        {'type': "DN", 'slug': "donation", 'color': 'is-success'},
+        {'type': "LN", 'slug': "loan", 'color': 'is-warning'},
+        {'type': "RQ", 'slug': "request", 'color': 'is-danger'},
+        {'type': "EV", 'slug': "event", 'color': 'is-purple'}
+      ],
       loading: false,
       step: 0,
 
