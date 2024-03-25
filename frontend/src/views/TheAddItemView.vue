@@ -117,7 +117,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input ref="load" v-model="description" expanded type="textarea" name="description" v-validate="'required'"/>
               </b-field>
             </div>
           </div>
@@ -624,14 +624,14 @@ export default {
     },
     async processImage(file) {
       this.loading = true;
-
+      const loadingComponent = this.openLoading();
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
         this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
-
+      loadingComponent.close();
       this.loading = false;
     },
     async fetchPredictions(file, position) {
@@ -805,6 +805,13 @@ export default {
         if (this.enddate < this.startdate)
           this.startdate = this.enddate;
       }
+    },
+    openLoading(){
+      const loadingComponent = this.$buefy.loading.open({
+        container : this.$refs.load.$el,        
+      })
+
+      return loadingComponent;
     },
     windowWidthChanged() {
       let imagesPreviewColumnSizeClass = "is-one-third";
