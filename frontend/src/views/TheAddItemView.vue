@@ -332,7 +332,7 @@ export default {
       enddate: null,
       isRecurrent: false,
       visibility: 'PB',
-
+      loadingComponent : null,
       geoLocation: null,
       refLocation : null,
       waitingFormResponse: false,
@@ -462,6 +462,11 @@ export default {
     }
   },
   watch: {
+    description(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.closeLoader();
+      }
+    },
     filesSelected() {
       if (this.filesSelected.length > 0) {
         if (this.imagesSlotsLeft) {
@@ -624,14 +629,13 @@ export default {
     },
     async processImage(file) {
       this.loading = true;
-      const loadingComponent = this.openLoading();
+      this.openLoading();
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
         this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
-      loadingComponent.close();
       this.loading = false;
     },
     async fetchPredictions(file, position) {
@@ -807,11 +811,12 @@ export default {
       }
     },
     openLoading(){
-      const loadingComponent = this.$buefy.loading.open({
+      this.loadingComponent = this.$buefy.loading.open({
         container : this.$refs.load.$el,        
       })
-
-      return loadingComponent;
+    },
+    closeLoader(){
+      this.loadingComponent.close();
     },
     windowWidthChanged() {
       let imagesPreviewColumnSizeClass = "is-one-third";

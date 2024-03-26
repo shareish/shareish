@@ -96,7 +96,7 @@ export default {
     },
     categories() {
       return categories;
-    }
+    },
   },
 };
 </script>
