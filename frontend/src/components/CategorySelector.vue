@@ -25,8 +25,11 @@
           <b-button v-else
           icon-right="fas fa-angle-down"
           :icon-left="selectedCategory ? categories[selectedCategory].icon : (value ? categories[value].icon : '')"
+          ref="load"
           >
             {{selectedCategory ? $t(categories[selectedCategory].slug) : (value ? $t(categories[value].slug) : $t('select_category'))}}
+            <b-loading v-model="loading" :isFullPage="false"></b-loading>
+            
           </b-button>
       </template>
 
@@ -72,7 +75,7 @@
 
 <script>
 import { categories } from "@/categories";
-
+import {mapState,mapActions} from "vuex";
 export default {
   name: 'CategorySelector',
   data() {
@@ -90,6 +93,7 @@ export default {
     errorCat: String,
   },
   computed: {
+    ...mapState(['loading']),
     label() {
       let category_number = (this.number) ? " " + this.number : "";
       return this.$tc('category', 1) + category_number;
@@ -98,6 +102,17 @@ export default {
       return categories;
     },
   },
+  methods : {
+    ...mapActions(['toggleLoading']),
+    changeLoading(value){
+      this.toggleLoading(value);
+    },
+  },
+  watch:{
+    value(newValue){
+      this.selectedCategory = newValue;
+    }
+  }
 };
 </script>
 

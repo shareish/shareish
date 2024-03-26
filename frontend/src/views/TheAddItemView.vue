@@ -283,6 +283,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
 import {GeolocationCoords} from "@/functions";
+import {mapActions}  from "vuex";
 
 export default {
   name: 'TheAddItemView',
@@ -488,7 +489,10 @@ export default {
     }
   },
   methods: {
-
+    ...mapActions(['toggleLoading']),
+    changeLoading(value){
+      this.toggleLoading(value);
+    },
     clearAddress(){
       this.address = ''
     },
@@ -628,7 +632,7 @@ export default {
         this.user_updated_address_field = true;
     },
     async processImage(file) {
-      this.loading = true;
+      this.changeLoading(true);
       this.openLoading();
       const reader = new FileReader();
       reader.addEventListener('load', () => {
@@ -636,7 +640,7 @@ export default {
         this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
-      this.loading = false;
+      setTimeout(()=> { this.changeLoading(false);},1000);
     },
     async fetchPredictions(file, position) {
       try {
