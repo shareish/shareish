@@ -148,8 +148,8 @@ export class GeolocationCoords {
       }
     } else {
       if (isNumber(param1) && isNumber(param2)) {
-	  this.longitude = param1;
-          this.latitude = param2;
+        this.longitude = param1;
+        this.latitude = param2;
       }
     }
 

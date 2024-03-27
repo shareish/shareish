@@ -529,3 +529,6 @@ error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has 
 error_keys__CONVERSATION_DOESNT_EXIST,This conversation doesn't exist.,Cette conversation n'existe pas.
 error_keys__BAD_MAP_POSITION,The position used for the map is invalid.,La position utilisée pour la carte est invalide.
 error_keys__BAD_ITEM_POSITION,The position used for the item is invalid.,La position utilisée pour l'élément est invalide.
+error_keys__INVALID_ITEM_TYPE,The type used for the item is invalid or doesn't exist.,Le type utilisé pour l'élément est invalide ou n'existe pas.
+error_keys__INVALID_RESOURCE,The resource used is invalid or doesn't exist.,La resource utilisée est invalide ou n'existe pas.
+error_keys__INVALID_RID,The resource ID used is invalid or doesn't exist.,L'identifiant de resource utilisé est invalide ou n'existe pas.

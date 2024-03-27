@@ -23,6 +23,7 @@ import TheRecoverAccountView from "@/views/TheRecoverAccountView.vue";
 import TheError404View from "@/views/TheError404View.vue";
 import TheStartAccountDeletionProcessView from "@/views/TheStartAccountDeletionProcessView.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
+import {isInt, isNumber} from "@/functions";
 
 const routes = [
     {
@@ -213,8 +214,22 @@ const routes = [
             const floatRegex = /^\d+(\.\d+)?$/;
             if (floatRegex.test(lat) && floatRegex.test(lng)) {
                 // TODO: add type, resource and rid verifications
-                next();
-                return;
+                const types = ['DN', 'LN', 'RQ'];
+                if (types.contains(type)) {
+                    const resources = ['BKC', 'DEF', 'DWS', 'FDB', 'FDS', 'FLF', 'FRS', 'GVB', 'SPK'];
+                    if (resources.contains(resource)) {
+                        if (isInt(rid) && Number(rid) > 0) {
+                            next();
+                            return;
+                        } else {
+                            ErrorHandler.methods.snackbarError({ key: "INVALID_RID"});
+                        }
+                    } else {
+                        ErrorHandler.methods.snackbarError({ key: "INVALID_RESOURCE"});
+                    }
+                } else {
+                    ErrorHandler.methods.snackbarError({ key: "INVALID_ITEM_TYPE"});
+                }
             } else {
                 ErrorHandler.methods.snackbarError({ key: "BAD_ITEM_POSITION"});
             }
