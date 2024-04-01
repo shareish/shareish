@@ -169,7 +169,7 @@ export default {
         data.append('image', tempFile);
 
         const image = (await axios.post("/api/v1/user_images/", data)).data;
-        // eslint-disable-next-line
+        
 	      this.internalUser.images.unshift(image);
         this.changesNotSaved = false;
       }
