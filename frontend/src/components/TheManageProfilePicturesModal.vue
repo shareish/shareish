@@ -82,8 +82,12 @@ export default {
       fileSelected: null,
       filename: null,
       preview: null,
-      changesNotSaved: false
+      changesNotSaved: false,
+      internalUser : null
     }
+  },
+  created(){
+    this.internalUser = {...this.user}
   },
   watch: {
     fileSelected() {
@@ -121,7 +125,7 @@ export default {
     },
     async reuseImage(index) {
       if (index > 0) {
-        const image_id = this.user.images[index].id;
+        const image_id = this.internalUser.images[index].id;
         try {
           const image = JSON.parse((await axios.get(`/api/v1/users/images/${image_id}/base64`)).data);
           this.filename = image.name;
@@ -136,7 +140,7 @@ export default {
       }
     },
     async removeImage(index) {
-      const image_id = this.user.images[index].id;
+      const image_id = this.internalUser.images[index].id;
       try {
         await axios.delete(`/api/v1/users/images/${image_id}`);
         this.$buefy.snackbar.open({
@@ -147,8 +151,7 @@ export default {
           position: 'is-bottom-right'
         });
 
-        // eslint-disable-next-line
-	this.user.images.splice(index, 1);
+	      this.internalUser.images.splice(index, 1);
       }
       catch (error) {
         this.snackbarError(error);
@@ -159,7 +162,7 @@ export default {
 
       if (this.filename !== null) {
         const data = new FormData();
-        data.append('user_id', this.user['id']);
+        data.append('user_id', this.internalUser['id']);
 
         const blob = await (await fetch(this.preview)).blob();
         const tempFile = new File([blob], this.filename);
@@ -167,7 +170,7 @@ export default {
 
         const image = (await axios.post("/api/v1/user_images/", data)).data;
         // eslint-disable-next-line
-	this.user.images.unshift(image);
+	      this.internalUser.images.unshift(image);
         this.changesNotSaved = false;
       }
 
