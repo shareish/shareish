@@ -327,7 +327,7 @@ export default {
   },
   created() {
     this.fetchItem();
-
+    
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
       // Get the position
