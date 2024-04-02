@@ -80,7 +80,7 @@ class MailNotificationFrequenciesOSM(models.TextChoices):
 
 class User(AbstractBaseUser):
     first_name = encrypt(models.CharField(max_length=50, null=True, blank=True))
-    last_name = models.CharField(max_length=20, null=True, blank=True)
+    last_name = encrypt(models.CharField(max_length=20, null=True, blank=True))
     birth_date = models.DateField(default=date.today, blank=True)
     sign_up_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
@@ -364,7 +364,7 @@ class ConversationUser(models.Model):
 
 
 class Message(models.Model):
-    content = models.TextField()
+    content = encrypt(models.TextField())
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
