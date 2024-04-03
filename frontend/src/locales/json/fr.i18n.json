@@ -527,5 +527,6 @@
   "error_keys__CONVERSATION_ALREADY_CLOSED": "Cette conversation est déjà fermée.",
   "error_keys__CONVERSATION_ALREADY_OPEN": "Cette conversation est déjà déverrouillée.",
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.",
-  "select_category": "Choissisez une catégorie"
+  "select_category": "Choissisez une catégorie",
+  "no_result": "Aucun résultat trouvé"
 }

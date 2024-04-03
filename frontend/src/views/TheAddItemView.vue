@@ -138,7 +138,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <b-input v-model="address" @input="addressUpdatedByUser" icon-right="fas fa-times-circle" icon-right-clickable @icon-right-click="clearAddress" class="is-expanded ml-2" name="ref_location" type="text" />
+            <auto-complete v-model="address" class="is-expanded ml-2" name="ref_location"/>
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -279,6 +279,7 @@
 <script>
 import axios from "axios";
 import CategorySelector from "@/components/CategorySelector.vue";
+import AutoComplete from "@/components/AutoComplete.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
@@ -290,7 +291,7 @@ export default {
   $_veeValidate: {
     validator: 'new'
   },
-  components: {CategorySelector},
+  components: {CategorySelector,AutoComplete},
   data() {
     return {
       itemTypes: [
