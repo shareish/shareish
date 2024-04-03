@@ -100,13 +100,13 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
+              <category-selector ref="categorySelector1" v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
             </div>
             <div>
-              <category-selector v-model="category2" :number="2"/>
+              <category-selector ref="categorySelector2" v-model="category2" :number="2"/>
             </div>
             <div >
-              <category-selector v-model="category3" :number="3"/>
+              <category-selector ref="categorySelector3" v-model="category3" :number="3"/>
             </div>
           </div>
           <div >
@@ -267,9 +267,9 @@
           </div>
         </div>
         <div class="container has-text-centered mt-5">
-          <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
-          <br />
-          <a class="is-inline-block mt-5 has-text-danger" :class="formBottomButtonsSize" @click="resetForm">{{ $t('reset-form') }}</a>
+          <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" icon-right="far fa-check" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
+          <b-button :type="'is-danger'" :class="formBottomButtonsSize" @click="resetForm" class="mt-2 ml-2" icon-right="fal fa-marker">
+            {{ $t('reset-form') }}</b-button>
         </div>
       </section>
     </div>
@@ -785,6 +785,11 @@ export default {
 
       this.images['files'] = [];
       this.images['previews'] = [];
+      this.clearAddress();
+
+      this.$refs.categorySelector1.resetSelection();
+      this.$refs.categorySelector2.resetSelection();
+      this.$refs.categorySelector3.resetSelection();
     },
     clearStartdate() {
       this.startdate = null;

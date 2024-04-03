@@ -98,6 +98,11 @@ export default {
       return categories;
     }
   },
+  methods: {
+    resetSelection() {
+      this.selectedCategory = null; 
+    }
+  }
 };
 </script>
 
