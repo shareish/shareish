@@ -11,7 +11,7 @@
                 v-validate="'required'"
                 />
         </b-field>
-      <b-message v-if="showDisabledAccountLink" title="Account disabled" type="is-warning">
+      <b-message v-if="showDisabledAccountLink" title="Account disabled" type="is-primary">
         {{ $t('help_login-disabled-account') }} <router-link :to="{name: 'recoverAccount'}">{{ $t('click-here') }}</router-link>.
       </b-message>
       <b-message v-if="showScheduledDeletionAccountLink" title="Account scheduled for deletion" type="is-danger">
@@ -26,28 +26,28 @@
         <p class="mt-5">{{ $t('OR') }}</p>
         <hr class="mt-2"> 
       </div>
-      <b-button type="is-warning is-light"
+      <b-button type="is-primary is-light"
         label="GOOGLE"
         icon-pack="fab"
         icon-left="fab fa-google"
         expanded
         class="ml-0">
       </b-button>
-      <b-button type="is-warning is-light"
+      <b-button type="is-primary is-light"
         label="FACEBOOK"
         icon-pack="fab"
         icon-left="fab fa-facebook"
         expanded
         class="ml-0 mt-2">
       </b-button>
-      <b-button type="is-warning is-light"
+      <b-button type="is-primary is-light"
         label="TWITTER"
         icon-pack="fab"
         icon-left="fab fa-twitter"
         expanded
         class="ml-0 mt-2">
       </b-button>
-      <b-button type="is-warning is-light"
+      <b-button type="is-primary is-light"
         label="MASTODON"
         icon-pack="fab"
         icon-left="fab fa-mastodon"
