@@ -32,7 +32,6 @@
     },
     methods: {
       async getSuggestion() {
-
         try {
           const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=5" + "&lang=" + this.$i18n.locale);
           response.data.features.forEach(feature => {
@@ -69,7 +68,6 @@
                     this.data.push({'type': 'PUBLIC BOOKCASE', 'suggestions': [address]})
                   }
                   break;
-
                 
                 default:
                   if(this.data.some(obj => obj.type === 'AUTRES...')){
@@ -91,7 +89,11 @@
     watch: {    
         address(newValue) {
           this.data = [];
-          this.getSuggestion();
+          if(newValue.length >= 3){
+            
+            this.getSuggestion();
+          }
+            
         },
         value(newValue){
           this.address = this.value
