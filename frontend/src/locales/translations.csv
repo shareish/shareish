@@ -528,4 +528,4 @@ error_keys__CONVERSATION_ALREADY_OPEN,This conversation is already unlocked.,Cet
 error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has been locked by another user. You cannot unlock it.,Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.
 select_category,Choose a category,Choissisez une catégorie
 no_result,No results found,Aucun résultat trouvé
-osm_value___GiveBox,Give Box,Boite à don
+givebox,Give Box,Boite à dons

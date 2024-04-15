@@ -529,5 +529,5 @@
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been locked by another user. You cannot unlock it.",
   "select_category": "Choose a category",
   "no_result": "No results found",
-  "osm_value___GiveBox": "Give Box"
+  "givebox": "Give Box"
 }

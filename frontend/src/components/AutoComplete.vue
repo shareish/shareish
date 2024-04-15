@@ -18,6 +18,7 @@
   
   <script>
   import axios from 'axios';
+  import Vue from 'vue';
   
   export default {
     name: "AutoComplete",
@@ -33,10 +34,9 @@
     methods: {
       async getSuggestion() {
 
-        if(this.data.length > 10) this.data = [];
 
         try {
-          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
+          const response = setTimeout(async() => {await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale)},500);
           response.data.features.forEach(feature => {
             
             const { housenumber, street, name, country, county, city, postcode, osm_key,osm_value } = feature.properties;
@@ -55,7 +55,7 @@
             {
               if(osm_value === "give_box")
               {
-                this.AddSuggestiontoCategory("GIVE BOX",address);
+                this.AddSuggestiontoCategory(this.$t("givebox"),address);
               }
               else if(osm_value ==="public_bookcase"){
                 this.AddSuggestiontoCategory("PUBLIC BOOKCASE",address);
@@ -96,11 +96,11 @@
         }
       }
     },
-    watch: {    
+    watch: {   
+
         address(newValue) {
-          this.data = [];
+          this.data.splice(0);
           if(newValue.length >= 3){
-            
             this.getSuggestion();
           }
         },
