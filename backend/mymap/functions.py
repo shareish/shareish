@@ -1,9 +1,7 @@
 import re
 
-from geopy import Nominatim
 from geopy import Photon
 
-locator = Nominatim(user_agent='shareish')
 locator_photon = Photon(user_agent='shareish');
 
 def verif_location(data):
@@ -86,7 +84,7 @@ def verif_location(data):
                                 if loc is not None:
                                     srid = "SRID=4326;POINT ({} {})".format(str(loc.longitude), str(loc.latitude))
                                 else:
-                                    return {'error': "Couldn't find location. Bah oui AD !"}
+                                    return {'error': "Couldn't find location."}
                             except:
                                 return {'error': "Third party geolocation service did not work properly."}
         elif isinstance(data, dict):

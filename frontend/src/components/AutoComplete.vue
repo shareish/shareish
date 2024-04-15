@@ -4,7 +4,7 @@
       v-model="address"
       group-field="type"
       group-options="suggestions"
-      placeholder="e.g. jQuery"
+      :placeholder="$t('address')"
       icon="fas fa-search"
       clearable
       @input="$emit('input', $event)"
@@ -32,11 +32,14 @@
     },
     methods: {
       async getSuggestion() {
+
+        if(this.data.length > 10) this.data = [];
+
         try {
-          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=5" + "&lang=" + this.$i18n.locale);
+          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
           response.data.features.forEach(feature => {
             
-            const { housenumber, street, name, country, county, city, postcode, osm_value } = feature.properties;
+            const { housenumber, street, name, country, county, city, postcode, osm_key,osm_value } = feature.properties;
             
             let address = '';
             
@@ -47,42 +50,49 @@
             if (city) address += (address ? `, ${city}` : city);
             if (postcode) address += (address ? `, ${postcode}` : postcode);
             if (county) address += (address ? `, ${county}` : county);
-    
-            switch (osm_value) {
-                case 'give_box':
-                  if(this.data.some(obj => obj.type === 'GIVE BOX')){
-                    const giveBoxIndex = this.data.findIndex(obj => obj.type === "GIVE BOX");
-                    this.data[giveBoxIndex].suggestions.push(address);
-                  }
-                  else{
-                    this.data.push({'type': 'GIVE BOX', 'suggestions': [address]})
-                  }
-                  break;
 
-                case 'public_bookcase':
-                  if(this.data.some(obj => obj.type === 'PUBLIC BOOKCASE')){
-                      const giveBoxIndex = this.data.findIndex(obj => obj.type === "PUBLIC BOOKCASE");
-                      this.data[giveBoxIndex].suggestions.push(address);
-                  }
-                  else{
-                    this.data.push({'type': 'PUBLIC BOOKCASE', 'suggestions': [address]})
-                  }
-                  break;
-                
-                default:
-                  if(this.data.some(obj => obj.type === 'AUTRES...')){
-                      const giveBoxIndex = this.data.findIndex(obj => obj.type === "AUTRES...");
-                      this.data[giveBoxIndex].suggestions.push(address);
-                    }
-                    else{
-                      this.data.push({'type': 'AUTRES...', 'suggestions': [address]})
-                    }
+            if(osm_key === "amenity")
+            {
+              if(osm_value === "give_box")
+              {
+                this.AddSuggestiontoCategory("GIVE BOX",address);
+              }
+              else if(osm_value ==="public_bookcase"){
+                this.AddSuggestiontoCategory("PUBLIC BOOKCASE",address);
+              }
+              else if(osm_value === "food_sharing"){
+                this.AddSuggestiontoCategory("FOOD SHARING",address);
+              }
+              else if(osm_value === "freeshop"){
+                this.AddSuggestiontoCategory("FREE SHOP",address);
+              }
+              else if(osm_value === "drinking_water"){
+                this.AddSuggestiontoCategory("DRINKING WATER",address);
+              }
+              else if(osm_value === "social_facility")
+              {
+                this.AddSuggestiontoCategory("SOCIAL FACILITY",address);
+              }
+              else if(osm_value === "emergency"){
+                this.AddSuggestiontoCategory("emergency",address);
+              }
             }
-
+            else{
+                this.AddSuggestiontoCategory("OTHERS...",address)
+            }
           });
         } catch (error) {
           console.error('Error fetching suggestions:', error);
           this.data = [];
+        }
+      },
+      AddSuggestiontoCategory(category,address){
+        if(this.data.some(obj => obj.type === category)){
+          const giveBoxIndex = this.data.findIndex(obj => obj.type === category);
+          this.data[giveBoxIndex].suggestions.push(address);
+        }
+        else{
+          this.data.push({'type': category, 'suggestions': [address]})
         }
       }
     },
@@ -93,7 +103,6 @@
             
             this.getSuggestion();
           }
-            
         },
         value(newValue){
           this.address = this.value

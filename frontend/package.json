@@ -20,6 +20,7 @@
         "leaflet": "^1.8.0",
         "leaflet-easybutton": "^2.4.0",
         "leaflet-geosearch": "^3.1.0",
+        "leaflet.photon": "^0.9.1",
         "lodash": "^4.17.21",
         "moment": "^2.29.4",
         "register-service-worker": "^1.7.2",
