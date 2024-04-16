@@ -117,7 +117,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input ref="load" v-model="description" expanded type="textarea" name="description" v-validate="'required'"/>
               </b-field>
             </div>
           </div>
@@ -283,6 +283,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
 import {GeolocationCoords} from "@/functions";
+import {mapActions}  from "vuex";
 
 export default {
   name: 'TheAddItemView',
@@ -332,7 +333,7 @@ export default {
       enddate: null,
       isRecurrent: false,
       visibility: 'PB',
-
+      loadingComponent : null,
       geoLocation: null,
       refLocation : null,
       waitingFormResponse: false,
@@ -462,6 +463,11 @@ export default {
     }
   },
   watch: {
+    description(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.closeLoader();
+      }
+    },
     filesSelected() {
       if (this.filesSelected.length > 0) {
         if (this.imagesSlotsLeft) {
@@ -483,7 +489,10 @@ export default {
     }
   },
   methods: {
-
+    ...mapActions(['toggleLoading']),
+    changeLoading(value){
+      this.toggleLoading(value);
+    },
     clearAddress(){
       this.address = ''
     },
@@ -623,16 +632,15 @@ export default {
         this.user_updated_address_field = true;
     },
     async processImage(file) {
-      this.loading = true;
-
+      this.changeLoading(true);
+      this.openLoading();
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
         this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
-
-      this.loading = false;
+      setTimeout(()=> { this.changeLoading(false);},1000);
     },
     async fetchPredictions(file, position) {
       try {
@@ -805,6 +813,14 @@ export default {
         if (this.enddate < this.startdate)
           this.startdate = this.enddate;
       }
+    },
+    openLoading(){
+      this.loadingComponent = this.$buefy.loading.open({
+        container : this.$refs.load.$el,        
+      })
+    },
+    closeLoader(){
+      this.loadingComponent.close();
     },
     windowWidthChanged() {
       let imagesPreviewColumnSizeClass = "is-one-third";
