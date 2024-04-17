@@ -24,19 +24,20 @@
     name: "AutoComplete",
     props: { 
       value: String,
+      location: Object
     },
     data() {
       return {
         address: this.value,
-        data: []  
+        data: []  ,
+        geolocation : this.location,
       };
     },
     methods: {
       async getSuggestion() {
-
-
+        this.data.splice(0);
         try {
-          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
+          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale+ "&lon=" + this.geolocation.longitude + "&lat=" + this.geolocation.latitude);
           response.data.features.forEach(feature => {
             
             const { housenumber, street, name, country, county, city, postcode, osm_key,osm_value } = feature.properties;
@@ -99,7 +100,6 @@
     watch: {   
 
         async address(newValue) {
-          this.data.splice(0);
           if(newValue.length >= 3){
             await this.getSuggestion();
           }

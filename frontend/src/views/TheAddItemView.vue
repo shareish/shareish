@@ -138,7 +138,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <auto-complete v-model="address" class="is-expanded ml-2" name="ref_location"/>
+            <auto-complete :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -412,6 +412,7 @@ export default {
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
+      console.log('Geolocation is available');
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
