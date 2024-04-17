@@ -36,7 +36,7 @@
 
 
         try {
-          const response = setTimeout(async() => {await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale)},500);
+          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
           response.data.features.forEach(feature => {
             
             const { housenumber, street, name, country, county, city, postcode, osm_key,osm_value } = feature.properties;
@@ -98,10 +98,10 @@
     },
     watch: {   
 
-        address(newValue) {
+        async address(newValue) {
           this.data.splice(0);
           if(newValue.length >= 3){
-            this.getSuggestion();
+            await this.getSuggestion();
           }
         },
         value(newValue){
