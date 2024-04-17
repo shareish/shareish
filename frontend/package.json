@@ -6,6 +6,7 @@
     "serve": "npm run watch-translations & vue-cli-service serve",
     "build": "npm run translations-csv2json && vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
+    "test:components": "vue-cli-service test:unit --testMatch '**/__tests__/components/**/*.spec.js'",
     "lint": "vue-cli-service lint",
     "translations-csv2json": "i18n-csv2json-cli --from src/locales/translations.csv --to src/locales/json --format",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"

@@ -69,6 +69,7 @@
                   </b-tooltip>
                 </template>
                 <b-autocomplete
+                    id="name"
                     v-model="name"
                     :open-on-focus="true"
                     :data="suggestedNames"
@@ -91,7 +92,7 @@
                 </template>
                 <div class="columns is-variable is-1">
                   <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
-                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']" v-model="type" v-validate="'required'" name="type">
+                    <b-button id="type" class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (type !== itemType['type'])}]" @click="type = itemType['type']" v-model="type" v-validate="'required'" name="type">
                       {{ $t(itemType['slug']) }}</b-button>
                   </div>
                 </div>
@@ -100,13 +101,13 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
+              <category-selector id="cat1" v-model="category1" :uses-tooltip="true" :number="1" v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
             </div>
             <div>
-              <category-selector v-model="category2" :number="2"/>
+              <category-selector id="cat2" v-model="category2" :number="2"/>
             </div>
             <div >
-              <category-selector v-model="category3" :number="3"/>
+              <category-selector id="cat3" v-model="category3" :number="3"/>
             </div>
           </div>
           <div >
@@ -117,7 +118,7 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input id="description" v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
               </b-field>
             </div>
           </div>
@@ -138,7 +139,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <b-input v-model="address" @input="addressUpdatedByUser" icon-right="fas fa-times-circle" icon-right-clickable @icon-right-click="clearAddress" class="is-expanded ml-2" name="ref_location" type="text" />
+            <b-input id="address" v-model="address" @input="addressUpdatedByUser" icon-right="fas fa-times-circle" icon-right-clickable @icon-right-click="clearAddress" class="is-expanded ml-2" name="ref_location" type="text" />
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -155,6 +156,7 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
+                    id="startdate"
                     v-model="startdate"
                     :max-datetime="enddate"
                     icon="calendar"
@@ -188,6 +190,7 @@
                   </b-tooltip>
                 </template>
                 <b-datetimepicker
+                    id="enddate"
                     v-model="enddate"
                     :min-datetime="startdate"
                     icon="calendar"

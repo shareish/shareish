@@ -3,5 +3,6 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!leaflet)/' 
   ],
-  setupFilesAfterEnv: ['./tests/unit/setupVue.js']
+  setupFilesAfterEnv: ['./__tests__/components/setupVue.js'],
+  testMatch: ['**/__tests__/unit/**/*.spec.js'],
 }

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Buefy from "buefy";
-import i18n from "../../src/i18n";
+import i18n from "@/i18n";
 import VeeValidate from "vee-validate";
 
 Vue.use(VeeValidate, {

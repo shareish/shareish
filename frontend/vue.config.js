@@ -1,5 +1,9 @@
 module.exports = {
- 
+  pluginOptions: {
+    jest: {
+      enableInSFC: true,
+    },
+  },
   pwa: {
     
     name: 'shareish',

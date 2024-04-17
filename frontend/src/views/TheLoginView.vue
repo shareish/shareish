@@ -5,7 +5,7 @@
       <div class="field">
         <label>{{ $t('email-or-username') }}</label>
         <div class="control">
-          <b-input v-model="authValue" name="authValue" type="text" icon-pack="fas" icon="user" icon-right="close-circle" icon-right-clickable
+          <b-input id="username" v-model="authValue" name="authValue" type="text" icon-pack="fas" icon="user" icon-right="close-circle" icon-right-clickable
                 @icon-right-click="clearAuthIconClick"/>
         </div>
       </div>
@@ -18,7 +18,7 @@
       <div class="field">
         <label>{{ $t('password') }}</label>
         <div class="control">
-          <b-input v-model="password" name="password" password-reveal type="password" icon-pack="fas" icon="lock"/>
+          <b-input id="password" v-model="password" name="password" password-reveal type="password" icon-pack="fas" icon="lock"/>
         </div>
       </div>
       <div class="field">
