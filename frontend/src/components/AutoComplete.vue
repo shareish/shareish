@@ -18,7 +18,9 @@
   
   <script>
   import axios from 'axios';
-  import Vue from 'vue';
+  import { debounce } from 'lodash'; 
+
+
   
   export default {
     name: "AutoComplete",
@@ -30,71 +32,91 @@
       return {
         address: this.value,
         data: []  ,
-        geolocation : this.location,
+        geolocation : null,
+        response: null
       };
     },
+    created(){
+      this.geolocation = this.location;
+    },
     methods: {
-      async getSuggestion() {
-        this.data.splice(0);
-        try {
-          const response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale+ "&lon=" + this.geolocation.longitude + "&lat=" + this.geolocation.latitude);
-          response.data.features.forEach(feature => {
-            
-            const { housenumber, street, name, country, county, city, postcode, osm_key,osm_value } = feature.properties;
-            
-            let address = '';
-            
-            if (housenumber) address += (address ? `${housenumber}` : housenumber);
-            if (street) address += (address ? `, ${street}` : street);
-            if (country) address += (address ? `, ${country}` : country);
-            if (name) address += (address ? `, ${name}` : name)
-            if (city) address += (address ? `, ${city}` : city);
-            if (postcode) address += (address ? `, ${postcode}` : postcode);
-            if (county) address += (address ? `, ${county}` : county);
+      getSuggestion: debounce(async function() {
 
-            if(osm_key === "amenity")
-            {
-              if(osm_value === "give_box")
-              {
-                this.AddSuggestiontoCategory(this.$t("givebox"),address);
-              }
-              else if(osm_value ==="public_bookcase"){
-                this.AddSuggestiontoCategory("PUBLIC BOOKCASE",address);
-              }
-              else if(osm_value === "food_sharing"){
-                this.AddSuggestiontoCategory("FOOD SHARING",address);
-              }
-              else if(osm_value === "freeshop"){
-                this.AddSuggestiontoCategory("FREE SHOP",address);
-              }
-              else if(osm_value === "drinking_water"){
-                this.AddSuggestiontoCategory("DRINKING WATER",address);
-              }
-              else if(osm_value === "social_facility")
-              {
-                this.AddSuggestiontoCategory("SOCIAL FACILITY",address);
-              }
-              else if(osm_value === "emergency"){
-                this.AddSuggestiontoCategory("emergency",address);
-              }
-            }
-            else{
-                this.AddSuggestiontoCategory("OTHERS...",address)
-            }
-          });
+        this.data = [];
+        console.log("Get suggestion")
+        try {
+
+          if(this.geolocation){
+            console.log(this.geolocation.longitude + "; " + this.geolocation.latitude)
+            this.response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale+ "&lon=" + this.geolocation.longitude + "&lat=" + this.geolocation.latitude);
+          }
+          else{
+            console.log("No geolocation")
+            this.response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
+          }  
+
+          this.MapFeaturesToSuggestions(this.response);
+            
         } catch (error) {
           console.error('Error fetching suggestions:', error);
           this.data = [];
         }
+      },300),
+      AddSuggestiontoCategory(category, address) {
+        const categoryIndex = this.data.findIndex(obj => obj.type === category);
+
+        if (categoryIndex !== -1) {
+          this.data[categoryIndex].suggestions.push(address);
+        } else {
+          this.data.push({ type: category, suggestions: [address] });
+        }
       },
-      AddSuggestiontoCategory(category,address){
-        if(this.data.some(obj => obj.type === category)){
-          const giveBoxIndex = this.data.findIndex(obj => obj.type === category);
-          this.data[giveBoxIndex].suggestions.push(address);
-        }
-        else{
-          this.data.push({'type': category, 'suggestions': [address]})
-        }
+      MapFeaturesToSuggestions(response){
+
+        response.data.features.forEach(feature => {
+            
+          const { housenumber, name, country, city,osm_key,osm_value } = feature.properties;
+          
+          let address = '';
+          
+          if (housenumber) address += (address ? `,${housenumber}` : housenumber);
+          if (name) address += (address ? `, ${name}` : name);
+          if(city) address += (address ? `, ${city}` : city);
+          if(country) address += (address ? `, ${country}` : country);
+          if(osm_value) address += (address ? `,${osm_value}` : osm_value);
+          
+          
+          switch (osm_key) {
+            case "amenity":
+              switch (osm_value) {
+                case "give_box":
+                  this.AddSuggestiontoCategory(this.$t("givebox"), address);
+                  break;
+                case "public_bookcase":
+                  this.AddSuggestiontoCategory("PUBLIC BOOKCASE", address);
+                  break;
+                case "food_sharing":
+                  this.AddSuggestiontoCategory("FOOD SHARING", address);
+                  break;
+                case "freeshop":
+                  this.AddSuggestiontoCategory("FREE SHOP", address);
+                  break;
+                case "drinking_water":
+                  this.AddSuggestiontoCategory("DRINKING WATER", address);
+                  break;
+                case "social_facility":
+                  this.AddSuggestiontoCategory("SOCIAL FACILITY", address);
+                  break;
+                case "emergency":
+                  this.AddSuggestiontoCategory("emergency", address);
+                  break;
+              }
+              break;
+            default:
+              this.AddSuggestiontoCategory("OTHERS...", address);
+              break;
+          }
+        });
       }
     },
     watch: {   
@@ -106,6 +128,9 @@
         },
         value(newValue){
           this.address = this.value
+        },
+        location(newValue){
+          this.geolocation = newValue;
         }
     }
   };
