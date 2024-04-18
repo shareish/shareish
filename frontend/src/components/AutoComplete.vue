@@ -12,6 +12,9 @@
       expanded
       >
       <template #empty>{{ $t('no_result') }}</template>
+      <template #default="{ option }">
+        <span v-html="option"></span>
+      </template>
     </b-autocomplete>
 </template>
 
@@ -77,14 +80,17 @@
             
           const { housenumber, name, country, city,osm_key,osm_value } = feature.properties;
           
+          let nameAdress = '';
           let address = '';
-          
+
+          if (name) nameAdress += '<b>' + name +'<br>' +'</b>';
           if (housenumber) address += (address ? `,${housenumber}` : housenumber);
-          if (name) address += (address ? `, ${name}` : name);
+
           if(city) address += (address ? `, ${city}` : city);
           if(country) address += (address ? `, ${country}` : country);
           if(osm_value) address += (address ? `,${osm_value}` : osm_value);
-          
+                    
+          address = nameAdress + address;
           
           switch (osm_key) {
             case "amenity":
