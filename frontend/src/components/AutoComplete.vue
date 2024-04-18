@@ -9,11 +9,19 @@
       clearable
       @input="$emit('input', $event)"
       :data="this.data"
+      @select="handleSelect"
       expanded
       >
       <template #empty>{{ $t('no_result') }}</template>
       <template #default="{ option }">
-        <span v-html="option"></span>
+        <span> 
+          <b>{{ option.name }}</b><br/>
+          <span v-if="option.osm_value && option.osm_value !== 'unclassified'"> {{ option.osm_value }},</span>
+          <span v-if="option.housenumber"> {{ option.housenumber }}, </span>
+          <span v-if="option.city"> {{ option.city }},</span>
+          <span v-if="option.country"> {{ option.country }}</span>
+          
+        </span>
       </template>
     </b-autocomplete>
 </template>
@@ -33,16 +41,26 @@
     },
     data() {
       return {
-        address: this.value,
+        address: "",
         data: []  ,
         geolocation : null,
-        response: null
+        response: null,
       };
     },
     created(){
-      this.geolocation = this.location;
+      if(this.location) this.geolocation = this.location;
+      if(this.value) this.address = this.value;
+      
     },
     methods: {
+      handleSelect(option){
+        this.selected = true;
+        let addressSelected = "";
+        const {housenumber, name, city, country} = option;
+        addressSelected = name + ", " + city + ", " + country;
+        this.address = addressSelected;
+        console.log(this.address);
+      },
       getSuggestion: debounce(async function() {
 
         this.data = [];
@@ -80,60 +98,56 @@
             
           const { housenumber, name, country, city,osm_key,osm_value } = feature.properties;
           
-          let nameAdress = '';
-          let address = '';
-
-          if (name) nameAdress += '<b>' + name +'<br>' +'</b>';
-          if (housenumber) address += (address ? `,${housenumber}` : housenumber);
-
-          if(city) address += (address ? `, ${city}` : city);
-          if(country) address += (address ? `, ${country}` : country);
-          if(osm_value) address += (address ? `,${osm_value}` : osm_value);
+          let suggestion = {
+            housenumber: housenumber || null,
+            name: name || null,
+            city: city || null,
+            country: country || null,
+            osm_value: osm_value || null
+          };
                     
-          address = nameAdress + address;
           
           switch (osm_key) {
             case "amenity":
               switch (osm_value) {
                 case "give_box":
-                  this.AddSuggestiontoCategory(this.$t("givebox"), address);
+                  this.AddSuggestiontoCategory(this.$t("givebox"), suggestion);
                   break;
                 case "public_bookcase":
-                  this.AddSuggestiontoCategory("PUBLIC BOOKCASE", address);
+                  this.AddSuggestiontoCategory("PUBLIC BOOKCASE", suggestion);
                   break;
                 case "food_sharing":
-                  this.AddSuggestiontoCategory("FOOD SHARING", address);
+                  this.AddSuggestiontoCategory("FOOD SHARING", suggestion);
                   break;
                 case "freeshop":
-                  this.AddSuggestiontoCategory("FREE SHOP", address);
+                  this.AddSuggestiontoCategory("FREE SHOP", suggestion);
                   break;
                 case "drinking_water":
-                  this.AddSuggestiontoCategory("DRINKING WATER", address);
+                  this.AddSuggestiontoCategory("DRINKING WATER", suggestion);
                   break;
                 case "social_facility":
-                  this.AddSuggestiontoCategory("SOCIAL FACILITY", address);
+                  this.AddSuggestiontoCategory("SOCIAL FACILITY", suggestion);
                   break;
                 case "emergency":
-                  this.AddSuggestiontoCategory("emergency", address);
+                  this.AddSuggestiontoCategory("emergency", suggestion);
                   break;
               }
               break;
             default:
-              this.AddSuggestiontoCategory("OTHERS...", address);
+              this.AddSuggestiontoCategory("OTHERS...", suggestion);
               break;
           }
         });
       }
     },
     watch: {   
-
         async address(newValue) {
-          if(newValue.length >= 3){
+          if(newValue && newValue.length >= 3){
             await this.getSuggestion();
           }
         },
         value(newValue){
-          this.address = this.value
+          this.address = newValue;
         },
         location(newValue){
           this.geolocation = newValue;
