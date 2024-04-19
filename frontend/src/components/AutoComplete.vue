@@ -1,30 +1,31 @@
 <template>
-    <b-autocomplete
-      rounded
-      v-model="address"
-      group-field="type"
-      group-options="suggestions"
-      :placeholder="$t('address')"
-      icon="fas fa-search"
-      clearable
-      @input="$emit('input', $event)"
-      :data="this.data"
-      @select="handleSelect"
-      expanded
-      >
-      <template #empty>{{ $t('no_result') }}</template>
-      <template #default="{ option }">
-        <span> 
-          <b>{{ option.name }}</b><br/>
-          <span v-if="option.osm_value && option.osm_value !== 'unclassified'"> {{ option.osm_value }},</span>
-          <span v-if="option.housenumber"> {{ option.housenumber }}, </span>
-          <span v-if="option.city"> {{ option.city }},</span>
-          <span v-if="option.country"> {{ option.country }}</span>
-          
-        </span>
-      </template>
-    </b-autocomplete>
+  <b-autocomplete
+    rounded
+    v-model="address"
+    group-field="type"
+    group-options="suggestions"
+    :placeholder="$t('address')"
+    icon="fas fa-search"
+    clearable
+    @input="$emit('input', $event)"
+    @select="option => (addressSelected = option.address)"
+    :data="this.data"
+    expanded
+    >
+    <template #empty>{{ $t('no_result') }}</template>
+    <template #default="{ option }">
+      <span> 
+        <b>{{ option.name || option.street}}</b><br/>
+        <span v-if="option.osm_value && option.osm_value !== 'unclassified' && option.osm_value !== 'yes'"> {{ option.osm_value }},</span>
+        <span v-if="option.housenumber"> {{ option.housenumber }}, </span>
+        <span v-if="option.postcode"> {{ option.postcode }}</span>
+        <span v-if="option.city"> {{ option.city }},</span>
+        <span v-if="option.country"> {{ option.country }}</span>
+      </span>
+    </template>
+  </b-autocomplete>
 </template>
+
 
   
   <script>
@@ -45,6 +46,8 @@
         data: []  ,
         geolocation : null,
         response: null,
+        selected: false,
+        addressSelected: null
       };
     },
     created(){
@@ -53,14 +56,6 @@
       
     },
     methods: {
-      handleSelect(option){
-        this.selected = true;
-        let addressSelected = "";
-        const {housenumber, name, city, country} = option;
-        addressSelected = name + ", " + city + ", " + country;
-        this.address = addressSelected;
-        console.log(this.address);
-      },
       getSuggestion: debounce(async function() {
 
         this.data = [];
@@ -96,14 +91,17 @@
 
         response.data.features.forEach(feature => {
             
-          const { housenumber, name, country, city,osm_key,osm_value } = feature.properties;
+          const {housenumber,street,name,country, city,osm_key,osm_value,postcode} = feature.properties;
           
           let suggestion = {
             housenumber: housenumber || null,
+            street: street || null,
             name: name || null,
             city: city || null,
             country: country || null,
-            osm_value: osm_value || null
+            osm_value: osm_value || null,
+            postcode: postcode || null,
+            address: `${housenumber ? housenumber +', ' : ""}${name ? name +', ' : ""}${street ? street +', ' : ""}${postcode ? postcode : ""} ${city ? city +', ' : ""}${country ? country : ""}`,
           };
                     
           
@@ -142,7 +140,7 @@
     },
     watch: {   
         async address(newValue) {
-          if(newValue && newValue.length >= 3){
+          if(newValue && newValue.length >= 3 && !this.selected){
             await this.getSuggestion();
           }
         },
@@ -151,6 +149,10 @@
         },
         location(newValue){
           this.geolocation = newValue;
+        },
+        addressSelected(newValue){
+          this.selected = true
+          this.address = newValue;
         }
     }
   };

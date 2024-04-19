@@ -296,10 +296,6 @@ export default {
   },
   data() {
     return {
-      photonControlOptions : {
-          placeholder: 'recherche',
-          position: 'topleft',
-      },
       mapLoading: true,
       zoom: 14,
       maxZoom: 19,
@@ -509,8 +505,15 @@ export default {
 
     this.leafletCenter = this.preLeafletCenter;
 
-    var searchControl = L.control.photon(this.photonControlOptions);
+    // Créez une instance de contrôle Leaflet.Photon avec vos options
+    var searchControl = L.control.photon({
+        placeholder: 'Search...',
+        position: 'topleft',
+    });
+
+    // Ajoutez le contrôle à la carte
     searchControl.addTo(this.$refs.map.mapObject);
+
 
     this.mapLoading = false;
   },
