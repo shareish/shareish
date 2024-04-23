@@ -58,6 +58,13 @@ INSTALLED_APPS = [
     'djoser',
     'channels',
     'mymap.apps.MymapConfig',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
+
+
 ]
 
 MIDDLEWARE = [
@@ -69,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'mapsite.urls'
@@ -86,6 +94,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+
             ],
         },
     },
@@ -94,6 +103,13 @@ TEMPLATES = [
 # /!\ use Redis channel layer in production
 WSGI_APPLICATION = 'mapsite.wsgi.application'
 ASGI_APPLICATION = 'mapsite.asgi.application'
+
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 CHANNEL_LAYERS = {
     'default': {
@@ -124,7 +140,6 @@ DATABASES = {
         'USER': os.environ.get('POSTGRES_USER'),
     }
 }
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = 587
@@ -239,7 +254,33 @@ DJOSER = {
     },
     
 }
+ 
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+#LOGIN_REDIRECT_URL = DEV_URL
+ACCOUNT_LOGOUT_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APPS": [
+            {
+                "client_id": os.environ.get('CLIENT_ID'),
+                "secret": os.environ.get('SECRET'),
+                "key": os.environ.get("KEY")
+            },
+        ],
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        
+    },
+}
+
+
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
-
 
