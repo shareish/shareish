@@ -17,7 +17,7 @@
                     <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
-                <auto-complete v-model="address" class="is-expanded ml-2"/>
+                <auto-complete v-model="address" :location="this.geoLocation" class="is-expanded ml-2"/>
               </b-field>
             </div>
           </div>

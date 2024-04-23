@@ -6,9 +6,12 @@
     group-options="suggestions"
     :placeholder="$t('address')"
     icon="fas fa-search"
-    clearable
-    @input="$emit('input', $event)"
-    @select="option => (addressSelected = option.address)"
+    icon-right="fas fa-times-circle" 
+    icon-right-clickable 
+    @icon-right-click="clearAddress"
+    clear-on-select
+    @input="addressChange"
+    @select="onOptionSelect"
     :data="this.data"
     expanded
     >
@@ -46,8 +49,7 @@
         data: []  ,
         geolocation : null,
         response: null,
-        selected: false,
-        addressSelected: null
+        addressSelected: false,
       };
     },
     created(){
@@ -57,17 +59,13 @@
     },
     methods: {
       getSuggestion: debounce(async function() {
-
         this.data = [];
-        console.log("Get suggestion")
         try {
 
           if(this.geolocation){
-            console.log(this.geolocation.longitude + "; " + this.geolocation.latitude)
             this.response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale+ "&lon=" + this.geolocation.longitude + "&lat=" + this.geolocation.latitude);
           }
           else{
-            console.log("No geolocation")
             this.response = await axios.get('https://photon.komoot.io/api/?q=' + this.address + "&limit=10" + "&lang=" + this.$i18n.locale);
           }  
 
@@ -136,24 +134,35 @@
               break;
           }
         });
+      },
+      async addressChange(){
+        this.data = [];
+        if(!this.addressSelected){
+          if(this.address && this.address.length > 3) await this.getSuggestion();
+        }
+        else{
+          this.addressSelected = false;
+        }
+      },
+      onOptionSelect(option) {
+        console.log("Option selected:", option);
+        this.addressSelected = true;
+        this.address = option.address;
+        console.log("Address updated to:", this.address);
+        this.$emit('input', this.address);
+      },
+      clearAddress(){
+        this.address = "";
+        this.$emit('input', this.address);
       }
     },
     watch: {   
-        async address(newValue) {
-          if(newValue && newValue.length >= 3 && !this.selected){
-            await this.getSuggestion();
-          }
-        },
-        value(newValue){
-          this.address = newValue;
-        },
-        location(newValue){
-          this.geolocation = newValue;
-        },
-        addressSelected(newValue){
-          this.selected = true
-          this.address = newValue;
-        }
+      location(newValue){
+        this.geolocation = newValue;
+      },
+      value(newValue){
+        this.address = newValue;
+      }
     }
   };
   </script>
