@@ -124,7 +124,7 @@
                      <i class="fas fa-home"></i>
                    </b-button>
                 </b-tooltip>
-          <auto-complete :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
+          <address-auto-complete :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
 		</b-field>
 	        <div class="is-flex is-justify-content-flex-end mb-3">
 		  <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -285,7 +285,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
 import {GeolocationCoords} from "@/functions";
-import AutoComplete from "@/components/AutoComplete.vue";
+import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 
 export default {
   name: 'TheEditItemView',
@@ -293,7 +293,7 @@ export default {
   $_veeValidate: {
     validator: 'new'
   },
-  components: {CategorySelector,AutoComplete},
+  components: {CategorySelector,AddressAutoComplete },
   data() {
     return {
       itemTypes: [

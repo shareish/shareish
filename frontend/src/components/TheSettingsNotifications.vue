@@ -17,7 +17,7 @@
                     <i class="fas fa-street-view"></i>
                   </b-button>
                 </b-tooltip>
-                <auto-complete v-model="address" :location="this.geoLocation" class="is-expanded ml-2"/>
+                <address-auto-complete v-model="address" :location="this.geoLocation" class="is-expanded ml-2"/>
               </b-field>
             </div>
           </div>
@@ -165,7 +165,7 @@ import axios from "axios";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import WindowSize from "@/mixins/WindowSize";
 import {GeolocationCoords, isNotEmptyString} from "@/functions";
-import AutoComplete from "./AutoComplete.vue";
+import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 export default {
   name: 'TheSettingsNotifications',
   mixins: [ErrorHandler, WindowSize],
@@ -179,7 +179,7 @@ export default {
     }
   },
   components:{
-    AutoComplete,
+    AddressAutoComplete ,
   },
   data() {
     return {

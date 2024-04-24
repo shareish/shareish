@@ -38,7 +38,7 @@
 
   
   export default {
-    name: "AutoComplete",
+    name: "AddressAutoComplete",
     props: { 
       value: String,
       location: Object
