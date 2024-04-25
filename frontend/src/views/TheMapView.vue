@@ -58,6 +58,7 @@
             <br/>
           </l-popup>
         </l-marker>
+        <v-geosearch :options="geosearchOptions"></v-geosearch>
         <l-tile-layer
             v-for="tileProvider in tileProviders"
             :key="tileProvider.name"
@@ -245,7 +246,6 @@ import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
 import axios from "axios";
-import "leaflet.photon"
 //import "leaflet-geosearch";
 
 import {
@@ -277,6 +277,7 @@ import {LatLng} from "leaflet/dist/leaflet-src.esm";
 import WindowSize from "@/mixins/WindowSize";
 import ItemsFilters from "@/components/ItemsFilters.vue";
 import {OpenStreetMapProvider} from 'leaflet-geosearch';
+import VGeoSearch from "vue2-leaflet-geosearch";
 
 export default {
   name: 'TheMapView',
@@ -288,11 +289,12 @@ export default {
     LTileLayer,
     LControlLayers,
     LControl,
+    'v-geosearch': VGeoSearch,
     LLayerGroup,
     LPopup,
     LMarker,
     LFeatureGroup,
-    'v-marker-cluster': Vue2LeafletMarkercluster,
+    'v-marker-cluster': Vue2LeafletMarkercluster
   },
   data() {
     return {
@@ -366,6 +368,12 @@ export default {
         },
 
       ],
+
+      geosearchOptions: {
+        provider: new OpenStreetMapProvider(),
+        searchLabel: this.$t('search_address'),
+      },
+
       markerClusterGroupOptions: {
         chunkedLoading: true,
         maxClusterRadius: 15,
@@ -505,17 +513,8 @@ export default {
 
     this.leafletCenter = this.preLeafletCenter;
 
-    // Créez une instance de contrôle Leaflet.Photon avec vos options
-    var searchControl = L.control.photon({
-        placeholder: 'Search...',
-        position: 'topleft',
-    });
-
-    // Ajoutez le contrôle à la carte
-    searchControl.addTo(this.$refs.map.mapObject);
-
-
     this.mapLoading = false;
+
   },
   computed: {
     isAuthenticated() {

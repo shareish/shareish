@@ -529,5 +529,12 @@
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.",
   "select_category": "Choissisez une catégorie",
   "no_result": "Aucun résultat trouvé",
-  "givebox": "Boite à dons"
+  "givebox": "Boite à dons",
+  "bookcase": "Boîte à livres",
+  "others": "Autres...",
+  "foodsharing": "Partage alimentaire",
+  "freeshop": "Boutique de gratuité",
+  "drinkingwater": "Station d'eau potable publique",
+  "socialfacility": "Centre communautaire",
+  "emergency": "Services d'urgence"
 }

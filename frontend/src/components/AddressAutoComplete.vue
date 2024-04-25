@@ -52,11 +52,6 @@
         addressSelected: false,
       };
     },
-    created(){
-      if(this.location) this.geolocation = this.location;
-      if(this.value) this.address = this.value;
-      
-    },
     methods: {
       getSuggestion: debounce(async function() {
         this.data = [];
@@ -110,27 +105,27 @@
                   this.AddSuggestiontoCategory(this.$t("givebox"), suggestion);
                   break;
                 case "public_bookcase":
-                  this.AddSuggestiontoCategory("PUBLIC BOOKCASE", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("bookcase"), suggestion);
                   break;
                 case "food_sharing":
-                  this.AddSuggestiontoCategory("FOOD SHARING", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("foodsharing"), suggestion);
                   break;
                 case "freeshop":
-                  this.AddSuggestiontoCategory("FREE SHOP", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("freeshop"), suggestion);
                   break;
                 case "drinking_water":
-                  this.AddSuggestiontoCategory("DRINKING WATER", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("drinkingwater"), suggestion);
                   break;
                 case "social_facility":
-                  this.AddSuggestiontoCategory("SOCIAL FACILITY", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("socialfacility"), suggestion);
                   break;
                 case "emergency":
-                  this.AddSuggestiontoCategory("emergency", suggestion);
+                  this.AddSuggestiontoCategory(this.$t("emergency"), suggestion);
                   break;
               }
               break;
             default:
-              this.AddSuggestiontoCategory("OTHERS...", suggestion);
+              this.AddSuggestiontoCategory(this.$t("others"), suggestion);
               break;
           }
         });
