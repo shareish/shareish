@@ -297,7 +297,7 @@ export default {
     'v-marker-cluster': Vue2LeafletMarkercluster
   },
   props : {
-    popup : Boolean
+    popup : String
   },
   data() {
     return {
@@ -310,7 +310,6 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-      activePopup: false || this.popup,
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
 
@@ -540,11 +539,12 @@ export default {
     ecatsCheckboxes() {
       this.ecatsCheckboxesUpdated();
     },
-    activePopup(newValue){
-      if(newValue === true){
-        this.addMarker();
+    popup(newValue){
+      console.log("popup change");
+      if(newValue === "true")
+        this.$refs.newmarker.mapObject.openPopup();
+        console.log(this.newmarker);
       }
-    },
   },
   methods: {
     ucfirst,

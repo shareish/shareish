@@ -101,19 +101,10 @@ const routes = [
         }
     },
     {
-        path: "/map/:popup",
-        name: 'mapPopup',
-        component: TheMapView,
-        props:true,
-        meta: {
-            requiresAuth: true,
-            layout: 'default'
-        }
-    },
-    {
-        path: "/map/pos/:lat/:lng",
+        path: "/map/pos/:lat/:lng/:popup",
         name: 'mapPos',
         component: TheMapView,
+        props: true,
         meta: {
             requiresAuth: true,
             layout: 'default'
