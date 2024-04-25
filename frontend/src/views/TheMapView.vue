@@ -11,7 +11,7 @@
           @update:bounds="boundsUpdated"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
-        <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
+        <l-marker name="maPopup" ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
           <l-popup ref="newpopup" :options="newPopupOptions">
             <b>{{ $t('choose_add_content_type_map') }}</b> <br/><br/>
             <template v-if="newmarker.lat">
@@ -296,6 +296,9 @@ export default {
     LFeatureGroup,
     'v-marker-cluster': Vue2LeafletMarkercluster
   },
+  props : {
+    popup : Boolean
+  },
   data() {
     return {
       mapLoading: true,
@@ -307,7 +310,7 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-
+      activePopup: false || this.popup,
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
 
@@ -536,7 +539,12 @@ export default {
   watch: {
     ecatsCheckboxes() {
       this.ecatsCheckboxesUpdated();
-    }
+    },
+    activePopup(newValue){
+      if(newValue === true){
+        this.addMarker();
+      }
+    },
   },
   methods: {
     ucfirst,

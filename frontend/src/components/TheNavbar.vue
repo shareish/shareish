@@ -18,6 +18,10 @@
         <i class="fas fa-plus"></i>
         {{ $t('add-item') }}
       </b-navbar-item>
+      <b-navbar-item tag="router-link" :to="{name:'mapPopup', params:{popup:true}}">
+        <i class="fas fa-plus"></i>
+        {{ $t('add-publicresource') }}
+      </b-navbar-item>
       <b-navbar-item tag="router-link" to="/conversations">
         <i class="fas fa-comments"></i>
         {{ $t('conversations') }}
