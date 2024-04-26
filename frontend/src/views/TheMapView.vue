@@ -540,10 +540,9 @@ export default {
       this.ecatsCheckboxesUpdated();
     },
     popup(newValue){
-      console.log("popup change");
       if(newValue === "true")
-        this.$refs.newmarker.mapObject.openPopup();
-        console.log(this.newmarker);
+        console.log(this.$refs.map.mapObject.getBounds().getCenter())
+        this.addMarker(this.$refs.map.mapObject.getBounds().getCenter(),true)
       }
   },
   methods: {
@@ -773,8 +772,13 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-    addMarker(e) {
-      this.newmarker = e.latlng;
+    addMarker(e,test) {
+      if(test){
+        this.newmarker = e;
+      }
+      else{
+        this.newmarker = e.latlng;
+      }
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
