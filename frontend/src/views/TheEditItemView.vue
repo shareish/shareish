@@ -258,35 +258,35 @@
         </div>
         <div class="container has-text-centered mt-6">
           <div class="row">
-            <div class="col-md-12 mb-2">
-              <router-link :to="{ name: 'item', params: { id: itemId } }" class="d-block w-100">
-                <b-button type="is-danger" :class="[formBottomButtonsSize, 'ml-2']" icon-right="fas fa-times" block expanded>
-                  {{ $t('cancel') }}
-                </b-button>
-              </router-link>
-            </div>
+              <div class="col-md-12 mb-2">
+                  <router-link :to="{ name: 'item', params: { id: itemId } }" class="d-block w-100">
+                      <b-button ref="cancelBtn" type="is-danger" :class="[formBottomButtonsSize, buttonSizeClass]" icon-right="fas fa-times" block>
+                          {{ $t('cancel') }}
+                      </b-button>
+                  </router-link>
+              </div>
           </div>
           <div class="row">
-            <div class="col-md-12 mb-2">
-              <b-button :type="'is-danger'" :class="[formBottomButtonsSize, 'ml-2']" @click="resetForm" icon-right="fal fa-marker" expanded>
-                {{ $t('reset-form') }}
-              </b-button>
-            </div>
-            <div class="col-md-12 mb-2">
-              <b-button 
-                expanded
-                :type="internalItem.visibility !== 'DR' ? 'is-primary' : 'is-warning'"
-                class="ml-2"
-                :class="formBottomButtonsSize"
-                :loading="waitingFormResponse"
-                @click="submit"
-                icon-right="far fa-check"
-              >
-                {{ $t(internalItem.visibility !== 'DR' ? 'save' : 'modify') }}
-              </b-button>
-            </div>
+              <div class="col-md-12 mb-2">
+                  <b-button ref="resetBtn" :type="'is-danger'" :class="[formBottomButtonsSize, buttonSizeClass]" @click="resetForm" icon-right="fal fa-marker">
+                      {{ $t('reset-form') }}
+                  </b-button>
+              </div>
+              <div class="col-md-12 mb-2">
+                  <b-button 
+                      ref="submitBtn"
+                      :type="internalItem.visibility !== 'DR' ? 'is-primary' : 'is-warning'"
+                      class="ml-2"
+                      :class="[formBottomButtonsSize, buttonSizeClass]"
+                      :loading="waitingFormResponse"
+                      @click="submit"
+                      icon-right="far fa-check"
+                  >
+                      {{ $t(internalItem.visibility !== 'DR' ? 'save' : 'modify') }}
+                  </b-button>
+              </div>
           </div>
-        </div>
+      </div>
       </section>
     </div>
   </div>
@@ -326,7 +326,7 @@ export default {
       imagesSlots: 12,
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
-
+      buttonSizeClass: '',
       item: {},
       internalItem: {},
       address_text: "",
@@ -408,7 +408,19 @@ export default {
         this.updateAddressField();
     }
   },
+  mounted() {
+    this.calculateButtonSize();
+  },
   methods: {
+    calculateButtonSize() {
+      const buttons = [this.$refs.cancelBtn, this.$refs.resetBtn, this.$refs.submitBtn];
+
+      const maxButtonWidth = Math.max(...buttons.map(btn => btn.$el.offsetWidth));
+
+      buttons.forEach(btn => {
+          btn.$el.style.width = `${maxButtonWidth}px`;
+      });
+    },
     clearAddress(){
       this.address = ''
     },
