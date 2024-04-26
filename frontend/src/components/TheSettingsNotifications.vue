@@ -311,7 +311,6 @@ export default {
             if (isNotEmptyString(this.address)) {
               const newRefLocation = await this.fetchGeolocation(this.address);
               if (newRefLocation instanceof GeolocationCoords) {
-                console.log("oki !")
                 this.internalUser.ref_location = newRefLocation;
                 this.address = await this.fetchAddress(this.internalUser.ref_location);
               } else {

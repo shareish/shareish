@@ -1,6 +1,8 @@
 <template>
   <b-autocomplete
     rounded
+    open-on-focus
+    ref="autocomplete"
     v-model="address"
     group-field="type"
     group-options="suggestions"
@@ -145,10 +147,11 @@
         }
       },
       onOptionSelect(option) {
-        console.log("Option selected:", option);
         this.addressSelected = true;
         this.address = option.address;
-        console.log("Address updated to:", this.address);
+        this.$nextTick(() => {
+          this.$refs.autocomplete.$emit('input', option.address);
+        });
         this.$emit('input', this.address);
       },
       clearAddress(){
