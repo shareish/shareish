@@ -413,7 +413,6 @@ export default {
 
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
-      console.log('Geolocation is available');
       // Get the position
       navigator.geolocation.getCurrentPosition(
         position => {
