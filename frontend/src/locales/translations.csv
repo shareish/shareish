@@ -529,3 +529,9 @@ error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN,This conversation has 
 error_keys__BAD_LOGIN,Connection error, Erreur de connexion
 select_category,Choose a category,Choissisez une catégorie
 OR,OR,OU
+thirdpartyconnection,You can also use a third-party service to connect :,Vous pouvez également utiliser un service tiers pour vous connecter :
+osm_connect,Connecting with openStreetMap,Se connecter avec openStreetMap
+google_connect,Connecting with Google,Se connecter avec Google
+facebook_connect,Connecting with Facebook,Se connecter avec Facebook
+mastodon_connect,Connecting with Mastodon,Se connecter avec Mastodon
+instagram_connect,Connecting with Instagram,Se connecter avec Instagram

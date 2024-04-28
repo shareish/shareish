@@ -529,5 +529,11 @@
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been locked by another user. You cannot unlock it.",
   "error_keys__BAD_LOGIN": "Connection error",
   "select_category": "Choose a category",
-  "OR": "OR"
+  "OR": "OR",
+  "thirdpartyconnection": "You can also use a third-party service to connect :",
+  "osm_connect": "Connecting with openStreetMap",
+  "google_connect": "Connecting with Google",
+  "facebook_connect": "Connecting with Facebook",
+  "mastodon_connect": "Connecting with Mastodon",
+  "instagram_connect": "Connecting with Instagram"
 }

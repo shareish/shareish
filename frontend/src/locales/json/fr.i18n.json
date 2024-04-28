@@ -529,5 +529,11 @@
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "Cette conversation a été verrouillée par un autre utilisateur. Vous ne pouvez pas la déverrouiller.",
   "error_keys__BAD_LOGIN": " Erreur de connexion",
   "select_category": "Choissisez une catégorie",
-  "OR": "OU"
+  "OR": "OU",
+  "thirdpartyconnection": "Vous pouvez également utiliser un service tiers pour vous connecter :",
+  "osm_connect": "Se connecter avec openStreetMap",
+  "google_connect": "Se connecter avec Google",
+  "facebook_connect": "Se connecter avec Facebook",
+  "mastodon_connect": "Se connecter avec Mastodon",
+  "instagram_connect": "Se connecter avec Instagram"
 }
