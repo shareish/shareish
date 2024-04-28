@@ -1,6 +1,6 @@
 <template>
-  <div id="page-log-in" class="columns">
-    <div class="column is-6 is-offset-3">
+  <div id="page-log-in" class="columns is-vcentered">
+    <div class="column is-4 is-offset-4">
       <h1 class="title">{{ $t('log-in') }}</h1>
       <b-message v-if="!responseOK" :title="$t('error_keys__BAD_LOGIN')" type="is-danger">
         {{ $t('error_keys__ACCOUNT_DOESNT_EXIST') }}
