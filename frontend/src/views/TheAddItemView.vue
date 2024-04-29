@@ -283,7 +283,7 @@ import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords} from "@/functions";
+import {GeolocationCoords,isNotEmptyString} from "@/functions";
 
 export default {
   name: 'TheAddItemView',
@@ -324,7 +324,7 @@ export default {
       category2: '',
       category3: '',
       address_text: "",
-      address_coords: new GeolocationCoords(),
+      address_coords: null,
       ressource_id : '',  //public resource id
       address: "",
       use_coordinates: false,
@@ -569,6 +569,21 @@ export default {
         this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
+    async fetchAddressCoords(address) {
+      if (isNotEmptyString(address)) {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
     async fetchAddressRefLoc() {
       try {
         const params = {
@@ -613,11 +628,14 @@ export default {
       }
       return null;
     },
-    updateAddressField() {
+    async updateAddressField() {
       if (!this.use_coordinates)
-        this.address = this.address_text;
+        this.address = await this.fetchAddress(this.address_coords);
       else
-          this.address = this.address_coords.toStringForUser();
+      {
+        this.address_coords = await this.fetchAddressCoords(this.address);
+        this.address = this.address_coords.toStringForUser();
+      }
     },
     addressUpdatedByUser() {
       if (!this.user_updated_address_field)
