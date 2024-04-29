@@ -176,6 +176,15 @@ const routes = [
     },
     {
         path: "/add-item/pos/:lat/:lng/:type/:resource/:rid",
+        name: 'addItemPosResource',
+        component: TheAddItemView,
+        meta: {
+            requiresAuth: true,
+            layout: 'default'
+        }
+    },
+    {
+        path: "/add-item/pos/:lat/:lng/:type/",
         name: 'addItemPos',
         component: TheAddItemView,
         meta: {

@@ -16,13 +16,13 @@
           <l-popup ref="newpopup" :options="newPopupOptions">
             <b>{{ $t('choose_add_content_type_map') }}</b> <br/><br/>
             <template v-if="newmarker.lat && !this.popupIsActive">
-              <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' ',resource:' ',rid:' '}}">
+              <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">
                 {{ $t('add_item') }}
               </router-link>
               <div v-if="!this.popupIsActive" style="display: grid;grid-template-columns:repeat(4,1fr);">
                 <span v-for="(itemtype,index) in itemTypeIcons" :key="index">
                   <router-link
-                      :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index,resource:' ',rid:' '}}">
+                      :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index}}">
                     <b-tooltip :label="$t('item_type_'+index)">
                       <img :src="itemTypeIcons[index].options.iconUrl" style="height: 30px; display: inline">
                     </b-tooltip>
@@ -152,13 +152,13 @@
                     </div>
 		                <div v-if="ecatsInteractive(extraCategory.category)"> 
                       <span>{{ $t('add-a')}}
-                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
+                        <router-link :to="{name: 'addItemPosResource', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
                           <b-tooltip :label="$t('item_type_RQ')">
                             <img :src="itemTypeIcons['RQ'].options.iconUrl" style="height: 20px; display: inline">
                           </b-tooltip>
                         </router-link> 
                           {{ $t('or')}} 
-                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
+                        <router-link :to="{name: 'addItemPosResource', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
                           <b-tooltip :label="$t('item_type_DN')">
                             <img :src="itemTypeIcons['DN'].options.iconUrl" style="height: 20px; display: inline">
                           </b-tooltip>
@@ -787,7 +787,6 @@ export default {
       }
     },
     addMarker(e,active) {
-      console.log("addMarker");
       if(active){
         this.newmarker = e;
       }
