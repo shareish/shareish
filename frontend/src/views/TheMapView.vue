@@ -558,7 +558,7 @@ export default {
     ucfirst,
     lcall,
     popupClosed(){
-      console.log("popup closed")
+      this.newmarker = [0, 0]
       if(this.popup === "true")
         this.$router.push({params: {popup: "false"}})
     },
@@ -787,6 +787,7 @@ export default {
       }
     },
     addMarker(e,active) {
+      console.log("addMarker");
       if(active){
         this.newmarker = e;
       }
