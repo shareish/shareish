@@ -1,6 +1,5 @@
 <template>
-  <b-loading v-if="loading" :active="true" :is-full-page="false" />
-  <div v-else id="page-add-item" class="max-width-is-max-container" ref="page-container">
+  <div id="page-add-item" class="max-width-is-max-container" ref="page-container">
     <h1 class="title has-text-centered mb-6">
       {{ $t('add-new-item') }}
       <b-tooltip :label="$t('help_add_item')" multilined position="is-bottom">
@@ -283,7 +282,7 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
 import {GeolocationCoords} from "@/functions";
-import {mapActions}  from "vuex";
+import {mapActions,mapState}  from "vuex";
 
 export default {
   name: 'TheAddItemView',
@@ -301,7 +300,6 @@ export default {
         {'type': "EV", 'slug': "event", 'color': 'is-purple'}
       ],
 
-      loading: false,
       step: 0,
 
       filesSelected: [],
@@ -429,6 +427,7 @@ export default {
     document.title = `Shareish | ${this.$t('add-new-item')}`;
   },
   computed: {
+    ...mapState(['loading']),
     canStillUploadImages() {
       return this.imagesSlots > this.images.length;
     },
@@ -464,7 +463,7 @@ export default {
   },
   watch: {
     description(newValue, oldValue) {
-      if (newValue !== oldValue) {
+      if (this.loading) {
         this.closeLoader();
       }
     },
