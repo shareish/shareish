@@ -1,34 +1,36 @@
 <template>
-  <b-autocomplete
-    rounded
-    open-on-focus
-    ref="autocomplete"
-    v-model="address"
-    group-field="type"
-    group-options="suggestions"
-    :placeholder="$t('address')"
-    icon="fas fa-search"
-    icon-right="fas fa-times-circle" 
-    icon-right-clickable 
-    @icon-right-click="clearAddress"
-    clear-on-select
-    @input="addressChange"
-    @select="onOptionSelect"
-    :data="this.data"
-    expanded
-    >
-    <template #empty>{{ $t('no_result') }}</template>
-    <template #default="{ option }">
-      <span> 
-        <b>{{ option.name || option.street}}</b><br/>
-        <span v-if="option.osm_value && option.osm_value !== 'unclassified' && option.osm_value !== 'yes'"> {{ option.osm_value }},</span>
-        <span v-if="option.housenumber"> {{ option.housenumber }}, </span>
-        <span v-if="option.postcode"> {{ option.postcode }}</span>
-        <span v-if="option.city"> {{ option.city }},</span>
-        <span v-if="option.country"> {{ option.country }}</span>
-      </span>
-    </template>
-  </b-autocomplete>
+  <b-field style="width: 100%;">
+    <b-autocomplete
+      rounded
+      open-on-focus
+      ref="autocomplete"
+      v-model="address"
+      group-field="type"
+      group-options="suggestions"
+      :placeholder="$t('address')"
+      icon="fas fa-search"
+      icon-right="fas fa-times-circle" 
+      icon-right-clickable 
+      @icon-right-click="clearAddress"
+      clear-on-select
+      @input="addressChange"
+      @select="onOptionSelect"
+      :data="this.data"
+      expanded
+      >
+      <template #empty>{{ $t('no_result') }}</template>
+      <template #default="{ option }">
+        <span> 
+          <b>{{ option.name || option.street}}</b><br/>
+          <span v-if="option.osm_value && option.osm_value !== 'unclassified' && option.osm_value !== 'yes'"> {{ option.osm_value }},</span>
+          <span v-if="option.housenumber"> {{ option.housenumber }}, </span>
+          <span v-if="option.postcode"> {{ option.postcode }}</span>
+          <span v-if="option.city"> {{ option.city }},</span>
+          <span v-if="option.country"> {{ option.country }}</span>
+        </span>
+      </template>
+    </b-autocomplete>
+  </b-field>
 </template>
 
 
@@ -43,7 +45,7 @@
     name: "AddressAutoComplete",
     props: { 
       value: String,
-      location: Object
+      location: Object,
     },
     data() {
       return {
@@ -148,6 +150,7 @@
           this.$refs.autocomplete.$emit('input', option.address);
         });
         this.$emit('input', this.address);
+        this.$emit('address-selected');
       },
       clearAddress(){
         this.address = "";
@@ -160,6 +163,9 @@
       },
       value(newValue){
         this.address = newValue;
+      },
+      address(newValue){
+        this.$emit('input', newValue);
       }
     }
   };

@@ -138,7 +138,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <address-auto-complete :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
+            <address-auto-complete  @address-selected="handleSelect" :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="address"/>
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -283,7 +283,7 @@ import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords,isNotEmptyString} from "@/functions";
+import {GeolocationCoords,isNotEmptyString,isEmptyString} from "@/functions";
 
 export default {
   name: 'TheAddItemView',
@@ -328,7 +328,6 @@ export default {
       ressource_id : '',  //public resource id
       address: "",
       use_coordinates: false,
-      user_updated_address_field: false,
       startdate: null,
       enddate: null,
       isRecurrent: false,
@@ -479,12 +478,23 @@ export default {
       }
     },
     use_coordinates() {
-      if (!this.user_updated_address_field)
-        this.updateAddressField();
+      this.updateAddressField();
+    },
+    address(){
+      if(isEmptyString(this.address))
+      {
+        console.log("address cleared");
+        this.address_coords = null;
+        this.address_text = "";
+      }
     }
   },
   methods: {
-
+    async handleSelect(){
+      console.log("address selected");
+      this.address_coords = await this.fetchAddressCoords(this.address);
+      this.address_text = await this.fetchAddress(this.address_coords);
+    },
     clearAddress(){
       this.address = ''
     },
@@ -594,7 +604,6 @@ export default {
         if (refLocation !== null) {
           this.refLocation = new GeolocationCoords(refLocation);
           if (this.refLocation instanceof GeolocationCoords) {
-            this.user_updated_address_field = false;
             this.address_text = await this.fetchAddress(this.refLocation);
             this.address_coords = this.refLocation;
             this.updateAddressField();
@@ -609,7 +618,6 @@ export default {
     },
     async fetchAddressGeoLoc() {
       if (this.geoLocation instanceof GeolocationCoords) {
-        this.user_updated_address_field = false;
         this.address_text = await this.fetchAddress(this.geoLocation);
         this.address_coords = this.geoLocation;
         this.updateAddressField();
@@ -630,16 +638,12 @@ export default {
     },
     async updateAddressField() {
       if (!this.use_coordinates)
-        this.address = await this.fetchAddress(this.address_coords);
+        this.address = this.address_text;
       else
       {
-        this.address_coords = await this.fetchAddressCoords(this.address);
-        this.address = this.address_coords.toStringForUser();
+        if(this.address_coords instanceof GeolocationCoords)
+          this.address = this.address_coords.toStringForUser()
       }
-    },
-    addressUpdatedByUser() {
-      if (!this.user_updated_address_field)
-        this.user_updated_address_field = true;
     },
     async processImage(file) {
       this.loading = true;
