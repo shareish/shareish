@@ -126,7 +126,10 @@
                 case "emergency":
                   this.AddSuggestiontoCategory(this.$t("emergency"), suggestion);
                   break;
-              }
+                default:
+                  this.AddSuggestiontoCategory(this.$t("others"), suggestion);
+                  break;
+            }
               break;
             default:
               this.AddSuggestiontoCategory(this.$t("others"), suggestion);
