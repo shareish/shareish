@@ -1,8 +1,8 @@
 import re
 
-from geopy import Nominatim
+from geopy import Photon
 
-locator = Nominatim(user_agent='shareish')
+locator_photon = Photon(user_agent='shareish');
 
 def verif_location(data):
     srid = None
@@ -80,7 +80,7 @@ def verif_location(data):
                         else:
                             # It's a string complete address that we need to find
                             try:
-                                loc = locator.geocode(address)
+                                loc = locator_photon.geocode(address)
                                 if loc is not None:
                                     srid = "SRID=4326;POINT ({} {})".format(str(loc.longitude), str(loc.latitude))
                                 else:

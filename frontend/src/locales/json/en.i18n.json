@@ -528,5 +528,14 @@
   "error_keys__CONVERSATION_ALREADY_CLOSED": "This conversation is already locked.",
   "error_keys__CONVERSATION_ALREADY_OPEN": "This conversation is already unlocked.",
   "error_keys__CONVERSATION_CLOSED_BY_OTHER_USER_CANNOT_OPEN": "This conversation has been locked by another user. You cannot unlock it.",
-  "select_category": "Choose a category"
+  "select_category": "Choose a category",
+  "no_result": "No results found",
+  "givebox": "Give Box",
+  "bookcase": "Book box",
+  "others": "Others...",
+  "foodsharing": "Community Food Exchange",
+  "freeshop": "Community Giveaway Hub",
+  "drinkingwater": "Public Water Fountain",
+  "socialfacility": "Community Center",
+  "emergency": "Emergency Services"
 }
