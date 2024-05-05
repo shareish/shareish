@@ -1,5 +1,5 @@
 <template>
-  <b-field style="width: 100%;">
+  <b-field style="width: 100%;" :message="this.errorAddress" :type="{'is-danger': errorAddress}">
     <b-autocomplete
       rounded
       open-on-focus
@@ -46,6 +46,7 @@
     props: { 
       value: String,
       location: Object,
+      errorAddress: String,
     },
     data() {
       return {
