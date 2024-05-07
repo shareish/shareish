@@ -49,7 +49,7 @@ describe('TheSignUpView.vue', () => {
       expect(inputPassword.element.value).toBe(valuePasswordInput);
 
       //models tests
-      //expect(wrapper.vm.agreement).toBe(valueAgreementCheckBox);
+      expect(wrapper.vm.agreement).toBe(!valueAgreementCheckBox);
       expect(wrapper.vm.email).toBe(valueEmailInput);
       expect(wrapper.vm.password).toBe(valuePasswordInput);
       expect(wrapper.vm.username).toBe(valueUsernameInput);
