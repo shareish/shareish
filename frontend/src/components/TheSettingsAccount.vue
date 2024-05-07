@@ -11,7 +11,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['first_name']" v-validate="'required'" name="first_name" type="search" />
+            <b-input id="firstname" v-model="internalUser['first_name']" v-validate="'required'" name="first_name" type="search" />
           </b-field>
         </div>
         <div class="column is-half">
@@ -22,7 +22,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['last_name']" v-validate="'required'" name="last_name" type="search" />
+            <b-input id="lastname" v-model="internalUser['last_name']" v-validate="'required'" name="last_name" type="search" />
           </b-field>
         </div>
         <div class="column is-half">
@@ -33,7 +33,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['email']" v-validate="'required|email'" name="email" type="search" icon-pack="fas" icon="envelope"/>
+            <b-input id="email" v-model="internalUser['email']" v-validate="'required|email'" name="email" type="search" icon-pack="fas" icon="envelope"/>
           </b-field>
         </div>
         <div class="column is-half">
@@ -44,7 +44,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['username']" v-validate="'required'" name="username" type="search" />
+            <b-input id="username" v-model="internalUser['username']" v-validate="'required'" name="username" type="search" />
           </b-field>
         </div>
       </div>
@@ -65,6 +65,7 @@
               style="width: 120px;"
               :type="internalUser['save_item_viewing'] ? 'is-success' : 'is-danger'"
               @click="internalUser['save_item_viewing'] = !internalUser['save_item_viewing']"
+              id="save_item_viewing"
           >
             {{ $t(internalUser['save_item_viewing'] ? 'yes' : 'no') }}
           </b-button>

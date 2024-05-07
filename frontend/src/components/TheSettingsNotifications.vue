@@ -18,6 +18,7 @@
                   </b-button>
                 </b-tooltip>
                 <b-autocomplete
+                    id="address"
                     v-model="address"
                     :open-on-focus="true"
                     :data="suggestedAddresses"
@@ -42,6 +43,7 @@
               </b-tooltip>
             </template>
             <b-slider
+                id="slider_notifications"
                 v-model="internalUser['dwithin_notifications']"
                 :max="99"
                 :tooltip="false"
@@ -65,6 +67,7 @@
           <b-radio-button
               v-for="{key, translationKey, color} in frequencies"
               :key="key"
+              :id="field + key"
               v-model="radioGroups[field]"
               :native-value="key" :type="color"
           >
