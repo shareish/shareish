@@ -436,14 +436,30 @@ export default {
     const filteredQueryValues = this.filterQueryValues(this.queryValues);
     this.$emit('fieldsUpdated', filteredQueryValues, this.buildURLParams(filteredQueryValues));
 
+    
+    let resizingTimeout = null;
+
     this.$nextTick(() => {
       const filters = document.getElementById("filters");
+      
       if (filters !== null) {
         const resizeObserver = new ResizeObserver((entries) => {
-          this.componentWidth = entries[0].contentRect.width;
+          if (resizingTimeout !== null) {
+            clearTimeout(resizingTimeout);
+          }
+
+          resizingTimeout = setTimeout(() => {
+            this.componentWidth = entries[0].contentRect.width;
+            resizingTimeout = null;
+          }, 100); 
         });
+
         resizeObserver.observe(filters);
       }
+    });
+
+    window.addEventListener("error", function (e) {
+      console.error("itemFilter :" + e.message);
     });
   },
   computed: {
