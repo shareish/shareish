@@ -138,7 +138,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <address-auto-complete :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
+            <address-auto-complete  @address-selected="handleSelect" :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="address" v-validate="'required'" :errorAddress="errors.first('address')"/>
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -283,7 +283,7 @@ import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords} from "@/functions";
+import {GeolocationCoords,isNotEmptyString,isEmptyString} from "@/functions";
 import {mapActions}  from "vuex";
 
 export default {
@@ -325,11 +325,10 @@ export default {
       category2: '',
       category3: '',
       address_text: "",
-      address_coords: new GeolocationCoords(),
+      address_coords: null,
       ressource_id : '',  //public resource id
       address: "",
       use_coordinates: false,
-      user_updated_address_field: false,
       startdate: null,
       enddate: null,
       isRecurrent: false,
@@ -485,11 +484,23 @@ export default {
       }
     },
     use_coordinates() {
-      if (!this.user_updated_address_field)
-        this.updateAddressField();
+      this.updateAddressField();
+    },
+    address(){
+      if(isEmptyString(this.address))
+      {
+        console.log("address cleared");
+        this.address_coords = null;
+        this.address_text = "";
+      }
     }
   },
   methods: {
+    async handleSelect(){
+      console.log("address selected");
+      this.address_coords = await this.fetchAddressCoords(this.address);
+      this.address_text = await this.fetchAddress(this.address_coords);
+    },
     ...mapActions(['toggleLoading']),
     changeLoading(value){
       this.toggleLoading(value);
@@ -578,6 +589,21 @@ export default {
         this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
+    async fetchAddressCoords(address) {
+      if (isNotEmptyString(address)) {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
     async fetchAddressRefLoc() {
       try {
         const params = {
@@ -588,7 +614,6 @@ export default {
         if (refLocation !== null) {
           this.refLocation = new GeolocationCoords(refLocation);
           if (this.refLocation instanceof GeolocationCoords) {
-            this.user_updated_address_field = false;
             this.address_text = await this.fetchAddress(this.refLocation);
             this.address_coords = this.refLocation;
             this.updateAddressField();
@@ -603,7 +628,6 @@ export default {
     },
     async fetchAddressGeoLoc() {
       if (this.geoLocation instanceof GeolocationCoords) {
-        this.user_updated_address_field = false;
         this.address_text = await this.fetchAddress(this.geoLocation);
         this.address_coords = this.geoLocation;
         this.updateAddressField();
@@ -622,15 +646,14 @@ export default {
       }
       return null;
     },
-    updateAddressField() {
+    async updateAddressField() {
       if (!this.use_coordinates)
         this.address = this.address_text;
       else
-          this.address = this.address_coords.toStringForUser();
-    },
-    addressUpdatedByUser() {
-      if (!this.user_updated_address_field)
-        this.user_updated_address_field = true;
+      {
+        if(this.address_coords instanceof GeolocationCoords)
+          this.address = this.address_coords.toStringForUser()
+      }
     },
     async processImage(file) {
       this.changeLoading(true);

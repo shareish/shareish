@@ -37,10 +37,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .ai import findClass
 
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
 
 User = get_user_model()
-locator = Nominatim(user_agent='shareish')
+locator = Photon(user_agent='shareish')
 
 
 class ItemViewSet(viewsets.ModelViewSet):
