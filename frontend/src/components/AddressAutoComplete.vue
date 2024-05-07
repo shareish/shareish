@@ -153,8 +153,6 @@
         this.$nextTick(() => {
           this.$refs.autocomplete.$emit('input', option.address);
         });
-        this.$emit('input', this.address);
-        this.$emit('address-selected');
       },
       clearAddress(){
         this.address = "";
