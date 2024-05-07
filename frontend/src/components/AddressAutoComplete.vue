@@ -140,10 +140,8 @@
         }
       },
       onOptionSelect(option) {
-        console.log("Option selected:", option);
         this.addressSelected = true;
         this.address = option.address;
-        console.log("Address updated to:", this.address);
         this.$emit('input', this.address);
       },
       clearAddress(){
