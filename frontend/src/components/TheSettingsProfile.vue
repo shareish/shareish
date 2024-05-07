@@ -53,7 +53,7 @@
             <i class="icon far fa-question-circle"></i>
           </b-tooltip>
         </template>
-        <b-input v-model="internalUser['description']" name="description" type="textarea" />
+        <b-input id="description" v-model="internalUser['description']" name="description" type="textarea" />
       </b-field>
     </div>
     <div class="tile is-ancestor">
@@ -66,7 +66,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['homepage_url']" v-validate="'url'" name="homepage_url" type="search" />
+            <b-input id="homepage_url" v-model="internalUser['homepage_url']" v-validate="'url'" name="homepage_url" type="search" />
           </b-field>
         </div>
       </div>
@@ -79,7 +79,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['facebook_url']" v-validate="'url'" name="facebook_url" type="search" />
+            <b-input id="facebook_url" v-model="internalUser['facebook_url']" v-validate="'url'" name="facebook_url" type="search" />
           </b-field>
         </div>
       </div>
@@ -92,7 +92,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['instagram_url']" name="instagram_url" type="search" v-validate="'url'"/>
+            <b-input id="instagram_url" v-model="internalUser['instagram_url']" name="instagram_url" type="search" v-validate="'url'"/>
           </b-field>
         </div>
       </div>
@@ -105,7 +105,7 @@
                 <i class="icon far fa-question-circle"></i>
               </b-tooltip>
             </template>
-            <b-input v-model="internalUser['mastodon_url']" name="mastodon_url" type="search" v-validate="{required: false, regex: '^(?:https?://|@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,})'}"/>
+            <b-input id="mastodon_url" v-model="internalUser['mastodon_url']" name="mastodon_url" type="search" v-validate="{required: false, regex: '^(?:https?://|@[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,})'}"/>
           </b-field>
         </div>
       </div>
