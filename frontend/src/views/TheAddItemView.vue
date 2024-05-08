@@ -267,7 +267,7 @@
           </div>
         </div>
         <div class="container has-text-centered mt-5">
-          <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" class="mt-2 ml-2" :class="formBottomButtonsSize" :loading="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
+          <b-button :type="visibility !== 'DR' ? 'is-primary' : 'is-warning'" class="mt-2 ml-2" :class="formBottomButtonsSize" :loadingPage="waitingFormResponse" @click="submit">{{ $t(visibility !== 'DR' ? 'publish-item' : 'save') }}</b-button>
           <br />
           <a class="is-inline-block mt-5 has-text-danger" :class="formBottomButtonsSize" @click="resetForm">{{ $t('reset-form') }}</a>
         </div>
