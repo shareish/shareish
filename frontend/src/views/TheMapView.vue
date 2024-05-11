@@ -9,17 +9,16 @@
           :zoom.sync="zoom"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
-          @popupclose="popupClosed"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
-        <l-marker name="maPopup" ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
-          <l-popup ref="newpopup" :options="newPopupOptions">
+        <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
+          <l-popup ref="popupdefault" :options="newPopupOptions">
             <b>{{ $t('choose_add_content_type_map') }}</b> <br/><br/>
-            <template v-if="newmarker.lat && !this.popupIsActive">
+            <template v-if="newmarker.lat">
               <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">
                 {{ $t('add_item') }}
               </router-link>
-              <div v-if="!this.popupIsActive" style="display: grid;grid-template-columns:repeat(4,1fr);">
+              <div style="display: grid;grid-template-columns:repeat(4,1fr);">
                 <span v-for="(itemtype,index) in itemTypeIcons" :key="index">
                   <router-link
                       :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: index}}">
@@ -152,13 +151,13 @@
                     </div>
 		                <div v-if="ecatsInteractive(extraCategory.category)"> 
                       <span>{{ $t('add-a')}}
-                        <router-link :to="{name: 'addItemPosResource', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'RQ', resource: extraCategory.category, rid: marker.id}}">
                           <b-tooltip :label="$t('item_type_RQ')">
                             <img :src="itemTypeIcons['RQ'].options.iconUrl" style="height: 20px; display: inline">
                           </b-tooltip>
                         </router-link> 
                           {{ $t('or')}} 
-                        <router-link :to="{name: 'addItemPosResource', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
+                        <router-link :to="{name: 'addItemPos', params: {lat: marker.location.leafletLatLng.lat, lng: marker.location.leafletLatLng.lng, type: 'DN', resource: extraCategory.category, rid: marker.id}}">
                           <b-tooltip :label="$t('item_type_DN')">
                             <img :src="itemTypeIcons['DN'].options.iconUrl" style="height: 20px; display: inline">
                           </b-tooltip>
@@ -297,11 +296,13 @@ export default {
     LFeatureGroup,
     'v-marker-cluster': Vue2LeafletMarkercluster
   },
-  props : {
+  props: {
     popup : {
       type: String,
-      default: "false"
-    }
+      default: 'default'
+    },
+    lat : String,
+    lng : String,
   },
   data() {
     return {
@@ -314,9 +315,10 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
+
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
-      popupIsActive : false ,
+
       bounds: null,
       searchBounds: null,
       geoLocation: null,
@@ -543,25 +545,16 @@ export default {
     ecatsCheckboxes() {
       this.ecatsCheckboxesUpdated();
     },
-    
-    popup(newValue) {
-      if (newValue === "true") {
-        this.popupIsActive = true;
-        this.addMarker(this.$refs.map.mapObject.getBounds().getCenter(), true);
-      } 
-      else {
-        this.popupIsActive = false; 
+    popup(){
+      if(this.popup !== 'default'){
+        const centerPos = this.$refs.map.mapObject.getBounds().getCenter();
+        this.addMarker({latlng: centerPos});        
       }
-    },
+    }
   },
   methods: {
     ucfirst,
     lcall,
-    popupClosed(){
-      this.newmarker = [0, 0]
-      if(this.popup === "true")
-        this.$router.push({params: {popup: "false"}})
-    },
     async ecatsCheckboxesUpdated() {
       for (const i in this.user.map_ecats) {
         const checkboxSelected = this.ecatsCheckboxes.includes(this.user.map_ecats[i].category);
@@ -588,16 +581,19 @@ export default {
 	return(interactiveCats.indexOf(category)+1)
     },
     rewriteURL() {
-      clearTimeout(this.timeouts['rewriteURL']);
-      this.timeouts['rewriteURL'] = setTimeout(async () => {
+      if(this.$router.currentRoute.name === 'map'){
+        clearTimeout(this.timeouts['rewriteURL']);
+        this.timeouts['rewriteURL'] = setTimeout(async () => {
         try {
           await this.$router.push({name: 'map', query: this.builtURLParams});
         } catch (error) {
           console.log("Redirected on same URL.");
         }
       }, 100);
+      }
     },
     itemFiltersUpdated(filteredQueryValues, builtURLParams) {
+      console.log("itemFiltersUpdated");
       this.builtURLParams = {...builtURLParams};
       this.rewriteURL();
 
@@ -786,25 +782,48 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-    addMarker(e,active) {
-      if(active){
-        this.newmarker = e;
-      }
-      else{
-        this.newmarker = e.latlng;
-      }
-      
-      this.$refs.newmarker.mapObject.setOpacity(1);
-      this.$refs.newmarker.mapObject.getPopup().on('remove', function () {
-        this._source.setOpacity(0);
-      });
-      this.$refs.newmarker.mapObject.openPopup();
+    addMarker(e) {
+      this.newmarker = e.latlng;
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
       //    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
       //    this.$refs.map.mapObject.panTo(map.unproject(px),{animate: true}); // pan to new center
       //});
+      
+      switch(this.popup){
+
+        case 'default' : 
+          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
+          this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
+          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+            this.$router.push({params:{lat:0,lng:0}});
+            this.$refs.newmarker.mapObject.setOpacity(0);
+          });
+          break;
+
+        case 'addItem' :
+          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
+          // this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupadditem.mapObject);
+          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+            this.$router.push({params:{popup:'default',lat:0,lng:0}});
+            this.$refs.newmarker.mapObject.setOpacity(0);
+          });
+          break;
+        case 'publicResource':
+          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
+          // this.$refs.newmarker.mapObject.bindPopup(this.$refs.popuppublicresource.mapObject);
+          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+            this.$router.push({params:{popup:'default',lat:0,lng:0}});
+            this.$refs.newmarker.mapObject.setOpacity(0);
+          });
+          break;
+
+      }
+      
+      this.$refs.newmarker.mapObject.openPopup();
+      this.$refs.newmarker.mapObject.setOpacity(1);
+     
       //this.$refs.map.mapObject.setView(this.newmarker);
 
     },

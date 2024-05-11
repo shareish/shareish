@@ -14,11 +14,11 @@
         <i class="fas fa-binoculars"></i>
         {{ $t('browse-items') }}
       </b-navbar-item>
-      <b-navbar-item tag="router-link" to="/add-item">
+      <b-navbar-item tag="router-link" :to="{name:'mapPos', params:{lat:'default', lng:'default', popup:'addItem'}}">
         <i class="fas fa-plus"></i>
         {{ $t('add-item') }}
       </b-navbar-item>
-      <b-navbar-item tag="router-link" :to="{name:'mapPopup', params:{popup:'true'}}">
+      <b-navbar-item tag="router-link" :to="{name:'mapPos', params:{lat:'default', lng:'default', popup:'publicResource'}}">
         <i class="fas fa-plus"></i>
         {{ $t('add-publicresource') }}
       </b-navbar-item>
