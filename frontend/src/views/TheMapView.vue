@@ -7,7 +7,7 @@
           :bounds.sync="bounds"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
-          @contextmenu="addMarker"
+          @contextmenu="addDefaultMarker"
           @update:bounds="boundsUpdated"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
@@ -548,7 +548,7 @@ export default {
     popup(){
       if(this.popup !== 'default'){
         const centerPos = this.$refs.map.mapObject.getBounds().getCenter();
-        this.addMarker({latlng: centerPos});        
+        this.addOtherMarkers({latlng: centerPos});        
       }
     }
   },
@@ -782,48 +782,78 @@ export default {
         this.extraCategories = tmpExtraCategories;
       }
     },
-    addMarker(e) {
+    addOtherMarkers(e){
       this.newmarker = e.latlng;
+      let params = {
+            lat: '0',
+            lng: '0',
+            popup: 'default'
+      };
+      switch(this.popup){
+        case 'addItem' :
+          params = {
+            lat: this.newmarker.lat.toString(),
+            lng: this.newmarker.lng.toString(),
+            popup: 'addItem'
+          };
+          this.$router.push({ name: 'mapPos', params: params });
+          this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
+          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+            this.$refs.newmarker.mapObject.setOpacity(0);
+          });
+          break;
+          
+        case 'publicResource':
+          params = {
+            lat: this.newmarker.lat.toString(),
+            lng: this.newmarker.lng.toString(),
+            popup: 'publicResource'
+          };
+          this.$router.push({ name: 'mapPos', params: params });      
+          this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
+          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+            this.$refs.newmarker.mapObject.setOpacity(0);
+          });
+          break;
+      }
+
+      this.$refs.newmarker.mapObject.openPopup();
+      this.$refs.newmarker.mapObject.setOpacity(1);
+
+    },
+    addDefaultMarker(e){
+
+      this.newmarker = e.latlng;
+      
+      console.log("addDefaultMarker")
+      
+      const params = {
+        lat: this.newmarker.lat.toString(),
+        lng: this.newmarker.lng.toString(),
+        popup: 'default'
+      };
+
+      this.$router.push({ name: 'mapPos', params: params });
+
+      this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
+
+      this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
+        this.$route.params.lat = 0;
+        this.$route.params.lng = 0;
+        this.$refs.newmarker.mapObject.setOpacity(0);
+      });
+
+      
+      
+      this.$refs.newmarker.mapObject.openPopup();
+      this.$refs.newmarker.mapObject.setOpacity(1);
+
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
       //    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
       //    this.$refs.map.mapObject.panTo(map.unproject(px),{animate: true}); // pan to new center
       //});
-      
-      switch(this.popup){
-
-        case 'default' : 
-          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
-          this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
-          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
-            this.$router.push({params:{lat:0,lng:0}});
-            this.$refs.newmarker.mapObject.setOpacity(0);
-          });
-          break;
-
-        case 'addItem' :
-          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
-          // this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupadditem.mapObject);
-          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
-            this.$router.push({params:{popup:'default',lat:0,lng:0}});
-            this.$refs.newmarker.mapObject.setOpacity(0);
-          });
-          break;
-        case 'publicResource':
-          this.$router.push({params:{lat:this.newmarker.lat,lng:this.newmarker.lng}});
-          // this.$refs.newmarker.mapObject.bindPopup(this.$refs.popuppublicresource.mapObject);
-          this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
-            this.$router.push({params:{popup:'default',lat:0,lng:0}});
-            this.$refs.newmarker.mapObject.setOpacity(0);
-          });
-          break;
-
-      }
-      
-      this.$refs.newmarker.mapObject.openPopup();
-      this.$refs.newmarker.mapObject.setOpacity(1);
-     
       //this.$refs.map.mapObject.setView(this.newmarker);
 
     },
