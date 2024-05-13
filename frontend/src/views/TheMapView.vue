@@ -14,7 +14,7 @@
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
           <l-popup ref="popupdefault" :options="newPopupOptions">
             <b>{{ $t('choose_add_content_type_map') }}</b> <br/><br/>
-            <template v-if="newmarker.lat">
+            <template v-if="newmarker.lat && this.popup === 'default' || this.popup === 'addItem'">
               <router-link :to="{name: 'addItemPos', params: {lat: newmarker.lat, lng: newmarker.lng, type: ' '}}">
                 {{ $t('add_item') }}
               </router-link>
@@ -30,11 +30,11 @@
               </div>
             </template>
             <br/>
-            <a :href="getMarkerURLAddOSM(newmarker)" target="_blank">
+            <a v-if="this.popup === 'default' || this.popup === 'publicResource'" :href="getMarkerURLAddOSM(newmarker)" target="_blank">
               <span><i class="fas fa-external-link-alt"></i></span>
               <span>{{ $t('add_osm') }}</span>
             </a>
-            <div style="display: grid;grid-template-columns:repeat(4,1fr);">
+            <div v-if="this.popup === 'publicResource' || this.popup === 'default'" style="display: grid;grid-template-columns:repeat(4,1fr);">
               <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
                 <b-tooltip :label="$tc('map_ecat_'+ extraCategory.category, 1)">
                   <a :href="getMarkerURLAddSpecificOSM(newmarker,extraCategory.category)" target="_blank">
@@ -45,7 +45,7 @@
               </span>
             </div>
             <br/>
-            <a :href="getMarkerURLAddFF(newmarker)" target="_blank">
+            <a v-if="this.popup === 'default' || this.popup ==='publicResource'" :href="getMarkerURLAddFF(newmarker)" target="_blank">
               <span><i class="fas fa-external-link-alt"></i></span>
               <span>
                 {{ $t('add_ffruit') }}<br/>
@@ -821,33 +821,38 @@ export default {
       this.$refs.newmarker.mapObject.setOpacity(1);
 
     },
-    addDefaultMarker(e){
-
+    addDefaultMarker(e) {
       this.newmarker = e.latlng;
-      
-      console.log("addDefaultMarker")
-      
+      console.log("addDefaultMarker");
+
       const params = {
-        lat: this.newmarker.lat.toString(),
-        lng: this.newmarker.lng.toString(),
-        popup: 'default'
+          lat: this.newmarker.lat.toString(),
+          lng: this.newmarker.lng.toString(),
+          popup: 'default'
       };
 
-      this.$router.push({ name: 'mapPos', params: params });
+      // Vérifiez si les paramètres sont différents avant de naviguer
+      if (JSON.stringify(this.$route.params) !== JSON.stringify(params)) {
+          this.$router.push({ name: 'mapPos', params: params });
+      }
 
       this.$refs.newmarker.mapObject.bindPopup(this.$refs.popupdefault.mapObject);
 
       this.$refs.newmarker.mapObject.getPopup().on('remove', () => {
-        this.$route.params.lat = 0;
-        this.$route.params.lng = 0;
-        this.$refs.newmarker.mapObject.setOpacity(0);
+          const resetParams = {
+              lat: '0',
+              lng: '0',
+              popup: 'default'
+          };
+          // Vérifiez si les paramètres sont différents avant de naviguer
+          if (JSON.stringify(this.$route.params) !== JSON.stringify(resetParams)) {
+              this.$router.push({ name: 'mapPos', params: resetParams });
+          }
+          this.$refs.newmarker.mapObject.setOpacity(0);
       });
 
-      
-      
       this.$refs.newmarker.mapObject.openPopup();
       this.$refs.newmarker.mapObject.setOpacity(1);
-
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
