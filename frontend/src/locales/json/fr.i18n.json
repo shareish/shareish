@@ -537,5 +537,8 @@
   "freeshop": "Boutique de gratuité",
   "drinkingwater": "Station d'eau potable publique",
   "socialfacility": "Centre communautaire",
-  "emergency": "Services d'urgence"
+  "emergency": "Services d'urgence",
+  "amenity-website": "Site web",
+  "more-info-on": "Plus d'informations sur",
+  "opening_hours": "Heures d'ouverture"
 }
