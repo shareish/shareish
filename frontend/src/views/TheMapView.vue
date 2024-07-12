@@ -89,6 +89,11 @@
                 <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
+	    <b-tooltip :label="$t('add-map-content')" class="w-75 mt-1" position="is-left" type="is-info">
+              <b-button expanded type="is-info" @click="addMarker">
+                <i class="fas fa-plus-circle"></i>
+              </b-button>
+            </b-tooltip>
           </div>
         </l-control>
         <l-control position="bottomleft">
@@ -766,7 +771,7 @@ export default {
       }
     },
     addMarker(e) {
-      this.newmarker = e.latlng;
+	this.newmarker = e.latlng != null ? e.latlng : new LatLng(this.leafletCenter.lat,this.leafletCenter.lng);
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is

@@ -43,6 +43,7 @@ view-map,View the map,Voir la carte
 view-map-noaccount,View the map with limited content (without an account).,Voir la carte avec un contenu limité (sans compte).
 browse-items,Browse items,Liste d'éléments
 add-item,Add item,Ajouter un élément
+add-map-content,"Add content at the center of the map","Ajouter du contenu au centre de la carte"
 conversations,Conversations,Conversations
 my-account,My account,Mon compte
 log-in,Log in,Connexion
