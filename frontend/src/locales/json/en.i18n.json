@@ -537,5 +537,8 @@
   "freeshop": "Community Giveaway Hub",
   "drinkingwater": "Public Water Fountain",
   "socialfacility": "Community Center",
-  "emergency": "Emergency Services"
+  "emergency": "Emergency Services",
+  "amenity-website": "Website",
+  "more-info-on": "More info on",
+  "opening_hours": "Opening hours"
 }

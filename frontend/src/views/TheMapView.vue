@@ -140,8 +140,13 @@
                       <img v-if="marker.image" :alt="marker.image" :src="marker.image">
                     </figure>
                     <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
-                    <div v-if="marker.description">{{ marker.description }}</div>
-                    <div class="is-grey is-size-7 has-text-right is-italic">
+		    
+                    <div class="is-grey" v-if="marker.description">{{ marker.description }}</div>
+                    <div v-if="marker.opening_hours || marker.website">
+		       <span> <b-tooltip v-if="marker.opening_hours" :label="marker.opening_hours"> <i class="far fa-clock">  </i> </b-tooltip> </span> 
+		       &nbsp; <span>  <b-tooltip v-if="marker.website" :label="marker.website">   <a :href="marker.website" target="_blank">  <i class="fas fa-globe"> </i> </a>  </b-tooltip>  </span>
+		    </div>
+		    <div>
                       <a :href="getMarkerURLView(extraCategory.category, marker.id)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
@@ -760,6 +765,8 @@ export default {
                   type: extraCategory.tagValue,
                   name: element['tags']['name'],
                   location: new GeolocationCoords(element['lon'], element['lat']),
+		  opening_hours: element['tags']['opening_hours'],
+		  website: element['tags']['website'],
                   image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
                 }
               });
