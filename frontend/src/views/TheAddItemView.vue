@@ -690,7 +690,7 @@ export default {
         this.sortPredictions();
         this.refreshSuggestedNames();
 
-        this.description += response['detected_text']
+        this.description += response['detected_text'] + ' '
 
         if (this.probabilities[0])
           this.category1 = this.probabilities[0]['category'];
