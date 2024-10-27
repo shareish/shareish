@@ -767,7 +767,7 @@ export default {
                   location: new GeolocationCoords(element['lon'], element['lat']),
 		  opening_hours: element['tags']['opening_hours'],
 		  website: element['tags']['website'],
-                  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
+                  image: element['tags']['panoramax'] != null ? "https://api.panoramax.xyz/api/pictures/"+element['tags']['panoramax']+"/thumb.jpg" : element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
                 }
               });
             }
