@@ -230,6 +230,7 @@ notif-error-send-message,An error prevented your message to be sent,Une erreur a
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
 location,Location,Localisation
+jump-to-maplocation,"Go to map","Aller à la carte"
 no-address,No address provided,Pas d'adresse renseignée
 item-availability-from,From,À partir du
 item-availability-until,Until,Jusqu'au
@@ -338,6 +339,10 @@ distance,Distance,Distance
 comments_count,Comments count,Nombre de commentaires
 views_count,Views count,Nombre de vues
 use-geolocation,Use geolocation from your device,Utiliser la géolocalisation de votre appareil
+paste-geolocation,Paste your geolocation into your message,Insérer votre géolocalisation dans votre message
+items-from-others,"Items from others","Les éléments des autres"
+items-from-you,"Your items","Vos éléments"
+all,"All","Tous"
 use-reflocation,Use reference location from your user profile,Utiliser la localisation de référence définie dans votre profil d'utilisateur
 dont-use-geolocation,Don't use geolocation,Ne pas utiliser la géolocalisation
 or-enter-an-address,Or enter an address,Ou entrez une adresse
@@ -482,6 +487,7 @@ open_source_code,"Open source code on", "Code source disponible sur"
 report_bug,"Report a bug or an issue","Signaler un bug ou une erreur"
 follow_us,"Follow us on","Suivez-nous sur"
 chat_with_us,"Chat with us on","Discutez avec nous via"
+chatting_with,"Chatting with", "En conversation avec"
 suggest_idea,"Suggest an idea","Suggérez une idée/fonctionnalité"
 after_registration_settings,"After registration, please go to your account page to configure more details and settings (including neighbourdhood notifications).","Après avoir confirmé votre inscription, nous vous invitons à vous rendre sur votre page de compte pour davantage de configurations (notamment les notifications dans votre voisinage)."
 and_you,"and you ?","et vous ?"
