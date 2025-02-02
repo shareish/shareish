@@ -27,7 +27,7 @@
                 <i class="fas fa-list-ul"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="Items you asked">
+            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="$t('items-from-others')">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'asked'"
                   :disabled="!canChangeCategory && selectedCategory !== 'asked'"
@@ -39,7 +39,7 @@
                 <i class="far fa-hand-paper"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="From your items">
+            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="$t('items-from-you')">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'yours'"
                   :disabled="!canChangeCategory && selectedCategory !== 'yours'"
@@ -104,7 +104,7 @@
               </div>
               <div class="level-item">
                 <p v-if="activeConversation.receivers.length === 1">
-                  <template v-if="windowWidth > 768">Chatting with </template>
+                  <template v-if="windowWidth > 768">{{ $t('chatting_with') }} </template>
                   <strong>
                     <router-link :to="{name: 'profile', params: {id: activeConversation.receivers[0].user.id}}">
                       {{ activeConversation.receivers[0].user.first_name }} {{ activeConversation.receivers[0].user.last_name }}
@@ -112,7 +112,7 @@
                   </strong>
                 </p>
                 <p v-else-if="activeConversation.receivers.length === 0">
-                  <template v-if="windowWidth > 768">Chatting with </template>
+                  <template v-if="windowWidth > 768">{{ $t('chatting-with') }} </template>
                   <strong>{{ $t('unknown-user') }}</strong>
                 </p>
                 <p v-else><strong>Group chat</strong></p>
@@ -175,6 +175,11 @@
                 />
               </div>
               <div class="column">
+		<b-tooltip :label="$t('paste-geolocation')" type="is-info" position="is-left">
+              <b-button type="is-info" @click="fetchAddressGeoLoc" size="is-small">
+                <i class="fas fa-street-view"></i>
+              </b-button>
+            </b-tooltip>
                 <b-button
                     type="is-primary"
                     @click="sendMessage"
@@ -200,6 +205,7 @@ import {scrollParentToChild, rem, isEmptyArray, isNotEmptyString} from "@/functi
 import ConversationMessage from "@/components/ConversationMessage.vue";
 import ItemCardHorizontal from "@/components/ItemCardHorizontal.vue";
 import WindowSize from "@/mixins/WindowSize";
+import {GeolocationCoords} from "@/functions";
 import _ from "lodash";
 
 const CONVERSATIONS_REFRESH_INTERVAL = 15000;
@@ -228,7 +234,28 @@ export default {
       isMobile: false,
       allMessagesLoaded: false,
       messagesSection: 1,
-      messagesLoading: false
+      messagesLoading: false,
+      address_text: "",
+      geoLocation: null,	
+    }
+  },
+
+  async created() {
+      // Has the user activated geolocation?
+    if ('geolocation' in navigator) {
+      // Get the position
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          this.geoLocation = new GeolocationCoords(position);
+        },
+        null,
+        {
+          maximumAge: 10000,
+          timeout: 5000,
+          enableHighAccuracy: true
+        }
+      );
+
     }
   },
   watch: {
@@ -350,6 +377,25 @@ export default {
     shiftEnterPressed() {
       this.messageToSend += "\n";
       this.checkRows();
+    },
+    async fetchAddressGeoLoc() {
+      if (this.geoLocation instanceof GeolocationCoords) {
+        this.address_text = await this.fetchAddress(this.geoLocation);
+        this.messageToSend += " " + this.address_text;
+      } else {
+        this.snackbarError(this.$t('enable-geolocation-to-use-feature'));
+      }
+    },
+    async fetchAddress(location) {
+      if (location instanceof GeolocationCoords) {
+        try {
+          return (await axios.post("/api/v1/address/reverse", location)).data;
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
     },
     async fetchConversations() {
       clearTimeout(this.timeouts['conversations']);
