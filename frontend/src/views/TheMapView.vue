@@ -729,6 +729,7 @@ export default {
       if (this.zoom >= this.minZoomToShowElements) {
         const elements = await Promise.all([
           this.getFallingFruitElements(),
+	  this.getRepairCafeElements(),  //we also need to return map elements as done below for ff/osm and probably do some check when opening popups
           this.getOverPassElements('public_bookcase'),
           this.getOverPassElements('defibrillator'),
           this.getOverPassElements('give_box'),
@@ -849,6 +850,24 @@ export default {
     },
     getMarkerURLAddFF(marker) {
       return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
+    },
+    async getRepairCafeElements() {
+	try {
+	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map?";
+	    const rpcoords = "northeast="+this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng +"&southwest="+ this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng;
+	    const rpURL = rpbaseURL + rpcoords;
+	    console.log(rpURL);
+	    return (await axios.fetch(rpURL)).data;
+	    //return (await axios.get(rpURL, {
+	//	transformRequest: (data, headers) => {
+	//	    delete headers.common['Authorization'];
+	//	    return data;
+        //  }
+        //})).data;
+	} catch (error) {
+          console.log(error);
+          return [];
+      }
     },
     async getFallingFruitElements() {
       try {
