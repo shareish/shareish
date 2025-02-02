@@ -176,10 +176,10 @@
               </div>
               <div class="column">
 		<b-tooltip :label="$t('paste-geolocation')" type="is-info" position="is-left">
-              <b-button type="is-info" @click="fetchAddressGeoLoc" size="is-small">
-                <i class="fas fa-street-view"></i>
-              </b-button>
-            </b-tooltip>
+		  <b-button type="is-info" @click="fetchAddressGeoLoc" size="is-small"> 
+                    <i class="fas fa-street-view"></i>
+		  </b-button>
+		</b-tooltip>
                 <b-button
                     type="is-primary"
                     @click="sendMessage"
