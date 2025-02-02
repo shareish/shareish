@@ -14,7 +14,7 @@
                   @icon-right-click="search = ''"
               />
             </div>
-            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="All">
+            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" :label="$t('all')">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'all'"
                   :disabled="!canChangeCategory && selectedCategory !== 'all'"
@@ -27,7 +27,7 @@
                 <i class="fas fa-list-ul"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="$t('items-from-others')">
+            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" :label="$t('items-from-others')">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'asked'"
                   :disabled="!canChangeCategory && selectedCategory !== 'asked'"
@@ -39,7 +39,7 @@
                 <i class="far fa-hand-paper"></i>
               </b-button>
             </b-tooltip>
-            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" label="$t('items-from-you')">
+            <b-tooltip :position="isMobile ? 'is-left' : 'is-bottom'" :label="$t('items-from-you')">
               <b-button
                   :loading="!canChangeCategory && selectedCategory === 'yours'"
                   :disabled="!canChangeCategory && selectedCategory !== 'yours'"
@@ -162,7 +162,7 @@
           </div>
           <div id="write">
             <div class="columns is-mobile">
-              <div class="column">
+	      <div class="column">
                 <textarea
                     v-model="messageToSend"
                     class="textarea"
@@ -176,10 +176,10 @@
               </div>
               <div class="column">
 		<b-tooltip :label="$t('paste-geolocation')" type="is-info" position="is-left">
-		  <b-button type="is-info" @click="fetchAddressGeoLoc" size="is-small"> 
+		  <b-button id="smallbutton" type="is-info" @click="fetchAddressGeoLoc" size="is-small"> 
                     <i class="fas fa-street-view"></i>
 		  </b-button>
-		</b-tooltip>
+			</b-tooltip>
                 <b-button
                     type="is-primary"
                     @click="sendMessage"
@@ -865,7 +865,7 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
     border-top: 1px solid #e9e9e9;
 
     .column:last-child {
-      flex: 0 0 calc(60px + 0.75rem);
+      flex: 0 0 calc(110px + 0.75rem);
       padding-left: 0;
     }
 
@@ -876,6 +876,10 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
     button {
       width: 60px;
       height: 48px;
+    }
+    #smallbutton {
+	width: 30px;
+	height: 24px;
     }
   }
 }

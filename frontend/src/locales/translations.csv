@@ -230,6 +230,7 @@ notif-error-send-message,An error prevented your message to be sent,Une erreur a
 availability,Availability,Disponibilité
 shared-by,Shared by,Partagé par
 location,Location,Localisation
+jump-to-maplocation,"Go to map","Aller à la carte"
 no-address,No address provided,Pas d'adresse renseignée
 item-availability-from,From,À partir du
 item-availability-until,Until,Jusqu'au
