@@ -499,12 +499,12 @@ def get_address_reverse(request):
         else:
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         try:
-            location = locator.reverse((latitude, longitude), exactly_one=True)
+            location = locator.reverse((latitude, longitude), exactly_one=True, timeout=5)
             if location is not None:
                 return Response(location.address, status=status.HTTP_200_OK)
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response("Third party geolocation service did not work properly.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Third party geolocation service did not work properly. Please retry.", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -512,12 +512,12 @@ def get_address_reverse(request):
 def get_address(request):
     if request.method == 'POST':
         try:
-            location = locator.geocode(request.POST['address'])
+            location = locator.geocode(request.POST['address'], timeout=5)
             if location is not None:
                 return JsonResponse({'latitude': location.latitude, 'longitude': location.longitude}, status=status.HTTP_200_OK)
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response("Third party geolocation service did not work properly.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Third party geolocation service did not work properly. Please retry !", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
