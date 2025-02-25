@@ -106,6 +106,8 @@ publicbookcase_donation,"Free books have been deposited here:","Livres gratuits 
 givebox_donation,"I put the following free objects here:","J'ai déposé ces objets gratuits ici:"
 freeshop_donation,"The following free objects are available here:","Les objets gratuits suivants sont disponibles ici:"
 freeshop_request,"Can anyone help us: We are looking for the following objects: / We are looking for volunteers to ...","Est-ce que quelqu'un peut nous aider: nous cherchons les objets suivants / Nous avons besoin de bénévoles pour ..."
+repaircafe_request,"We are looking for volunteers to repair the following types of objects:","Nous cherchons des volontaires pour réparer les types d'objets suivants:"
+repaircafe_req_volunteers,"Repair Café looking for volunteers","Repair café cherche volontaires"
 givebox_status,"Can anyone help to resolve the following give box status: Damaged items / Empty / Full / To be cleaned","Est-ce que quelqu'un peut aider à résoudre le statut de la boîte à dons: Objets endommagés / Boîte vide / Boîte pleine / À nettoyer"
 related_to,Related to,Lié à
 search-dot,Search...,Recherche...
@@ -118,6 +120,7 @@ map_ecat_FLF,Falling fruit|Falling fruits,Fruit qui tombe|Fruits qui tombent
 map_ecat_FRS,Free shop|Free shops,Magasin gratuit|Magasins gratuits
 map_ecat_GVB,Give box|Give boxes,Boîte à dons|Boîtes à dons
 map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
+map_ecat_REP,Repair Cafe|Repair Cafes,Repair Café|Repair Cafés
 view-from-osm,view,voir
 view-from-ff,view,voir
 edit_minor,edit,éditer
