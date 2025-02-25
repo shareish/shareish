@@ -147,16 +147,17 @@
 		       &nbsp; <span>  <b-tooltip v-if="marker.website" :label="marker.website">   <a :href="marker.website" target="_blank">  <i class="fas fa-globe"> </i> </a>  </b-tooltip>  </span>
 		    </div>
 		    <div>
-                      <a :href="getMarkerURLView(extraCategory.category, marker.id)" target="_blank">
+                      <a :href="getMarkerURLView(extraCategory.category, marker)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
                       </a>
-                      <span> {{ $t('or') }} </span>
-                      <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
-                        <span><i class="fas fa-external-link-alt"></i></span>
-                        <span>{{ $t('edit_minor') }}</span>
-                      </a>
-                      <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      <span v-if="extraCategory.category != 'REP'"> {{ $t('or') }} </span>
+                      <span v-if="extraCategory.category != 'REP'">
+			<a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
+                          <span><i class="fas fa-external-link-alt"></i></span>
+                          <span>{{ $t('edit_minor') }}</span>
+                      </a></span>
+                      <span v-if="extraCategory.category != 'REP'"> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm')}}</span>
                       <br/>
                     </div>
 		                <div v-if="ecatsInteractive(extraCategory.category)"> 
@@ -273,6 +274,7 @@ import {
   foodBankIcon,
   soupKitchenIcon,
   fallingfruitIcon,
+  repairCafeIcon,  
   blueIcon,
   addIcon,
   homeIcon
@@ -440,7 +442,12 @@ export default {
           id: 'soup-kitchens',
           markers: [],
           tagValue: 'soup_kitchen'
-        }
+        },
+	'REP': {
+	      id: 'repair-cafes',
+              markers: [],
+              tagValue: 'repair_cafe'
+	}
       },
       extraLayersTagsOverpass: {
         'public_bookcase': 'amenity',
@@ -461,7 +468,8 @@ export default {
         'food-sharings': foodSharingIcon,
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
-        'falling-fruits': fallingfruitIcon
+        'falling-fruits': fallingfruitIcon,
+	'repair-cafes': repairCafeIcon,  
       },
       itemTypeIcons: {
         'DN': greenIcon,
@@ -491,7 +499,8 @@ export default {
       
     if (this.isAuthenticated) {
 	await this.fetchUser();
-    } 
+    }
+
     else {
 	//Create fake user.map_ecats to be able to display OSM/FF data while not logged in
 	this.user.map_ecats = [{category: "BKC", selected: true},
@@ -503,9 +512,9 @@ export default {
 			       {category: "FRS", selected: true},
 			       {category: "GVB", selected: true},
 			       {category: "SPK", selected: true},
+			       {category: "REP", selected: true},
 			      ];
     }
-      
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
@@ -573,7 +582,7 @@ export default {
       return catswithoutFF;
     },
     ecatsInteractive(category) {
-	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB'];
+	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB','REP'];
 	return(interactiveCats.indexOf(category)+1)
     },
     rewriteURL() {
@@ -728,7 +737,8 @@ export default {
     async fetchExtraLayersMakers() {
       if (this.zoom >= this.minZoomToShowElements) {
         const elements = await Promise.all([
-          this.getFallingFruitElements(),
+          this.getFallingFruitElements(), // elements[0]
+	  this.getRepairCafeElements(),  // elements[1]
           this.getOverPassElements('public_bookcase'),
           this.getOverPassElements('defibrillator'),
           this.getOverPassElements('give_box'),
@@ -742,7 +752,7 @@ export default {
         const tmpExtraCategories = {...this.extraCategories};
 
         for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
-          if (key === 'FLF') {
+          if (key === 'FLF') { // elements[0]
             tmpExtraCategories['FLF']['markers'] = elements[0].filter(element =>
                 element['id'] != null && element['lat'] != null && element['lng'] != null
             ).map(element => {
@@ -754,10 +764,27 @@ export default {
                 location: new GeolocationCoords(element['lng'], element['lat'])
               }
             });
-          } else {
+          }
+	    else if (key === 'REP') { //elements[1]
+		tmpExtraCategories['REP']['markers'] = elements[1].filter(element =>
+                element['name'] != null && element['coordinate'] != null
+            ).map(element => {
+              return {
+                  id: Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // // convert date to integer for arbitrary id
+		  //parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
+                  type: extraCategory.tagValue,//'repair_cafe',
+		  image: "https://www.repaircafe.org/wp-content/uploads/2021/05/logo-repair-cafe-2.png", //"https://repairtogether.restarters.net/images/logos/repairtogether.png",
+                  name: element['name'],
+                  description: element['external_link'],
+                  location: new GeolocationCoords(parseFloat(element['coordinate'].split(",")[1]),parseFloat(element['coordinate'].split(",")[0]))
+              }
+            });
+	    }
+
+	    else { // OSM elements [2...]
             const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
             if (opKey !== -1) {
-              tmpExtraCategories[key]['markers'] = elements[opKey + 1].filter(element =>
+              tmpExtraCategories[key]['markers'] = elements[opKey + 2].filter(element =>
                   element['id'] != null && element['lat'] != null && element['lon'] != null
               ).map(element => {
                 return {
@@ -773,7 +800,6 @@ export default {
             }
           }
         }
-
         this.extraCategories = tmpExtraCategories;
       }
     },
@@ -795,12 +821,16 @@ export default {
       //this.$refs.map.mapObject.setView(this.newmarker);
 
     },
-    getMarkerURLView(category, markerId) {
-      if (category === 'FLF') {
-        return "https://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
-      } else {
-        return "https://openstreetmap.org/node/" + markerId;
-      }
+    getMarkerURLView(category, marker) {
+	if (category === 'FLF') {
+            return "https://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
+	}
+	else if (category === 'REP') {
+	    return marker.description;
+	}
+	else {
+            return "https://openstreetmap.org/node/" + marker.id;
+	}
     },
     getMarkerURLEdit(category, marker) {
 	if (category === 'FLF') {
@@ -850,6 +880,21 @@ export default {
     getMarkerURLAddFF(marker) {
       return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
     },
+    async getRepairCafeElements() {
+	try {
+	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map?";
+	    const rpcoords = "northeast="+this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng +"&southwest="+ this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng;
+	    const rpURL = rpbaseURL + rpcoords;
+	    //const proxyURL = `https://corsproxy.io/?url=` + encodeURIComponent(rpURL); // Ajout du proxy
+	    //const proxyURL = `https://api.allorigins.win/get?url=` + encodeURIComponent(rpURL); // Ajout du proxy
+	    const proxyURL = "https://thingproxy.freeboard.io/fetch/" + rpURL;
+            const response = await axios.get(proxyURL);
+            return response.data; 
+	} catch (error) {
+          console.log(error);
+          return [];
+      }
+    },
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
@@ -872,9 +917,9 @@ export default {
         const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        const baseURL = "https://overpass-api.de/api";
+        //const baseURL = "https://overpass-api.de/api";
         //const baseURL = "https://overpass.kumi.systems/api";
-        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+        const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
 
         return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
       } catch (error) {

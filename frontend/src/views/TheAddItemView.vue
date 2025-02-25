@@ -392,7 +392,12 @@ export default {
           markers: [],
           tagValue: 'soup_kitchen',
 	  item_category: 'FD'    
-        }
+        },
+	'REP': {
+	      id: 'repair-cafes',
+              markers: [],
+              tagValue: 'repair_cafe'
+	}
       },
 	
     }
@@ -532,6 +537,10 @@ export default {
 		this.description = this.$t('publicbookcase_status');
 	    else if (this.$route.params.resource == 'FRS')
 		this.description = this.$t('freeshop_request');
+	    else if (this.$route.params.resource == 'REP') {
+		this.description = this.$t('repaircafe_request');
+		this.name = this.$t('repaircafe_req_volunteers');
+	    }
 	}
 	else if (this.type=="DN") {
 	    if (this.$route.params.resource == 'BKC')
@@ -543,11 +552,19 @@ export default {
 	}
         if (this.$route.params.resource == 'FLF')
 	    prsource = "Falling Fruit"
+	else if (this.$route.params.resource == 'REP')
+	    prsource = "Repair cafes"
 	else
 	    prsource = "OpenStreetMap"
 	this.description += "\n("+this.$t('related_to')+" " + this.$tc('map_ecat_'+this.$route.params.resource,1) + " " + prsource + " node ID "+this.ressource_id+")";
-	this.category1 = 'PR';
-	this.category2 = this.extraCategories[this.$route.params.resource].item_category;
+	if (this.$route.params.resource == 'REP') {
+	    this.category1 = 'DY';
+	    this.category2 = 'HL';
+	}
+	else {
+	    this.category1 = 'PR';
+	    this.category2 = this.extraCategories[this.$route.params.resource].item_category;
+	}
     },
     async fetchMapMarkerAddress(lat, lng) {
       try {
