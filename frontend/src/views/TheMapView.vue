@@ -147,7 +147,7 @@
 		       &nbsp; <span>  <b-tooltip v-if="marker.website" :label="marker.website">   <a :href="marker.website" target="_blank">  <i class="fas fa-globe"> </i> </a>  </b-tooltip>  </span>
 		    </div>
 		    <div>
-                      <a :href="getMarkerURLView(extraCategory.category, marker.id, marker)" target="_blank">
+                      <a :href="getMarkerURLView(extraCategory.category, marker)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
                       </a>
@@ -499,7 +499,6 @@ export default {
       
     if (this.isAuthenticated) {
 	await this.fetchUser();
-	console.log(this.user.map_ecats);
     }
 
     else {
@@ -771,8 +770,8 @@ export default {
                 element['name'] != null && element['coordinate'] != null
             ).map(element => {
               return {
-                  id: parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
-		  //Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // convert date to integer for arbitrary id
+                  id: Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // // convert date to integer for arbitrary id
+		  //parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
                   type: extraCategory.tagValue,//'repair_cafe',
 		  image: "https://www.repaircafe.org/wp-content/uploads/2021/05/logo-repair-cafe-2.png", //"https://repairtogether.restarters.net/images/logos/repairtogether.png",
                   name: element['name'],
@@ -822,15 +821,15 @@ export default {
       //this.$refs.map.mapObject.setView(this.newmarker);
 
     },
-    getMarkerURLView(category, markerId, marker) {
+    getMarkerURLView(category, marker) {
 	if (category === 'FLF') {
-            return "https://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
+            return "https://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
 	}
 	else if (category === 'REP') {
 	    return marker.description;
 	}
 	else {
-            return "https://openstreetmap.org/node/" + markerId;
+            return "https://openstreetmap.org/node/" + marker.id;
 	}
     },
     getMarkerURLEdit(category, marker) {
