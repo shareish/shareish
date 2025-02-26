@@ -39,6 +39,15 @@ from .ai import findClass
 
 from geopy.geocoders import Photon
 
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from urllib.parse import urlparse
+
+
+import logging
+logger = logging.getLogger(__name__)
+
+
 User = get_user_model()
 locator = Photon(user_agent='shareish')
 
@@ -891,3 +900,31 @@ def close_item(request, item_id):
         else:
             return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def proxy_view(request):
+    external_url = request.GET.get('target')
+    if not external_url:
+        return JsonResponse({"error": "Missing 'target' parameter"}, status=400)
+
+    # Check if the URL domain is authorized in settings.py
+    parsed_url = urlparse(external_url)
+    if parsed_url.netloc not in settings.ALLOWED_PROXY_HOSTS:
+        logger.warning(f"Access refused: {external_url}")
+        return JsonResponse({"error": "Unauthorized target URL"}, status=403)
+    
+    # Use all GET parameters except target
+    params = request.GET.copy()
+    params.pop('target')
+    
+    # Perform request to external API
+    logger.info(f"Proxying request to: {external_url} with params {params}")
+    try:
+        response = requests.get(external_url, params=params)
+        if response.status_code != 200:
+            logger.error(f"External API error: {response.status_code} {response.text}")
+            return JsonResponse({"error": "API request failed"}, status=response.status_code)
+        return JsonResponse(response.json(), safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({'error': str(e)}, status=500)
