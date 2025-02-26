@@ -213,8 +213,14 @@ CORS_ALLOW_ALL_ORIGINS = DEV
 CORS_ALLOWED_ORIGINS = [
     "http://ui",
     "http://localhost",
-    APP_URL
+    APP_URL,
 ]
+
+
+ALLOWED_PROXY_HOSTS = [
+    "www.repaircafe.org",
+]
+
 
 DOMAIN = APP_DOMAIN
 SITE_NAME = 'Shareish'

@@ -880,7 +880,7 @@ export default {
     getMarkerURLAddFF(marker) {
       return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
     },
-    async getRepairCafeElements() {
+    async getRepairCafeElements_frontend() { // not used anymore
 	try {
 	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map?";
 	    const rpcoords = "northeast="+this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng +"&southwest="+ this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng;
@@ -891,9 +891,25 @@ export default {
             const response = await axios.get(proxyURL);
             return response.data; 
 	} catch (error) {
-          console.log(error);
-          return [];
-      }
+            console.log(error);
+            return [];
+	}
+    },
+    async getRepairCafeElements() { //using django proxy to avoid CORS issue from frontend
+	try {
+	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map";
+	    const response = await axios.get('/api/v1/proxy', {
+		params: {
+		    target: rpbaseURL,
+		    northeast: this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng,
+		    southwest: this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng
+		    }
+	    });
+	    return response.data;
+	} catch (error) {
+            console.log(error);
+            return [];
+	}
     },
     async getFallingFruitElements() {
       try {

@@ -5,7 +5,7 @@ from . import views
 from .views import (
     ActiveItemViewSet, ConversationViewSet, ItemImageViewSet, ItemViewSet, MessageViewSet,
     RecurrentItemViewSet, UserImageViewSet, UserItemViewSet, UserViewSet, ItemCommentViewSet,
-    UserMapExtraCategoriesViewSet, CustomLogin
+    UserMapExtraCategoriesViewSet, CustomLogin, proxy_view
 )
 
 router = DefaultRouter()
@@ -24,6 +24,7 @@ router.register("map_ecats", UserMapExtraCategoriesViewSet, basename='map_ecats'
 
 urlpatterns = [
     path("", include(router.urls)),
+    path('proxy', proxy_view, name='proxy_view'),
     path("address", views.get_address, name='get_address'),
     path("address/reverse", views.get_address_reverse, name='get_address_reverse'),
     path("predictClass/", views.predict_class, name='predict_class'),
@@ -41,4 +42,5 @@ urlpatterns = [
     re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
     re_path(r'^delete-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.delete_account_confirm_token, name='delete_account_confirm_token'),
     path("items/<int:item_id>/close", views.close_item, name='close_item'),
+
 ]
