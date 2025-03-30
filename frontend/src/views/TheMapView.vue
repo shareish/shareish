@@ -149,7 +149,7 @@
 		    <div>
                       <a :href="getMarkerURLView(extraCategory.category, marker)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
-                        <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
+                        <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span><span v-if="extraCategory.category == 'REP'"> {{ $t('dates_places') }}</span>
                       </a>
                       <span v-if="extraCategory.category != 'REP'"> {{ $t('or') }} </span>
                       <span v-if="extraCategory.category != 'REP'">

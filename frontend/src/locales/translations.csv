@@ -123,6 +123,7 @@ map_ecat_SPK,Soup kitchen|Soup kitchens,Soupe populaire|Soupes populaires
 map_ecat_REP,Repair Cafe|Repair Cafes,Repair Café|Repair Cafés
 view-from-osm,view,voir
 view-from-ff,view,voir
+dates_places,"dates and locations","les dates et lieux"
 edit_minor,edit,éditer
 from-osm,OpenStreetMap data,les données OSM
 from-ff,on Falling Fruit,sur Falling Fruit
