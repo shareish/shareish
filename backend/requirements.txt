@@ -9,7 +9,7 @@ Django==3.2.23
 django-filter==22.1
 django-cors-headers==3.13.0
 django-mail-templated==2.6.5
-torch==1.13.1
+torch==2.2.0
 torchvision==0.14.1
 Pillow==10.0.1
 matplotlib==3.4.3
