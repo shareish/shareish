@@ -11,6 +11,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from djoser.signals import user_registered
+from django_cryptography.fields import encrypt
 
 
 def get_random_string(length):
@@ -78,8 +79,8 @@ class MailNotificationFrequenciesOSM(models.TextChoices):
 
 
 class User(AbstractBaseUser):
-    first_name = models.CharField(max_length=50, null=True, blank=True)
-    last_name = models.CharField(max_length=20, null=True, blank=True)
+    first_name = encrypt(models.CharField(max_length=50, null=True, blank=True))
+    last_name = encrypt(models.CharField(max_length=20, null=True, blank=True))
     birth_date = models.DateField(default=date.today, blank=True)
     sign_up_date = models.DateField(auto_now_add=True)
     email = models.EmailField(_('email address'), unique=True, max_length=255)
@@ -91,7 +92,6 @@ class User(AbstractBaseUser):
     facebook_url = models.URLField(blank=True, default="")
     instagram_url = models.URLField(blank=True, default="")
     mastodon_url = models.URLField(blank=True, default="")
-
     ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)
     mail_notif_generalinfo = models.BooleanField(default=True)
@@ -365,7 +365,7 @@ class ConversationUser(models.Model):
 
 
 class Message(models.Model):
-    content = models.TextField()
+    content = encrypt(models.TextField())
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
