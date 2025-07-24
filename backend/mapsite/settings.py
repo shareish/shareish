@@ -219,6 +219,7 @@ CORS_ALLOWED_ORIGINS = [
 
 ALLOWED_PROXY_HOSTS = [
     "www.repaircafe.org",
+    "www.levolontariat.be",
 ]
 
 

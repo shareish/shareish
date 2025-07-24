@@ -751,7 +751,7 @@ export default {
         const elements = await Promise.all([
             this.getFallingFruitElements(), // elements[0]
 	    this.getRepairCafeElements(),  // elements[1]
-	    this.getVolunteerElements_frontend(), // elements[2],
+	    this.getVolunteerElements(), // elements[2],
             this.getOverPassElements('public_bookcase'), //TODO: make it a single overpass query to avoid too many requests
             this.getOverPassElements('defibrillator'),
             this.getOverPassElements('give_box'),
@@ -976,21 +976,41 @@ export default {
         return [];
       }
     },
-      async getVolunteerElements_frontend() {
+      async getVolunteerElements_frontend() { // not used anymore
 	  try {
 	      const vbaseURL = 'https://www.levolontariat.be/api/search?';
 	      const vcoords = 'filter[location][condition][lat_min]=' + this.bounds.getSouthWest().lat + '&filter[location][condition][lat_max]=' + this.bounds.getNorthEast().lat + '&filter[location][condition][lng_min]=' + this.bounds.getSouthWest().lng + '&filter[location][condition][lng_max]=' + this.bounds.getNorthEast().lng + '&filter[accessibility][condition][lang]=false&filter[accessibility][condition][reduced]=false&filter[extra][condition][hobbies]=undefined&filter[extra][condition][times]=undefined';
 	      const vURL = vbaseURL+vcoords;
 	      const proxyURL = "https://thingproxy.freeboard.io/fetch/" + vURL;
-	      //console.log("fetching volontariat");
 	      const response = await axios.get(proxyURL);
-	      //console.log(response.data);
               return response.data;
 	  } catch (error) {
-              //console.log(error);
               return [];
 	  }
       },
+
+      async getVolunteerElements() {
+	  try {
+	      const vbaseURL = 'https://www.levolontariat.be/api/search?';
+	      const response = await axios.get('/api/v1/proxy', {
+		  params: {
+		      target: vbaseURL,
+		      'filter[location][condition][lat_min]': this.bounds.getSouthWest().lat,
+		      'filter[location][condition][lat_max]': this.bounds.getNorthEast().lat,
+		      'filter[location][condition][lng_min]': this.bounds.getSouthWest().lng,
+		      'filter[location][condition][lng_max]': this.bounds.getNorthEast().lng,
+		      'filter[accessibility][condition][lang]': false,
+		      'filter[accessibility][condition][reduced]': false,
+		      'filter[extra][condition][hobbies]': 'undefined',
+		      'filter[extra][condition][times]': 'undefined'
+		  }
+	      });
+              return response.data;
+	  } catch (error) {
+              return [];
+	  }
+      },
+      
       
       async getOverPassElements(tagValue) {
 	  try {
