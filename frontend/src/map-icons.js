@@ -178,3 +178,13 @@ export const repairCafeIcon = new L.Icon({
     popupAnchor: [0, -20],
     shadowSize: [41, 41]
 });
+
+
+export const volunteerIcon = new L.Icon({
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Map_Icon_-_Service.png/250px-Map_Icon_-_Service.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [32, 32],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -20],
+    shadowSize: [41, 41]
+});

@@ -193,6 +193,7 @@ class UserMapExtraCategories(models.TextChoices):
     FOOD_SHARING = 'FDS', _("Food Sharing")
     FALLING_FRUITS = 'FLF', _("Falling fruits")
     REPAIR_CAFES = 'REP',_("Repair Cafes")
+    VOLUNTEERING = 'VOL',_("Volunteering")
     FREE_SHOPS = 'FRS', _("Free shops")
     GIVE_BOXES = 'GVB', _("Give boxes")
     SOUP_KITCHENS = 'SPK', _("Soup Kitchens")
