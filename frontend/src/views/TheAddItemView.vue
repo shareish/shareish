@@ -121,6 +121,20 @@
               </b-field>
             </div>
           </div>
+          <div>
+            <b-field label="Link">
+              <template #label>
+                  {{ $t('url') }}
+              </template>
+              <b-input
+                type="url"
+                v-model="url"
+                icon="link"
+                placeholder="https://shareish.org" 
+                >
+              </b-input>
+            </b-field>
+          </div>
           <b-field>
             <template #label>
               <b-tooltip :label="$t('help_item_address')" multilined position="is-right">
@@ -337,6 +351,7 @@ export default {
       geoLocation: null,
       refLocation : null,
       waitingFormResponse: false,
+      url: "",
 
       extraCategories: {
         'BKC': {
@@ -784,6 +799,7 @@ export default {
             category2: this.category2,
             category3: this.category3,
             description: this.description,
+            url: this.url,
             location: this.address,
             use_coordinates: this.use_coordinates,
             is_recurrent: this.isRecurrent,

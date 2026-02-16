@@ -134,6 +134,17 @@
               <p class="description wbbw wspw">{{ item.description }}</p>
             </div>
           </article>
+          <article id="url" class="mb-5-5">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-info-circle"></i></span>
+                <span>{{ $t('url') }}</span>
+              </div>
+            </div>
+            <div class="box has-background-white-ter">
+              <p class="description wbbw wspw">{{ item.url }}</p>
+            </div>
+          </article>
           <article id="location" class="mb-5-5">
             <div class="title is-size-4 mb-2">
               <div class="icon-text">

@@ -100,6 +100,20 @@
               </b-field>
             </div>
           </div>
+          <div>
+            <b-field label="Link">
+              <template #label>
+                  {{ $t('url') }}
+              </template>
+              <b-input
+                type="url"
+                v-model="url"
+                icon="link"
+                placeholder="https://shareish.org" 
+                >
+              </b-input>
+            </b-field>
+          </div>
           <div class="columns">
             <div class="column">
               <b-field>
