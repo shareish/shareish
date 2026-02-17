@@ -107,7 +107,7 @@
               </template>
               <b-input
                 type="url"
-                v-model="url"
+                v-model="internalItem.url"
                 icon="link"
                 placeholder="https://shareish.org" 
                 >
