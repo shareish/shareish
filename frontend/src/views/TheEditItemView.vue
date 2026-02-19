@@ -583,7 +583,8 @@ export default {
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
             enddate: endDate,
-            visibility: this.internalItem.visibility
+            visibility: this.internalItem.visibility,
+            url: this.internalItem.url
           })).data;
 
           if (this.images['files'].length > 0) {
