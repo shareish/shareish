@@ -551,5 +551,7 @@
   "emergency": "Services d'urgence",
   "amenity-website": "Site web",
   "more-info-on": "Plus d'informations sur",
-  "opening_hours": "Heures d'ouverture"
+  "opening_hours": "Heures d'ouverture",
+  "url": "Lien externe",
+  "help_item_url": "Entrez l'adresse d'un site web externe décrivant votre élément, p.ex. pour un événement la page sur le site officiel des organisateurs"
 }

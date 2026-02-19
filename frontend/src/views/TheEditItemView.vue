@@ -100,6 +100,23 @@
               </b-field>
             </div>
           </div>
+          <div>
+            <b-field label="Link">
+              <template #label>
+                  {{ $t('url') }}
+                  <b-tooltip :label="$t('help_item_url')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+              </template>
+              <b-input
+                type="url"
+                v-model="internalItem.url"
+                icon="link"
+                placeholder="https://shareish.org" 
+                >
+              </b-input>
+            </b-field>
+          </div>
           <div class="columns">
             <div class="column">
               <b-field>
@@ -569,7 +586,8 @@ export default {
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
             enddate: endDate,
-            visibility: this.internalItem.visibility
+            visibility: this.internalItem.visibility,
+            url: this.internalItem.url
           })).data;
 
           if (this.images['files'].length > 0) {
