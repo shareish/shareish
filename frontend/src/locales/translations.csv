@@ -552,4 +552,5 @@ emergency,Emergency Services,Services d'urgence
 amenity-website,Website,Site web
 more-info-on,More info on,Plus d'informations sur
 opening_hours,Opening hours,"Heures d'ouverture"
-help_item_url,"Entrez l'adresse d'un site web externe décrivant votre élément, p.ex. pour un événement la page sur le site officiel des organisateurs","Enter the URL of an external website describing this item, e.g., the official page of the organizers for an event."
+url,"External link","Lien externe"
+help_item_url,"Enter the URL of an external website describing this item, e.g., the official page of the organizers for an event.","Entrez l'adresse d'un site web externe décrivant votre élément, p.ex. pour un événement la page sur le site officiel des organisateurs"
