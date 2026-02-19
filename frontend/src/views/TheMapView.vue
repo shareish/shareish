@@ -813,28 +813,10 @@ export default {
               }
             });
           }
-          /*else { // OSM elements [3...]
-            const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
-            if (opKey !== -1) {
-              tmpExtraCategories[key]['markers'] = elements[opKey + 3].filter(element =>
-                element['id'] != null && element['lat'] != null && element['lon'] != null
-              ).map(element => {
-                return {
-                  id: element['id'],
-                  type: extraCategory.tagValue,
-                  name: element['tags']['name'],
-                  location: new GeolocationCoords(element['lon'], element['lat']),
-                  opening_hours: element['tags']['opening_hours'],
-                  website: element['tags']['website'],
-                  image: element['tags']['panoramax'] != null ? "https://api.panoramax.xyz/api/pictures/"+element['tags']['panoramax']+"/thumb.jpg" : element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
-                }
-              });
-            }
-          }*/
           else{
             const allOsmElements = elements[3] || [];
             const tagValue = extraCategory.tagValue; 
-            const tagKey = this.extraLayersTagsOverpass[tagValue]; 
+            const tagKey = this.extraLayersTagsOverpass[tagValue];
 
             tmpExtraCategories[key]['markers'] = allOsmElements.filter(element => {
               return (
@@ -848,7 +830,7 @@ export default {
               return {
                 id: element['id'],
                 type: tagValue,
-                name: element['tags']['name'] || this.$t(tagValue), 
+                name: element['tags']['name'] || this.$t(tagValue),
                 location: new GeolocationCoords(element['lon'], element['lat']),
                 opening_hours: element['tags']['opening_hours'],
                 website: element['tags']['website'],
