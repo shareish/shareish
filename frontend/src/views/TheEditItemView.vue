@@ -104,6 +104,9 @@
             <b-field label="Link">
               <template #label>
                   {{ $t('url') }}
+                  <b-tooltip :label="$t('help_item_url')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
               </template>
               <b-input
                 type="url"
