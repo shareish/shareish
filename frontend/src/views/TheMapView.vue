@@ -830,7 +830,7 @@ export default {
               return {
                 id: element['id'],
                 type: tagValue,
-                name: element['tags']['name'] || this.$t(tagValue),
+                name: element['tags']['name'],
                 location: new GeolocationCoords(element['lon'], element['lat']),
                 opening_hours: element['tags']['opening_hours'],
                 website: element['tags']['website'],
