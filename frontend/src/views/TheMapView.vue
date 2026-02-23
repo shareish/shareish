@@ -4,11 +4,11 @@
       <l-map
           id="leaflet-map"
           ref="map"
-          :bounds.sync="bounds"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
+          @ready="onMapReady"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
@@ -324,7 +324,7 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-      lastZoom: 0,
+      lastZoom: 15, //lastZoom bigger than zoom for the first updateBounds
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
 
@@ -1112,6 +1112,10 @@ export default {
           flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
+    },
+    onMapReady(map){
+      this.bounds = map.getBounds();
+      this.boundsUpdated();
     },
   }
 }
