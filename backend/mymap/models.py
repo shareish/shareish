@@ -269,6 +269,7 @@ class Item(models.Model):
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
     is_recurrent = models.BooleanField(default=False)
+    url = models.URLField(blank=True, default="")
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 

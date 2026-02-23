@@ -249,4 +249,6 @@ DJOSER = {
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
 
-
+# Implements xss and mime sniffing protection
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True

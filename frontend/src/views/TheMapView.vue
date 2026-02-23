@@ -9,6 +9,8 @@
           :zoom.sync="zoom"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
+          @zoomstart="isZoom = true"
+          @zoomend="isZoom = false"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
@@ -324,7 +326,8 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-
+      lastZoom: 0,
+      isZoom: false,
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
 
@@ -814,7 +817,7 @@ export default {
             });
           }
           else{
-            const allOsmElements = elements[3] || [];
+            const allOsmElements = elements[3];
             const tagValue = extraCategory.tagValue; 
             const tagKey = this.extraLayersTagsOverpass[tagValue];
 
@@ -1059,8 +1062,19 @@ export default {
 	  }
     },
     async boundsUpdated() {
+      if(this.isZoom){return;}
+
+
       clearTimeout(this.timeouts['boundsUpdated']);
-      this.timeouts['boundsUpdated'] = setTimeout(async () => {
+      const isZoom = this.lastZoom < this.zoom;
+      this.lastZoom = this.zoom;
+      if (isZoom) {
+        console.log("Zoom in");
+        return;
+      }
+      else{
+        console.log("Query request");
+        this.timeouts['boundsUpdated'] = setTimeout(async () => {
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
@@ -1073,11 +1087,11 @@ export default {
         }
 
         if (this.isAuthenticated) {
-	    await this.fetchItems(this.filteredQueryValues);
-	}
-	else {
-	    this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
-	}
+	        await this.fetchItems(this.filteredQueryValues);
+        }
+        else {
+          this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
+        }
 
         if (!this.initialItemsLoadDone) {
           if (this.itemId !== null && !this.routedItemError) {
@@ -1093,6 +1107,7 @@ export default {
 
         this.mapLoading = false;
       }, 600);
+      }
     },
     async fetchMathElements() {
       this.mapLoading = true;
