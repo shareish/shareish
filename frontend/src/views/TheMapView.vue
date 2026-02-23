@@ -9,8 +9,6 @@
           :zoom.sync="zoom"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
-          @zoomstart="isZoom = true"
-          @zoomend="isZoom = false"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
@@ -327,7 +325,6 @@ export default {
       ecatsCheckboxes: [],
       waitingFormResponse: false,
       lastZoom: 0,
-      isZoom: false,
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
 
@@ -755,19 +752,8 @@ export default {
             this.getFallingFruitElements(), // elements[0]
             this.getRepairCafeElements(),  // elements[1]
             this.getVolunteerElements(), // elements[2],
-            this.getOverPass(),
-            /*this.getOverPassElements('public_bookcase'), //TODO: make it a single overpass query to avoid too many requests
-            this.getOverPassElements('defibrillator'),
-            this.getOverPassElements('give_box'),
-            this.getOverPassElements('food_bank'),
-            this.getOverPassElements('food_sharing'),
-            this.getOverPassElements('soup_kitchen'),
-            this.getOverPassElements('drinking_water'),
-            this.getOverPassElements('freeshop'),*/
+            this.getOverPass(), //elements[3]
         ]);
-
-        console.log(elements)
-
         const tmpExtraCategories = {...this.extraCategories};
 
         for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
@@ -1021,6 +1007,7 @@ export default {
               return [];
 	  }
       },
+      //Single request overpass
       async getOverPass(){
         try{
           const overpass = {...this.extraLayersTagsOverpass};
@@ -1029,7 +1016,6 @@ export default {
           for(const[key, value] of Object.entries(overpass)){
             nodeQuery += `node["${value}"="${key}"](${bounds});`;
           }
-          console.log(nodeQuery)
           nodeQuery += ");";
           const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
@@ -1045,6 +1031,7 @@ export default {
           return [];
         }
       },
+      //Should we remove it ?
       async getOverPassElements(tagValue) {
         try {
               const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
@@ -1062,19 +1049,14 @@ export default {
 	  }
     },
     async boundsUpdated() {
-      if(this.isZoom){return;}
-
-
       clearTimeout(this.timeouts['boundsUpdated']);
-      const isZoom = this.lastZoom < this.zoom;
+      this.timeouts['boundsUpdated'] = setTimeout(async () => {
+      const isZoomUpdated = this.lastZoom < this.zoom;
       this.lastZoom = this.zoom;
-      if (isZoom) {
-        console.log("Zoom in");
+      if (isZoomUpdated) {
         return;
       }
       else{
-        console.log("Query request");
-        this.timeouts['boundsUpdated'] = setTimeout(async () => {
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
@@ -1106,8 +1088,8 @@ export default {
         await this.fetchExtraLayersMakers();
 
         this.mapLoading = false;
-      }, 600);
       }
+      }, 600);
     },
     async fetchMathElements() {
       this.mapLoading = true;
