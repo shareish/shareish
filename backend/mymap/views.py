@@ -37,10 +37,19 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .ai import findClass
 
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
+
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from urllib.parse import urlparse
+
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 User = get_user_model()
-locator = Nominatim(user_agent='shareish')
+locator = Photon(user_agent='shareish')
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -499,12 +508,12 @@ def get_address_reverse(request):
         else:
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         try:
-            location = locator.reverse((latitude, longitude), exactly_one=True)
+            location = locator.reverse((latitude, longitude), exactly_one=True, timeout=5)
             if location is not None:
                 return Response(location.address, status=status.HTTP_200_OK)
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response("Third party geolocation service did not work properly.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Third party geolocation service did not work properly. Please retry.", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -512,12 +521,12 @@ def get_address_reverse(request):
 def get_address(request):
     if request.method == 'POST':
         try:
-            location = locator.geocode(request.POST['address'])
+            location = locator.geocode(request.POST['address'], timeout=5)
             if location is not None:
                 return JsonResponse({'latitude': location.latitude, 'longitude': location.longitude}, status=status.HTTP_200_OK)
             return Response("Couldn't find location.", status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response("Third party geolocation service did not work properly.", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Third party geolocation service did not work properly. Please retry !", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -891,3 +900,31 @@ def close_item(request, item_id):
         else:
             return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def proxy_view(request):
+    external_url = request.GET.get('target')
+    if not external_url:
+        return JsonResponse({"error": "Missing 'target' parameter"}, status=400)
+
+    # Check if the URL domain is authorized in settings.py
+    parsed_url = urlparse(external_url)
+    if parsed_url.netloc not in settings.ALLOWED_PROXY_HOSTS:
+        logger.warning(f"Access refused: {external_url}")
+        return JsonResponse({"error": "Unauthorized target URL"}, status=403)
+    
+    # Use all GET parameters except target
+    params = request.GET.copy()
+    params.pop('target')
+    
+    # Perform request to external API
+    logger.info(f"Proxying request to: {external_url} with params {params}")
+    try:
+        response = requests.get(external_url, params=params)
+        if response.status_code != 200:
+            logger.error(f"External API error: {response.status_code} {response.text}")
+            return JsonResponse({"error": "API request failed"}, status=response.status_code)
+        return JsonResponse(response.json(), safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({'error': str(e)}, status=500)

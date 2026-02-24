@@ -167,3 +167,24 @@ export const fallingfruitIcon = new L.Icon({
     popupAnchor: [0, -20],
     shadowSize: [41, 41]
 });
+
+
+
+export const repairCafeIcon = new L.Icon({
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Deepin_Icon_Theme_%E2%80%93_deepin-repair-tools_%2822%29.svg',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [32, 32],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -20],
+    shadowSize: [41, 41]
+});
+
+
+export const volunteerIcon = new L.Icon({
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Map_Icon_-_Service.png/250px-Map_Icon_-_Service.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [32, 32],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -20],
+    shadowSize: [41, 41]
+});

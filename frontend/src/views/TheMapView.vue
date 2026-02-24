@@ -4,11 +4,12 @@
       <l-map
           id="leaflet-map"
           ref="map"
-          :bounds.sync="bounds"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
+          :bounds.sync="bounds"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
+          @ready="onMapReady"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
@@ -35,7 +36,7 @@
               <span>{{ $t('add_osm') }}</span>
             </a>
             <div style="display: grid;grid-template-columns:repeat(4,1fr);">
-              <span v-for="(extraCategory, index) in ecatswithoutFF()" :key="index">
+              <span v-for="(extraCategory, index) in addableEcats()" :key="index">
                 <b-tooltip :label="$tc('map_ecat_'+ extraCategory.category, 1)">
                   <a :href="getMarkerURLAddSpecificOSM(newmarker,extraCategory.category)" target="_blank">
                     <img :src="extraCategoriesIcons[extraCategories[extraCategory.category].id].options.iconUrl"
@@ -89,6 +90,11 @@
                 <i class="fas fa-cog"></i>
               </b-button>
             </b-tooltip>
+	    <b-tooltip :label="$t('add-map-content')" class="w-75 mt-1" position="is-left" type="is-info">
+              <b-button expanded type="is-info" @click="addMarker">
+                <i class="fas fa-plus-circle"></i>
+              </b-button>
+            </b-tooltip>
           </div>
         </l-control>
         <l-control position="bottomleft">
@@ -135,18 +141,26 @@
                       <img v-if="marker.image" :alt="marker.image" :src="marker.image">
                     </figure>
                     <div class="is-grey">{{ $tc('map_ecat_' + extraCategory.category, 1) }}</div>
-                    <div v-if="marker.description">{{ marker.description }}</div>
-                    <div class="is-grey is-size-7 has-text-right is-italic">
-                      <a :href="getMarkerURLView(extraCategory.category, marker.id)" target="_blank">
+		    
+                    <div class="is-grey" v-if="marker.description">{{ marker.description }}</div>
+                    <div v-if="marker.opening_hours || marker.website">
+		       <span> <b-tooltip v-if="marker.opening_hours" :label="marker.opening_hours"> <i class="far fa-clock">  </i> </b-tooltip> </span> 
+		       &nbsp; <span>  <b-tooltip v-if="marker.website" :label="marker.website">   <a :href="marker.website" target="_blank">  <i class="fas fa-globe"> </i> </a>  </b-tooltip>  </span>
+		    </div>
+		    <div>
+                      <a :href="getMarkerURLView(extraCategory.category, marker)" target="_blank">
                         <span><i class="fas fa-external-link-alt"></i></span>
                         <span>{{ $t(extraCategory.category === 'FLF' ? 'view-from-ff' : 'view-from-osm') }}</span>
+			<span v-if="extraCategory.category == 'REP'"> {{ $t('dates_places') }}</span>
+			<span v-if="extraCategory.category == 'VOL'"> {{ $t('dates_places') }}</span>
                       </a>
-                      <span> {{ $t('or') }} </span>
-                      <a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
-                        <span><i class="fas fa-external-link-alt"></i></span>
-                        <span>{{ $t('edit_minor') }}</span>
-                      </a>
-                      <span> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm') }}</span>
+                      <span v-if="!['REP', 'VOL'].includes(extraCategory.category)"> {{ $t('or') }} </span>
+                      <span v-if="!['REP', 'VOL'].includes(extraCategory.category)">
+			<a :href="getMarkerURLEdit(extraCategory.category, marker)" target="_blank">
+                          <span><i class="fas fa-external-link-alt"></i></span>
+                          <span>{{ $t('edit_minor') }}</span>
+                      </a></span>
+                      <span v-if="!['REP', 'VOL'].includes(extraCategory.category)"> {{ $t(extraCategory.category === 'FLF' ? 'from-ff' : 'from-osm')}}</span>
                       <br/>
                     </div>
 		                <div v-if="ecatsInteractive(extraCategory.category)"> 
@@ -246,27 +260,31 @@ import * as L from 'leaflet'; // do not remove for markercluster
 import "leaflet.markercluster";
 import "leaflet-easybutton";
 import axios from "axios";
-//import "leaflet-geosearch";
+ //import "leaflet-geosearch";
+import {formattedDate} from "@/functions";
 
-import {
-  greenIcon,
-  yellowIcon,
-  redIcon,
-  greyIcon,
-  eventIcon,
-  publicBookcaseIcon,
-  aedIcon,
-  giveBoxIcon,
-  drinkingWaterIcon,
-  freeShopIcon,
-  foodSharingIcon,
-  foodBankIcon,
-  soupKitchenIcon,
-  fallingfruitIcon,
-  blueIcon,
-  addIcon,
-  homeIcon
-} from "@/map-icons";
+
+ import {
+     greenIcon,
+     yellowIcon,
+     redIcon,
+     greyIcon,
+     eventIcon,
+     publicBookcaseIcon,
+     aedIcon,
+     giveBoxIcon,
+     drinkingWaterIcon,
+     freeShopIcon,
+     foodSharingIcon,
+     foodBankIcon,
+     soupKitchenIcon,
+     fallingfruitIcon,
+     repairCafeIcon,
+     volunteerIcon,
+     blueIcon,
+     addIcon,
+     homeIcon
+ } from "@/map-icons";
 
 import {LMap, LTileLayer, LControlLayers, LControl, LMarker, LPopup, LFeatureGroup, LLayerGroup} from "vue2-leaflet";
 import Vue2LeafletMarkercluster from "vue2-leaflet-markercluster";
@@ -307,11 +325,11 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-
+      lastZoom: 15, //lastZoom bigger than zoom for the first updateBounds
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
-
       bounds: null,
+      boundsLoaded: null,
       searchBounds: null,
       geoLocation: null,
       refLocation: null,
@@ -430,19 +448,29 @@ export default {
           id: 'soup-kitchens',
           markers: [],
           tagValue: 'soup_kitchen'
-        }
+        },
+	'REP': {
+	    id: 'repair-cafes',
+            markers: [],
+            tagValue: 'repair_cafe'
+	},
+	'VOL': {
+	    id: 'volunteer-offers',
+            markers: [],
+            tagValue: 'volunteer_offer'
+	},
       },
-      extraLayersTagsOverpass: {
-        'public_bookcase': 'amenity',
-        'defibrillator': 'emergency',
-        'give_box': 'amenity',
-        'food_bank': 'social_facility',
-        'food_sharing': 'amenity',
-        'soup_kitchen': 'social_facility',
-        'drinking_water': 'amenity',
-        'freeshop': 'amenity'
-      },
-      extraCategoriesIcons: {
+	extraLayersTagsOverpass: {
+            'public_bookcase': 'amenity',
+            'defibrillator': 'emergency',
+            'give_box': 'amenity',
+            'food_bank': 'social_facility',
+            'food_sharing': 'amenity',
+            'soup_kitchen': 'social_facility',
+            'drinking_water': 'amenity',
+            'freeshop': 'amenity'
+	},
+	extraCategoriesIcons: {
         'bookcases': publicBookcaseIcon,
         'defibrillators': aedIcon,
         'give-boxes': giveBoxIcon,
@@ -451,7 +479,9 @@ export default {
         'food-sharings': foodSharingIcon,
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
-        'falling-fruits': fallingfruitIcon
+        'falling-fruits': fallingfruitIcon,
+	    'repair-cafes': repairCafeIcon,
+	    'volunteer-offers': volunteerIcon,
       },
       itemTypeIcons: {
         'DN': greenIcon,
@@ -481,7 +511,8 @@ export default {
       
     if (this.isAuthenticated) {
 	await this.fetchUser();
-    } 
+    }
+
     else {
 	//Create fake user.map_ecats to be able to display OSM/FF data while not logged in
 	this.user.map_ecats = [{category: "BKC", selected: true},
@@ -493,9 +524,10 @@ export default {
 			       {category: "FRS", selected: true},
 			       {category: "GVB", selected: true},
 			       {category: "SPK", selected: true},
-			      ];
+			       {category: "REP", selected: true},
+			       {category: "VOL", selected: true},
+	];
     }
-      
     for (const i in this.user.map_ecats) {
       if (this.user.map_ecats[i].selected === true)
         this.ecatsCheckboxes.push(this.user.map_ecats[i].category)
@@ -554,16 +586,16 @@ export default {
         }
       }
     },
-    ecatswithoutFF() {
-      var catswithoutFF = [];
+    addableEcats() {
+      var addableCats = [];
       for (const i in this.user.map_ecats) {
-        if (this.user.map_ecats[i].category != 'FLF')
-          catswithoutFF.push(this.user.map_ecats[i])
+	  if (!['FLF', 'REP', 'VOL'].includes(this.user.map_ecats[i].category))
+	      addableCats.push(this.user.map_ecats[i])
       }
-      return catswithoutFF;
+      return addableCats;
     },
     ecatsInteractive(category) {
-	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB'];
+	const interactiveCats = ['BKC', 'FDS', 'GVB','FRS','FDB','REP'];
 	return(interactiveCats.indexOf(category)+1)
     },
     rewriteURL() {
@@ -718,21 +750,15 @@ export default {
     async fetchExtraLayersMakers() {
       if (this.zoom >= this.minZoomToShowElements) {
         const elements = await Promise.all([
-          this.getFallingFruitElements(),
-          this.getOverPassElements('public_bookcase'),
-          this.getOverPassElements('defibrillator'),
-          this.getOverPassElements('give_box'),
-          this.getOverPassElements('food_bank'),
-          this.getOverPassElements('food_sharing'),
-          this.getOverPassElements('soup_kitchen'),
-          this.getOverPassElements('drinking_water'),
-          this.getOverPassElements('freeshop'),
+            this.getFallingFruitElements(), // elements[0]
+            this.getRepairCafeElements(),  // elements[1]
+            this.getVolunteerElements(), // elements[2],
+            this.getOverPass(), //elements[3]
         ]);
-
         const tmpExtraCategories = {...this.extraCategories};
 
         for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
-          if (key === 'FLF') {
+          if (key === 'FLF') { // elements[0]
             tmpExtraCategories['FLF']['markers'] = elements[0].filter(element =>
                 element['id'] != null && element['lat'] != null && element['lng'] != null
             ).map(element => {
@@ -744,29 +770,70 @@ export default {
                 location: new GeolocationCoords(element['lng'], element['lat'])
               }
             });
-          } else {
-            const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
-            if (opKey !== -1) {
-              tmpExtraCategories[key]['markers'] = elements[opKey + 1].filter(element =>
-                  element['id'] != null && element['lat'] != null && element['lon'] != null
-              ).map(element => {
-                return {
-                  id: element['id'],
-                  type: extraCategory.tagValue,
-                  name: element['tags']['name'],
-                  location: new GeolocationCoords(element['lon'], element['lat']),
-                  image: element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
-                }
-              });
-            }
+          }
+	        else if (key === 'REP') { //elements[1]
+            tmpExtraCategories['REP']['markers'] = elements[1].filter(element =>
+                element['name'] != null && element['coordinate'] != null
+            ).map(element => {
+              return {
+                id: Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // // convert date to integer for arbitrary id
+                //parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
+                type: extraCategory.tagValue,//'repair_cafe',
+                image: "https://www.repaircafe.org/wp-content/uploads/2021/05/logo-repair-cafe-2.png", //"https://repairtogether.restarters.net/images/logos/repairtogether.png",
+                name: element['name'],
+                description: element['external_link'],
+                location: new GeolocationCoords(parseFloat(element['coordinate'].split(",")[1]),parseFloat(element['coordinate'].split(",")[0]))
+              }
+            });
+          }
+          else if (key === 'VOL') { //elements[2]
+            tmpExtraCategories['VOL']['markers'] = elements[2].filter(element =>
+              element['ad'] != null && element['activity_place'] != null
+            ).map(element => {
+            //console.log(element);
+              return {
+                id: element['ad']['nid'], 
+                type: extraCategory.tagValue,//'volunteer-offer
+                image: "https://www.levolontariat.be/themes/custom/volontariat_theme/images/logo-print.svg", 
+                name: element['ad']['title']+' - '+element['group']['label'],
+                //we store categories and date as a formatted string, not ideal (should be vue formatting data)
+                description: this.getVolunteerCategories(element['hobbies']) + ' ('+ this.$t('published') +' ' + this.$t('on-day') + ' ' + formattedDate(new Date(element['ad']['changed']*1000),this.$i18n.locale) + ')',
+                website: 'https://www.levolontariat.be/node/'+element['ad']['nid'],
+                location: new GeolocationCoords(parseFloat(element['activity_place']['lng']),parseFloat(element['activity_place']['lat']))
+              }
+            });
+          }
+          else{
+            const allOsmElements = elements[3];
+            const tagValue = extraCategory.tagValue; 
+            const tagKey = this.extraLayersTagsOverpass[tagValue];
+
+            tmpExtraCategories[key]['markers'] = allOsmElements.filter(element => {
+              return (
+                element['id'] != null && 
+                element['lat'] != null && 
+                element['lon'] != null &&
+                element['tags'] && 
+                element['tags'][tagKey] === tagValue
+              );
+            }).map(element => {
+              return {
+                id: element['id'],
+                type: tagValue,
+                name: element['tags']['name'],
+                location: new GeolocationCoords(element['lon'], element['lat']),
+                opening_hours: element['tags']['opening_hours'],
+                website: element['tags']['website'],
+                image: element['tags']['panoramax'] != null ? "https://api.panoramax.xyz/api/pictures/"+element['tags']['panoramax']+"/thumb.jpg" : element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
+              }
+            });
           }
         }
-
         this.extraCategories = tmpExtraCategories;
       }
     },
     addMarker(e) {
-      this.newmarker = e.latlng;
+	this.newmarker = e.latlng != null ? e.latlng : new LatLng(this.leafletCenter.lat,this.leafletCenter.lng);
 
       //this.$refs.map.mapObject.on('popupopen', function(e) {
       //    var px = this.$refs.map.mapObject.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
@@ -780,15 +847,37 @@ export default {
         this._source.setOpacity(0);
       });
       this.$refs.newmarker.mapObject.openPopup();
-      //this.$refs.map.mapObject.setView(this.newmarker);
+	//this.$refs.map.mapObject.setView(this.newmarker);
 
     },
-    getMarkerURLView(category, markerId) {
-      if (category === 'FLF') {
-        return "https://fallingfruit.org/locations/" + markerId + "&locale=" + this.$i18n.locale;
-      } else {
-        return "https://openstreetmap.org/node/" + markerId;
-      }
+      formatTimestamp(timestamp) {
+	  // Convert from seconds to milliseconds
+	  const date = new Date(timestamp * 1000);
+	  // Format to readable string 
+	  return date.toLocaleDateString(); 
+      },
+      getVolunteerCategories(hobbies) {
+	  if (!hobbies || typeof hobbies !== 'object') return '';
+	  return Object.values(hobbies)
+		       .map(hobby => hobby.name)
+		       .filter(Boolean)
+		       .join(', ');
+      },
+      
+      getMarkerURLView(category, marker) {
+	  if (category === 'FLF') {
+              return "https://fallingfruit.org/locations/" + marker.id + "&locale=" + this.$i18n.locale;
+	  }
+	  else if (category === 'REP') {
+	      return marker.description;
+	  }
+	  else if (category === 'VOL') {
+	      return marker.website;
+	  }
+	  
+	  else {
+              return "https://openstreetmap.org/node/" + marker.id;
+	}
     },
     getMarkerURLEdit(category, marker) {
 	if (category === 'FLF') {
@@ -838,6 +927,37 @@ export default {
     getMarkerURLAddFF(marker) {
       return "http://fallingfruit.org/locations/new?lat=" + marker.lat + "&lng=" + marker.lng + "&locale=" + this.$i18n.locale;
     },
+    async getRepairCafeElements_frontend() { // not used anymore
+	try {
+	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map?";
+	    const rpcoords = "northeast="+this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng +"&southwest="+ this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng;
+	    const rpURL = rpbaseURL + rpcoords;
+	    //const proxyURL = `https://corsproxy.io/?url=` + encodeURIComponent(rpURL); // Ajout du proxy
+	    //const proxyURL = `https://api.allorigins.win/get?url=` + encodeURIComponent(rpURL); // Ajout du proxy
+	    const proxyURL = "https://thingproxy.freeboard.io/fetch/" + rpURL;
+            const response = await axios.get(proxyURL);
+            return response.data; 
+	} catch (error) {
+            console.log(error);
+            return [];
+	}
+    },
+    async getRepairCafeElements() { //using django proxy to avoid CORS issue from frontend
+	try {
+	    const rpbaseURL = "https://www.repaircafe.org/wp-json/v1/map";
+	    const response = await axios.get('/api/v1/proxy', {
+		params: {
+		    target: rpbaseURL,
+		    northeast: this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng,
+		    southwest: this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng
+		    }
+	    });
+	    return response.data;
+	} catch (error) {
+            console.log(error);
+            return [];
+	}
+    },
     async getFallingFruitElements() {
       try {
         const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
@@ -854,25 +974,94 @@ export default {
         return [];
       }
     },
-    async getOverPassElements(tagValue) {
-      try {
-        const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
-        const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
-        const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+      async getVolunteerElements_frontend() { // not used anymore
+	  try {
+	      const vbaseURL = 'https://www.levolontariat.be/api/search?';
+	      const vcoords = 'filter[location][condition][lat_min]=' + this.bounds.getSouthWest().lat + '&filter[location][condition][lat_max]=' + this.bounds.getNorthEast().lat + '&filter[location][condition][lng_min]=' + this.bounds.getSouthWest().lng + '&filter[location][condition][lng_max]=' + this.bounds.getNorthEast().lng + '&filter[accessibility][condition][lang]=false&filter[accessibility][condition][reduced]=false&filter[extra][condition][hobbies]=undefined&filter[extra][condition][times]=undefined';
+	      const vURL = vbaseURL+vcoords;
+	      const proxyURL = "https://thingproxy.freeboard.io/fetch/" + vURL;
+	      const response = await axios.get(proxyURL);
+              return response.data;
+	  } catch (error) {
+              return [];
+	  }
+      },
 
-        const baseURL = "https://overpass-api.de/api";
-        //const baseURL = "https://overpass.kumi.systems/api";
-        //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+      async getVolunteerElements() {
+	  try {
+	      const vbaseURL = 'https://www.levolontariat.be/api/search?';
+	      const response = await axios.get('/api/v1/proxy', {
+		  params: {
+		      target: vbaseURL,
+		      'filter[location][condition][lat_min]': this.bounds.getSouthWest().lat,
+		      'filter[location][condition][lat_max]': this.bounds.getNorthEast().lat,
+		      'filter[location][condition][lng_min]': this.bounds.getSouthWest().lng,
+		      'filter[location][condition][lng_max]': this.bounds.getNorthEast().lng,
+		      'filter[accessibility][condition][lang]': false,
+		      'filter[accessibility][condition][reduced]': false,
+		      'filter[extra][condition][hobbies]': 'undefined',
+		      'filter[extra][condition][times]': 'undefined'
+		  }
+	      });
+              return response.data;
+	  } catch (error) {
+              return [];
+	  }
+      },
+      //Single request overpass
+      async getOverPass(){
+        try{
+          const overpass = {...this.extraLayersTagsOverpass};
+          const bounds = `${this.bounds.pad(0.5).getSouth()},${this.bounds.pad(0.5).getWest()},${this.bounds.pad(0.5).getNorth()},${this.bounds.pad(0.5).getEast()}`;
+          let nodeQuery = "(";
+          for(const[key, value] of Object.entries(overpass)){
+            nodeQuery += `node["${value}"="${key}"](${bounds});`;
+          }
+          nodeQuery += ");";
+          const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
+          const baseURL = "https://overpass-api.de/api";
+          
+          return (await axios.get("/interpreter", {
+            params: {data}, 
+            baseURL,
+            timeout: 50000
+          })).data['elements'];
+        }catch(error){
+          console.log(error);
+          return [];
+        }
+      },
+      //Should we remove it ?
+      async getOverPassElements(tagValue) {
+        try {
+              const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
+              const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
+              const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+
+              const baseURL = "https://overpass-api.de/api";
+              //const baseURL = "https://overpass.kumi.systems/api";
+              //const baseURL = "https://maps.mail.ru/osm/tools/overpass/api";
+
+              return (await axios.get("/interpreter", {params: {data}, baseURL})).data['elements'];
+	  } catch (error) {
+              console.log(error);
+              return [];
+	  }
+    },
+    //check if the area is on the boundsLoaded area
+    boundsCheck(){
+      if(this.boundsLoaded === null){return false;}
+
+      return this.boundsLoaded.contains(this.bounds);
     },
     async boundsUpdated() {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
+      if (this.boundsCheck()) {
+        return;
+      }
+      else{
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
@@ -885,11 +1074,11 @@ export default {
         }
 
         if (this.isAuthenticated) {
-	    await this.fetchItems(this.filteredQueryValues);
-	}
-	else {
-	    this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
-	}
+	        await this.fetchItems(this.filteredQueryValues);
+        }
+        else {
+          this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
+        }
 
         if (!this.initialItemsLoadDone) {
           if (this.itemId !== null && !this.routedItemError) {
@@ -903,7 +1092,14 @@ export default {
 
         await this.fetchExtraLayersMakers();
 
+        const nw = this.bounds.getNorthWest();
+        const se = this.bounds.getSouthEast();
+        this.boundsLoaded = L.latLngBounds(
+          L.latLng(nw.lat, nw.lng),
+          L.latLng(se.lat, se.lng)
+        );
         this.mapLoading = false;
+      }
       }, 600);
     },
     async fetchMathElements() {
@@ -922,11 +1118,15 @@ export default {
           if (this.flapSelected === 'settings') {
             flap.style.width = "550px";
           } else if (this.flapSelected === 'filters') {
-            flap.style.width = "450px";
+              flap.style.width = "450px";
           }
           flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
+    },
+    onMapReady(map){
+      this.bounds = map.getBounds();
+      this.boundsUpdated();
     },
   }
 }

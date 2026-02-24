@@ -7,33 +7,6 @@ module.exports = {
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-
-    manifestOptions: {
-      name: 'Shareish',
-      short_name: 'Shareish',
-      start_url: '/',
-      display: 'standalone',
-      theme_color: '#4DBA87',
-      description : 'Shareish solidarity App',
-      icons: [
-        {
-          src: `/img/icons/shareish_helping_hands-192x192.png`,
-          sizes: "192x192",
-          type: "image/png"
-        },
-	{
-          src: `/img/icons/shareish_helping_hands-192x192_maskable.png`,
-          sizes: "192x192",
-          type: "image/png",
-	  purpose: "maskable"  
-        },
-	{
-          src: `/img/icons/shareish_helping_hands-512x512.png`,
-          sizes: "512x512",
-          type: "image/png"
-        },
-      ],  
-    },
     
     //workboxPluginMode: 'InjectManifest',
     //workboxOptions: {

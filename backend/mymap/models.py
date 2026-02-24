@@ -192,6 +192,8 @@ class UserMapExtraCategories(models.TextChoices):
     FOOD_BANKS = 'FDB', _("Food Banks")
     FOOD_SHARING = 'FDS', _("Food Sharing")
     FALLING_FRUITS = 'FLF', _("Falling fruits")
+    REPAIR_CAFES = 'REP',_("Repair Cafes")
+    VOLUNTEERING = 'VOL',_("Volunteering")
     FREE_SHOPS = 'FRS', _("Free shops")
     GIVE_BOXES = 'GVB', _("Give boxes")
     SOUP_KITCHENS = 'SPK', _("Soup Kitchens")
@@ -267,6 +269,7 @@ class Item(models.Model):
     startdate = models.DateTimeField(default=timezone.now)
     enddate = models.DateTimeField(null=True)
     is_recurrent = models.BooleanField(default=False)
+    url = models.URLField(blank=True, default="")
 
     type = models.CharField(max_length=2, choices=ItemType.choices, default=ItemType.REQUEST)
 

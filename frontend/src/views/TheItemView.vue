@@ -134,6 +134,21 @@
               <p class="description wbbw wspw">{{ item.description }}</p>
             </div>
           </article>
+          <article id="url" class="mb-5-5" v-if="item.url">
+            <div class="title is-size-4 mb-2">
+              <div class="icon-text">
+                <span class="icon is-medium"><i class="fas fa-external-link-alt"></i></span>
+                <span>{{ $t('url') }}</span>
+              </div>
+            </div>
+            <a
+              :href="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >
+              {{ item.url }}
+            </a>
+          </article>
           <article id="location" class="mb-5-5">
             <div class="title is-size-4 mb-2">
               <div class="icon-text">

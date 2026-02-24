@@ -15,6 +15,7 @@ export default new Vuex.Store({
         itemsFilters: {},
         token: null,
         notifications: 0,
+        loading : false,
     },
     getters: {},
     mutations: {
@@ -53,8 +54,15 @@ export default new Vuex.Store({
             } else {
                 state.itemsFilters = builtURLParams;
             }
+        },
+        TOGGLE_LOADING(state,value){
+            state.loading = value;
         }
     },
-    actions: {},
+    actions: {
+        toggleLoading({commit},value){
+            commit("TOGGLE_LOADING",value);
+        }
+    },
     modules: {}
 });

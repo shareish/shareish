@@ -117,9 +117,26 @@
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
-                <b-input v-model="description" expanded type="textarea" name="description" v-validate="'required'" />
+                <b-input ref="load" v-model="description" expanded type="textarea" name="description" v-validate="'required'"/>
               </b-field>
             </div>
+          </div>
+          <div>
+            <b-field label="Link">
+              <template #label>
+                  {{ $t('url') }}
+                  <b-tooltip :label="$t('help_item_url')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+              </template>
+              <b-input
+                type="url"
+                v-model="url"
+                icon="link"
+                placeholder="https://shareish.org" 
+                >
+              </b-input>
+            </b-field>
           </div>
           <b-field>
             <template #label>
@@ -138,7 +155,7 @@
                  <i class="fas fa-home"></i>
                </b-button>
             </b-tooltip>
-            <b-input v-model="address" @input="addressUpdatedByUser" icon-right="fas fa-times-circle" icon-right-clickable @icon-right-click="clearAddress" class="is-expanded ml-2" name="ref_location" type="text" />
+            <address-auto-complete  @address-selected="handleSelect" :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="address" v-validate="'required'" :errorAddress="errors.first('address')"/>
           </b-field>
           <div class="is-flex is-justify-content-flex-end mb-3">
 	      <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -279,10 +296,12 @@
 <script>
 import axios from "axios";
 import CategorySelector from "@/components/CategorySelector.vue";
+import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords} from "@/functions";
+import {GeolocationCoords,isNotEmptyString,isEmptyString} from "@/functions";
+import {mapActions}  from "vuex";
 
 export default {
   name: 'TheAddItemView',
@@ -290,7 +309,7 @@ export default {
   $_veeValidate: {
     validator: 'new'
   },
-  components: {CategorySelector},
+  components: {CategorySelector,AddressAutoComplete },
   data() {
     return {
       itemTypes: [
@@ -323,19 +342,19 @@ export default {
       category2: '',
       category3: '',
       address_text: "",
-      address_coords: new GeolocationCoords(),
+      address_coords: null,
       ressource_id : '',  //public resource id
       address: "",
       use_coordinates: false,
-      user_updated_address_field: false,
       startdate: null,
       enddate: null,
       isRecurrent: false,
       visibility: 'PB',
-
+      loadingComponent : null,
       geoLocation: null,
       refLocation : null,
       waitingFormResponse: false,
+      url: "",
 
       extraCategories: {
         'BKC': {
@@ -391,7 +410,12 @@ export default {
           markers: [],
           tagValue: 'soup_kitchen',
 	  item_category: 'FD'    
-        }
+        },
+	'REP': {
+	      id: 'repair-cafes',
+              markers: [],
+              tagValue: 'repair_cafe'
+	}
       },
 	
     }
@@ -462,6 +486,11 @@ export default {
     }
   },
   watch: {
+    description(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.closeLoader();
+      }
+    },
     filesSelected() {
       if (this.filesSelected.length > 0) {
         if (this.imagesSlotsLeft) {
@@ -478,12 +507,27 @@ export default {
       }
     },
     use_coordinates() {
-      if (!this.user_updated_address_field)
-        this.updateAddressField();
+      this.updateAddressField();
+    },
+    address(){
+      if(isEmptyString(this.address))
+      {
+        console.log("address cleared");
+        this.address_coords = null;
+        this.address_text = "";
+      }
     }
   },
   methods: {
-
+    async handleSelect(){
+      console.log("address selected");
+      this.address_coords = await this.fetchAddressCoords(this.address);
+      this.address_text = await this.fetchAddress(this.address_coords);
+    },
+    ...mapActions(['toggleLoading']),
+    changeLoading(value){
+      this.toggleLoading(value);
+    },
     clearAddress(){
       this.address = ''
     },
@@ -511,6 +555,10 @@ export default {
 		this.description = this.$t('publicbookcase_status');
 	    else if (this.$route.params.resource == 'FRS')
 		this.description = this.$t('freeshop_request');
+	    else if (this.$route.params.resource == 'REP') {
+		this.description = this.$t('repaircafe_request');
+		this.name = this.$t('repaircafe_req_volunteers');
+	    }
 	}
 	else if (this.type=="DN") {
 	    if (this.$route.params.resource == 'BKC')
@@ -522,11 +570,19 @@ export default {
 	}
         if (this.$route.params.resource == 'FLF')
 	    prsource = "Falling Fruit"
+	else if (this.$route.params.resource == 'REP')
+	    prsource = "Repair cafes"
 	else
 	    prsource = "OpenStreetMap"
 	this.description += "\n("+this.$t('related_to')+" " + this.$tc('map_ecat_'+this.$route.params.resource,1) + " " + prsource + " node ID "+this.ressource_id+")";
-	this.category1 = 'PR';
-	this.category2 = this.extraCategories[this.$route.params.resource].item_category;
+	if (this.$route.params.resource == 'REP') {
+	    this.category1 = 'DY';
+	    this.category2 = 'HL';
+	}
+	else {
+	    this.category1 = 'PR';
+	    this.category2 = this.extraCategories[this.$route.params.resource].item_category;
+	}
     },
     async fetchMapMarkerAddress(lat, lng) {
       try {
@@ -568,6 +624,21 @@ export default {
         this.address = await this.fetchAddress(new GeolocationCoords(this.recurrentItem.location));
       }
     },
+    async fetchAddressCoords(address) {
+      if (isNotEmptyString(address)) {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
     async fetchAddressRefLoc() {
       try {
         const params = {
@@ -578,7 +649,6 @@ export default {
         if (refLocation !== null) {
           this.refLocation = new GeolocationCoords(refLocation);
           if (this.refLocation instanceof GeolocationCoords) {
-            this.user_updated_address_field = false;
             this.address_text = await this.fetchAddress(this.refLocation);
             this.address_coords = this.refLocation;
             this.updateAddressField();
@@ -593,7 +663,6 @@ export default {
     },
     async fetchAddressGeoLoc() {
       if (this.geoLocation instanceof GeolocationCoords) {
-        this.user_updated_address_field = false;
         this.address_text = await this.fetchAddress(this.geoLocation);
         this.address_coords = this.geoLocation;
         this.updateAddressField();
@@ -612,27 +681,25 @@ export default {
       }
       return null;
     },
-    updateAddressField() {
+    async updateAddressField() {
       if (!this.use_coordinates)
         this.address = this.address_text;
       else
-          this.address = this.address_coords.toStringForUser();
-    },
-    addressUpdatedByUser() {
-      if (!this.user_updated_address_field)
-        this.user_updated_address_field = true;
+      {
+        if(this.address_coords instanceof GeolocationCoords)
+          this.address = this.address_coords.toStringForUser()
+      }
     },
     async processImage(file) {
-      this.loading = true;
-
+      this.changeLoading(true);
+      this.openLoading();
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         this.images.push({"filename": file.name, 'predictions': [], 'preview': reader.result, 'probability': 0});
         this.fetchPredictions(file, this.images.length - 1);
       });
       reader.readAsDataURL(file);
-
-      this.loading = false;
+      setTimeout(()=> { this.changeLoading(false);},1000);
     },
     async fetchPredictions(file, position) {
       try {
@@ -658,7 +725,7 @@ export default {
         this.sortPredictions();
         this.refreshSuggestedNames();
 
-        this.description += response['detected_text']
+        this.description += response['detected_text'] + ' '
 
         if (this.probabilities[0])
           this.category1 = this.probabilities[0]['category'];
@@ -735,6 +802,7 @@ export default {
             category2: this.category2,
             category3: this.category3,
             description: this.description,
+            url: this.url,
             location: this.address,
             use_coordinates: this.use_coordinates,
             is_recurrent: this.isRecurrent,
@@ -810,6 +878,14 @@ export default {
         if (this.enddate < this.startdate)
           this.startdate = this.enddate;
       }
+    },
+    openLoading(){
+      this.loadingComponent = this.$buefy.loading.open({
+        container : this.$refs.load.$el,        
+      })
+    },
+    closeLoader(){
+      this.loadingComponent.close();
     },
     windowWidthChanged() {
       let imagesPreviewColumnSizeClass = "is-one-third";

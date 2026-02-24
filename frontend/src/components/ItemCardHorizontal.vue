@@ -34,7 +34,7 @@
         </div>
         <div class="column">
           <i v-for="category in itemCategories" :key="category.slug" :class="category.icon" class="category mr-2" :title="$t(category.slug)" />
-          <router-link v-if="item.location" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2">
+          <router-link v-if="item.location" :to="{name: 'map', query: {id: item.id}}" class="button is-primary ml-2" :title="$t('jump-to-maplocation')">
             <i class="fas fa-map-marker-alt"></i>
           </router-link>
         </div>
