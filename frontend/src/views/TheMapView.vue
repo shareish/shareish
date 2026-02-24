@@ -4,11 +4,12 @@
       <l-map
           id="leaflet-map"
           ref="map"
-          :bounds.sync="bounds"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
+          :bounds.sync="bounds"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
+          @ready="onMapReady"
       >
         <l-control-layers position="bottomleft"></l-control-layers>
         <l-marker ref="newmarker" :icon="addIcon" :lat-lng="newmarker">
@@ -324,11 +325,11 @@ export default {
       flapSelected: null,
       ecatsCheckboxes: [],
       waitingFormResponse: false,
-
+      lastZoom: 15, //lastZoom bigger than zoom for the first updateBounds
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
-
       bounds: null,
+      boundsLoaded: null,
       searchBounds: null,
       geoLocation: null,
       refLocation: null,
@@ -750,18 +751,10 @@ export default {
       if (this.zoom >= this.minZoomToShowElements) {
         const elements = await Promise.all([
             this.getFallingFruitElements(), // elements[0]
-	    this.getRepairCafeElements(),  // elements[1]
-	    this.getVolunteerElements(), // elements[2],
-            this.getOverPassElements('public_bookcase'), //TODO: make it a single overpass query to avoid too many requests
-            this.getOverPassElements('defibrillator'),
-            this.getOverPassElements('give_box'),
-            this.getOverPassElements('food_bank'),
-            this.getOverPassElements('food_sharing'),
-            this.getOverPassElements('soup_kitchen'),
-            this.getOverPassElements('drinking_water'),
-            this.getOverPassElements('freeshop'),
+            this.getRepairCafeElements(),  // elements[1]
+            this.getVolunteerElements(), // elements[2],
+            this.getOverPass(), //elements[3]
         ]);
-
         const tmpExtraCategories = {...this.extraCategories};
 
         for (const [key, extraCategory] of Object.entries(tmpExtraCategories)) {
@@ -778,57 +771,62 @@ export default {
               }
             });
           }
-	    else if (key === 'REP') { //elements[1]
-		tmpExtraCategories['REP']['markers'] = elements[1].filter(element =>
+	        else if (key === 'REP') { //elements[1]
+            tmpExtraCategories['REP']['markers'] = elements[1].filter(element =>
                 element['name'] != null && element['coordinate'] != null
             ).map(element => {
               return {
-                  id: Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // // convert date to integer for arbitrary id
-		  //parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
-                  type: extraCategory.tagValue,//'repair_cafe',
-		  image: "https://www.repaircafe.org/wp-content/uploads/2021/05/logo-repair-cafe-2.png", //"https://repairtogether.restarters.net/images/logos/repairtogether.png",
-                  name: element['name'],
-                  description: element['external_link'],
-                  location: new GeolocationCoords(parseFloat(element['coordinate'].split(",")[1]),parseFloat(element['coordinate'].split(",")[0]))
+                id: Math.floor(new Date(element['last_updated'].replace(" ", "T")).getTime() / 1000), // // convert date to integer for arbitrary id
+                //parseInt(btoa(element['external_link']).replace(/[^a-zA-Z0-9]/g, '').substr(0, 10), 36), // convert external_link to integer for arbitrary unique marker id
+                type: extraCategory.tagValue,//'repair_cafe',
+                image: "https://www.repaircafe.org/wp-content/uploads/2021/05/logo-repair-cafe-2.png", //"https://repairtogether.restarters.net/images/logos/repairtogether.png",
+                name: element['name'],
+                description: element['external_link'],
+                location: new GeolocationCoords(parseFloat(element['coordinate'].split(",")[1]),parseFloat(element['coordinate'].split(",")[0]))
               }
             });
-	    }
+          }
+          else if (key === 'VOL') { //elements[2]
+            tmpExtraCategories['VOL']['markers'] = elements[2].filter(element =>
+              element['ad'] != null && element['activity_place'] != null
+            ).map(element => {
+            //console.log(element);
+              return {
+                id: element['ad']['nid'], 
+                type: extraCategory.tagValue,//'volunteer-offer
+                image: "https://www.levolontariat.be/themes/custom/volontariat_theme/images/logo-print.svg", 
+                name: element['ad']['title']+' - '+element['group']['label'],
+                //we store categories and date as a formatted string, not ideal (should be vue formatting data)
+                description: this.getVolunteerCategories(element['hobbies']) + ' ('+ this.$t('published') +' ' + this.$t('on-day') + ' ' + formattedDate(new Date(element['ad']['changed']*1000),this.$i18n.locale) + ')',
+                website: 'https://www.levolontariat.be/node/'+element['ad']['nid'],
+                location: new GeolocationCoords(parseFloat(element['activity_place']['lng']),parseFloat(element['activity_place']['lat']))
+              }
+            });
+          }
+          else{
+            const allOsmElements = elements[3];
+            const tagValue = extraCategory.tagValue; 
+            const tagKey = this.extraLayersTagsOverpass[tagValue];
 
-	    else if (key === 'VOL') { //elements[2]
-		tmpExtraCategories['VOL']['markers'] = elements[2].filter(element =>
-                element['ad'] != null && element['activity_place'] != null
-		).map(element => {
-		    //console.log(element);
-		    return {
-			id: element['ad']['nid'], 
-			type: extraCategory.tagValue,//'volunteer-offer
-			image: "https://www.levolontariat.be/themes/custom/volontariat_theme/images/logo-print.svg", 
-			name: element['ad']['title']+' - '+element['group']['label'],
-			//we store categories and date as a formatted string, not ideal (should be vue formatting data)
-			description: this.getVolunteerCategories(element['hobbies']) + ' ('+ this.$t('published') +' ' + this.$t('on-day') + ' ' + formattedDate(new Date(element['ad']['changed']*1000),this.$i18n.locale) + ')',
-			website: 'https://www.levolontariat.be/node/'+element['ad']['nid'],
-			location: new GeolocationCoords(parseFloat(element['activity_place']['lng']),parseFloat(element['activity_place']['lat']))
-		    }
-		});
-	    }
-
-	    else { // OSM elements [3...]
-		const opKey = Object.keys(this.extraLayersTagsOverpass).indexOf(extraCategory.tagValue);
-            if (opKey !== -1) {
-              tmpExtraCategories[key]['markers'] = elements[opKey + 3].filter(element =>
-                  element['id'] != null && element['lat'] != null && element['lon'] != null
-              ).map(element => {
-                return {
-                  id: element['id'],
-                  type: extraCategory.tagValue,
-                  name: element['tags']['name'],
-                  location: new GeolocationCoords(element['lon'], element['lat']),
-		  opening_hours: element['tags']['opening_hours'],
-		  website: element['tags']['website'],
-                  image: element['tags']['panoramax'] != null ? "https://api.panoramax.xyz/api/pictures/"+element['tags']['panoramax']+"/thumb.jpg" : element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
-                }
-              });
-            }
+            tmpExtraCategories[key]['markers'] = allOsmElements.filter(element => {
+              return (
+                element['id'] != null && 
+                element['lat'] != null && 
+                element['lon'] != null &&
+                element['tags'] && 
+                element['tags'][tagKey] === tagValue
+              );
+            }).map(element => {
+              return {
+                id: element['id'],
+                type: tagValue,
+                name: element['tags']['name'],
+                location: new GeolocationCoords(element['lon'], element['lat']),
+                opening_hours: element['tags']['opening_hours'],
+                website: element['tags']['website'],
+                image: element['tags']['panoramax'] != null ? "https://api.panoramax.xyz/api/pictures/"+element['tags']['panoramax']+"/thumb.jpg" : element['tags']['image:0'] != null ? element['tags']['image:0'] : element['tags']['image'],
+              }
+            });
           }
         }
         this.extraCategories = tmpExtraCategories;
@@ -1010,10 +1008,33 @@ export default {
               return [];
 	  }
       },
-      
-      
+      //Single request overpass
+      async getOverPass(){
+        try{
+          const overpass = {...this.extraLayersTagsOverpass};
+          const bounds = `${this.bounds.pad(0.5).getSouth()},${this.bounds.pad(0.5).getWest()},${this.bounds.pad(0.5).getNorth()},${this.bounds.pad(0.5).getEast()}`;
+          let nodeQuery = "(";
+          for(const[key, value] of Object.entries(overpass)){
+            nodeQuery += `node["${value}"="${key}"](${bounds});`;
+          }
+          nodeQuery += ");";
+          const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+
+          const baseURL = "https://overpass-api.de/api";
+          
+          return (await axios.get("/interpreter", {
+            params: {data}, 
+            baseURL,
+            timeout: 50000
+          })).data['elements'];
+        }catch(error){
+          console.log(error);
+          return [];
+        }
+      },
+      //Should we remove it ?
       async getOverPassElements(tagValue) {
-	  try {
+        try {
               const bounds = `${this.bounds.getSouth()},${this.bounds.getWest()},${this.bounds.getNorth()},${this.bounds.getEast()}`;
               const nodeQuery = `node["${this.extraLayersTagsOverpass[tagValue]}"="${tagValue}"](${bounds});`;
               const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
@@ -1028,9 +1049,19 @@ export default {
               return [];
 	  }
     },
+    //check if the area is on the boundsLoaded area
+    boundsCheck(){
+      if(this.boundsLoaded === null){return false;}
+
+      return this.boundsLoaded.contains(this.bounds);
+    },
     async boundsUpdated() {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
+      if (this.boundsCheck()) {
+        return;
+      }
+      else{
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
@@ -1043,11 +1074,11 @@ export default {
         }
 
         if (this.isAuthenticated) {
-	    await this.fetchItems(this.filteredQueryValues);
-	}
-	else {
-	    this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
-	}
+	        await this.fetchItems(this.filteredQueryValues);
+        }
+        else {
+          this.snackbarError(this.$t('better_if_connected'),{timeout:3000});
+        }
 
         if (!this.initialItemsLoadDone) {
           if (this.itemId !== null && !this.routedItemError) {
@@ -1061,7 +1092,14 @@ export default {
 
         await this.fetchExtraLayersMakers();
 
+        const nw = this.bounds.getNorthWest();
+        const se = this.bounds.getSouthEast();
+        this.boundsLoaded = L.latLngBounds(
+          L.latLng(nw.lat, nw.lng),
+          L.latLng(se.lat, se.lng)
+        );
         this.mapLoading = false;
+      }
       }, 600);
     },
     async fetchMathElements() {
@@ -1085,6 +1123,10 @@ export default {
           flap.style.left = "calc(100% - " + flap.style.width + " - 0.5rem)";
         }
       }
+    },
+    onMapReady(map){
+      this.bounds = map.getBounds();
+      this.boundsUpdated();
     },
   }
 }
