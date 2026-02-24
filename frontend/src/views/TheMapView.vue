@@ -1053,19 +1053,17 @@ export default {
     boundsCheck(){
       if(this.boundsLoaded === null){return false;}
 
-      return (
-        this.bounds.getNorthWest().lng >= this.boundsLoaded.getNorthWest().lng &&
-        this.bounds.getNorthWest().lat <= this.boundsLoaded.getNorthWest().lat &&
-        this.bounds.getSouthEast().lng <= this.boundsLoaded.getSouthEast().lng &&
-        this.bounds.getSouthEast().lat >= this.boundsLoaded.getSouthEast().lat);
+      return this.boundsLoaded.contains(this.bounds);
     },
     async boundsUpdated() {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
       if (this.boundsCheck()) {
+        console.log("true");
         return;
       }
       else{
+        console.log("false");
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
