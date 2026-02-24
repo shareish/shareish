@@ -1059,11 +1059,9 @@ export default {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
       if (this.boundsCheck()) {
-        console.log("true");
         return;
       }
       else{
-        console.log("false");
         this.mapLoading = true;
 
         const NWCoords = [this.bounds.getNorthWest().lng, this.bounds.getNorthWest().lat];
