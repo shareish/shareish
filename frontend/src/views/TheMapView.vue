@@ -6,6 +6,7 @@
           ref="map"
           :center.sync="leafletCenter"
           :zoom.sync="zoom"
+          :bounds.sync="bounds"
           @contextmenu="addMarker"
           @update:bounds="boundsUpdated"
           @ready="onMapReady"
@@ -327,8 +328,8 @@ export default {
       lastZoom: 15, //lastZoom bigger than zoom for the first updateBounds
       newmarker: [0, 0], //window middle?
       newPopupOptions: {autoPan: false, maxWidth: '200'},
-
       bounds: null,
+      boundsLoaded: null,
       searchBounds: null,
       geoLocation: null,
       refLocation: null,
@@ -1048,12 +1049,20 @@ export default {
               return [];
 	  }
     },
+    //check if the area is on the boundsLoaded area
+    boundsCheck(){
+      if(this.boundsLoaded === null){return false;}
+
+      return (
+        this.bounds.getNorthWest().lng >= this.boundsLoaded.getNorthWest().lng &&
+        this.bounds.getNorthWest().lat <= this.boundsLoaded.getNorthWest().lat &&
+        this.bounds.getSouthEast().lng <= this.boundsLoaded.getSouthEast().lng &&
+        this.bounds.getSouthEast().lat >= this.boundsLoaded.getSouthEast().lat);
+    },
     async boundsUpdated() {
       clearTimeout(this.timeouts['boundsUpdated']);
       this.timeouts['boundsUpdated'] = setTimeout(async () => {
-      const isZoomUpdated = this.lastZoom < this.zoom;
-      this.lastZoom = this.zoom;
-      if (isZoomUpdated) {
+      if (this.boundsCheck()) {
         return;
       }
       else{
@@ -1087,6 +1096,12 @@ export default {
 
         await this.fetchExtraLayersMakers();
 
+        const nw = this.bounds.getNorthWest();
+        const se = this.bounds.getSouthEast();
+        this.boundsLoaded = L.latLngBounds(
+          L.latLng(nw.lat, nw.lng),
+          L.latLng(se.lat, se.lng)
+        );
         this.mapLoading = false;
       }
       }, 600);
