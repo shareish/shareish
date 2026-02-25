@@ -155,6 +155,34 @@
         </template>
       </b-field>
     </div>
+    <div class="box">
+      <b-field key="notif_preferedLanguage" horizontal>
+        <template #label>
+          <b-tooltip :label="$t('help_notif_language')" class="frequency_label" multilined position="is-right">
+            {{ $t('notif_preferedLanguage') }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </template>
+        <template v-if="windowWidth >= 1024">
+          <b-radio-button
+              v-for="{key, translationKey, color} in GeneralInfoLanguages"
+              :key="key"
+              v-model="radioGroups['notif_preferedLanguage']"
+              :native-value="key"
+              :type="color"
+          >
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
+        </template>
+        <template v-else>
+          <b-select v-model="radioGroups['notif_preferedLanguage']" expanded placeholder="Select a prefered language">
+            <option v-for="{key, translationKey} in GeneralInfoLanguages" :key="key" :value="key">
+              {{ $t(translationKey) }}
+            </option>
+          </b-select>
+        </template>
+      </b-field>
+    </div>
     <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save" />
   </section>
 </template>
@@ -196,9 +224,11 @@ export default {
         'notif_items': String,
         'notif_osm': String,
         'notif_generalinfo': String,
+        'notif_preferedLanguage': String,
       },
       waitingFormResponse: false,
-      timeouts: {}
+      timeouts: {},
+      preferedLanguage: "",
     }
   },
   async created() {
@@ -444,10 +474,23 @@ export default {
           color: 'is-danger'
         }
       ];
+    },
+    GeneralInfoLanguages() {
+      return [
+        {
+          key: 'en',
+          translationKey: 'language-en',
+          color: 'is-primary'
+        },
+        {
+          key: 'fr',
+          translationKey: 'language-fr',
+          color: 'is-info'
+        },
+      ];
     }
-      
   }
-};
+}
 </script>
 
 <style scoped>
