@@ -555,5 +555,5 @@
   "url": "External link",
   "help_item_url": "Enter the URL of an external website describing this item, e.g., the official page of the organizers for an event.",
   "help_notif_language": "Choose the language in which you prefer to receive your emails and notifications",
-  "notif_preferedLanguage": "Prefered language"
+  "preferred_language": "Prefered language"
 }

@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.utils.translation import override
+from django.utils.translation import gettext as _
+
 
 from mail_templated import EmailMessage
 
@@ -193,66 +196,70 @@ def _prepare_mail_notif_conversations(user, frequency: MailNotificationFrequenci
     unread_messages, n = _get_unread_messages(user)
 
     if n > 0:
-        if frequency == MailNotificationFrequencies.DAILY:
-            digest = "Daily conversations digest"
-        else:
-            digest = "Recent conversations"
+        #context manager of user
+        with override(user.preferred_language):
+            if frequency == MailNotificationFrequencies.DAILY:
+                #_ replace gettext (:12)
+                digest = _("Daily conversations digest")
+            else:
+                digest = _("Recent conversations")
 
-        context = {
-            "digest": digest,
-            "n": n,
-            "user": user,
-            "unread_messages": unread_messages,
-            "app_url": settings.APP_URL,
-            "to_show": to_show['conversations']
-        }
+            context = {
+                "digest": digest,
+                "n": n,
+                "user": user,
+                "unread_messages": unread_messages,
+                "app_url": settings.APP_URL,
+                "to_show": to_show['conversations']
+            }
 
-        email = EmailMessage(
-            'emails/notif_digest_conversations.tpl',
-            context,
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            connection=connection
-        )
+            email = EmailMessage(
+                'emails/notif_digest_conversations.tpl',
+                context,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                connection=connection
+            )
 
-        if not email.is_rendered:
-            email.render()
+            if not email.is_rendered:
+                email.render()
 
-        return email
+            return email
 
 
 def _prepare_mail_notif_events(user, frequency: MailNotificationFrequencies, connection):
     new_events, n = _get_last_new_events_near_user(user, frequency)
 
     if n > 0:
-        if frequency == MailNotificationFrequencies.DAILY:
-            digest = "Daily events digest"
-        elif frequency == MailNotificationFrequencies.WEEKLY:
-            digest = "Weekly events digest"
-        else:
-            digest = "Recent events"
+        with override(user.preferred_language):
+            if frequency == MailNotificationFrequencies.DAILY:
+                digest = _("Daily events digest")
+            elif frequency == MailNotificationFrequencies.WEEKLY:
+                digest = _("Weekly events digest")
+            else:
+                digest = _("Recent events")
 
-        context = {
-            "digest": digest,
-            "n": n,
-            "user": user,
-            "new_events": new_events,
-            "app_url": settings.APP_URL,
-            "to_show": to_show['events']
-        }
+            context = {
+                "digest": digest,
+                "n": n,
+                "user": user,
+                "new_events": new_events,
+                "app_url": settings.APP_URL,
+                "to_show": to_show['events']
+            }
 
-        email = EmailMessage(
-            'emails/notif_digest_events.tpl',
-            context,
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            connection=connection
-        )
+            email = EmailMessage(
+                'emails/notif_digest_events.tpl',
+                context,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                connection=connection
+            )
 
-        if not email.is_rendered:
-            email.render()
+            if not email.is_rendered:
+                email.render()
 
-        return email
+            return email
 
 
 def _prepare_mail_notif_norefloc(user, frequency: MailNotificationFrequencies, connection):
@@ -341,71 +348,73 @@ def _get_last_new_osm_items_near_user(user, frequency: MailNotificationFrequenci
 def _prepare_mail_notif_osm(user, frequency: MailNotificationFrequencies, connection):
     new_items, n = _get_last_new_osm_items_near_user(user, frequency)
     if n > 0:
-        print("we have to send an email with new osm items")
-        if frequency == MailNotificationFrequenciesOSM.DAILY:
-            digest = "Daily public resources digest"
-        elif frequency == MailNotificationFrequenciesOSM.WEEKLY:
-            digest = "Weekly public resources digest"
-        elif frequency == MailNotificationFrequenciesOSM.MONTHLY:
-            digest = "Monthly public resources digest"
-        else:
-            digest = "Recent items"
-        context = {
-            "n": n,
-            "digest": digest,
-            "user": user,
-            "new_items": new_items,
-            "app_url": settings.APP_URL,
-            "to_show": to_show['osm']
-        }
+        with override(user.preferred_language):
+            print("we have to send an email with new osm items")
+            if frequency == MailNotificationFrequenciesOSM.DAILY:
+                digest = _("Daily public resources digest")
+            elif frequency == MailNotificationFrequenciesOSM.WEEKLY:
+                digest = _("Weekly public resources digest")
+            elif frequency == MailNotificationFrequenciesOSM.MONTHLY:
+                digest = _("Monthly public resources digest")
+            else:
+                digest = _("Recent items")
+            context = {
+                "n": n,
+                "digest": digest,
+                "user": user,
+                "new_items": new_items,
+                "app_url": settings.APP_URL,
+                "to_show": to_show['osm']
+            }
 
-        email = EmailMessage(
-            'emails/notif_digest_osm_items.tpl',
-            context,
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            connection=connection
-        )
+            email = EmailMessage(
+                'emails/notif_digest_osm_items.tpl',
+                context,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                connection=connection
+            )
 
-        if not email.is_rendered:
-            email.render()
+            if not email.is_rendered:
+                email.render()
 
-        return email
+            return email
 
     
 def _prepare_mail_notif_items(user, frequency: MailNotificationFrequencies, connection):
     new_items, n = _get_last_new_items_near_user(user, frequency)
 
     if n > 0:
-        if frequency == MailNotificationFrequencies.DAILY:
-            digest = "Daily items digest"
-        elif frequency == MailNotificationFrequencies.WEEKLY:
-            digest = "Weekly items digest"
-        else:
-            digest = "Recent items"
+        with override(user.preferred_language):
+            if frequency == MailNotificationFrequencies.DAILY:
+                digest = _("Daily items digest")
+            elif frequency == MailNotificationFrequencies.WEEKLY:
+                digest = _("Weekly items digest")
+            else:
+                digest = _("Recent items")
 
-        context = {
-            "digest": digest,
-            "n": n,
-            "user": user,
-            "new_items": new_items,
-            "app_url": settings.APP_URL,
-            "item_types": item_types,
-            "to_show": to_show['items']
-        }
+            context = {
+                "digest": digest,
+                "n": n,
+                "user": user,
+                "new_items": new_items,
+                "app_url": settings.APP_URL,
+                "item_types": item_types,
+                "to_show": to_show['items']
+            }
 
-        email = EmailMessage(
-            'emails/notif_digest_items.tpl',
-            context,
-            settings.EMAIL_HOST_USER,
-            [user.email],
-            connection=connection
-        )
+            email = EmailMessage(
+                'emails/notif_digest_items.tpl',
+                context,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                connection=connection
+            )
 
-        if not email.is_rendered:
-            email.render()
+            if not email.is_rendered:
+                email.render()
 
-        return email
+            return email
 
 
 def send_mail_recover_account(user, token):

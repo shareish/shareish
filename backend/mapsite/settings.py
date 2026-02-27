@@ -226,6 +226,11 @@ ALLOWED_PROXY_HOSTS = [
 DOMAIN = APP_DOMAIN
 SITE_NAME = 'Shareish'
 
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'PASSWORD_RESET_CONFIRM_URL': 'reset-password/confirm/{uid}/{token}',
