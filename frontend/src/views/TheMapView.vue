@@ -790,7 +790,6 @@ export default {
             tmpExtraCategories['VOL']['markers'] = elements[2].filter(element =>
               element['ad'] != null && element['activity_place'] != null
             ).map(element => {
-            //console.log(element);
               return {
                 id: element['ad']['nid'], 
                 type: extraCategory.tagValue,//'volunteer-offer
@@ -1091,13 +1090,17 @@ export default {
         }
 
         await this.fetchExtraLayersMakers();
-
-        const nw = this.bounds.getNorthWest();
-        const se = this.bounds.getSouthEast();
-        this.boundsLoaded = L.latLngBounds(
+        if(this.zoom >= this.minZoomToShowElements){
+         const nw = this.bounds.getNorthWest();
+          const se = this.bounds.getSouthEast();
+          this.boundsLoaded = L.latLngBounds(
           L.latLng(nw.lat, nw.lng),
           L.latLng(se.lat, se.lng)
-        );
+        ); 
+        }else{
+          this.boundsLoaded = null;
+        }
+        
         this.mapLoading = false;
       }
       }, 600);
