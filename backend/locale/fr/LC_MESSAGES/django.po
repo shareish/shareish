@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Shareish 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-27 10:42+0100\n"
+"POT-Creation-Date: 2026-03-02 13:55+0100\n"
 "PO-Revision-Date: 2026-02-27 11:00+0100\n"
 "Last-Translator: Gemini\n"
 "Language-Team: French\n"
@@ -277,19 +277,25 @@ msgstr "Non résolu"
 #: mymap/templates/emails/activation.html:4
 #, python-format
 msgid "%(site_name)s solidarity platform - Please confirm account creation"
-msgstr "Plateforme solidaire %(site_name)s - Veuillez confirmer la création de votre compte"
+msgstr ""
+"Plateforme solidaire %(site_name)s - Veuillez confirmer la création de votre "
+"compte"
 
 #: mymap/templates/emails/activation.html:8
 #, python-format
 msgid ""
 "Hello, You're receiving this email because an account creation was initiated "
 "on %(site_name)s and you need to finish the activation process."
-msgstr "Bonjour, Vous recevez cet e-mail car une création de compte a été initiée sur %(site_name)s et vous devez terminer le processus d'activation."
+msgstr ""
+"Bonjour, Vous recevez cet e-mail car une création de compte a été initiée "
+"sur %(site_name)s et vous devez terminer le processus d'activation."
 
 #: mymap/templates/emails/activation.html:10
 #: mymap/templates/emails/activation.html:21
 msgid "Please go to the following page to confirm and activate your account:"
-msgstr "Veuillez vous rendre sur la page suivante pour confirmer et activer votre compte :"
+msgstr ""
+"Veuillez vous rendre sur la page suivante pour confirmer et activer votre "
+"compte :"
 
 #: mymap/templates/emails/activation.html:13
 #: mymap/templates/emails/activation.html:24
@@ -309,14 +315,17 @@ msgstr "L'équipe %(site_name)s"
 msgid ""
 "Hello,<br><br> You're receiving this email because an account creation was "
 "initiated on %(site_name)s and you need to finish the activation process."
-msgstr "Bonjour,<br><br> Vous recevez cet e-mail car une création de compte a été initiée sur %(site_name)s et vous devez terminer le processus d'activation."
+msgstr ""
+"Bonjour,<br><br> Vous recevez cet e-mail car une création de compte a été "
+"initiée sur %(site_name)s et vous devez terminer le processus d'activation."
 
 #: mymap/templates/emails/confirmation.html:4
 #, python-format
 msgid ""
 "%(site_name)s solidarity platform - Your account has been successfully "
 "activated!"
-msgstr "Plateforme solidaire %(site_name)s - Votre compte a été activé avec succès !"
+msgstr ""
+"Plateforme solidaire %(site_name)s - Votre compte a été activé avec succès !"
 
 #: mymap/templates/emails/confirmation.html:8
 #, python-format
@@ -327,7 +336,14 @@ msgid ""
 "notification to configure notifications when new content is created in your "
 "neighbourdhood. You can also provide more details about yourself here: "
 "%(protocol)s://%(domain)s/settings/profile ."
-msgstr "Bonjour, Votre compte %(site_name)s a été créé et est prêt à être utilisé, veuillez vous connecter sur : %(protocol)s://%(domain)s/log-in ! Nous vous invitons à modifier votre profil et vos paramètres ici : %(protocol)s://%(domain)s/settings/notification pour configurer les notifications lorsque du nouveau contenu est créé dans votre quartier. Vous pouvez également fournir plus de détails sur vous ici : %(protocol)s://%(domain)s/settings/profile ."
+msgstr ""
+"Bonjour, Votre compte %(site_name)s a été créé et est prêt à être utilisé, "
+"veuillez vous connecter sur : %(protocol)s://%(domain)s/log-in ! Nous vous "
+"invitons à modifier votre profil et vos paramètres ici : %(protocol)s://"
+"%(domain)s/settings/notification pour configurer les notifications lorsque "
+"du nouveau contenu est créé dans votre quartier. Vous pouvez également "
+"fournir plus de détails sur vous ici : %(protocol)s://%(domain)s/settings/"
+"profile ."
 
 #: mymap/templates/emails/confirmation.html:10
 #: mymap/templates/emails/confirmation.html:18
@@ -346,4 +362,93 @@ msgid ""
 "new content is created in your neighbourdhood. You can also provide more "
 "details about yourself here: <a href=\"%(protocol)s://%(domain)s/settings/"
 "profile\">%(protocol)s://%(domain)s/settings/profile</a>. "
-msgstr "Bonjour,<br><br>Votre compte %(site_name)s a été créé et est prêt à être utilisé, veuillez vous connecter à l'adresse suivante : <a href=\"%(protocol)s://%(domain)s/log-in\">%(protocol)s://%(domain)s/log-in</a> ! <br><br>Ensuite, nous vous invitons à <b>modifier votre profil et vos paramètres</b> (menu \"Compte\" en haut à droite) ici : <a href=\"%(protocol)s://%(domain)s/settings/notifications\">%(protocol)s://%(domain)s/settings/notifications</a> pour <b>configurer les notifications</b> lorsque de nouveaux contenus sont créés dans votre voisinage. Vous pouvez également fournir plus de détails sur vous ici : <a href=\"%(protocol)s://%(domain)s/settings/profile\">%(protocol)s://%(domain)s/settings/profile</a>. "
+msgstr ""
+"Bonjour,<br><br>Votre compte %(site_name)s a été créé et est prêt à être "
+"utilisé, veuillez vous connecter à l'adresse suivante : <a href="
+"\"%(protocol)s://%(domain)s/log-in\">%(protocol)s://%(domain)s/log-in</a> ! "
+"<br><br>Ensuite, nous vous invitons à <b>modifier votre profil et vos "
+"paramètres</b> (menu \"Compte\" en haut à droite) ici : <a href="
+"\"%(protocol)s://%(domain)s/settings/notifications\">%(protocol)s://"
+"%(domain)s/settings/notifications</a> pour <b>configurer les notifications</"
+"b> lorsque de nouveaux contenus sont créés dans votre voisinage. Vous pouvez "
+"également fournir plus de détails sur vous ici : <a href=\"%(protocol)s://"
+"%(domain)s/settings/profile\">%(protocol)s://%(domain)s/settings/profile</"
+"a>. "
+
+#: mymap/templates/emails/recover_account.tpl:4
+msgid "[Shareish] Recover your account"
+msgstr "[Shareish] Récuperer votre compte"
+
+#: mymap/templates/emails/recover_account.tpl:7
+#: mymap/templates/emails/recover_account.tpl:26
+#, python-format
+msgid "Dear %(name)s,"
+msgstr "Chère %(name)s,"
+
+#: mymap/templates/emails/recover_account.tpl:9
+#: mymap/templates/emails/recover_account.tpl:28
+msgid ""
+"We have received a request to recover your account. If you made this "
+"request, please click the link below to recover your account:"
+msgstr ""
+"Nous avons reçu une demande de récupération de votre compte. Si vous "
+"avez effectué cette demande, veuillez cliquer sur le lien ci-dessous:"
+
+#: mymap/templates/emails/recover_account.tpl:13
+#: mymap/templates/emails/recover_account.tpl:32
+msgid ""
+"If you did not make this request, you can safely ignore this email. Your "
+"account is safe and secure, and no unauthorized parties have gained access "
+"to your account or password."
+msgstr ""
+"Si vous n'avez pas fait cette requête, vous pouvez ignorer ce mail. Votre"
+"compote ne présente aucun problème de sécurité et personne d'autres que vous n'a accès"
+"à votre identifiants."
+
+#: mymap/templates/emails/recover_account.tpl:15
+#: mymap/templates/emails/recover_account.tpl:35
+#: mymap/templates/emails/start_delete_account_process.tpl:19
+#: mymap/templates/emails/start_delete_account_process.tpl:44
+msgid "Best regards,"
+msgstr "Cordialement,"
+
+#: mymap/templates/emails/recover_account.tpl:16
+#: mymap/templates/emails/recover_account.tpl:36
+msgid "The Shareish team."
+msgstr "L'équipe Shareish"
+
+#: mymap/templates/emails/start_delete_account_process.tpl:7
+#, python-format
+msgid "[%(site_name)s] Start the deletion process of your account"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:11
+#: mymap/templates/emails/start_delete_account_process.tpl:40
+msgid "Dear"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:13
+msgid ""
+"We have received your request to delete your account. If you made this "
+"request, please click the link below to confirm your account deletion:"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:17
+#: mymap/templates/emails/start_delete_account_process.tpl:43
+msgid ""
+"If you did not make this request, please consider improve your account "
+"security by changing your password. As of now, your account will not be "
+"deleted."
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:20
+#: mymap/templates/emails/start_delete_account_process.tpl:44
+msgid "The Shareish Team."
+msgstr "Sur Shareish"
+
+#: mymap/templates/emails/start_delete_account_process.tpl:41
+msgid ""
+"We have received your request to delete your account. If you made this "
+"request, please click the link below to start the deletion process of your "
+"account:"
+msgstr ""
