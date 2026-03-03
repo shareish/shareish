@@ -335,11 +335,9 @@ export default {
       refLocation: null,
       filteredQueryValues: {},
       builtURLParams: {},
-
       initialItemsLoadDone: false,
       user: {},
       itemId: null,
-
       tileProviders: [
         {
           name: this.$t('tilemap_osm_humanitarian'),
@@ -386,12 +384,10 @@ export default {
         },
 
       ],
-
       geosearchOptions: {
         provider: new OpenStreetMapProvider(),
         searchLabel: this.$t('search_address'),
       },
-
       markerClusterGroupOptions: {
         chunkedLoading: true,
         maxClusterRadius: 15,
@@ -449,28 +445,28 @@ export default {
           markers: [],
           tagValue: 'soup_kitchen'
         },
-	'REP': {
-	    id: 'repair-cafes',
-            markers: [],
-            tagValue: 'repair_cafe'
-	},
-	'VOL': {
-	    id: 'volunteer-offers',
-            markers: [],
-            tagValue: 'volunteer_offer'
-	},
+	      'REP': {
+          id: 'repair-cafes',
+          markers: [],
+          tagValue: 'repair_cafe'
+        },
+        'VOL': {
+          id: 'volunteer-offers',
+          markers: [],
+          tagValue: 'volunteer_offer'
+        },
       },
-	extraLayersTagsOverpass: {
-            'public_bookcase': 'amenity',
-            'defibrillator': 'emergency',
-            'give_box': 'amenity',
-            'food_bank': 'social_facility',
-            'food_sharing': 'amenity',
-            'soup_kitchen': 'social_facility',
-            'drinking_water': 'amenity',
-            'freeshop': 'amenity'
-	},
-	extraCategoriesIcons: {
+      extraLayersTagsOverpass: {
+        'public_bookcase': 'amenity',
+        'defibrillator': 'emergency',
+        'give_box': 'amenity',
+        'food_bank': 'social_facility',
+        'food_sharing': 'amenity',
+        'soup_kitchen': 'social_facility',
+        'drinking_water': 'amenity',
+        'freeshop': 'amenity'
+      },
+      extraCategoriesIcons: {
         'bookcases': publicBookcaseIcon,
         'defibrillators': aedIcon,
         'give-boxes': giveBoxIcon,
@@ -480,8 +476,8 @@ export default {
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon,
-	    'repair-cafes': repairCafeIcon,
-	    'volunteer-offers': volunteerIcon,
+        'repair-cafes': repairCafeIcon,
+        'volunteer-offers': volunteerIcon,
       },
       itemTypeIcons: {
         'DN': greenIcon,
@@ -494,9 +490,13 @@ export default {
       addIcon: addIcon,
       routedItemLocation: null,
       items: [],
-
       routedItemError: false,
-      timeouts: {}
+      timeouts: {},
+      baseURL: [ //URL from https://wiki.openstreetmap.org/wiki/Overpass_API
+        'https://overpass-api.de/api',
+        'https://maps.mail.ru/osm/tools/overpass/api',
+        'https://overpass.private.coffee/api',
+      ],
     }
   },
   async created() {
@@ -1019,9 +1019,7 @@ export default {
         nodeQuery += ");";
         const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
 
-        const baseURL = ["https://overpass-api.de/api", "https://overpass.kumi.systems/api", "https://maps.mail.ru/osm/tools/overpass/api"];
-        
-        for(const url of baseURL){
+        for(const url of this.baseURL){
           try{
             const response = await axios.get("/interpreter", {
               params: {data}, 
