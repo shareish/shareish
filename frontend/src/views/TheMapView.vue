@@ -335,11 +335,9 @@ export default {
       refLocation: null,
       filteredQueryValues: {},
       builtURLParams: {},
-
       initialItemsLoadDone: false,
       user: {},
       itemId: null,
-
       tileProviders: [
         {
           name: this.$t('tilemap_osm_humanitarian'),
@@ -386,12 +384,10 @@ export default {
         },
 
       ],
-
       geosearchOptions: {
         provider: new OpenStreetMapProvider(),
         searchLabel: this.$t('search_address'),
       },
-
       markerClusterGroupOptions: {
         chunkedLoading: true,
         maxClusterRadius: 15,
@@ -449,28 +445,28 @@ export default {
           markers: [],
           tagValue: 'soup_kitchen'
         },
-	'REP': {
-	    id: 'repair-cafes',
-            markers: [],
-            tagValue: 'repair_cafe'
-	},
-	'VOL': {
-	    id: 'volunteer-offers',
-            markers: [],
-            tagValue: 'volunteer_offer'
-	},
+	      'REP': {
+          id: 'repair-cafes',
+          markers: [],
+          tagValue: 'repair_cafe'
+        },
+        'VOL': {
+          id: 'volunteer-offers',
+          markers: [],
+          tagValue: 'volunteer_offer'
+        },
       },
-	extraLayersTagsOverpass: {
-            'public_bookcase': 'amenity',
-            'defibrillator': 'emergency',
-            'give_box': 'amenity',
-            'food_bank': 'social_facility',
-            'food_sharing': 'amenity',
-            'soup_kitchen': 'social_facility',
-            'drinking_water': 'amenity',
-            'freeshop': 'amenity'
-	},
-	extraCategoriesIcons: {
+      extraLayersTagsOverpass: {
+        'public_bookcase': 'amenity',
+        'defibrillator': 'emergency',
+        'give_box': 'amenity',
+        'food_bank': 'social_facility',
+        'food_sharing': 'amenity',
+        'soup_kitchen': 'social_facility',
+        'drinking_water': 'amenity',
+        'freeshop': 'amenity'
+      },
+      extraCategoriesIcons: {
         'bookcases': publicBookcaseIcon,
         'defibrillators': aedIcon,
         'give-boxes': giveBoxIcon,
@@ -480,8 +476,8 @@ export default {
         'food-banks': foodBankIcon,
         'soup-kitchens': soupKitchenIcon,
         'falling-fruits': fallingfruitIcon,
-	    'repair-cafes': repairCafeIcon,
-	    'volunteer-offers': volunteerIcon,
+        'repair-cafes': repairCafeIcon,
+        'volunteer-offers': volunteerIcon,
       },
       itemTypeIcons: {
         'DN': greenIcon,
@@ -494,9 +490,13 @@ export default {
       addIcon: addIcon,
       routedItemLocation: null,
       items: [],
-
       routedItemError: false,
-      timeouts: {}
+      timeouts: {},
+      baseURL: [ //URL from https://wiki.openstreetmap.org/wiki/Overpass_API
+        'https://overpass-api.de/api',
+        'https://maps.mail.ru/osm/tools/overpass/api',
+        'https://overpass.private.coffee/api',
+      ],
     }
   },
   async created() {
@@ -1008,29 +1008,33 @@ export default {
 	  }
       },
       //Single request overpass
-      async getOverPass(){
-        try{
-          const overpass = {...this.extraLayersTagsOverpass};
-          const bounds = `${this.bounds.pad(0.5).getSouth()},${this.bounds.pad(0.5).getWest()},${this.bounds.pad(0.5).getNorth()},${this.bounds.pad(0.5).getEast()}`;
-          let nodeQuery = "(";
-          for(const[key, value] of Object.entries(overpass)){
-            nodeQuery += `node["${value}"="${key}"](${bounds});`;
-          }
-          nodeQuery += ");";
-          const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
-
-          const baseURL = "https://overpass-api.de/api";
-          
-          return (await axios.get("/interpreter", {
-            params: {data}, 
-            baseURL,
-            timeout: 50000
-          })).data['elements'];
-        }catch(error){
-          console.log(error);
-          return [];
+       async getOverPass(){
+        const overpass = {...this.extraLayersTagsOverpass};
+        const bounds = `${this.bounds.pad(0.5).getSouth()},${this.bounds.pad(0.5).getWest()},${this.bounds.pad(0.5).getNorth()},${this.bounds.pad(0.5).getEast()}`;
+        let nodeQuery = "(";
+        for(const[key, value] of Object.entries(overpass)){
+          nodeQuery += `node["${value}"="${key}"](${bounds});`;
         }
+        nodeQuery += ");";
+        const data = `[out:json][timeout:15];(${nodeQuery});out body geom;`;
+
+        for(const url of this.baseURL){
+          try{
+            const response = await axios.get("/interpreter", {
+              params: {data}, 
+              baseURL: url,
+              timeout: 20000 
+            });
+
+            return response.data['elements'];
+          }catch(error){
+            console.log(`le serveur ${url} est inaccessible`);
+          }
+        }
+        console.log("Aucun serveur accessible");
+        return [];
       },
+
       //Should we remove it ?
       async getOverPassElements(tagValue) {
         try {
