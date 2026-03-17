@@ -959,9 +959,9 @@ export default {
     },
     async getFallingFruitElements() {
       try {
-        const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=EEQRBBUB&locale=' + this.$i18n.locale + '&muni=false';
-        const ffcoords = '&bounds=' + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
-        const ffURL = ffbaseURL + ffcoords;
+	  const ffbaseURL = 'https://fallingfruit.org/api/0.3/locations?api_key=48aa85bd5a23b892de4867ec848bcc99&locale=' + this.$i18n.locale + '&muni=false';
+          const ffcoords = '&bounds=' + this.bounds.getSouthWest().lat + ',' + this.bounds.getSouthWest().lng + '|' + this.bounds.getNorthEast().lat + ',' + this.bounds.getNorthEast().lng;
+          const ffURL = ffbaseURL + ffcoords;
         return (await axios.get(ffURL, {
           transformRequest: (data, headers) => {
             delete headers.common['Authorization'];
