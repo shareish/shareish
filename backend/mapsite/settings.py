@@ -228,8 +228,15 @@ CORS_ALLOW_ALL_ORIGINS = DEV
 CORS_ALLOWED_ORIGINS = [
     "http://ui",
     "http://localhost",
-    APP_URL
+    APP_URL,
 ]
+
+
+ALLOWED_PROXY_HOSTS = [
+    "www.repaircafe.org",
+    "www.levolontariat.be",
+]
+
 
 DOMAIN = APP_DOMAIN
 SITE_NAME = 'Shareish'
@@ -284,3 +291,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
 
+# Implements xss and mime sniffing protection
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True

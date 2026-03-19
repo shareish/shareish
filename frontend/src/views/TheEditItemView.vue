@@ -100,6 +100,23 @@
               </b-field>
             </div>
           </div>
+          <div>
+            <b-field label="Link">
+              <template #label>
+                  {{ $t('url') }}
+                  <b-tooltip :label="$t('help_item_url')" multilined position="is-right">
+                    <i class="icon far fa-question-circle"></i>
+                  </b-tooltip>
+              </template>
+              <b-input
+                type="url"
+                v-model="internalItem.url"
+                icon="link"
+                placeholder="https://shareish.org" 
+                >
+              </b-input>
+            </b-field>
+          </div>
           <div class="columns">
             <div class="column">
               <b-field>
@@ -124,7 +141,7 @@
                      <i class="fas fa-home"></i>
                    </b-button>
                 </b-tooltip>
-	        <b-input v-model="address" @input="addressUpdatedByUser" class="is-expanded ml-2" name="ref_location" type="text" />
+          <address-auto-complete @address-selected="handleSelect" :location="this.geoLocation" v-model="address" class="is-expanded ml-2" name="ref_location"/>
 		</b-field>
 	        <div class="is-flex is-justify-content-flex-end mb-3">
 		  <b-tooltip :label="$t('help_gps_coordinates')" multilined position="is-right">
@@ -284,7 +301,8 @@ import CategorySelector from "@/components/CategorySelector.vue";
 import ErrorHandler from "@/mixins/ErrorHandler";
 import moment from "moment/moment";
 import WindowSize from "@/mixins/WindowSize";
-import {GeolocationCoords} from "@/functions";
+import {GeolocationCoords,isEmptyString,isNotEmptyString} from "@/functions";
+import AddressAutoComplete  from "@/components/AddressAutoComplete.vue";
 
 export default {
   name: 'TheEditItemView',
@@ -292,7 +310,7 @@ export default {
   $_veeValidate: {
     validator: 'new'
   },
-  components: {CategorySelector},
+  components: {CategorySelector,AddressAutoComplete },
   data() {
     return {
       itemTypes: [
@@ -374,6 +392,14 @@ export default {
     }
   },
   watch: {
+    address(){
+      if(isEmptyString(this.address))
+      {
+        console.log("address cleared");
+        this.address_coords = null;
+        this.address_text = "";
+      }
+    },
     filesSelected() {
       if (this.filesSelected.length > 0) {
         if (this.imagesSlotsLeft) {
@@ -395,6 +421,11 @@ export default {
     }
   },
   methods: {
+    async handleSelect(){
+      console.log("address selected");
+      this.address_coords = await this.fetchAddressCoords(this.address);
+      this.address_text = await this.fetchAddress(this.address_coords);
+    },
     async fetchItem() {
       try {
         this.item = (await axios.get(`/api/v1/user_items/${this.itemId}`)).data;
@@ -440,6 +471,21 @@ export default {
         }
       }
     },
+    async fetchAddressCoords(address) {
+      if (isNotEmptyString(address)) {
+        try {
+          const formData = new FormData();
+          formData.append('address', address);
+          const location = (await axios.post("/api/v1/address", formData)).data;
+          if (location !== null)
+            return new GeolocationCoords(location);
+        }
+        catch (error) {
+          this.fullErrorHandling(error);
+        }
+      }
+      return null;
+    },
     async fetchAddressRefLoc() {
       try {
         const params = {
@@ -482,11 +528,14 @@ export default {
       }
       return null;
     },
-    updateAddressField() {
+    async updateAddressField() {
       if (!this.use_coordinates)
         this.address = this.address_text;
       else
-        this.address = this.address_coords.toStringForUser();
+      {
+        if(this.address_coords instanceof GeolocationCoords)
+          this.address = this.address_coords.toStringForUser()
+      }
     },
     addressUpdatedByUser() {
       if (!this.user_updated_address_field)
@@ -537,7 +586,8 @@ export default {
             is_recurrent: this.internalItem.is_recurrent,
             startdate: startDate,
             enddate: endDate,
-            visibility: this.internalItem.visibility
+            visibility: this.internalItem.visibility,
+            url: this.internalItem.url
           })).data;
 
           if (this.images['files'].length > 0) {

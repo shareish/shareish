@@ -210,6 +210,9 @@ export default {
         resizeObserver.observe(itemsList);
       }
     });
+    window.addEventListener("error", function (e) {
+      console.error("itemView :",e.message);
+    });
   },
   watch: {
     input_orderBy() {

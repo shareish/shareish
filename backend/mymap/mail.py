@@ -306,30 +306,35 @@ def _get_last_new_osm_items_near_user(user, frequency: MailNotificationFrequenci
 
     print(user)
 
-    #overpass query to get nodes around reference location that were created (version 1) since start date, limits the output to a maximum of to_show
+    #overpass query to get nodes around reference location that were created since start date (and modified less than 5 times), limits the output to a maximum of to_show
     result = overapi.query(
         f"""
-        ( node["amenity"="public_bookcase"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["amenity"="give_box"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["amenity"="food_sharing"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["amenity"="freeshop"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["social_facility"="food_bank"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["social_facility"="soup_kitchen"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["amenity"="drinking_water"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
-          node["emergency"="defibrillator"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() == 1);
+        ( 
+          node["amenity"="public_bookcase"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["amenity"="give_box"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["amenity"="food_sharing"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["amenity"="freeshop"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["social_facility"="food_bank"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["social_facility"="soup_kitchen"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["amenity"="drinking_water"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+          node["emergency"="defibrillator"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
         );
         out {to_show['osm']} body qt;
         """
         )
 
+    #node["amenity"="public_bookcase"](around:{user.dwithin_notifications*1000},{user.ref_location.coords[1]},{user.ref_location.coords[0]})(newer:"{start}")(if:version() < 5);
+
+    
     #build array with essential node info for email
     nodes  = []
     nodes += [[ _get_osm_type(node), node.tags.get("name",""),
                Point(user.ref_location.coords[1],user.ref_location.coords[0]).distance(Point(float(node.lat),float(node.lon)))*100,
                float(node.lat), float(node.lon)]
            for node in result.nodes]
-    #print(nodes)
-    return nodes,len(nodes)
+    sorted_nodes = sorted(nodes, key=lambda x: (x[0], x[2]))
+    #print(sorted_nodes)
+    return sorted_nodes,len(sorted_nodes)
 
 
 
@@ -541,7 +546,7 @@ def start_mail_scheduler():
     # To test quickly (10s delay between checks), uncomment line below.
     # Update args parameter to tell who are the job's targets
     # MailNotificationFrequencies.DAILY = all users that have at least one of the 3 notif settings set on Daily
-    #scheduler.add_job(send_emails, args=[MailNotificationFrequencies.DAILY], trigger='interval', seconds=10)
+    #scheduler.add_job(send_emails, args=[MailNotificationFrequencies.WEEKLY], trigger='interval', seconds=10)
     #scheduler.add_job(send_emails, args=[MailNotificationFrequenciesOSM.MONTHLY], trigger='interval', seconds=10)
 
     scheduler.add_listener(_scheduler_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
