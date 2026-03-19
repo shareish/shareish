@@ -58,7 +58,7 @@ export default {
     const token = this.$store.state.token;
     axios.defaults.headers.common['Authorization'] = (token) ? "Token " + token : "";
   },
-  created(){
+  async created(){
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       this.deferredPrompt = e;
@@ -70,6 +70,23 @@ export default {
     });
 
     this.checkDismiss();
+    try{
+      const response = await axios.get('api/v1/user-info/', {
+        withCredentials:true
+        });
+      if(response.data.is_logged_in){
+        this.$store.commit('setToken', response.data.token);
+        this.$store.commit('setUserID', response.data.user.id);
+        localStorage.setItem('token',response.data.token);
+        localStorage.setItem('user_id', response.data.user.id);
+        axios.defaults.headers.common['Authorization'] = "Token " + response.data.token;
+      }
+    }catch(error){
+        this.$store.commit('removeToken');
+        this.$store.commit('removeUserID');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user_id');
+    }
   },
   methods: {
     dismiss() {

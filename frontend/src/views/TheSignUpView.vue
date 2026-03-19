@@ -57,7 +57,7 @@
           <b-button :disabled="!agreement" type="is-primary" :loading="waitingFormResponse" @click="submitForm">{{ $t('sign-up') }}</b-button>
         </div>
       </div>
-      
+      <Providers/> 
       
     </div>
   </div>
@@ -65,8 +65,10 @@
 
 <script>
 import axios from 'axios'
+import Providers from '../components/Providers.vue'
 
 export default {
+  components: { Providers },
   name: 'TheSignUpView',
   data() {
     return {

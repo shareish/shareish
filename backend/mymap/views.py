@@ -928,3 +928,27 @@ def proxy_view(request):
         return JsonResponse(response.json(), safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    token, created = RestToken.objects.get_or_create(user=request.user)
+    return Response({
+        "is_logged_in": True,
+        "token": token.key,
+        "user":{
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email,
+        }
+    })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    if request.user.is_authenticated:
+        request.user.auth_token.delete()
+
+        django_logout(request)
+
+        return Response({"status": "Logged out"})

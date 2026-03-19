@@ -62,9 +62,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-
-
-
 ]
 
 MIDDLEWARE = [
@@ -76,7 +73,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'mapsite.urls'
@@ -217,6 +213,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -267,27 +264,36 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 #LOGIN_REDIRECT_URL = DEV_URL
 ACCOUNT_LOGOUT_ON_GET = True
 
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = True
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True 
+
+SOCIALACCOUNT_ADAPTER = 'mymap.adapter.SocialAccountAdapter'
+
+LOGIN_REDIRECT_URL = f"{APP_URL}/map"
+
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
 SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APPS": [
-            {
-                "client_id": os.environ.get('CLIENT_ID'),
-                "secret": os.environ.get('SECRET'),
-                "key": os.environ.get("KEY")
-            },
-        ],
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        },
-        
-    },
+    'google':{
+        'APP':{
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_SECRET'),
+        }
+    }
 }
-
-
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
 

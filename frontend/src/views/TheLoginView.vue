@@ -27,6 +27,9 @@
         </div>
       </div>
       <router-link :to="{name: 'resetPassword'}">{{ $t('password-forgotten-?') }}</router-link>
+      <div>
+        <Providers/>
+      </div>
     </div>
   </div>
 </template>
@@ -34,8 +37,10 @@
 <script>
 import axios from 'axios'
 import ErrorHandler from "@/mixins/ErrorHandler";
+import Providers from '../components/Providers.vue';
 
 export default {
+  components: { Providers },
   name: "TheLoginView",
   mixins: [ErrorHandler],
   data() {
