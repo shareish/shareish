@@ -20,6 +20,7 @@ services:
       - ./backend:/code
       - media_volume:/code/mediafiles
       - static_volume:/static
+      - ./backend/backups:/code/backups
     ports:
       - "8000:8000"
     env_file:
@@ -47,18 +48,6 @@ services:
       - web
     restart: unless-stopped
 
-  backup:
-    build:
-      context: backup
-    volumes:
-      - postgis-data:/backup/postgis
-      - media_volume:/backup/mediafiles
-      - ./backup/postgres:/backup/shareish_database
-      - ./backup/image:/backup/shareish_mediafiles
-    env_file:
-      - docker-compose.env
-    depends_on:
-      - db
 
 #  certbot:
 #    image: certbot/certbot:latest
