@@ -58,6 +58,12 @@ INSTALLED_APPS = [
     'djoser',
     'channels',
     'mymap.apps.MymapConfig',
+    'dbbackup',
+    'django_cron' ,
+]
+
+CRON_CLASSES = [
+    'mymap.cron.BackupAndMedia',
 ]
 
 MIDDLEWARE = [
@@ -124,6 +130,18 @@ DATABASES = {
         'USER': os.environ.get('POSTGRES_USER'),
     }
 }
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/code/backups/'}
+DBBACKUP_CLEANUP_KEEP = 4
+
+DBBACKUP_MEDIA_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_MEDIA_STORAGE_OPTIONS = {'location': '/code/backups/'}
+DBBACKUP_CLEANUP_KEEP_MEDIA = 4
+
+
+DBBACKUP_FILENAME_TEMPLATE = 'shareish_bd_{datetime}.{extension}'
+DBBACKUP_MEDIA_FILENAME_TEMPLATE = 'shareish_media_{datetime}.{extension}'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
