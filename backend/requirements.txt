@@ -19,3 +19,5 @@ numpy==1.18.5
 psycopg2==2.9.3
 pytesseract==0.3.10
 overpy==0.5
+cryptography>=3.4.6
+django-cryptography==1.1
