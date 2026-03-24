@@ -76,6 +76,9 @@ class MailNotificationFrequenciesOSM(models.TextChoices):
     MONTHLY = 'M', _("Monthly")
     NEVER = 'N', _("Never")
 
+class PreferredLanguage(models.TextChoices):
+    FRENCH = 'FR', _("French")
+    ENGLISH = 'EN', _("English")
 
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50, null=True, blank=True)
@@ -91,6 +94,11 @@ class User(AbstractBaseUser):
     facebook_url = models.URLField(blank=True, default="")
     instagram_url = models.URLField(blank=True, default="")
     mastodon_url = models.URLField(blank=True, default="")
+    preferred_language = models.CharField(
+        max_length=2,
+        choices=PreferredLanguage.choices,
+        default=PreferredLanguage.ENGLISH
+    )
 
     ref_location = models.PointField(blank=True, geography=True, null=True)
     use_ref_loc = models.BooleanField(default=False)

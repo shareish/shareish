@@ -16,7 +16,7 @@ RUN apt-get update && \
     locale-gen $LC_ALL
 
 RUN apt-get update && \
-    apt-get install -y python3-pip libgdal-dev tesseract-ocr libtesseract-dev
+    apt-get install -y python3-pip libgdal-dev tesseract-ocr libtesseract-dev gettext
 
 RUN cd /usr/bin && \
     ln -s python3 python
@@ -30,4 +30,7 @@ COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 
 COPY . /code/
+
+#RUN python manage.py compilemessages
+
 CMD python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000

@@ -155,6 +155,34 @@
         </template>
       </b-field>
     </div>
+    <div class="box">
+      <b-field key="preferred_language" horizontal>
+        <template #label>
+          <b-tooltip :label="$t('help_notif_language')" class="frequency_label" multilined position="is-right">
+            {{ $t('preferred_language') }}
+            <i class="icon far fa-question-circle"></i>
+          </b-tooltip>
+        </template>
+        <template v-if="windowWidth >= 1024">
+          <b-radio-button
+              v-for="{key, translationKey, color} in GeneralInfoLanguages"
+              :key="key"
+              v-model="radioGroups['preferred_language']"
+              :native-value="key"
+              :type="color"
+          >
+            <span>{{ $t(translationKey) }}</span>
+          </b-radio-button>
+        </template>
+        <template v-else>
+          <b-select v-model="radioGroups['preferred_language']" expanded placeholder="Select a preferred language">
+            <option v-for="{key, translationKey} in GeneralInfoLanguages" :key="key" :value="key">
+              {{ $t(translationKey) }}
+            </option>
+          </b-select>
+        </template>
+      </b-field>
+    </div>
     <b-button :label="$t('save')" :loading="waitingFormResponse" type="is-primary" @click="save" />
   </section>
 </template>
@@ -196,9 +224,11 @@ export default {
         'notif_items': String,
         'notif_osm': String,
         'notif_generalinfo': String,
+        'preferred_language': String,
       },
       waitingFormResponse: false,
-      timeouts: {}
+      timeouts: {},
+      preferred_language: "",
     }
   },
   async created() {
@@ -212,7 +242,8 @@ export default {
       'mail_notif_freq_events': this.user.mail_notif_freq_events,
       'mail_notif_freq_items': this.user.mail_notif_freq_items,
       'mail_notif_freq_osm': this.user.mail_notif_freq_osm,
-      'mail_notif_generalinfo': this.user.mail_notif_generalinfo,	
+      'mail_notif_generalinfo': this.user.mail_notif_generalinfo,
+      'preferred_language' : this.user.preferred_language,	
     };
 
     if (this.user.ref_location !== null) {
@@ -228,7 +259,7 @@ export default {
     this.radioGroups.notif_items = this.internalUser.mail_notif_freq_items;
     this.radioGroups.notif_osm = this.internalUser.mail_notif_freq_osm;
     this.radioGroups.notif_generalinfo = this.internalUser.mail_notif_generalinfo;  
-
+    this.radioGroups.preferred_language = this.internalUser.preferred_language;   
       
     // Has the user activated geolocation?
     if ('geolocation' in navigator) {
@@ -325,7 +356,7 @@ export default {
             this.internalUser.mail_notif_freq_items = this.radioGroups.notif_items;
             this.internalUser.mail_notif_freq_osm = this.radioGroups.notif_osm;
             this.internalUser.mail_notif_generalinfo = this.radioGroups.notif_generalinfo;
-
+            this.internalUser.preferred_language = this.radioGroups.preferred_language;
             if (this.internalUser.ref_location instanceof GeolocationCoords)
               this.internalUser.ref_location = this.internalUser.ref_location.toString();
 
@@ -444,10 +475,23 @@ export default {
           color: 'is-danger'
         }
       ];
+    },
+    GeneralInfoLanguages() {
+      return [
+        {
+          key: 'EN',
+          translationKey: 'language-en',
+          color: 'is-primary'
+        },
+        {
+          key: 'FR',
+          translationKey: 'language-fr',
+          color: 'is-info'
+        },
+      ];
     }
-      
   }
-};
+}
 </script>
 
 <style scoped>

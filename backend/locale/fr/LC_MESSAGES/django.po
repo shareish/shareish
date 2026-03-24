@@ -1,0 +1,454 @@
+# French translations for Shareish.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Shareish 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-02 13:55+0100\n"
+"PO-Revision-Date: 2026-02-27 11:00+0100\n"
+"Last-Translator: Gemini\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: mymap/mail.py:203
+msgid "Daily conversations digest"
+msgstr "Résumé quotidien des conversations"
+
+#: mymap/mail.py:205
+msgid "Recent conversations"
+msgstr "Conversations récentes"
+
+#: mymap/mail.py:236
+msgid "Daily events digest"
+msgstr "Résumé quotidien des événements"
+
+#: mymap/mail.py:238
+msgid "Weekly events digest"
+msgstr "Résumé hebdomadaire des événements"
+
+#: mymap/mail.py:240
+msgid "Recent events"
+msgstr "Événements récents"
+
+#: mymap/mail.py:354
+msgid "Daily public resources digest"
+msgstr "Résumé quotidien des ressources publiques"
+
+#: mymap/mail.py:356
+msgid "Weekly public resources digest"
+msgstr "Résumé hebdomadaire des ressources publiques"
+
+#: mymap/mail.py:358
+msgid "Monthly public resources digest"
+msgstr "Résumé mensuel des ressources publiques"
+
+#: mymap/mail.py:360 mymap/mail.py:394
+msgid "Recent items"
+msgstr "Annonces récentes"
+
+#: mymap/mail.py:390
+msgid "Daily items digest"
+msgstr "Résumé quotidien des annonces"
+
+#: mymap/mail.py:392
+msgid "Weekly items digest"
+msgstr "Résumé hebdomadaire des annonces"
+
+#: mymap/models.py:61 mymap/models.py:68
+msgid "Instantly"
+msgstr "Instantanément"
+
+#: mymap/models.py:62 mymap/models.py:69 mymap/models.py:74
+msgid "Daily"
+msgstr "Quotidiennement"
+
+#: mymap/models.py:63 mymap/models.py:75
+msgid "Weekly"
+msgstr "Hebdomadairement"
+
+#: mymap/models.py:64 mymap/models.py:70 mymap/models.py:77
+msgid "Never"
+msgstr "Jamais"
+
+#: mymap/models.py:76
+msgid "Monthly"
+msgstr "Mensuellement"
+
+#: mymap/models.py:80
+msgid "French"
+msgstr "Français"
+
+#: mymap/models.py:81
+msgid "English"
+msgstr "Anglais"
+
+#: mymap/models.py:88
+msgid "email address"
+msgstr "adresse e-mail"
+
+#: mymap/models.py:197
+msgid "Public bookcases"
+msgstr "Boîtes à livres"
+
+#: mymap/models.py:198
+msgid "Defibrillators"
+msgstr "Défibrillateurs"
+
+#: mymap/models.py:199
+msgid "Drinking water spots"
+msgstr "Points d'eau potable"
+
+#: mymap/models.py:200
+msgid "Food Banks"
+msgstr "Banques alimentaires"
+
+#: mymap/models.py:201
+msgid "Food Sharing"
+msgstr "Partage alimentaire"
+
+#: mymap/models.py:202
+msgid "Falling fruits"
+msgstr "Fruits à glaner"
+
+#: mymap/models.py:203
+msgid "Repair Cafes"
+msgstr "Repair Cafés"
+
+#: mymap/models.py:204
+msgid "Volunteering"
+msgstr "Bénévolat"
+
+#: mymap/models.py:205
+msgid "Free shops"
+msgstr "Magasins gratuits"
+
+#: mymap/models.py:206
+msgid "Give boxes"
+msgstr "Boîtes à dons"
+
+#: mymap/models.py:207
+msgid "Soup Kitchens"
+msgstr "Soupes populaires"
+
+#: mymap/models.py:229
+msgid "Donation"
+msgstr "Don"
+
+#: mymap/models.py:230
+msgid "Loan"
+msgstr "Prêt"
+
+#: mymap/models.py:231
+msgid "Request"
+msgstr "Demande"
+
+#: mymap/models.py:232
+msgid "Event"
+msgstr "Événement"
+
+#: mymap/models.py:235
+msgid "Food and Supplies"
+msgstr "Nourriture et Fournitures"
+
+#: mymap/models.py:236
+msgid "Pets and Animals"
+msgstr "Animaux"
+
+#: mymap/models.py:237
+msgid "Arts, Culture, and Entertainments"
+msgstr "Arts, Culture et Divertissement"
+
+#: mymap/models.py:238
+msgid "Collectibles and Decoratives"
+msgstr "Collections et Décoration"
+
+#: mymap/models.py:239
+msgid "Helping hand and Manual Labor"
+msgstr "Coup de main et Travaux manuels"
+
+#: mymap/models.py:240
+msgid "Administrative tasks"
+msgstr "Tâches administratives"
+
+#: mymap/models.py:241
+msgid "Do-it-Yourself"
+msgstr "Bricolage"
+
+#: mymap/models.py:242
+msgid "Beauty and Well-being"
+msgstr "Beauté et Bien-être"
+
+#: mymap/models.py:243
+msgid "Health"
+msgstr "Santé"
+
+#: mymap/models.py:244
+msgid "Energy and Heating"
+msgstr "Énergie et Chauffage"
+
+#: mymap/models.py:245
+msgid "Childhood"
+msgstr "Enfance"
+
+#: mymap/models.py:246
+msgid "Clothes and Shoes"
+msgstr "Vêtements et Chaussures"
+
+#: mymap/models.py:247
+msgid "Multimedia Hardware"
+msgstr "Matériel Multimédia"
+
+#: mymap/models.py:248
+msgid "Informatics Software"
+msgstr "Logiciels Informatiques"
+
+#: mymap/models.py:249
+msgid "Gardening and Nature"
+msgstr "Jardinage et Nature"
+
+#: mymap/models.py:250
+msgid "Living spaces and Housing"
+msgstr "Logement et Espaces de vie"
+
+#: mymap/models.py:251
+msgid "Tools and Equipments and Ustensils"
+msgstr "Outils, Équipements et Ustensiles"
+
+#: mymap/models.py:252
+msgid "Holidays, Week-end, Leisures"
+msgstr "Vacances, Week-end et Loisirs"
+
+#: mymap/models.py:253
+msgid "Books and Magazines"
+msgstr "Livres et Magazines"
+
+#: mymap/models.py:254
+msgid "CDs, DVDs, Blu-rays, Discs"
+msgstr "CDs, DVDs, Blu-rays, Disques"
+
+#: mymap/models.py:255
+msgid "Sports"
+msgstr "Sports"
+
+#: mymap/models.py:256
+msgid "Transportation, Delivery, Pick-up, Moving"
+msgstr "Transport, Livraison et Déménagement"
+
+#: mymap/models.py:257
+msgid "Vehicles and Means of transport"
+msgstr "Véhicules et Moyens de transport"
+
+#: mymap/models.py:258
+msgid "Public Resource"
+msgstr "Ressource publique"
+
+#: mymap/models.py:259 mymap/models.py:270
+msgid "Other"
+msgstr "Autre"
+
+#: mymap/models.py:262
+msgid "Public"
+msgstr "Public"
+
+#: mymap/models.py:263
+msgid "Unlisted"
+msgstr "Non répertorié"
+
+#: mymap/models.py:264
+msgid "Draft"
+msgstr "Brouillon"
+
+#: mymap/models.py:267
+msgid "On Shareish"
+msgstr "Sur Shareish"
+
+#: mymap/models.py:268
+msgid "Outside Shareish"
+msgstr "En dehors de Shareish"
+
+#: mymap/models.py:269
+msgid "Not resolved"
+msgstr "Non résolu"
+
+#: mymap/templates/emails/activation.html:4
+#, python-format
+msgid "%(site_name)s solidarity platform - Please confirm account creation"
+msgstr ""
+"Plateforme solidaire %(site_name)s - Veuillez confirmer la création de votre "
+"compte"
+
+#: mymap/templates/emails/activation.html:8
+#, python-format
+msgid ""
+"Hello, You're receiving this email because an account creation was initiated "
+"on %(site_name)s and you need to finish the activation process."
+msgstr ""
+"Bonjour, Vous recevez cet e-mail car une création de compte a été initiée "
+"sur %(site_name)s et vous devez terminer le processus d'activation."
+
+#: mymap/templates/emails/activation.html:10
+#: mymap/templates/emails/activation.html:21
+msgid "Please go to the following page to confirm and activate your account:"
+msgstr ""
+"Veuillez vous rendre sur la page suivante pour confirmer et activer votre "
+"compte :"
+
+#: mymap/templates/emails/activation.html:13
+#: mymap/templates/emails/activation.html:24
+msgid "Thanks for using our site!"
+msgstr "Merci d'utiliser notre site !"
+
+#: mymap/templates/emails/activation.html:15
+#: mymap/templates/emails/activation.html:26
+#: mymap/templates/emails/confirmation.html:12
+#: mymap/templates/emails/confirmation.html:20
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "L'équipe %(site_name)s"
+
+#: mymap/templates/emails/activation.html:19
+#, python-format
+msgid ""
+"Hello,<br><br> You're receiving this email because an account creation was "
+"initiated on %(site_name)s and you need to finish the activation process."
+msgstr ""
+"Bonjour,<br><br> Vous recevez cet e-mail car une création de compte a été "
+"initiée sur %(site_name)s et vous devez terminer le processus d'activation."
+
+#: mymap/templates/emails/confirmation.html:4
+#, python-format
+msgid ""
+"%(site_name)s solidarity platform - Your account has been successfully "
+"activated!"
+msgstr ""
+"Plateforme solidaire %(site_name)s - Votre compte a été activé avec succès !"
+
+#: mymap/templates/emails/confirmation.html:8
+#, python-format
+msgid ""
+"Hello, Your %(site_name)s account has been created and is ready to use, "
+"please log in on: %(protocol)s://%(domain)s/log-in ! We invite you to edit "
+"your profile and settings here: %(protocol)s://%(domain)s/settings/"
+"notification to configure notifications when new content is created in your "
+"neighbourdhood. You can also provide more details about yourself here: "
+"%(protocol)s://%(domain)s/settings/profile ."
+msgstr ""
+"Bonjour, Votre compte %(site_name)s a été créé et est prêt à être utilisé, "
+"veuillez vous connecter sur : %(protocol)s://%(domain)s/log-in ! Nous vous "
+"invitons à modifier votre profil et vos paramètres ici : %(protocol)s://"
+"%(domain)s/settings/notification pour configurer les notifications lorsque "
+"du nouveau contenu est créé dans votre quartier. Vous pouvez également "
+"fournir plus de détails sur vous ici : %(protocol)s://%(domain)s/settings/"
+"profile ."
+
+#: mymap/templates/emails/confirmation.html:10
+#: mymap/templates/emails/confirmation.html:18
+msgid "Thanks for using Share & Cherish!"
+msgstr "Merci d'utiliser Share & Cherish !"
+
+#: mymap/templates/emails/confirmation.html:16
+#, python-format
+msgid ""
+"Hello,<br><br>Your %(site_name)s account has been created and is ready to "
+"use, please log in at: <a href=\"%(protocol)s://%(domain)s/log-in\">"
+"%(protocol)s://%(domain)s/log-in</a> ! <br><br>Then, we invite you to "
+"<b>edit your profile and settings</b> (top-right \"Account\" menu) here: <a "
+"href=\"%(protocol)s://%(domain)s/settings/notifications\">%(protocol)s://"
+"%(domain)s/settings/notifications</a> to <b>configure notifications</b> when "
+"new content is created in your neighbourdhood. You can also provide more "
+"details about yourself here: <a href=\"%(protocol)s://%(domain)s/settings/"
+"profile\">%(protocol)s://%(domain)s/settings/profile</a>. "
+msgstr ""
+"Bonjour,<br><br>Votre compte %(site_name)s a été créé et est prêt à être "
+"utilisé, veuillez vous connecter à l'adresse suivante : <a href="
+"\"%(protocol)s://%(domain)s/log-in\">%(protocol)s://%(domain)s/log-in</a> ! "
+"<br><br>Ensuite, nous vous invitons à <b>modifier votre profil et vos "
+"paramètres</b> (menu \"Compte\" en haut à droite) ici : <a href="
+"\"%(protocol)s://%(domain)s/settings/notifications\">%(protocol)s://"
+"%(domain)s/settings/notifications</a> pour <b>configurer les notifications</"
+"b> lorsque de nouveaux contenus sont créés dans votre voisinage. Vous pouvez "
+"également fournir plus de détails sur vous ici : <a href=\"%(protocol)s://"
+"%(domain)s/settings/profile\">%(protocol)s://%(domain)s/settings/profile</"
+"a>. "
+
+#: mymap/templates/emails/recover_account.tpl:4
+msgid "[Shareish] Recover your account"
+msgstr "[Shareish] Récuperer votre compte"
+
+#: mymap/templates/emails/recover_account.tpl:7
+#: mymap/templates/emails/recover_account.tpl:26
+#, python-format
+msgid "Dear %(name)s,"
+msgstr "Chère %(name)s,"
+
+#: mymap/templates/emails/recover_account.tpl:9
+#: mymap/templates/emails/recover_account.tpl:28
+msgid ""
+"We have received a request to recover your account. If you made this "
+"request, please click the link below to recover your account:"
+msgstr ""
+"Nous avons reçu une demande de récupération de votre compte. Si vous "
+"avez effectué cette demande, veuillez cliquer sur le lien ci-dessous:"
+
+#: mymap/templates/emails/recover_account.tpl:13
+#: mymap/templates/emails/recover_account.tpl:32
+msgid ""
+"If you did not make this request, you can safely ignore this email. Your "
+"account is safe and secure, and no unauthorized parties have gained access "
+"to your account or password."
+msgstr ""
+"Si vous n'avez pas fait cette requête, vous pouvez ignorer ce mail. Votre"
+"compote ne présente aucun problème de sécurité et personne d'autres que vous n'a accès"
+"à votre identifiants."
+
+#: mymap/templates/emails/recover_account.tpl:15
+#: mymap/templates/emails/recover_account.tpl:35
+#: mymap/templates/emails/start_delete_account_process.tpl:19
+#: mymap/templates/emails/start_delete_account_process.tpl:44
+msgid "Best regards,"
+msgstr "Cordialement,"
+
+#: mymap/templates/emails/recover_account.tpl:16
+#: mymap/templates/emails/recover_account.tpl:36
+msgid "The Shareish team."
+msgstr "L'équipe Shareish"
+
+#: mymap/templates/emails/start_delete_account_process.tpl:7
+#, python-format
+msgid "[%(site_name)s] Start the deletion process of your account"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:11
+#: mymap/templates/emails/start_delete_account_process.tpl:40
+msgid "Dear"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:13
+msgid ""
+"We have received your request to delete your account. If you made this "
+"request, please click the link below to confirm your account deletion:"
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:17
+#: mymap/templates/emails/start_delete_account_process.tpl:43
+msgid ""
+"If you did not make this request, please consider improve your account "
+"security by changing your password. As of now, your account will not be "
+"deleted."
+msgstr ""
+
+#: mymap/templates/emails/start_delete_account_process.tpl:20
+#: mymap/templates/emails/start_delete_account_process.tpl:44
+msgid "The Shareish Team."
+msgstr "Sur Shareish"
+
+#: mymap/templates/emails/start_delete_account_process.tpl:41
+msgid ""
+"We have received your request to delete your account. If you made this "
+"request, please click the link below to start the deletion process of your "
+"account:"
+msgstr ""
