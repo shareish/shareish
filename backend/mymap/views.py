@@ -3,7 +3,7 @@ import json
 import re
 from datetime import datetime
 
-
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import Q, Count
@@ -446,6 +446,16 @@ class MessageViewSet(viewsets.ModelViewSet):
         else:
             return Message.objects.all()
 
+    def perform_create(self, serializer):
+        conversation_id = self.kwargs.get('conversation_id')
+        if conversation_id:
+            conversation = get_object_or_404(Conversation, pk=conversation_id)
+            serializer.save(user=self.request.user, conversation=conversation)
+        else:
+            serializer.save(user=self.request.user)
+        
+        message = serializer.instance
+      
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
 

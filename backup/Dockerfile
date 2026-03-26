@@ -1,39 +1,32 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-RUN apt-get update && apt-get install -y \
-    wget \
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    PG_VERSION=14
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-
-# Add PostgreSQL repository
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
-
-RUN apt-get update && apt-get install -y \
+    wget \
+    && . /etc/os-release \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ ${VERSION_CODENAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/postgresql-archive-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ ${VERSION_CODENAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     locate \
     net-tools \
     cron \
     rsyslog \
     gzip \
-    postgresql-client-14 \
-    && rm -rf /var/lib/apt/lists/*
+    postgresql-client-$PG_VERSION \
+    && apt-get purge -y --auto-remove wget gnupg \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
-COPY script_backup_postgres.sh /tmp/script_backup_postgres.sh
-COPY script_backup_mediafiles.sh /tmp/script_backup_mediafiles.sh
-COPY deploy.sh /tmp/deploy.sh
-
-
-RUN chmod +x /tmp/deploy.sh
-
-
-ENTRYPOINT ["/tmp/deploy.sh"]
-
-ENV LANG C.UTF-8
-ENV DEBIAN_FRONTEND noninteractive
-
+COPY script_backup_postgres.sh script_backup_mediafiles.sh deploy.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/*.sh
 
 EXPOSE 5432
+
+ENTRYPOINT ["deploy.sh"]

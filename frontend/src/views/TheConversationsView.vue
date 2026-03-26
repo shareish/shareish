@@ -118,7 +118,7 @@
                 <p v-else><strong>Group chat</strong></p>
               </div>
               <div class="level-right">
-		              <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? $t('unlock-conversation') : $t('locked-conversation')) : $t('lock-conversation')">
+                      <b-tooltip position="is-left" :label="activeConversation.is_closed ? (activeConversation.closed_by.id === userId ? $t('unlock-conversation') : $t('locked-conversation')) : $t('lock-conversation')">
                   <b-button
                       type="is-primary"
                       outlined
@@ -161,8 +161,38 @@
             />
           </div>
           <div id="write">
-            <div class="columns is-mobile">
-	      <div class="column">
+            
+            <div v-if="imagePreview" class="image-preview-container mb-2">
+              <div class="image-preview-box">
+                <img :src="imagePreview" alt="Aperçu de l'image" @load="checkRows"  />
+                <button class="delete-btn" @click="removeImage">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <input 
+              type="file" 
+              ref="fileInput" 
+              accept="image/*" 
+              style="display: none;" 
+              @change="onFileSelected" 
+            />
+
+            <div class="columns is-mobile is-vcentered">
+              
+              <div class="column is-narrow pb-0" style="padding-right: 0;">
+                <b-button 
+                  type="is-light" 
+                  @click="triggerFileInput" 
+                  :disabled="activeConversation.is_closed"
+                  class="add-image-btn"
+                >
+                  <i class="fas fa-image"></i>
+                </b-button>
+              </div>
+
+              <div class="column pb-0">
                 <textarea
                     v-model="messageToSend"
                     class="textarea"
@@ -174,12 +204,12 @@
                     @keydown.enter.shift.exact.prevent="shiftEnterPressed"
                 />
               </div>
-              <div class="column">
-		<b-tooltip :label="$t('paste-geolocation')" type="is-info" position="is-left">
-		  <b-button id="smallbutton" type="is-info" @click="fetchAddressGeoLoc" size="is-small"> 
+              <div class="column pb-0" style="flex: 0 0 calc(110px + 0.75rem); padding-left: 0; display: flex; align-items: center; justify-content: space-between;">
+                <b-tooltip :label="$t('paste-geolocation')" type="is-info" position="is-top">
+                  <b-button id="smallbutton" type="is-info" @click="fetchAddressGeoLoc" size="is-small" :disabled="activeConversation.is_closed"> 
                     <i class="fas fa-street-view"></i>
-		  </b-button>
-			</b-tooltip>
+                  </b-button>
+                </b-tooltip>
                 <b-button
                     type="is-primary"
                     @click="sendMessage"
@@ -222,6 +252,10 @@ export default {
       selected: -1,
       messages: [],
       messageToSend: "",
+      
+      selectedImage: null, 
+      imagePreview: null,
+      
       unableToFetchConversations: false,
       textareaRows: 1,
       ws: null,
@@ -236,7 +270,7 @@ export default {
       messagesSection: 1,
       messagesLoading: false,
       address_text: "",
-      geoLocation: null,	
+      geoLocation: null,    
     }
   },
 
@@ -284,7 +318,9 @@ export default {
       }
     },
     messageToSend() {
-      this.conversationsTextarea[this.activeConversation.id] = this.messageToSend;
+      if(this.activeConversation) {
+        this.conversationsTextarea[this.activeConversation.id] = this.messageToSend;
+      }
     }
   },
   computed: {
@@ -308,6 +344,25 @@ export default {
     }
   },
   methods: {
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    onFileSelected(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedImage = file;
+        this.imagePreview = URL.createObjectURL(file);
+        this.checkRows();
+      }
+    },
+    removeImage() {
+      this.selectedImage = null;
+      this.imagePreview = null;
+      if(this.$refs.fileInput) this.$refs.fileInput.value = '';   
+      this.$nextTick(() => { this.checkRows(); });
+    },
+    // ---------------------------------------
+
     windowWidthChanged() {
       this.isMobile = (this.windowWidth < 900);
     },
@@ -328,12 +383,18 @@ export default {
               this.conversationsTextarea[this.activeConversation.id] = "";
           }
           this.messageToSend = this.conversationsTextarea[this.activeConversation.id];
+          
+          this.removeImage();
+
           await this.setMessagesAsSeen();
 
           this.connectToConversation();
 
           this.$nextTick(function () {
-            document.getElementById('messages').addEventListener('scroll', this.scrollHandler);
+            const messagesBlock = document.getElementById('messages');
+            if (messagesBlock) {
+               messagesBlock.addEventListener('scroll', this.scrollHandler);
+            }
           });
         }
         catch (error) {
@@ -365,12 +426,17 @@ export default {
           break;
       }
 
-      const conversationWithHeight = 40 + 2 * rem(0.75) + 1;
-      const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75) + 1;
-      const textareaHeight = ((messageRows * 24) + 24);
-      const writeHeight = textareaHeight + (2 * rem(0.75));
-      const messagesHeight = 750 - conversationWithHeight - itemHeight - writeHeight
-      this.$el.querySelector("#messages").style.height = messagesHeight + "px";
+      this.$nextTick(() => {
+        const conversationWithHeight = 40 + 2 * rem(0.75) + 1;
+        const itemHeight = this.itemCardHorizontalHeight + 2 * rem(0.75) + 1;
+      
+        const writeBlock = this.$el.querySelector("#write");
+        const writeHeight = writeBlock ? writeBlock.offsetHeight : ((messageRows * 24) + 24 + (2 * rem(0.75)));
+        
+        const messagesHeight = 750 - conversationWithHeight - itemHeight - writeHeight;
+        const messagesEl = this.$el.querySelector("#messages");
+        if (messagesEl) messagesEl.style.height = messagesHeight + "px";
+      });
 
       this.textareaRows = messageRows;
     },
@@ -463,8 +529,6 @@ export default {
 
           this.conversations[this.selected].unread_messages = newUnreadMessages;
 
-          // If new message was sent but not yet retrieved/displayed, the this.messages[this.messages.length - 1]
-          // could not be the real last message and this.conversation.unread_messages could be greater than 0
           const unreadMessagesBadge = this.$el.querySelector("#conversations .columns:nth-child(" + (this.selected + 1) + ") > .column:first-child .unread-messages");
           if (unreadMessagesBadge) {
             if (newUnreadMessages === 0)
@@ -493,7 +557,7 @@ export default {
           const parent = this.$el.querySelector("#messages");
           const childSelector = (messageIndex === "last") ? "last-child" : "nth-child(" + (messageIndex + 1) + ")";
           const child = this.$el.querySelector("#messages article:" + childSelector);
-          scrollParentToChild(parent, child, position, offset);
+          if (parent && child) scrollParentToChild(parent, child, position, offset);
         });
       }
     },
@@ -505,10 +569,12 @@ export default {
             const data = JSON.parse(event.data);
             if (data.type === 'new_message') {
               const newMessage = JSON.parse(data['content']);
-              this.messages.push(newMessage);
-              this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
-              this.updateCurrentConversation(newMessage.content);
-              this.setMessagesAsSeen(true);
+              if (!this.messages.some(msg => msg.id === newMessage.id)) {
+                this.messages.push(newMessage);
+                this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
+                this.updateCurrentConversation(newMessage.content || "📷 Image");
+                this.setMessagesAsSeen(true);
+              }
             } else if (data.type === 'message_deleted') {
               const id = Number(data['content']);
               let messageIndex = -1;
@@ -540,39 +606,61 @@ export default {
         }
       }
     },
-    sendMessage() {
-      if (this.isConversationSelected && isNotEmptyString(this.messageToSend)) {
-        this.waitingFormResponse = true;
-        try {
+    
+
+    async sendMessage() {
+      if (!this.isConversationSelected) return;
+      if (!isNotEmptyString(this.messageToSend) && !this.selectedImage) return;
+
+      this.waitingFormResponse = true;
+
+      try {
+        if (this.selectedImage) {
+          let formData = new FormData();
+          if (this.messageToSend.trim()) formData.append('content', this.messageToSend);
+          formData.append('image', this.selectedImage);
+          formData.append('conversation', this.activeConversation.id);
+          const response = await axios.post(`/api/v1/conversations/${this.activeConversation.id}/messages/`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+
+          this.messages.push(response.data);
+          this.scrollLastMessageIntoView("last", "bottom", rem(0.75));
+          
+          this.updateCurrentConversation(response.data.content ? response.data.content : "📷 Image");
+          
+          this.removeImage(); 
+
+        } else {
           const data = {
             'type': 'new_message',
             'content': {
               'content': this.messageToSend,
               'conversation_id': this.activeConversation.id,
-              'user_id': this.$store.state.user.id
+              'user_id': this.userId
             }
           };
           this.ws.send(JSON.stringify(data));
-
           this.updateCurrentConversation(this.messageToSend);
-
-          setTimeout(() => {
-            this.waitingFormResponse = false;
-          }, 500);
-
-          this.conversationsTextarea[this.activeConversation.id] = "";
-          this.messageToSend = this.conversationsTextarea[this.activeConversation.id]
-
-          this.checkRows();
         }
-        catch (error) {
-          this.snackbarError(this.$t('notif-error-send-message'));
-        }
+
+        setTimeout(() => {
+          this.waitingFormResponse = false;
+        }, 500);
+
+        this.conversationsTextarea[this.activeConversation.id] = "";
+        this.messageToSend = "";
+        
+        this.$nextTick(() => { this.checkRows(); });
+      }
+      catch (error) {
+        this.snackbarError(this.$t('notif-error-send-message'));
+        this.waitingFormResponse = false;
       }
     },
+
     updateCurrentConversation(newMessage) {
       if (this.isConversationSelected) {
-        // Move conversation to top
         const conversationToPoke = this.conversations.splice(this.selected, 1)[0];
         this.conversations.unshift(conversationToPoke);
         this.selected = 0;
@@ -744,7 +832,6 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   border-bottom: 1px solid #e9e9e9;
 
   #search-input {
-    // $conversationsWidth - input margin right - 3 * icons width - 2 * icons margin left - 2 * outer padding - border width
     width: $conversationsWidth - rem(0.75) - 3 * 40px - 2 * 5px - 2 * rem(0.75) - 1px;
   }
 
@@ -849,7 +936,6 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   }
 
   #messages {
-    // $boxHeight - $itemHeight - base textarea height - 2 * outer padding
     height: $boxHeight - $conversationWithHeight - $itemHeight - 48px - (2 * rem(0.75));
     overflow-y: scroll;
     display: flex;
@@ -863,23 +949,66 @@ $itemHeight: 70px + 2 * rem(0.75) + 1px;
   #write {
     padding: 0.75rem;
     border-top: 1px solid #e9e9e9;
+    .image-preview-container {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #dbdbdb;
 
-    .column:last-child {
-      flex: 0 0 calc(110px + 0.75rem);
-      padding-left: 0;
+      .image-preview-box {
+        position: relative;
+        display: inline-block;
+
+        img {
+          display: block;
+          
+          
+          width: 100%; 
+          max-width: 300px; 
+          height: auto;
+          max-height: 300px; 
+          object-fit: contain; 
+          border-radius: 8px;
+          border: 2px solid #3eae7b;
+        }
+
+        .delete-btn {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          background-color: #ff4c4c;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background-color: hsl(348, 86%, 43%);
+          }
+        }
+      }
+    }
+    .add-image-btn {
+      height: 48px;
+      width: 48px;
     }
 
     textarea {
       resize: none;
     }
 
-    button {
+    button:not(.delete-btn) {
       width: 60px;
       height: 48px;
     }
     #smallbutton {
-	width: 30px;
-	height: 24px;
+      width: 30px;
+      height: 24px;
     }
   }
 }

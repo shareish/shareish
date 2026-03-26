@@ -7,10 +7,23 @@
         </figure>
       </router-link>
     </div>
+    
     <div class="media-content">
-      <p class="content wbbw wspw" :class="{'show-arrow': showSide}">{{ message.content }}</p>
+      <div class="content wbbw wspw" :class="{'show-arrow': showSide}">
+        <p v-if="message.content" class="message-text">{{ message.content }}</p>
+        
+        <img 
+          v-if="message.image" 
+          :src="getFullImageUrl(message.image)" 
+          alt="Image envoyée" 
+          class="attached-image" 
+          :class="{'has-text': message.content}"
+        />
+      </div>
+      
       <p v-if="showSide" class="date has-text-grey">{{ formattedDateFromNow(message.date, $i18n.locale) }}</p>
     </div>
+    
     <div v-if="isFromSelf" class="media-right">
       <router-link v-if="showSide" :to="{name: 'profile', params: {id: sender.id}}">
         <figure class="image">
@@ -18,6 +31,7 @@
         </figure>
       </router-link>
     </div>
+    
     <div v-if="isFromSelf" class="delete-message vh-align-center" @click="clickDeleteMessage">
       <i class="fas fa-trash"></i>
     </div>
@@ -59,12 +73,23 @@ export default {
       return (this.isFromSelf) ? 'from-self' : 'from-sender';
     },
     senderImage() {
-      if (this.message.user.images.length > 0)
+      if (this.message.user.images && this.message.user.images.length > 0)
         return this.message.user.images[0].url;
       return "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
     }
   },
   methods: {
+    getFullImageUrl(imagePath) {
+      if (!imagePath) return '';
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      let baseUrl = axios.defaults.baseURL || 'http://localhost:8000';
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+      }
+      return baseUrl + imagePath;
+    },
     clickDeleteMessage() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-message'),
@@ -121,17 +146,47 @@ $mediaWidth: 75%;
     }
   }
 
-  .media-content p {
-    margin: 0;
+  .media-content {
+    p {
+      margin: 0;
+    }
 
-    &.content {
+    .content {
       position: relative;
       padding: 12px 14px;
       border-radius: 5px;
       z-index: 1;
+      display: inline-block; 
+      max-width: 100%;
+
+      .message-text {
+        margin: 0;
+      }
+
+      
+      .attached-image {
+        display: block; 
+        border-radius: 8px;
+        margin: 5px auto; 
+
+        
+        width: 100%; 
+        max-width: 250px; 
+        min-width: 150px; 
+
+        height: auto; 
+        max-height: 250px; 
+
+        
+        object-fit: contain; 
+
+        &.has-text {
+          margin-top: 8px;
+        }
+      }
     }
 
-    &.date {
+    p.date {
       margin-top: 0.25rem;
       font-size: 0.75rem;
     }
@@ -164,7 +219,7 @@ $mediaWidth: 75%;
     }
 
     .media-content {
-      p.content {
+      .content {
         background-color: #e7e7e7;
 
         &.show-arrow {
@@ -191,11 +246,13 @@ $mediaWidth: 75%;
 
   &.from-self {
     padding-left: 100% - $mediaWidth !important;
+    text-align: right; 
 
     .media-content {
-      p.content {
+      .content {
         background-color: #3eae7b;
         color: white;
+        text-align: left; 
 
         &.show-arrow {
           position: relative;

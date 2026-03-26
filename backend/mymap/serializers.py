@@ -207,13 +207,16 @@ class ConversationSerializer(serializers.ModelSerializer):
         if request is not None:
             return Message.objects.filter(conversation=obj, seen=False).exclude(user=request.user.id).count()
         return 0
-
+    
     def get_last_message(self, obj):
         request = self.context.get('request')
         if request is not None:
             last_message = Message.objects.filter(conversation=obj).first()
             if last_message is not None:
-                return last_message.content
+                if last_message.content:
+                    return last_message.content
+                elif last_message.image:
+                    return "📷 Image"
         return None
 
 
@@ -223,10 +226,9 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = [
-            'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user'
+            'id', 'conversation', 'content', 'user_id', 'date', 'seen', 'user' ,'image'
         ]
 
-        
 class ItemCommentSerializer(serializers.ModelSerializer):
     user = UserLightSerializer(allow_null=True, default=None)
     item = ItemSerializer(allow_null=True, default=None)
