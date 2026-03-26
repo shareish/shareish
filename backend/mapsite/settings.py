@@ -39,7 +39,7 @@ API_URL = DEV_API_URL if DEV else PROD_API_URL
 print(APP_URL)
 print(API_URL)
 
-ALLOWED_HOSTS = ['web', APP_DOMAIN.split(":")[0]]
+ALLOWED_HOSTS = ['web', '127.0.0.1', 'localhost', APP_DOMAIN.split(":")[0]]
 
 # Application definition
 

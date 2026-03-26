@@ -54,25 +54,25 @@
 export default({
     methods:{
         async oidcGoogle(){
-            window.location.href = "http://localhost:8000/accounts/google/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/google/login/";
         },
         async oidcOSM(){
-            window.location.href = "http://localhost:8000/accounts/openstreetmap/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/openstreetmap/login/";
         },
         async oidcWikipedia(){
-            window.location.href = "http://localhost:8000/accounts/mediawiki/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/mediawiki/login/";
         },
         async oidcFacebook(){
-            window.location.href = "http://localhost:8000/accounts/facebook/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/facebook/login/";
         },
         async oidcMicrosoft(){
-            window.location.href = "http://localhost:8000/accounts/microsoft/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/microsoft/login/";
         },
         async oidcApple(){
-            window.location.href = "http://localhost:8000/accounts/apple/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/apple/login/";
         },
         async oidcGithub(){
-            window.location.href = "http://localhost:8000/accounts/github/login/";
+            window.location.href = "http://127.0.0.1:8000/accounts/github/login/";
         },
     },
 })
