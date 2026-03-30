@@ -1,5 +1,5 @@
 var PROD_URL = "https://shareish.org";
-var DEV_URL = "http://localhost:8000";
+var DEV_URL = "http://127.0.0.1:8000";
 
 import axios from "axios";
 axios.defaults.baseURL = (process.env.NODE_ENV === 'production') ? PROD_URL : DEV_URL;

@@ -16,6 +16,20 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             username = data.get('given_name', '') + data.get('family_name', '') + sociallogin.account.uid
             user.username = username[:20]
 
+        elif sociallogin.account.provider == 'mediawiki':
+            user.first_name = data.get('firstname', '')
+            user.last_name = data.get('lastname', '')
+            username = data.get('firstname', '') + data.get('lastname', '') + sociallogin.account.uid
+            user.username = username[:20]
+
+        elif sociallogin.account.provider == 'openstreetmap':
+            user.first_name = data.get('firstname', '')
+            user.last_name = data.get('lastname', '')
+            username = data.get('firstname', '') + data.get('lastname', '') + sociallogin.account.uid
+            user.username = username[:20]
+
+
+
         user.save()
 
         Token.objects.get_or_create(user=user)

@@ -24,9 +24,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == "True"
 
 DEV = os.environ.get('DEV') == "True"
-DEV_DOMAIN = "localhost:8081"
+DEV_DOMAIN = "127.0.0.1:8081"
 DEV_URL = "http://" + DEV_DOMAIN
-DEV_API_URL = "http://localhost:8000"
+DEV_API_URL = "http://127.0.0.1:8000"
 
 PROD_DOMAIN = "shareish.org"
 PROD_URL = "https://" + PROD_DOMAIN
@@ -62,6 +62,12 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.openid_connect',
+    'allauth.socialaccount.providers.mediawiki',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.microsoft',
+    'allauth.socialaccount.providers.apple',
+    'allauth.socialaccount.providers.github',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'mapsite.urls'
@@ -261,7 +268,7 @@ DJOSER = {
  
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
-#LOGIN_REDIRECT_URL = DEV_URL
+LOGIN_REDIRECT_URL = DEV_URL
 ACCOUNT_LOGOUT_ON_GET = True
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -286,13 +293,117 @@ CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
+#https://docs.allauth.org/en/latest/socialaccount/providers/index.html
 SOCIALACCOUNT_PROVIDERS = {
     'google':{
         'APP':{
             'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
             'secret': os.environ.get('GOOGLE_SECRET'),
         }
-    }
+    },
+    "openid_connect": {
+        "APPS": [
+            {
+              "provider_id": "openstreetmap",
+              "name": "OpenStreetMap",
+              "client_id": os.environ.get('OPENSTREETMAP_CLIENT_ID'),
+              "secret": os.environ.get('OPENSTREETMAP_SECRET'),
+              "settings": {
+                  "server_url": "https://master.apis.dev.openstreetmap.org/.well-known/openid-configuration",
+                  "token_auth_method": "client_secret_basic",
+                  "scope": ["openid", "read_prefs"],
+              },
+            },
+        ],
+    },
+    'mediawiki': {
+        'REST_API': 'https://meta.wikimedia.org/w/rest.php',
+        'USERPAGE_TEMPLATE': 'https://meta.wikimedia.org/wiki/{username}',
+        # Identify your application with a descriptive user agent.
+        # Format (generic template):
+        #   <client>/<version> (<contact info>) [<extra lib>/<version> ...]
+        # Contact info can be a user page URL, project URL, or email.
+        # Example (bot):
+        'USER_AGENT': 'Shareish/0.7 (+https://shareish.org/; contact@shareish.org) django-allauth',
+        'SCOPE': ['mwoauth-authonlyprivate'],
+        'APP':{
+            'client_id': os.environ.get('MEDIAWIKI_CLIENT_ID'),
+            'secret': os.environ.get('MEDIAWIKI_SECRET'),
+            'key': '',   
+        },
+    },
+    'facebook': {
+        'METHOD': 'oauth2',  # Set to 'js_sdk' to use the Facebook connect SDK
+        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'name',
+            'name_format',
+            'picture',
+            'short_name'
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': 'path.to.callable',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v13.0',
+        'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
+    },
+    "microsoft": {
+        "APPS": [
+            {
+                "client_id": "<insert-id>",
+                "secret": "<insert-secret>",
+                "settings": {
+                    "tenant": "organizations",
+                    # Optional: override URLs (use base URLs without path)
+                    "login_url": "https://login.microsoftonline.com",
+                    "graph_url": "https://graph.microsoft.com",
+                }
+            }
+        ]
+    },
+    #Need to be register as company
+    "apple": {
+        "APPS": [{
+            # Your service identifier.
+            "client_id": "your.service.id",
+
+            # The Key ID (visible in the "View Key Details" page).
+            "secret": "KEYID",
+
+             # Member ID/App ID Prefix -- you can find it below your name
+             # at the top right corner of the page, or it’s your App ID
+             # Prefix in your App ID.
+            "key": "MEMAPPIDPREFIX",
+
+            "settings": {
+                # The certificate you downloaded when generating the key.
+                "certificate_key": """-----BEGIN PRIVATE KEY-----
+                s3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr
+                3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3
+                c3ts3cr3t
+                -----END PRIVATE KEY-----"""
+            }
+        }]
+    },
+    'github': {
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
+        'APP':{
+            'client_id': os.environ.get('GITHUB_CLIENT_ID'),
+            'secret': os.environ.get('GITHUB_SECRET'),
+            'key': '',
+        },
+    },
 }
 
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
