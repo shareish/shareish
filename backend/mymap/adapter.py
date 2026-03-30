@@ -4,11 +4,12 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+#Override default behavior of django-allauth
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     #save the user on the djangoallauth socialaccount table AND on the user table
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form)
-        user.isActive = True
+        user.is_active = True
         data = sociallogin.account.extra_data
         if sociallogin.account.provider == 'google':
             user.first_name = data.get('given_name', '')

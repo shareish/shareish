@@ -309,11 +309,13 @@ SOCIALACCOUNT_PROVIDERS = {
               "client_id": os.environ.get('OPENSTREETMAP_CLIENT_ID'),
               "secret": os.environ.get('OPENSTREETMAP_SECRET'),
               "settings": {
-                  "server_url": "https://master.apis.dev.openstreetmap.org/.well-known/openid-configuration",
-                  "token_auth_method": "client_secret_basic",
-                  "scope": ["openid", "read_prefs"],
+                  "server_url": "https://master.apis.dev.openstreetmap.org",
+                  "token_auth_method": "client_secret_post",
               },
             },
+        ],
+        'SCOPE': [
+            'openid',
         ],
     },
     'mediawiki': {
