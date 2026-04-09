@@ -20,36 +20,25 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         elif sociallogin.account.provider == 'mediawiki':
             user.first_name = data.get('firstname', '')
             user.last_name = data.get('lastname', '')
-            username = data.get('firstname', '') + data.get('lastname', '') + sociallogin.account.uid
+            username = data.get('firstname', 'User') + data.get('lastname', '') + sociallogin.account.uid
             user.username = username[:20]
 
         elif sociallogin.account.provider == 'openstreetmap':
-            user.first_name = data.get('firstname', '')
-            user.last_name = data.get('lastname', '')
-            username = data.get('firstname', '') + data.get('lastname', '') + sociallogin.account.uid
+            username = data.get('preferred_username', 'User') + sociallogin.account.uid
             user.username = username[:20]
 
         elif sociallogin.account.provider == 'microsoft':
-            data = sociallogin.account.extra_data
-            
-            # Microsoft renvoie les données en CamelCase via la Graph API
             first_name = data.get('givenName', '') 
             last_name = data.get('surname', '')
-            
-            # L'email est soit dans 'mail', soit dans 'userPrincipalName' (UPN)
-            email = data.get('mail') 
-            
-            user.first_name = first_name[:20]
-            user.last_name = last_name[:20]
-            user.email = email
-            
-            # Génération de l'username (Nettoyage des points/espaces fréquents chez MS)
-            uid = str(sociallogin.account.uid)
-            base_name = data.get('displayName', 'msuser')
-            if(base_name == 'msuser'):
-                user.username = f"{base_name}{sociallogin.account.uid}"
+            base_name = data.get('displayName', 'User')
+            if(base_name == 'User'):
+                user.username = base_name + sociallogin.account.uid
             else: 
                 user.username = base_name
+        elif sociallogin.account.provider == 'github':
+            username = data.get("name", "User") + sociallogin.account.uid
+            user.username = username[:20]
+             
         user.save()
 
         Token.objects.get_or_create(user=user)
