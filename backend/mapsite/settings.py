@@ -166,7 +166,11 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
         },
-    }
+        'allauth': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
 }
 
 LOGIN_URL = 'login/'
@@ -231,6 +235,8 @@ CORS_ALLOW_ALL_ORIGINS = DEV
 
 CORS_ALLOWED_ORIGINS = [
     "http://ui",
+    "http://localhost:8081",
+    "http://localhost:8000",
     "http://localhost",
     APP_URL,
 ]
@@ -268,12 +274,12 @@ DJOSER = {
  
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
-LOGIN_REDIRECT_URL = DEV_URL
+#LOGIN_REDIRECT_URL = DEV_URL
+LOGIN_REDIRECT_URL = f"{DEV_URL}/map"
+
 ACCOUNT_LOGOUT_ON_GET = True
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
-ACCOUNT_LOGOUT_ON_GET = True
-
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
@@ -286,10 +292,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 SOCIALACCOUNT_ADAPTER = 'mymap.adapter.SocialAccountAdapter'
 
-LOGIN_REDIRECT_URL = f"{APP_URL}/map"
 
 CORS_ALLOW_CREDENTIALS = True
 
+SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
@@ -321,12 +327,12 @@ SOCIALACCOUNT_PROVIDERS = {
     'mediawiki': {
         'REST_API': 'https://meta.wikimedia.org/w/rest.php',
         'USERPAGE_TEMPLATE': 'https://meta.wikimedia.org/wiki/{username}',
+
         # Identify your application with a descriptive user agent.
         # Format (generic template):
         #   <client>/<version> (<contact info>) [<extra lib>/<version> ...]
         # Contact info can be a user page URL, project URL, or email.
-        # Example (bot):
-        'USER_AGENT': 'Shareish/0.7 (+https://shareish.org/; contact@shareish.org) django-allauth',
+        'USER_AGENT': 'shareish/0.7 (http://shareish.org)',
         'SCOPE': ['mwoauth-authonlyprivate'],
         'APP':{
             'client_id': os.environ.get('MEDIAWIKI_CLIENT_ID'),
@@ -334,11 +340,12 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': '',   
         },
     },
+    #ONLY HTTPS
     'facebook': {
         'METHOD': 'oauth2',  # Set to 'js_sdk' to use the Facebook connect SDK
-        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+        #'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
         'SCOPE': ['email', 'public_profile'],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        #'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
         'INIT_PARAMS': {'cookie': True},
         'FIELDS': [
             'id',
@@ -350,17 +357,23 @@ SOCIALACCOUNT_PROVIDERS = {
             'picture',
             'short_name'
         ],
-        'EXCHANGE_TOKEN': True,
-        'LOCALE_FUNC': 'path.to.callable',
-        'VERIFIED_EMAIL': False,
+        #'EXCHANGE_TOKEN': True,
+        #'LOCALE_FUNC': 'path.to.callable',
+        #'VERIFIED_EMAIL': False,
         'VERSION': 'v13.0',
         'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
+        'APP':{
+            'client_id': os.environ.get('FACEBOOK_CLIENT_ID'),
+            'secret': os.environ.get('FACEBOOK_SECRET'),
+            'key': '',
+        }
     },
+    #OK but does not work in dev prod
     "microsoft": {
         "APPS": [
             {
-                "client_id": "<insert-id>",
-                "secret": "<insert-secret>",
+                "client_id": os.environ.get('MICROSOFT_CLIENT_ID'),
+                "secret": os.environ.get('MICROSOFT_SECRET'),
                 "settings": {
                     "tenant": "organizations",
                     # Optional: override URLs (use base URLs without path)
@@ -368,7 +381,13 @@ SOCIALACCOUNT_PROVIDERS = {
                     "graph_url": "https://graph.microsoft.com",
                 }
             }
-        ]
+        ],
+        'AUTH_PARAMS':{
+            'redirect_uri': 'http://localhost:8000/accounts/microsoft/login/callback/'
+        },
+        'SCOPE':[
+            'openid', 'email', 'profile', 'User.Read'
+        ],
     },
     #Need to be register as company
     "apple": {
@@ -397,14 +416,13 @@ SOCIALACCOUNT_PROVIDERS = {
     'github': {
         'SCOPE': [
             'user',
-            'repo',
             'read:org',
         ],
-        'APP':{
+        'APPS':[{
             'client_id': os.environ.get('GITHUB_CLIENT_ID'),
             'secret': os.environ.get('GITHUB_SECRET'),
             'key': '',
-        },
+        }],
     },
 }
 
@@ -413,3 +431,5 @@ INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
 # Implements xss and mime sniffing protection
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SITE_ID = 1

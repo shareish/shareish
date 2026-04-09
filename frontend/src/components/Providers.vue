@@ -66,7 +66,7 @@ export default({
             window.location.href = "http://127.0.0.1:8000/accounts/facebook/login/";
         },
         async oidcMicrosoft(){
-            window.location.href = "http://127.0.0.1:8000/accounts/microsoft/login/";
+            window.location.href = "http://localhost:8000/accounts/microsoft/login/";
         },
         async oidcApple(){
             window.location.href = "http://127.0.0.1:8000/accounts/apple/login/";
