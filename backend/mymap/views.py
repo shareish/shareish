@@ -663,7 +663,7 @@ def close_all_conversations_from_item(request, item_id):
 @permission_classes([IsAuthenticated])
 def disable_user(request, user_id):
     if request.method == 'POST':
-        if 'password' in request.data:
+        #if 'password' in request.data:
             if user_id == request.user.id or request.user.is_staff:
                 # Retrieve the user to modify
                 try:
@@ -672,8 +672,8 @@ def disable_user(request, user_id):
                     return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
                 # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                #if not user.check_password(request.data['password']):
+                #    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 if not user.is_disabled:
                     try:
@@ -696,8 +696,8 @@ def disable_user(request, user_id):
                     return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+        #else:
+        #    return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -705,7 +705,7 @@ def disable_user(request, user_id):
 @permission_classes([IsAuthenticated])
 def user_send_delete_confirmation(request, user_id):
     if request.method == 'POST':
-        if 'password' in request.data:
+        #if 'password' in request.data:
             if user_id == request.user.id or request.user.is_staff:
                 # Retrieve the user to contact
                 try:
@@ -714,8 +714,8 @@ def user_send_delete_confirmation(request, user_id):
                     return JsonResponse({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
                 # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                #if not user.check_password(request.data['password']):
+                #    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate and store a delete_account token for the user
                 token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
@@ -726,8 +726,8 @@ def user_send_delete_confirmation(request, user_id):
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+        #else:
+            #return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 

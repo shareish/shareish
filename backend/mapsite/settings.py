@@ -64,9 +64,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.openid_connect',
     'allauth.socialaccount.providers.mediawiki',
-    'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.microsoft',
-    'allauth.socialaccount.providers.apple',
     'allauth.socialaccount.providers.github',
 ]
 
@@ -340,34 +338,6 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': '',   
         },
     },
-    #ONLY HTTPS
-    'facebook': {
-        'METHOD': 'oauth2',  # Set to 'js_sdk' to use the Facebook connect SDK
-        #'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
-        'SCOPE': ['email', 'public_profile'],
-        #'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'INIT_PARAMS': {'cookie': True},
-        'FIELDS': [
-            'id',
-            'first_name',
-            'last_name',
-            'middle_name',
-            'name',
-            'name_format',
-            'picture',
-            'short_name'
-        ],
-        #'EXCHANGE_TOKEN': True,
-        #'LOCALE_FUNC': 'path.to.callable',
-        #'VERIFIED_EMAIL': False,
-        'VERSION': 'v13.0',
-        'GRAPH_API_URL': 'https://graph.facebook.com/v13.0',
-        'APP':{
-            'client_id': os.environ.get('FACEBOOK_CLIENT_ID'),
-            'secret': os.environ.get('FACEBOOK_SECRET'),
-            'key': '',
-        }
-    },
     #OK but does not work in dev prod
     "microsoft": {
         "APPS": [
@@ -388,30 +358,6 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE':[
             'openid', 'email', 'profile', 'User.Read'
         ],
-    },
-    #Need to be register as company
-    "apple": {
-        "APPS": [{
-            # Your service identifier.
-            "client_id": "your.service.id",
-
-            # The Key ID (visible in the "View Key Details" page).
-            "secret": "KEYID",
-
-             # Member ID/App ID Prefix -- you can find it below your name
-             # at the top right corner of the page, or it’s your App ID
-             # Prefix in your App ID.
-            "key": "MEMAPPIDPREFIX",
-
-            "settings": {
-                # The certificate you downloaded when generating the key.
-                "certificate_key": """-----BEGIN PRIVATE KEY-----
-                s3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr
-                3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3cr3ts3
-                c3ts3cr3t
-                -----END PRIVATE KEY-----"""
-            }
-        }]
     },
     'github': {
         'SCOPE': [
