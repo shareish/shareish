@@ -5,15 +5,21 @@ import ErrorHandler from "@/mixins/ErrorHandler";
 
 export async function logout(instance) {
   try {
-    await axios.post("/api/v1/token/logout/");
-    axios.defaults.headers.common["Authorization"] = "";
-    localStorage.removeItem("token");
-    instance.$store.commit('removeToken');
-    instance.$store.commit('removeUserID');
-    await instance.$router.push("/log-in");
+    await axios.post("/api/v1/logout/", {}, {withCredentials: true});
   }
   catch (error) {
-    ErrorHandler.methods.snackbarError(error);
+    if(error.response && error.response.status !== 401){
+      ErrorHandler.methods.snackbarError(error);
+    }
+  }finally{
+    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem("token");
+    localStorage.removeItem("user_id");
+    if(instance.$store){
+      instance.$store.commit('removeToken');
+      instance.$store.commit('removeUserID');
+    }
+    await instance.$router.push("/log-in");
   }
 }
 

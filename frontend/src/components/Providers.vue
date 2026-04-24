@@ -7,31 +7,31 @@
         <div class="buttons is-centered">
             <b-tooltip label="Google" type="is-dark" position="is-bottom">
                 <b-button @click="login('google')">
-                    <b-icon pack="fab" icon="google" size="is-medium" type="is-primary"></b-icon>
+                    <img src="@/assets/icons/google.svg" alt="Google">
                 </b-button>
             </b-tooltip>
             
             <b-tooltip label="Openstreetmap" type="is-dark" position="is-bottom">
                 <b-button @click="login('openstreetmap')">
-                    <b-icon pack="fa" icon="map" size="is-medium" type="is-primary"></b-icon>
+                    <img src="@/assets/icons/openstreetmap.svg" alt="Openstreetmap">
                 </b-button>
             </b-tooltip>
                               
             <b-tooltip label="Wikipedia" type="is-dark" position="is-bottom">
                 <b-button @click="login('mediawiki')">
-                    <b-icon pack="fab" icon="wikipedia-w" size="is-medium" type="is-primary"></b-icon>
+                    <img src="@/assets/icons/wikipedia.svg" alt="Wikipedia">
                 </b-button>
             </b-tooltip>
 
             <b-tooltip label="Microsoft" type="is-dark" position="is-bottom">
                 <b-button @click="login('microsoft')">
-                    <b-icon pack="fab" icon="microsoft" size="is-medium" type="is-primary"></b-icon>
+                    <img src="@/assets/icons/microsoft-icon.svg" alt="Microsoft">
                 </b-button>
             </b-tooltip>
 
             <b-tooltip label="Github" type="is-dark" position="is-bottom">
                 <b-button @click="login('github')">
-                    <b-icon pack="fab" icon="github" size="is-medium" type="is-primary"></b-icon>
+                    <img src="@/assets/icons/github.svg" alt="Github">
                 </b-button>
             </b-tooltip>
         </div>
@@ -39,10 +39,11 @@
 </template>
 
 <script>
+import axios from "axios"
 export default({
     data() {
         return {
-            ip: "http://127.0.0.1:8000",
+            ip: axios.defaults.baseURL,
         }
     },
     methods:{
@@ -89,7 +90,16 @@ export default({
     }
 
     .buttons .button{
+        padding: 0;
         height: 3rem;
         width: 3rem;
+        align-items: center;
+        justify-content: center;
     }
+
+    .buttons .button img{
+        width: 75%;
+        height: 75%;
+    }
+    
 </style>
