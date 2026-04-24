@@ -95,7 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-
+                'mymap.context_processors.site_settings',
             ],
         },
     },
@@ -269,33 +269,32 @@ DJOSER = {
     },
     
 }
- 
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
-#LOGIN_REDIRECT_URL = DEV_URL
-LOGIN_REDIRECT_URL = f"{DEV_URL}/map"
-
+LOGIN_REDIRECT_URL = f"{APP_URL}/map"
 ACCOUNT_LOGOUT_ON_GET = True
-
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
-
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True 
-
 SOCIALACCOUNT_ADAPTER = 'mymap.adapter.SocialAccountAdapter'
-
-
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+if DEV:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_DOMAIN = None
+    CORS_ALLOW_ALL_ORIGINS = True 
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+else: 
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
 
 #https://docs.allauth.org/en/latest/socialaccount/providers/index.html
 SOCIALACCOUNT_PROVIDERS = {
@@ -319,7 +318,7 @@ SOCIALACCOUNT_PROVIDERS = {
             },
         ],
         'SCOPE': [
-            'openid',
+            'openid', 
         ],
     },
     'mediawiki': {
@@ -338,16 +337,13 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': '',   
         },
     },
-    #OK but does not work in dev prod
     "microsoft": {
         "APPS": [
             {
                 "client_id": os.environ.get('MICROSOFT_CLIENT_ID'),
                 "secret": os.environ.get('MICROSOFT_SECRET'),
                 "settings": {
-                    "tenant": "organizations",
-                    # Optional: override URLs (use base URLs without path)
-                    "login_url": "https://login.microsoftonline.com",
+                    "login_url": "https://login.microsoftonline.com/",
                     "graph_url": "https://graph.microsoft.com",
                 }
             }

@@ -1,6 +1,8 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.models import Token as RestToken
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from mymap.models import UserMapExtraCategories
 
 User = get_user_model()
 
@@ -9,39 +11,42 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
     #save the user on the djangoallauth socialaccount table AND on the user table
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form)
-        user.is_active = True
         data = sociallogin.account.extra_data
-        if sociallogin.account.provider == 'google':
+        provider = sociallogin.account.provider
+        uid = sociallogin.account.uid
+        
+        if provider == 'google':
             user.first_name = data.get('given_name', '')
             user.last_name = data.get('family_name', '')
-            username = data.get('given_name', '') + data.get('family_name', '') + sociallogin.account.uid
-            user.username = username[:20]
-
-        elif sociallogin.account.provider == 'mediawiki':
+            user.username = (data.get('given_name', '') + '.' + data.get('family_name', '') + '.' + uid)[:20]
+        elif provider == 'mediawiki':
             user.first_name = data.get('firstname', '')
             user.last_name = data.get('lastname', '')
-            username = data.get('firstname', 'User') + data.get('lastname', '') + sociallogin.account.uid
-            user.username = username[:20]
-
-        elif sociallogin.account.provider == 'openstreetmap':
-            username = data.get('preferred_username', 'User') + sociallogin.account.uid
-            user.username = username[:20]
-
-        elif sociallogin.account.provider == 'microsoft':
-            first_name = data.get('givenName', '') 
-            last_name = data.get('surname', '')
-            base_name = data.get('displayName', 'User')
-            if(base_name == 'User'):
-                user.username = base_name + sociallogin.account.uid
-            else: 
-                user.username = base_name
-        elif sociallogin.account.provider == 'github':
-            username = data.get("name", "User") + sociallogin.account.uid
-            user.username = username[:20]
-             
+            user.username = (data.get('firstname', '') + '.' + data.get('lastname', '') + '.' + uid)[:20]
+        elif provider == 'openstreetmap':
+            user.username = (data.get('preferred_username', 'User') + uid)[:20]
+        elif provider == 'microsoft':
+            user.first_name = data.get('given_name', '')
+            user.last_name = data.get('surname', '')
+            display_name = data.get('display_name', 'User')
+            user.username = (display_name + uid)[:20]
+        elif provider == 'github':
+            user.first_name = (data.get('name', 'User') + uid)[:20]
+        
+        user.is_active = True 
+        user.last_login = timezone.now()
         user.save()
 
-        Token.objects.get_or_create(user=user)
+        if not user.map_ecats.exists():
+            from .models import UserMapExtraCategory, UserMapExtraCategories
+            for category_code, category_name in UserMapExtraCategories.choices:
+                UserMapExtraCategory.objects.get_or_create(
+                    user=user, 
+                    category=category_code,
+                    defaults={'selected': True}
+                )
+        
+        RestToken.objects.get_or_create(user=user)
 
         return user
 
