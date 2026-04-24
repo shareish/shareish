@@ -2,17 +2,17 @@
 {% load i18n %}
 
 {% block content %}
-<div class="login-container">
+<div class="container">
     <h2>{% trans "Almost there!" %}</h2>
     <p>
-        {% trans "Please provide your email address to complete your Shareish account." %}
+        {% trans "The provider does not give the mail. Shareish needs your mail to enable all of its features. Please enter a valid email address." %}
     </p> 
 
     <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
         {% csrf_token %}
         
         <div class="field">
-            <label for="id_email">{% trans "Email" %}</label>
+            <label for="id_email">{% trans "email" %}</label>
             <input type="email" name="email" id="id_email" 
                    placeholder="email@example.com" 
                    value="{{ form.email.value|default:'' }}" required>
@@ -28,43 +28,9 @@
 
         <div class="actions">
             <button type="submit" class="button is-primary">
-                {% trans "Confirm Email" %}
+                {% trans "Confirm the email" %}
             </button>
         </div>
     </form>
 </div>
-
-<style>
-    .login-container {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 30px;
-        background: #fff;
-        border: 1px solid #eaeaea;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-    .field { margin-bottom: 20px; }
-    .field label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a4a4a; }
-    .field input { 
-        width: 100%; 
-        padding: 12px; 
-        border: 1px solid #dbdbdb; 
-        border-radius: 6px;
-        font-size: 1rem;
-    }
-    .help.is-danger { color: #f14668; font-size: 0.85rem; margin-top: 5px; }
-    .actions { margin-top: 25px; }
-    .button.is-primary { 
-        width: 100%;
-        background-color: #00d1b2; 
-        color: white; 
-        border: none; 
-        padding: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-    .button.is-primary:hover { opacity: 0.9; }
-</style>
 {% endblock %}
