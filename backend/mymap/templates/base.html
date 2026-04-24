@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shareish</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Shareish</h1>
+
+        {% block content %} 
+        {% endblock %}
+
+        <h2>Back to login</h2>
+        <button onclick="redirect()" class="button is-primary">
+            go 
+        </button>
+    </div>
+    <script>
+        function redirect(){
+            window.location.href = 'http://127.0.0.1:8081/map';
+        }
+    </script>
+</body>
+</html>
