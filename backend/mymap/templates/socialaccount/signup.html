@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container">
+    <h2>{% trans "Almost there!" %}</h2>
+    <p>
+        {% trans "The provider does not give the mail. Shareish needs your mail to enable all of its features. Please enter a valid email address." %}
+    </p> 
+
+    <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+        {% csrf_token %}
+        
+        <div class="field">
+            <label for="id_email">{% trans "email" %}</label>
+            <input type="email" name="email" id="id_email" 
+                   placeholder="email@example.com" 
+                   value="{{ form.email.value|default:'' }}" required>
+            
+            {% if form.email.errors %}
+                <p class="help is-danger">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        {% if form.username %}
+            <input type="hidden" name="username" value="{{ form.username.value|default:'' }}">
+        {% endif %}
+
+        <div class="actions">
+            <button type="submit" class="button is-primary">
+                {% trans "Confirm the email" %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

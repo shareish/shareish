@@ -15,6 +15,7 @@ class MymapConfig(AppConfig):
         from djoser.views import UserViewSet
         from django.conf import settings
         from djoser.compat import get_user_email
+        import signals
 
         def perform_update(self, serializer):
             request = self.request

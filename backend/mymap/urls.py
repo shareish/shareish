@@ -42,5 +42,7 @@ urlpatterns = [
     re_path(r'^recover-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.recover_account_confirm_token, name='recover_account_confirm_token'),
     re_path(r'^delete-account/confirm/(?P<token>[a-zA-Z0-9\-_]+)$', views.delete_account_confirm_token, name='delete_account_confirm_token'),
     path("items/<int:item_id>/close", views.close_item, name='close_item'),
-
+    path('proxy/', proxy_view, name='proxy_view'),
+    path('user-info/', views.get_user_info, name='get_user_info'),
+    path('logout/', views.logout_view, name='logout'),
 ]

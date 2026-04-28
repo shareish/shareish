@@ -16,7 +16,6 @@
         <li>You won't receive any new notification from Shareish.</li>
       </ul>
       <p class="mb-2">{{ $t('if-still-want-to-x-your-account-password', {x: lcall($t('disable'))}) }}</p>
-      <b-input type="password" v-model="password" password-reveal />
     </section>
     <footer class="modal-card-foot">
       <b-button :label="$t('cancel')" @click="$emit('close')" />
@@ -54,7 +53,7 @@ export default {
         const data = {
           password: this.password
         }
-        await axios.post(`/api/v1/users/${this.userId}/disable`, data);
+        await axios.post(`/api/v1/users/${this.userId}/disable`);
 
         this.$emit('close');
 

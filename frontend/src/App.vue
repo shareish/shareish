@@ -1,37 +1,47 @@
 <template>
   <div class="layout-surrounding">
-    <template v-if="$route.meta.layout === 'no-navbar'">
+    <template v-if="isReady">
       
-      <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
-        <div class="content">
-          <p>{{$t('description-install')}}</p>
-          <div class="button-container">
-            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
-            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
+      <template v-if="$route.meta.layout === 'no-navbar'">
+        <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
+          <div class="content">
+            <p>{{$t('description-install')}}</p>
+            <div class="button-container">
+              <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
+              <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
+            </div>
           </div>
-        </div>
-      </b-notification>
+        </b-notification>
 
-      <no-navbar-layout>
-        <router-view />
-      </no-navbar-layout>
+        <no-navbar-layout>
+          <router-view />
+        </no-navbar-layout>
+      </template>
+
+      <template v-else>
+        <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
+          <div class="content">
+            <p>{{$t('description-install')}}</p>
+            <div class="button-container">
+              <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
+              <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
+            </div>
+          </div>
+        </b-notification>
+        
+        <default-layout>
+          <router-view />
+        </default-layout>
+      </template>
 
     </template>
-    <template v-else>
-      <b-notification v-if="showInstallPrompt && !localTimeStorage.value" type="is-info" has-icon class="notification-overlay"> 
-        <div class="content">
-          <p>{{$t('description-install')}}</p>
-          <div class="button-container">
-            <b-button @click="dismiss" size="is-small" type="is-light" >{{ $t('button-app-dismiss') }}</b-button>
-            <b-button @click="install" size="is-small" type="is-light" >{{$t('button-app-install') }}</b-button>
-          </div>
-        </div>
-      </b-notification>
-      
-      <default-layout>
-        <router-view />
-      </default-layout>
-    </template>
+
+    <div v-else class="vh-align-center" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+      <div class="has-text-centered">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p class="mt-3">Loading Shareish...</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,7 +59,8 @@ export default {
       deferredPrompt: null,
       localTimeStorage : {
         value : false,
-      }
+      },
+      isReady: false,
     };
   },
   components: {NoNavbarLayout, DefaultLayout},
@@ -58,7 +69,7 @@ export default {
     const token = this.$store.state.token;
     axios.defaults.headers.common['Authorization'] = (token) ? "Token " + token : "";
   },
-  created(){
+  async created(){
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       this.deferredPrompt = e;
@@ -70,6 +81,30 @@ export default {
     });
 
     this.checkDismiss();
+    try{
+      const response = await axios.get('api/v1/user-info/', {
+        withCredentials:true
+        });
+      if (response.data && response.data.token) {
+        const token = response.data.token;
+        const userId = response.data.user.id;
+
+        this.$store.commit('setToken', token);
+        this.$store.commit('setUserID', userId);
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user_id', userId);
+
+        axios.defaults.headers.common['Authorization'] = "Token " + token;
+      }
+    }catch(error){
+        this.$store.commit('removeToken');
+        this.$store.commit('removeUserID');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user_id');
+    }finally{
+    this.isReady = true;
+    }
   },
   methods: {
     dismiss() {

@@ -1,0 +1,61 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shareish</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .field { margin-bottom: 20px; }
+        .field label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a4a4a; }
+        .field input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #dbdbdb; 
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .help.is-danger { color: #f14668; font-size: 0.85rem; margin-top: 5px; }
+        .actions { margin-top: 25px; }
+        .button.is-primary { 
+            width: 100%;
+            background-color: #00d1b2; 
+            color: white; 
+            border: none; 
+            padding: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .button.is-primary:hover { opacity: 0.9; }
+    </style>
+</head>
+    <body>
+        <div class="container">
+            <h1>Shareish</h1>
+
+            {% block content %} 
+            {% endblock %}
+
+            <h2>
+                {% trans "Go back to login page" %}
+            </h2>
+            <button onclick="redirect()" class="button is-primary">
+                {% trans "Go" %} 
+            </button>
+        </div>
+        <script>
+            function redirect(){
+                window.location.href = "{{ APP_URL }}/map";
+            }
+        </script>
+    </body>
+</html>

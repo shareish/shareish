@@ -25,7 +25,7 @@ from .models import Conversation, Item, ItemImage, Message, UserImage, ItemComme
 
 from rest_framework import filters, viewsets
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import api_view, permission_classes, action, authentication_classes
 from rest_framework.response import Response
 from .pagination import ActivePaginationClass, MessagePaginationClass
 from .serializers import (
@@ -34,6 +34,8 @@ from .serializers import (
 )
 from .permissions import IsOwnerProfileOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 from .ai import findClass
 
@@ -663,7 +665,7 @@ def close_all_conversations_from_item(request, item_id):
 @permission_classes([IsAuthenticated])
 def disable_user(request, user_id):
     if request.method == 'POST':
-        if 'password' in request.data:
+        #if 'password' in request.data:
             if user_id == request.user.id or request.user.is_staff:
                 # Retrieve the user to modify
                 try:
@@ -672,8 +674,8 @@ def disable_user(request, user_id):
                     return Response({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
                 # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                #if not user.check_password(request.data['password']):
+                #    return Response({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 if not user.is_disabled:
                     try:
@@ -696,8 +698,8 @@ def disable_user(request, user_id):
                     return Response({'key': 'ACCOUNT_ALREADY_DISABLED'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+        #else:
+        #    return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -705,7 +707,7 @@ def disable_user(request, user_id):
 @permission_classes([IsAuthenticated])
 def user_send_delete_confirmation(request, user_id):
     if request.method == 'POST':
-        if 'password' in request.data:
+        #if 'password' in request.data:
             if user_id == request.user.id or request.user.is_staff:
                 # Retrieve the user to contact
                 try:
@@ -714,8 +716,8 @@ def user_send_delete_confirmation(request, user_id):
                     return JsonResponse({'key': 'ACCOUNT_DOESNT_EXIST'}, status=status.HTTP_404_NOT_FOUND)
 
                 # Verify that the password entered is correct
-                if not user.check_password(request.data['password']):
-                    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
+                #if not user.check_password(request.data['password']):
+                #    return JsonResponse({'key': 'INVALID_PASSWORD'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate and store a delete_account token for the user
                 token = Token.get_or_create(user, Token.TokenActions.DELETE_ACCOUNT)
@@ -726,8 +728,8 @@ def user_send_delete_confirmation(request, user_id):
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response({'key': 'NOT_ACCOUNT_OWNER'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
+        #else:
+            #return Response({'key': 'MISSING_INTERNAL_FIELDS'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -928,3 +930,51 @@ def proxy_view(request):
         return JsonResponse(response.json(), safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    user = request.user
+
+    if not user.is_active:
+        return Response({'key': 'NOT_VALIDATED_YET'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if user.is_disabled:
+        try: 
+            schedule = ScheduledAccountDeletion.objects.get(user=user)
+            if schedule.due_date() > timezone.now():
+                days_left = (schedule.due_date() - timezone.now()).days
+            else:
+                days_left = 0
+            return Response({'key': 'SCHEDULED_DELETION_ACCOUNT', 'days_left': days_left})
+        except Exception:
+            return Response({'key': 'DISABLED_ACCOUNT'}, status=status.HTTP_400_BAD_REQUEST)
+
+    token, created = RestToken.objects.get_or_create(user=user)
+
+    return Response({
+        "is_logged_in": True,
+        "token": token.key,
+        "user": {
+            "id": user.id,
+        }
+    })
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    RestToken.objects.filter(user=request.user).delete()
+
+    request.session.flush()
+
+
+    from django.contrib.auth import logout as django_logout
+    django_logout(request)
+
+    response = Response({"status": "Logged out successfully"}, status=200)
+
+    response.delete_cookie('sessionid', path='/')
+
+    return response

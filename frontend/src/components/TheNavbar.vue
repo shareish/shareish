@@ -91,6 +91,7 @@ export default {
   },
   methods: {
     async logout() {
+      clearTimeout(this.timeout);
       await logout(this);
     },
     async fetchConversationUpdates() {

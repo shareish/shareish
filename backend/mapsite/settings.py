@@ -24,9 +24,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == "True"
 
 DEV = os.environ.get('DEV') == "True"
-DEV_DOMAIN = "localhost:8081"
+DEV_DOMAIN = "127.0.0.1:8081"
 DEV_URL = "http://" + DEV_DOMAIN
-DEV_API_URL = "http://localhost:8000"
+DEV_API_URL = "http://127.0.0.1:8000"
 
 PROD_DOMAIN = "shareish.org"
 PROD_URL = "https://" + PROD_DOMAIN
@@ -39,7 +39,7 @@ API_URL = DEV_API_URL if DEV else PROD_API_URL
 print(APP_URL)
 print(API_URL)
 
-ALLOWED_HOSTS = ['web', APP_DOMAIN.split(":")[0]]
+ALLOWED_HOSTS = ['web', '127.0.0.1', 'localhost', APP_DOMAIN.split(":")[0]]
 
 # Application definition
 
@@ -58,6 +58,14 @@ INSTALLED_APPS = [
     'djoser',
     'channels',
     'mymap.apps.MymapConfig',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.openid_connect',
+    'allauth.socialaccount.providers.mediawiki',
+    'allauth.socialaccount.providers.microsoft',
+    'allauth.socialaccount.providers.github',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +77,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'mapsite.urls'
@@ -86,6 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'mymap.context_processors.site_settings',
             ],
         },
     },
@@ -94,6 +104,13 @@ TEMPLATES = [
 # /!\ use Redis channel layer in production
 WSGI_APPLICATION = 'mapsite.wsgi.application'
 ASGI_APPLICATION = 'mapsite.asgi.application'
+
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 CHANNEL_LAYERS = {
     'default': {
@@ -124,7 +141,6 @@ DATABASES = {
         'USER': os.environ.get('POSTGRES_USER'),
     }
 }
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = 587
@@ -148,7 +164,11 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
         },
-    }
+        'allauth': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
 }
 
 LOGIN_URL = 'login/'
@@ -202,6 +222,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -212,6 +233,8 @@ CORS_ALLOW_ALL_ORIGINS = DEV
 
 CORS_ALLOWED_ORIGINS = [
     "http://ui",
+    "http://localhost:8081",
+    "http://localhost:8000",
     "http://localhost",
     APP_URL,
 ]
@@ -247,8 +270,108 @@ DJOSER = {
     
 }
 
+ACCOUNT_EMAIL_VERIFICATION = "none"
+LOGIN_REDIRECT_URL = f"{APP_URL}/map"
+ACCOUNT_LOGOUT_ON_GET = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_UNIQUE_EMAIL = True 
+SOCIALACCOUNT_ADAPTER = 'mymap.adapter.SocialAccountAdapter'
+CORS_ALLOW_CREDENTIALS = True
+
+if DEV:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_DOMAIN = None
+    CORS_ALLOW_ALL_ORIGINS = True 
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+else: 
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+
+#https://docs.allauth.org/en/latest/socialaccount/providers/index.html
+SOCIALACCOUNT_PROVIDERS = {
+    'google':{
+        'APP':{
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_SECRET'),
+        }
+    },
+    "openid_connect": {
+        "APPS": [
+            {
+              "provider_id": "openstreetmap",
+              "name": "OpenStreetMap",
+              "client_id": os.environ.get('OPENSTREETMAP_CLIENT_ID'),
+              "secret": os.environ.get('OPENSTREETMAP_SECRET'),
+              "settings": {
+                  "server_url": "https://master.apis.dev.openstreetmap.org",
+                  "token_auth_method": "client_secret_post",
+              },
+            },
+        ],
+        'SCOPE': [
+            'openid', 
+        ],
+    },
+    'mediawiki': {
+        'REST_API': 'https://meta.wikimedia.org/w/rest.php',
+        'USERPAGE_TEMPLATE': 'https://meta.wikimedia.org/wiki/{username}',
+
+        # Identify your application with a descriptive user agent.
+        # Format (generic template):
+        #   <client>/<version> (<contact info>) [<extra lib>/<version> ...]
+        # Contact info can be a user page URL, project URL, or email.
+        'USER_AGENT': 'shareish/0.7 (http://shareish.org)',
+        'SCOPE': ['mwoauth-authonlyprivate'],
+        'APP':{
+            'client_id': os.environ.get('MEDIAWIKI_CLIENT_ID'),
+            'secret': os.environ.get('MEDIAWIKI_SECRET'),
+            'key': '',   
+        },
+    },
+    "microsoft": {
+        "APPS": [
+            {
+                "client_id": os.environ.get('MICROSOFT_CLIENT_ID'),
+                "secret": os.environ.get('MICROSOFT_SECRET'),
+                "settings": {
+                    "login_url": "https://login.microsoftonline.com/",
+                    "graph_url": "https://graph.microsoft.com",
+                }
+            }
+        ],
+        'AUTH_PARAMS':{
+            'redirect_uri': 'http://localhost:8000/accounts/microsoft/login/callback/'
+        },
+        'SCOPE':[
+            'openid', 'email', 'profile', 'User.Read'
+        ],
+    },
+    'github': {
+        'SCOPE': [
+            'user',
+            'read:org',
+        ],
+        'APPS':[{
+            'client_id': os.environ.get('GITHUB_CLIENT_ID'),
+            'secret': os.environ.get('GITHUB_SECRET'),
+            'key': '',
+        }],
+    },
+}
+
 INTERVAL_ACCOUNT_DELETION = datetime.timedelta(days=30)
 
 # Implements xss and mime sniffing protection
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SITE_ID = 1

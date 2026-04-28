@@ -21,7 +21,6 @@
       </p>
       <p class="mb-5 has-text-centered is-size-5"><strong class="has-text-danger">{{ $t('danger-warning-delete-account') }}</strong></p>
       <p class="mb-2">{{ $t('if-still-want-to-x-your-account-password', {x: lcall($t('delete'))}) }}</p>
-      <b-input type="password" v-model="password" password-reveal />
     </section>
     <footer class="modal-card-foot">
       <b-button :label="$t('cancel')" @click="$emit('close')" />
@@ -59,7 +58,7 @@ export default {
         const data = {
           password: this.password
         }
-        await axios.post(`/api/v1/users/${this.userId}/send-delete-confirmation`, data);
+        await axios.post(`/api/v1/users/${this.userId}/send-delete-confirmation`);
 
         this.$emit('close');
 
