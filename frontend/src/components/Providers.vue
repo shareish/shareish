@@ -23,12 +23,6 @@
                 </b-button>
             </b-tooltip>
 
-            <b-tooltip label="Microsoft" type="is-dark" position="is-bottom">
-                <b-button @click="login('microsoft')">
-                    <img src="@/assets/icons/microsoft-icon.svg" alt="Microsoft">
-                </b-button>
-            </b-tooltip>
-
             <b-tooltip label="Github" type="is-dark" position="is-bottom">
                 <b-button @click="login('github')">
                     <img src="@/assets/icons/github.svg" alt="Github">
@@ -52,7 +46,6 @@ export default({
                 google: "/accounts/google/login/",
                 openstreetmap: "/accounts/oidc/openstreetmap/login/",
                 mediawiki: "/accounts/mediawiki/login/",
-                microsoft: "/accounts/microsoft/login/",
                 github: "/accounts/github/login/"
             };
 

@@ -337,24 +337,6 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': '',   
         },
     },
-    "microsoft": {
-        "APPS": [
-            {
-                "client_id": os.environ.get('MICROSOFT_CLIENT_ID'),
-                "secret": os.environ.get('MICROSOFT_SECRET'),
-                "settings": {
-                    "login_url": "https://login.microsoftonline.com/",
-                    "graph_url": "https://graph.microsoft.com",
-                }
-            }
-        ],
-        'AUTH_PARAMS':{
-            'redirect_uri': 'http://localhost:8000/accounts/microsoft/login/callback/'
-        },
-        'SCOPE':[
-            'openid', 'email', 'profile', 'User.Read'
-        ],
-    },
     'github': {
         'SCOPE': [
             'user',
