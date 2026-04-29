@@ -296,6 +296,10 @@ else:
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
 
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+    
+
 #https://docs.allauth.org/en/latest/socialaccount/providers/index.html
 SOCIALACCOUNT_PROVIDERS = {
     'google':{
@@ -336,24 +340,6 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.environ.get('MEDIAWIKI_SECRET'),
             'key': '',   
         },
-    },
-    "microsoft": {
-        "APPS": [
-            {
-                "client_id": os.environ.get('MICROSOFT_CLIENT_ID'),
-                "secret": os.environ.get('MICROSOFT_SECRET'),
-                "settings": {
-                    "login_url": "https://login.microsoftonline.com/",
-                    "graph_url": "https://graph.microsoft.com",
-                }
-            }
-        ],
-        'AUTH_PARAMS':{
-            'redirect_uri': 'http://localhost:8000/accounts/microsoft/login/callback/'
-        },
-        'SCOPE':[
-            'openid', 'email', 'profile', 'User.Read'
-        ],
     },
     'github': {
         'SCOPE': [
