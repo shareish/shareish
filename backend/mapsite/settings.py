@@ -296,6 +296,10 @@ else:
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
 
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+    
+
 #https://docs.allauth.org/en/latest/socialaccount/providers/index.html
 SOCIALACCOUNT_PROVIDERS = {
     'google':{

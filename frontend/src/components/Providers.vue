@@ -51,7 +51,11 @@ export default({
 
             const path = endpoints[provider];
             if(path){
-                window.location.href = this.ip + path;
+                if(process.env.NODE_ENV === 'development'){
+                    window.location.href = this.ip + path;
+                }else{
+                    window.location.href = path;
+                }
             }else{
                 console.error("Provider not found");
             }
