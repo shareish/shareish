@@ -316,7 +316,8 @@ SOCIALACCOUNT_PROVIDERS = {
               "client_id": os.environ.get('OPENSTREETMAP_CLIENT_ID'),
               "secret": os.environ.get('OPENSTREETMAP_SECRET'),
               "settings": {
-                  "server_url": "https://master.apis.dev.openstreetmap.org",
+                  # DEV server url"server_url": "https://master.apis.dev.openstreetmap.org",
+                  "server_url": "https://www.openstreetmap.org/oauth2/authorize",
                   "token_auth_method": "client_secret_post",
               },
             },
