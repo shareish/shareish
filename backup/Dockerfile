@@ -1,18 +1,10 @@
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     lsb-release \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
-RUN apt-get update && apt-get install -y \
     build-essential \
     locate \
     net-tools \
@@ -28,6 +20,10 @@ COPY deploy.sh /tmp/deploy.sh
 
 RUN chmod +x /tmp/deploy.sh
 
+ENTRYPOINT ["/tmp/deploy.sh"]
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+
 EXPOSE 5432
 
-ENTRYPOINT ["/tmp/deploy.sh"]
