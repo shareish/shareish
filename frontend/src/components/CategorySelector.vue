@@ -102,15 +102,22 @@ export default {
       return categories;
     },
   },
-  methods : {
+  methods: {
     ...mapActions(['toggleLoading']),
-    changeLoading(value){
+    
+    changeLoading(value) {
       this.toggleLoading(value);
     },
+
+    resetSelection() {
+      this.selectedCategory = null;
+    },
   },
-  watch:{
-    value(newValue){
+  watch: {
+    value(newValue) {
       this.selectedCategory = newValue;
+    }
+  },
     }
   }
 };

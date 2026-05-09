@@ -64,13 +64,14 @@
             <div class="column">
               <b-field key="type" :message="errors.first('type')" :type="{'is-danger': errors.has('type')}">
                 <template #label>{{ $tc('type', 1) }}
+                  <b-icon v-if="errors.first('type')" :type="{'is-danger': errors.has('type')}" class="fas fa-exclamation-circle"></b-icon>
                   <b-tooltip :label="$t('help_item_type')" multilined position="is-right">
                     <i class="icon far fa-question-circle"></i>
                   </b-tooltip>
                 </template>
                 <div class="columns is-variable is-1">
                   <div class="column" v-for="itemType in itemTypes" :key="itemType['type']">
-                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (internalItem.type !== itemType['type'])}]" @click="internalItem.type = itemType['type']">
+                    <b-button class="is-fullwidth" :class="[itemType['color'], {'is-outlined': (internalItem.type !== itemType['type'])}]" @click="internalItem.type = itemType['type']" v-validate="'required'" name="type">
                       {{ $t(itemType['slug']) }}</b-button>
                   </div>
                 </div>
@@ -79,13 +80,13 @@
           </div>
           <div>
             <div>
-              <category-selector v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded/>
+              <category-selector  ref="categorySelector1" v-model="internalItem.category1" :uses-tooltip="true" :number="1" expanded v-validate="'required'" name="category1" :errorCat="errors.first('category1')"/>
             </div>
             <div>
-              <category-selector v-model="internalItem.category2" :number="2" expanded />
+              <category-selector ref="categorySelector2" v-model="internalItem.category2" :number="2" expanded />
             </div>
             <div>
-              <category-selector v-model="internalItem.category3" :number="3" expanded />
+              <category-selector ref="categorySelector3" v-model="internalItem.category3" :number="3" expanded />
             </div>
           </div>
           <div class="columns">
@@ -273,23 +274,36 @@
           </div>
         </div>
         <div class="container has-text-centered mt-6">
-          <router-link
-              :to="{name: 'item', params: {id: itemId}}"
-              class="button is-danger"
-              :class="formBottomButtonsSize">
-            {{ $t('cancel') }}
-          </router-link>
-          <b-button
-              :type="internalItem.visibility !== 'DR' ? 'is-primary' : 'is-warning'"
-              class="ml-2"
-              :class="formBottomButtonsSize"
-              :loading="waitingFormResponse"
-              @click="submit">
-            {{ $t(internalItem.visibility !== 'DR' ? 'save' : 'modify') }}
-          </b-button>
-          <br />
-          <a class="is-inline-block mt-5 has-text-danger" :class="formBottomButtonsSize" @click="resetForm">{{ $t('reset-form') }}</a>
-        </div>
+          <div class="row">
+              <div class="col-md-12 mb-2">
+                  <router-link :to="{ name: 'item', params: { id: itemId } }" class="d-block w-100">
+                      <b-button ref="cancelBtn" type="is-danger" :class="[formBottomButtonsSize, buttonSizeClass]" icon-right="fas fa-times" block>
+                          {{ $t('cancel') }}
+                      </b-button>
+                  </router-link>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-md-12 mb-2">
+                  <b-button ref="resetBtn" :type="'is-danger'" :class="[formBottomButtonsSize, buttonSizeClass]" @click="resetForm" icon-right="fal fa-marker">
+                      {{ $t('reset-form') }}
+                  </b-button>
+              </div>
+              <div class="col-md-12 mb-2">
+                  <b-button 
+                      ref="submitBtn"
+                      :type="internalItem.visibility !== 'DR' ? 'is-primary' : 'is-warning'"
+                      class="ml-2"
+                      :class="[formBottomButtonsSize, buttonSizeClass]"
+                      :loading="waitingFormResponse"
+                      @click="submit"
+                      icon-right="far fa-check"
+                  >
+                      {{ $t(internalItem.visibility !== 'DR' ? 'save' : 'modify') }}
+                  </b-button>
+              </div>
+          </div>
+      </div>
       </section>
     </div>
   </div>
@@ -330,7 +344,7 @@ export default {
       imagesSlots: 12,
       imagesPreviewColumnSizeClass: 'is-one-third',
       formBottomButtonsSize: 'is-large',
-
+      buttonSizeClass: '',
       item: {},
       internalItem: {},
       address_text: "",
@@ -420,7 +434,21 @@ export default {
         this.updateAddressField();
     }
   },
+  mounted() {
+    this.calculateButtonSize();
+  },
   methods: {
+    calculateButtonSize() {
+      const buttons = [this.$refs.cancelBtn, this.$refs.resetBtn, this.$refs.submitBtn];
+
+      const maxButtonWidth = Math.max(...buttons.map(btn => btn.$el.offsetWidth));
+
+      buttons.forEach(btn => {
+          btn.$el.style.width = `${maxButtonWidth}px`;
+      });
+    },
+    clearAddress(){
+      this.address = ''
     async handleSelect(){
       console.log("address selected");
       this.address_coords = await this.fetchAddressCoords(this.address);
@@ -618,7 +646,26 @@ export default {
       this.waitingFormResponse = false;
     },
     resetForm() {
-      this.setFieldFromItem();
+      this.internalItem.name = "";
+      this.internalItem.description = "";
+      this.internalItem.type = '';
+      this.internalItem.category1 = '';
+      this.internalItem.category2 = '';
+      this.internalItem.category3 ='';
+      this.internalItem.startdate = null;
+      this.internalItem.enddate = null;
+      this.internalItem.isRecurrent = false;
+      this.internalItem.recurrentItem = null;
+
+      this.images['files'] = [];
+      this.images['previews'] = [];
+      
+      this.clearAddress();
+
+      this.$refs.categorySelector1.resetSelection();
+      this.$refs.categorySelector2.resetSelection();
+      this.$refs.categorySelector3.resetSelection();
+
     },
     clearStartdate() {
       this.internalItem.startdate = this.initialStartdate;
