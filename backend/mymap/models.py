@@ -367,7 +367,8 @@ class ConversationUser(models.Model):
 
 
 class Message(models.Model):
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='messages_images/', blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='messages', on_delete=models.CASCADE)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True)
