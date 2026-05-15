@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.gis import admin as geoadmin
 from django.core.exceptions import ValidationError
 
-from .models import Conversation, Item, ItemImage, Message
+from .models import Conversation, Item, ItemImage, Message, ExternalItem, ExternalSource
 
 
 class UserCreationForm(forms.ModelForm):
@@ -68,3 +68,5 @@ geoadmin.site.register(Item)
 geoadmin.site.register(ItemImage)
 geoadmin.site.register(Conversation)
 geoadmin.site.register(Message)
+geoadmin.site.register(ExternalItem)
+geoadmin.site.register(ExternalSource)

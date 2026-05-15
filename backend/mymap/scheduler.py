@@ -3,9 +3,14 @@ from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
+from django.conf import settings
+import requests
+import os
+import json
 
-from .models import ScheduledAccountDeletion, ConversationUser
+from .models import ScheduledAccountDeletion, ConversationUser, ExternalSource, ExternalItem
 
+from . import script_manager
 
 def delete_users_due():
     due_account_deletions = ScheduledAccountDeletion.objects.filter(request_date__lte=timezone.now() - F('interval'))
@@ -40,6 +45,39 @@ def delete_users_due():
         print(str(accounts_count) + " accounts deleted in total.")
     print("No accounts were due to be deleted.")
 
+def update_external_sources():
+    print("Update external sources...")
+    sources = ExternalSource.objects.all()
+
+    if not sources.exists():
+        print("No external sources found")
+        return
+
+    data_dir = os.path.join(settings.BASE_DIR, 'data')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+
+    for source in sources:
+        print("Begin source loop")
+        if source.to_update():
+            print("Source to update ! ")
+
+            input_file = os.path.join(data_dir, f"{source.name}.geojson")
+
+            response = requests.get(source.url, timeout=30)
+            response.raise_for_status()
+
+            with open(input_file, "wb") as f:
+                f.write(response.content)
+            print("File downloaded")
+
+            geojson_parse = script_manager.run_script(source.script) 
+            if not geojson_parse:
+                print("Missing geojson")
+                continue
+            ExternalSource.objects.update_items(source, geojson_parse)
+            print("External source updated")
+    print("--External sources updated--")    
 
 
 def start_scheduler():
@@ -51,6 +89,8 @@ def start_scheduler():
 
     # Every 4 hours
     scheduler.add_job(delete_users_due, trigger='interval', hours=4)
+
+    scheduler.add_job(update_external_sources, trigger='interval', hours=72)
 
     # To test quickly (10s delay between checks), uncomment line below.
     # scheduler.add_job(delete_users_due, trigger='interval', seconds=10)

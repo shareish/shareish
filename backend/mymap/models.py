@@ -3,6 +3,7 @@ import random
 import secrets
 import string
 from datetime import date
+import hashlib
 
 from PIL import Image
 from django.conf import settings
@@ -11,6 +12,8 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from djoser.signals import user_registered
+from django.db import transaction
+from django.contrib.gis.geos import Point
 
 
 def get_random_string(length):
@@ -375,6 +378,89 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['conversation_id', '-date']
+
+class CustomExternalSourceManager(models.Manager):
+    def update_items(self, external_source, datas):
+        data_string = json.dumps(datas, sort_keys=True).encode('utf-8')
+        signature = hashlib.sha256(data_string).hexdigest()
+
+        if external_source.signature == signature:
+            print("Nothing to update")
+            external_source.last_update = timezone.now()
+            external_source.save()
+            return
+
+        #Mark and sweep
+        print("Mark and sweep...")
+        with transaction.atomic():
+            id_vec = []
+            features = datas.get('features', [])
+            for feature in features:
+                properties = feature.get('properties', {})
+                external_id = properties.get('external_id')
+
+                name = properties.get('name')
+                description = properties.get('description')
+
+                #ignore if the item don't have a name or a description
+                if not name or not description:
+                    continue
+
+                if not external_id:
+                    continue
+                
+                id_vec.append(external_id)
+
+                geo = feature.get('geometry', {})
+                coords = geo.get('coordinates', [0, 0]) 
+
+                from .models import ExternalItem, User
+
+                bot, value = User.objects.get_or_create(username="bot")
+                ExternalItem.objects.update_or_create(
+                    external_id=external_id,
+                    external_source=external_source,
+                    defaults={
+                        'name': name[:50],
+                        'description': description[:1000],
+                        'location': Point(coords[0], coords[1]), 
+                        'user': bot
+                    }
+                )
+            print("Mark and sweep done") 
+            external_source.externalitem_set.exclude(external_id__in=id_vec).delete()
+            external_source.last_update = timezone.now()
+            external_source.signature = signature
+            external_source.save()
+        
+        return True
+
+class ExternalSource(models.Model):
+    class Scripts(models.TextChoices):
+        LIEGE_TRANSITION = 'liege_transition', _("Liège en Transition")
+        ECO_SOCIALE = 'eco_sociale', _("Économie Sociale")
+        TIERS_LIEUX = 'tiers_lieux', _("Tiers Lieux")
+        MURMURATIONS = 'murmurations', _("Murmurations")
+
+    name = models.TextField(max_length=200) #name of the geojson file in the data file
+    url = models.URLField(blank=True, default="") 
+    last_update = models.DateTimeField(default=timezone.now)
+    frequency = models.DurationField() # timedelta(hours=36) for 36 hours
+    signature = models.TextField(blank=True, default="")
+    script = models.CharField(
+        max_length=50, 
+        choices=Scripts.choices,
+        default=Scripts.LIEGE_TRANSITION #We should create a standard script
+    )
+
+    objects = CustomExternalSourceManager()
+
+    def to_update(self):
+        return timezone.now() > (self.last_update + self.frequency)
+    
+class ExternalItem(Item):
+    external_id = models.CharField(max_length=255)
+    external_source = models.ForeignKey(ExternalSource, on_delete=models.CASCADE)
 
 
 class Token(models.Model):
